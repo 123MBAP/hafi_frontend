@@ -1,0 +1,32 @@
+/* ✅ External imports must come first */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Add this line at the top */
+
+
+/* src/index.css or src/App.css */
+
+#providers-map,
+.leaflet-container {
+  z-index: 10 !important;
+  /* lower than Tailwind's z-50 (z-index: 200) */
+}
+
+.leaflet-pane,
+.leaflet-tile-pane,
+.leaflet-overlay-pane,
+.leaflet-shadow-pane,
+.leaflet-marker-pane,
+.leaflet-tooltip-pane,
+.leaflet-popup-pane {
+  z-index: 10 !important;
+}
+
+body {
+  @apply bg-white text-black transition-colors duration-300;
+}
+
+.dark body {
+  @apply bg-gray-900 text-white;
+}
