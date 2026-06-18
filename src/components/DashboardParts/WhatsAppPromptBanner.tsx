@@ -87,35 +87,38 @@ export default function WhatsAppPromptBanner({ providerId, darkMode = false }: P
     if (phase2On || hasWhatsApp === null || hasWhatsApp || dismissed || saved) return null;
 
     const card = darkMode
-        ? 'bg-orange-900/30 border border-orange-700 text-orange-100'
-        : 'bg-orange-50 border border-orange-300 text-orange-900';
+        ? 'bg-gray-800 border-gray-700 text-gray-200'
+        : 'bg-white border-gray-250 text-gray-800';
 
     const inputCls = darkMode
-        ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-orange-400'
-        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-orange-500';
+        ? 'bg-gray-900 border-gray-750 text-white placeholder-gray-550 focus:border-emerald-500'
+        : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400 focus:border-emerald-500';
 
     return (
         <div className="fixed bottom-6 right-6 z-[9999] max-w-sm w-full p-4 md:p-0">
-            <div className={`relative rounded-3xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-xl border-2 ${card} transition-all duration-500 hover:scale-[1.02]`}>
+            <div className={`relative p-6 shadow-[0_20px_50px_rgba(0,0,0,0.15)] backdrop-blur-xl border ${card} transition-all duration-500 hover:scale-[1.02]`} style={{ borderRadius: '2px' }}>
                 {/* Dismiss */}
                 <button
                     onClick={() => setDismissed(true)}
-                    className="absolute top-4 right-4 opacity-40 hover:opacity-100 hover:rotate-90 transition-all duration-300 p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/5"
+                    className={`absolute top-2 right-2 p-1.5 opacity-40 hover:opacity-100 transition-colors border ${
+                        darkMode ? 'bg-gray-800 border-gray-750 text-gray-350 hover:bg-gray-700' : 'bg-white border-gray-250 text-gray-750 hover:bg-gray-50'
+                    }`}
+                    style={{ borderRadius: '2px' }}
                     aria-label="Dismiss"
                 >
-                    <X size={20} />
+                    <X size={16} />
                 </button>
 
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-4">
-                        <div className="shrink-0 bg-gradient-to-br from-orange-400 to-orange-600 text-white rounded-2xl p-3 shadow-lg shadow-orange-500/30">
-                            <PhoneCall size={24} />
+                        <div className={`shrink-0 p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-200 text-emerald-600'}`} style={{ borderRadius: '2px' }}>
+                            <PhoneCall size={20} />
                         </div>
                         <div>
-                            <h3 className="font-extrabold text-lg tracking-tight">
+                            <h3 className={`font-bold text-sm uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                                 Important Update
                             </h3>
-                            <p className="text-[10px] uppercase font-black opacity-60 tracking-widest">
+                            <p className={`text-[9px] uppercase font-bold tracking-wider ${darkMode ? 'text-gray-450' : 'text-gray-500'}`}>
                                 Orders are waiting
                             </p>
                         </div>
@@ -133,20 +136,22 @@ export default function WhatsAppPromptBanner({ providerId, darkMode = false }: P
                                 value={inputValue}
                                 onChange={e => { setInputValue(e.target.value); setSaveError(''); }}
                                 onKeyDown={e => e.key === 'Enter' && handleSave()}
-                                className={`w-full pl-4 pr-4 py-3 rounded-2xl border-2 text-sm font-semibold transition-all focus:outline-none focus:ring-4 focus:ring-orange-500/20 ${inputCls}`}
+                                className={`w-full pl-4 pr-4 py-2.5 border text-sm font-semibold transition-all focus:outline-none focus:ring-1 focus:ring-emerald-500/20 ${inputCls}`}
+                                style={{ borderRadius: '2px' }}
                             />
                         </div>
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="w-full py-3 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white text-sm font-black rounded-2xl transition-all shadow-xl shadow-orange-600/25 active:scale-[0.97] disabled:opacity-50 uppercase tracking-wider"
+                            className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider transition-colors duration-200 disabled:opacity-50"
+                            style={{ borderRadius: '2px' }}
                         >
                             {saving ? 'Saving...' : 'Connect WhatsApp'}
                         </button>
                     </div>
 
                     {saveError && (
-                        <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">
+                        <div className="bg-red-500/10 border border-red-500/20 px-3 py-2" style={{ borderRadius: '2px' }}>
                             <p className="text-[10px] font-bold text-red-500 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" /> {saveError}
                             </p>

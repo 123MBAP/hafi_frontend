@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import LoadingSpinner from './LoadingSpinner';
 
 interface LocationOption {
     id?: number;
@@ -310,11 +311,10 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
 
     // Controlled mode - render single dropdown for specific level
     if (level) {
-        const baseSelectClass = `w-full px-4 py-2 rounded-lg border ${darkMode
-            ? 'bg-gray-700 border-gray-600 focus:border-teal-500 text-white disabled:bg-gray-800 disabled:text-gray-500'
-            : 'bg-white border-gray-300 focus:border-blue-400 disabled:bg-gray-100 disabled:text-gray-400'
-            } focus:ring-2 ${darkMode ? 'focus:ring-teal-500/30' : 'focus:ring-blue-200'
-            } transition disabled:cursor-not-allowed`;
+        const baseSelectClass = `w-full px-4 py-2 border ${darkMode
+            ? 'bg-gray-700 border-gray-600 focus:border-emerald-500 text-white disabled:bg-gray-800 disabled:text-gray-500'
+            : 'bg-white border-gray-300 focus:border-emerald-500 disabled:bg-gray-100 disabled:text-gray-400'
+            } focus:ring-2 focus:ring-emerald-500/20 transition disabled:cursor-not-allowed`;
 
         switch (level) {
             case 'province':
@@ -324,6 +324,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                         onChange={handleProvinceChange}
                         disabled={loading.provinces}
                         className={baseSelectClass}
+                        style={{ borderRadius: '2px' }}
                     >
                         <option value="">Select Province</option>
                         {provinces.map((province, index) => (
@@ -340,6 +341,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                         onChange={handleDistrictChange}
                         disabled={!parentValues?.province || loading.districts}
                         className={baseSelectClass}
+                        style={{ borderRadius: '2px' }}
                     >
                         <option value="">
                             {parentValues?.province ? 'Select District' : 'Select Province First'}
@@ -358,6 +360,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                         onChange={handleSectorChange}
                         disabled={!parentValues?.district || loading.sectors}
                         className={baseSelectClass}
+                        style={{ borderRadius: '2px' }}
                     >
                         <option value="">
                             {parentValues?.district ? 'Select Sector' : 'Select District First'}
@@ -376,6 +379,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                         onChange={handleCellChange}
                         disabled={!parentValues?.sector || loading.cells}
                         className={baseSelectClass}
+                        style={{ borderRadius: '2px' }}
                     >
                         <option value="">
                             {parentValues?.sector ? 'Select Cell' : 'Select Sector First'}
@@ -394,6 +398,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                         onChange={handleVillageChange}
                         disabled={!parentValues?.cell || loading.villages}
                         className={baseSelectClass}
+                        style={{ borderRadius: '2px' }}
                     >
                         <option value="">
                             {parentValues?.cell ? 'Select Village' : 'Select Cell First'}
@@ -410,31 +415,31 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
 
     // Standalone mode - render full location selector UI
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 py-8 px-4">
+        <div className={`min-h-screen py-8 px-4 transition-colors duration-250 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'}`}>
             <div className="max-w-4xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className={`border p-8 shadow-xl transition-colors duration-250 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-250'}`} style={{ borderRadius: '2px' }}>
                     {/* Header */}
                     <div className="mb-8 text-center">
-                        <h1 className="text-4xl font-bold text-gray-800 mb-2">
+                        <h1 className={`text-2xl font-bold tracking-tighter uppercase mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
                             Rwanda Location Selector
                         </h1>
-                        <p className="text-gray-600">
+                        <p className={`text-xs uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                             Select your location from Province down to Village
                         </p>
                     </div>
 
                     {/* Error Message */}
                     {error && (
-                        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                        <div className={`mb-6 p-4 border text-sm transition-colors ${darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-700'}`} style={{ borderRadius: '2px' }}>
                             {error}
                         </div>
                     )}
 
                     {/* Selected Path Display */}
                     {getSelectedLocationPath() && (
-                        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-1">Selected Location:</p>
-                            <p className="text-lg font-semibold text-blue-800">
+                        <div className={`mb-6 p-4 border transition-colors ${darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-250 text-emerald-800'}`} style={{ borderRadius: '2px' }}>
+                            <p className={`text-xs uppercase tracking-wider mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Selected Location:</p>
+                            <p className="text-lg font-semibold text-emerald-500">
                                 {getSelectedLocationPath()}
                             </p>
                         </div>
@@ -444,14 +449,15 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Province */}
                         <div className="form-group">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            <label className={`block text-xs font-semibold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 Province
                             </label>
                             <select
                                 value={selectedProvince}
                                 onChange={handleProvinceChange}
                                 disabled={loading.provinces}
-                                className="w-full px-4 py-3 border border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
+                                className={`w-full px-4 py-3 border focus:ring-2 transition disabled:cursor-not-allowed ${darkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-800 disabled:text-gray-500' : 'bg-white border-gray-300 text-gray-900 focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-100 disabled:text-gray-400'}`}
+                                style={{ borderRadius: '2px' }}
                             >
                                 <option value="">Select Province</option>
                                 {provinces.map((province, index) => (
@@ -464,14 +470,15 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
 
                         {/* District */}
                         <div className="form-group">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            <label className={`block text-xs font-semibold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 District
                             </label>
                             <select
                                 value={selectedDistrict}
                                 onChange={handleDistrictChange}
                                 disabled={!selectedProvince || loading.districts}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
+                                className={`w-full px-4 py-3 border focus:ring-2 transition disabled:cursor-not-allowed ${darkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-800 disabled:text-gray-500' : 'bg-white border-gray-300 text-gray-900 focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-100 disabled:text-gray-400'}`}
+                                style={{ borderRadius: '2px' }}
                             >
                                 <option value="">
                                     {selectedProvince ? 'Select District' : 'Select Province First'}
@@ -486,14 +493,15 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
 
                         {/* Sector */}
                         <div className="form-group">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            <label className={`block text-xs font-semibold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 Sector
                             </label>
                             <select
                                 value={selectedSector}
                                 onChange={handleSectorChange}
                                 disabled={!selectedDistrict || loading.sectors}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
+                                className={`w-full px-4 py-3 border focus:ring-2 transition disabled:cursor-not-allowed ${darkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-800 disabled:text-gray-500' : 'bg-white border-gray-300 text-gray-900 focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-100 disabled:text-gray-400'}`}
+                                style={{ borderRadius: '2px' }}
                             >
                                 <option value="">
                                     {selectedDistrict ? 'Select Sector' : 'Select District First'}
@@ -508,14 +516,15 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
 
                         {/* Cell */}
                         <div className="form-group">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            <label className={`block text-xs font-semibold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 Cell
                             </label>
                             <select
                                 value={selectedCell}
                                 onChange={handleCellChange}
                                 disabled={!selectedSector || loading.cells}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
+                                className={`w-full px-4 py-3 border focus:ring-2 transition disabled:cursor-not-allowed ${darkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-800 disabled:text-gray-500' : 'bg-white border-gray-300 text-gray-900 focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-100 disabled:text-gray-400'}`}
+                                style={{ borderRadius: '2px' }}
                             >
                                 <option value="">
                                     {selectedSector ? 'Select Cell' : 'Select Sector First'}
@@ -530,14 +539,15 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
 
                         {/* Village */}
                         <div className="form-group md:col-span-2">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            <label className={`block text-xs font-semibold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 Village
                             </label>
                             <select
                                 value={selectedVillage}
                                 onChange={handleVillageChange}
                                 disabled={!selectedCell || loading.villages}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
+                                className={`w-full px-4 py-3 border focus:ring-2 transition disabled:cursor-not-allowed ${darkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-800 disabled:text-gray-500' : 'bg-white border-gray-300 text-gray-900 focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-100 disabled:text-gray-400'}`}
+                                style={{ borderRadius: '2px' }}
                             >
                                 <option value="">
                                     {selectedCell ? 'Select Village' : 'Select Cell First'}
@@ -555,13 +565,15 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                     <div className="mt-8 flex gap-4 justify-center">
                         <button
                             onClick={handleReset}
-                            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+                            className={`px-6 py-3 border font-semibold uppercase tracking-wider transition-colors ${darkMode ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-gray-250' : 'bg-gray-200 border-gray-300 hover:bg-gray-300 text-gray-750'}`}
+                            style={{ borderRadius: '2px' }}
                         >
                             Reset Selection
                         </button>
                         <button
                             disabled={!selectedVillage}
-                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-semibold"
+                            className={`px-6 py-3 border font-semibold uppercase tracking-wider transition-colors ${selectedVillage ? 'bg-emerald-500 border-emerald-500 text-white hover:bg-emerald-600' : 'bg-gray-350 dark:bg-gray-700 border-transparent text-gray-500 dark:text-gray-400 cursor-not-allowed'}`}
+                            style={{ borderRadius: '2px' }}
                         >
                             Confirm Location
                         </button>
@@ -569,30 +581,30 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
 
                     {/* Location Summary */}
                     {selectedVillage && (
-                        <div className="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
-                            <h3 className="text-lg font-bold text-gray-800 mb-3">
+                        <div className={`mt-8 p-6 border transition-colors ${darkMode ? 'bg-gray-750 border-gray-750' : 'bg-gray-50 border-gray-250'}`} style={{ borderRadius: '2px' }}>
+                            <h3 className={`text-sm font-bold uppercase tracking-wider mb-3 ${darkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
                                 Complete Location Details
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                 <div>
-                                    <span className="font-semibold text-gray-700">Province:</span>{' '}
-                                    <span className="text-gray-900">{selectedProvince}</span>
+                                    <span className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Province:</span>{' '}
+                                    <span className={darkMode ? 'text-white' : 'text-gray-900'}>{selectedProvince}</span>
                                 </div>
                                 <div>
-                                    <span className="font-semibold text-gray-700">District:</span>{' '}
-                                    <span className="text-gray-900">{selectedDistrict}</span>
+                                    <span className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>District:</span>{' '}
+                                    <span className={darkMode ? 'text-white' : 'text-gray-900'}>{selectedDistrict}</span>
                                 </div>
                                 <div>
-                                    <span className="font-semibold text-gray-700">Sector:</span>{' '}
-                                    <span className="text-gray-900">{selectedSector}</span>
+                                    <span className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Sector:</span>{' '}
+                                    <span className={darkMode ? 'text-white' : 'text-gray-900'}>{selectedSector}</span>
                                 </div>
                                 <div>
-                                    <span className="font-semibold text-gray-700">Cell:</span>{' '}
-                                    <span className="text-gray-900">{selectedCell}</span>
+                                    <span className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Cell:</span>{' '}
+                                    <span className={darkMode ? 'text-white' : 'text-gray-900'}>{selectedCell}</span>
                                 </div>
                                 <div className="md:col-span-2">
-                                    <span className="font-semibold text-gray-700">Village:</span>{' '}
-                                    <span className="text-gray-900">{selectedVillage}</span>
+                                    <span className={`font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Village:</span>{' '}
+                                    <span className={darkMode ? 'text-white' : 'text-gray-900'}>{selectedVillage}</span>
                                 </div>
                             </div>
                         </div>
@@ -601,9 +613,8 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
 
                 {/* Loading Indicator */}
                 {Object.values(loading).some(Boolean) && (
-                    <div className="mt-4 text-center">
-                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                        <p className="mt-2 text-gray-600">Loading...</p>
+                    <div className="mt-6">
+                        <LoadingSpinner size="md" message="Loading location data..." variant="dots" />
                     </div>
                 )}
             </div>

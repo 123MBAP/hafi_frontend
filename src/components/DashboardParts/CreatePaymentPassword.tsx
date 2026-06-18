@@ -35,11 +35,12 @@ export default function PaymentPasswordManager({ hasPassword, onSave }: { hasPas
   };
 
   return (
-    <div className="p-4 rounded-xl shadow-md bg-white">
+    <div className="p-5 border border-gray-200 bg-white shadow-sm" style={{ borderRadius: '2px' }}>
       {!showForm ? (
         <button
           onClick={() => setShowForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+          className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 font-bold uppercase text-xs tracking-wider transition-colors duration-200"
+          style={{ borderRadius: '2px' }}
         >
           {hasPassword ? "Change Payment Password" : "Create Payment Password"}
         </button>
@@ -47,71 +48,89 @@ export default function PaymentPasswordManager({ hasPassword, onSave }: { hasPas
         <div className="space-y-4">
           {hasPassword && (
             <div>
-              <label className="block text-sm font-medium">Current Password</label>
+              <label className="block text-[10px] font-bold uppercase tracking-wider mb-1 text-gray-650">Current Password</label>
               <input
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="mt-1 w-full p-2 border rounded-lg"
+                className="w-full p-2.5 border border-gray-250 text-gray-900 text-sm focus:border-emerald-500 focus:outline-none transition-all"
+                style={{ borderRadius: '2px' }}
               />
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium">New Password</label>
+            <label className="block text-[10px] font-bold uppercase tracking-wider mb-1 text-gray-650">New Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full p-2 border rounded-lg"
+              className="w-full p-2.5 border border-gray-250 text-gray-900 text-sm focus:border-emerald-500 focus:outline-none transition-all"
+              style={{ borderRadius: '2px' }}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium">Confirm New Password</label>
+            <label className="block text-[10px] font-bold uppercase tracking-wider mb-1 text-gray-650">Confirm New Password</label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="mt-1 w-full p-2 border rounded-lg"
+              className="w-full p-2.5 border border-gray-250 text-gray-900 text-sm focus:border-emerald-500 focus:outline-none transition-all"
+              style={{ borderRadius: '2px' }}
             />
           </div>
 
           {/* Password strength meter */}
           {password && (
             <div className="space-y-1">
-              <div className="w-full bg-gray-200 h-2 rounded-lg overflow-hidden">
-                <div className={`h-2 ${strengthColor}`} style={{ width: `${(strengthScore / 5) * 100}%` }}></div>
+              <div className="w-full bg-gray-200 h-1.5 overflow-hidden" style={{ borderRadius: '2px' }}>
+                <div className={`h-1.5 ${strengthColor}`} style={{ width: `${(strengthScore / 5) * 100}%`, borderRadius: '2px' }}></div>
               </div>
-              <p className="text-sm font-medium">Strength: {strength}</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Strength: {strength}</p>
             </div>
           )}
 
           {/* Validation feedback */}
-          <div className="text-sm space-y-1">
-            <p className={rules.length ? "text-green-600" : "text-red-600"}>• At least 8 characters</p>
-            <p className={rules.uppercase ? "text-green-600" : "text-red-600"}>• At least 1 uppercase letter</p>
-            <p className={rules.lowercase ? "text-green-600" : "text-red-600"}>• At least 1 lowercase letter</p>
-            <p className={rules.number ? "text-green-600" : "text-red-600"}>• At least 1 number</p>
-            <p className={rules.symbol ? "text-green-600" : "text-red-600"}>• At least 1 special symbol</p>
+          <div className="text-xs space-y-1 font-medium">
+            <p className={rules.length ? "text-emerald-600" : "text-red-600"}>• At least 8 characters</p>
+            <p className={rules.uppercase ? "text-emerald-600" : "text-red-600"}>• At least 1 uppercase letter</p>
+            <p className={rules.lowercase ? "text-emerald-600" : "text-red-600"}>• At least 1 lowercase letter</p>
+            <p className={rules.number ? "text-emerald-600" : "text-red-600"}>• At least 1 number</p>
+            <p className={rules.symbol ? "text-emerald-600" : "text-red-600"}>• At least 1 special symbol</p>
           </div>
 
           {/* Confirm password feedback */}
           {confirmPassword && password !== confirmPassword && (
-            <p className="text-red-600 text-sm">Passwords do not match</p>
+            <p className="text-red-600 text-xs font-semibold">Passwords do not match</p>
           )}
 
-          <button
-            disabled={!isValid || (hasPassword && !currentPassword)}
-            onClick={handleSubmit}
-            className={`w-full py-2 rounded-lg text-white ${
-              isValid && (!hasPassword || currentPassword)
-                ? "bg-green-600 hover:bg-green-700"
-                : "bg-gray-400"
-            }`}
-          >
-            {hasPassword ? "Update Password" : "Save Password"}
-          </button>
+          <div className="flex gap-2 pt-2">
+            <button
+              disabled={!isValid || (hasPassword && !currentPassword)}
+              onClick={handleSubmit}
+              className={`flex-1 py-2 font-bold uppercase text-xs tracking-wider text-white transition-colors duration-200 ${
+                isValid && (!hasPassword || currentPassword)
+                  ? "bg-emerald-500 hover:bg-emerald-600"
+                  : "bg-gray-300 cursor-not-allowed"
+              }`}
+              style={{ borderRadius: '2px' }}
+            >
+              {hasPassword ? "Update Password" : "Save Password"}
+            </button>
+            <button
+              onClick={() => {
+                setPassword("");
+                setConfirmPassword("");
+                setCurrentPassword("");
+                setShowForm(false);
+              }}
+              className="px-4 py-2 border border-gray-300 text-gray-750 font-bold uppercase text-xs tracking-wider hover:bg-gray-50 transition-colors"
+              style={{ borderRadius: '2px' }}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       )}
     </div>

@@ -62,25 +62,25 @@ export default function ServiceUploadCard({
   setFeatureValues = () => { },
   onReset,
 }: Props) {
+  const hasFeatures = !!(service?.specific_features && service?.features && service.features.length > 0);
+  const leftFeatures = hasFeatures && service?.features ? service.features.filter((_, idx) => idx % 2 === 0) : [];
+  const rightFeatures = hasFeatures && service?.features ? service.features.filter((_, idx) => idx % 2 !== 0) : [];
+
   return (
     <div
-      className={`rounded-xl overflow-hidden transition-all duration-300 ${darkMode ? 'bg-gray-800' : 'bg-white'
-        } shadow-lg`}
+      className={`border transition-all duration-300 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+        } shadow-sm overflow-hidden`}
+      style={{ borderRadius: '2px' }}
     >
       <div
-        className={`p-6 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'
-          }`}
+        className={`px-6 py-4 border-b ${darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'
+          } flex justify-between items-center`}
       >
-        <h3
-          className={`text-xl font-semibold flex items-center gap-3 ${darkMode ? 'text-teal-300' : 'text-hafi-teal'
-            }`}
-        >
+        <h3 className={`text-base font-bold uppercase tracking-tight flex items-center gap-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
           Upload Service
           <span
-            className={`text-sm px-2 py-1 rounded-full ${darkMode
-              ? 'bg-gray-700 text-teal-300'
-              : 'bg-purple-100 text-purple-800'
-              }`}
+            className={`text-xs px-2 py-0.5 border font-bold uppercase ${darkMode ? 'bg-emerald-500/10 text-emerald-450 border-emerald-500/20' : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'}`}
+            style={{ borderRadius: '2px' }}
           >
             {serviceImages.length} images
           </span>
@@ -89,141 +89,75 @@ export default function ServiceUploadCard({
 
       <form
         onSubmit={handleServiceUpload}
-        className={`p-6 ${darkMode ? 'bg-gray-700/30' : 'bg-purple-50'
-          } rounded-b-xl`}
+        className={`p-6 ${darkMode ? 'bg-gray-800/40' : 'bg-gray-50/50'}`}
       >
-        <div className="grid md:grid-cols-2 gap-6">
+        {/* Top Section: Title/Description and Media Selection */}
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
           <div className="space-y-4">
             <div>
-              <label
-                className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-              >
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Service Title
               </label>
               <input
                 type="text"
                 value={serviceTitle}
                 onChange={(e) => setServiceTitle(e.target.value)}
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode
-                  ? 'bg-gray-700 border-gray-600 focus:border-teal-500 text-white'
-                  : 'bg-white border-gray-300 focus:border-purple-400'
-                  } focus:ring-2 ${darkMode ? 'focus:ring-teal-500/30' : 'focus:ring-purple-200'
-                  } transition`}
-                placeholder="Professional Service..."
+                className={`w-full p-2.5 border text-sm ${darkMode
+                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                  : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                  } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                style={{ borderRadius: '2px' }}
+                placeholder="PROFESSIONAL SERVICE..."
               />
             </div>
             <div>
-              <label
-                className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-              >
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Description
               </label>
               <textarea
                 value={serviceDesc}
                 onChange={(e) => setServiceDesc(e.target.value)}
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode
-                  ? 'bg-gray-700 border-gray-600 focus:border-teal-500 text-white'
-                  : 'bg-white border-gray-300 focus:border-purple-400'
-                  } focus:ring-2 ${darkMode ? 'focus:ring-teal-500/30' : 'focus:ring-purple-200'
-                  } transition`}
-                rows={3}
-                placeholder="Describe your service..."
+                className={`w-full p-2.5 border text-sm ${darkMode
+                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                  : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                  } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                style={{ borderRadius: '2px' }}
+                rows={4}
+                placeholder="DESCRIBE YOUR SERVICE..."
               />
             </div>
             <div>
-              <label
-                className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-              >
-                Base Price ($)
-              </label>
-              <input
-                type="number"
-                min={0}
-                value={servicePrice}
-                onChange={(e) => setServicePrice(e.target.value)}
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode
-                  ? 'bg-gray-700 border-gray-600 focus:border-teal-500 text-white'
-                  : 'bg-white border-gray-300 focus:border-purple-400'
-                  } focus:ring-2 ${darkMode ? 'focus:ring-teal-500/30' : 'focus:ring-purple-200'
-                  } transition`}
-                placeholder="99.99"
-              />
-            </div>
+                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Base Price ($)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={servicePrice}
+                    onChange={(e) => setServicePrice(e.target.value)}
+                    className={`w-full p-2.5 border text-sm ${darkMode
+                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                      : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                      } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                    style={{ borderRadius: '2px' }}
+                    placeholder="99.99"
+                  />
+                </div>
 
 
-            {(() => {
-              console.log('🎨 [SERVICE_UPLOAD_CARD] Rendering check:');
-              console.log('  - service exists:', !!service);
-              console.log('  - service.specific_features:', service?.specific_features);
-              console.log('  - service.features exists:', !!service?.features);
-              console.log('  - service.features length:', service?.features?.length);
-              console.log('  - Full service object:', service);
-              console.log('  - featureValues:', featureValues);
-
-              const shouldRender = service?.specific_features && service?.features && service.features.length > 0;
-              console.log('  - Should render features?', shouldRender);
-
-              return null;
-            })()}
-
-            {service?.specific_features && service?.features && service.features.length > 0 && (
-              <>
-                {console.log('✅ [SERVICE_UPLOAD_CARD] Rendering features, count:', service.features.length)}
-                {service.features.map((feature, index) => {
-                  console.log(`  🎯 Rendering feature #${index + 1}:`, feature);
-                  return (
-                    <FeatureFieldRenderer
-                      key={index}
-                      feature={feature}
-                      values={featureValues}
-                      onChange={(featureName: string, value: any) => {
-                        console.log(`📝 Feature value changed: ${featureName} =`, value);
-                        setFeatureValues({
-                          ...featureValues,
-                          [featureName]: value
-                        });
-                      }}
-                      darkMode={darkMode}
-                    />
-                  );
-                })}
-              </>
-            )}
-
-            {service?.specific_features && (!service?.features || service.features.length === 0) && (
-              <div
-                className={`p-4 rounded-lg border mt-4 ${darkMode
-                  ? 'bg-gray-700/50 border-gray-600'
-                  : 'bg-white border-purple-200'
-                  }`}
-              >
-                <ServiceFeaturesFields
-                  featureData={extraFieldsData}
-                  setFeatureData={(newData) =>
-                    setExtraFieldsData((prev) => ({ ...prev, ...newData }))
-                  }
-                  darkMode={darkMode}
-                />
-              </div>
-            )}
           </div>
 
           <div className="space-y-4">
             <div>
-              <label
-                className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-              >
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Service Images
               </label>
               <div
                 className={`border-2 border-dashed ${darkMode
-                  ? 'border-gray-600 hover:border-teal-400'
-                  : 'border-gray-300 hover:border-purple-400'
-                  } rounded-lg p-4 transition`}
+                  ? 'border-gray-700 bg-gray-900/30'
+                  : 'border-gray-300 bg-white'
+                  } p-4 transition hover:border-emerald-500`}
+                style={{ borderRadius: '2px' }}
               >
                 <input
                   type="file"
@@ -243,9 +177,10 @@ export default function ServiceUploadCard({
                         <div key={i} className="relative">
                           <img
                             src={URL.createObjectURL(img)}
-                            className="w-16 h-16 object-cover rounded border"
+                            className="w-16 h-16 object-cover border"
                             style={{
-                              borderColor: darkMode ? '#4B5563' : '#E5E7EB',
+                              borderColor: darkMode ? '#374151' : '#E5E7EB',
+                              borderRadius: '2px',
                             }}
                             alt="Preview"
                           />
@@ -259,10 +194,7 @@ export default function ServiceUploadCard({
                         className={`mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'
                           }`}
                       />
-                      <p
-                        className={`text-center ${darkMode ? 'text-gray-400' : 'text-gray-500'
-                          }`}
-                      >
+                      <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-455' : 'text-gray-500'}`}>
                         Click to upload service images
                       </p>
                     </>
@@ -273,17 +205,15 @@ export default function ServiceUploadCard({
 
             {serviceImages.map((img, idx) => (
               <div key={idx} className="mb-4">
-                <label
-                  className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                    }`}
-                >
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                   Views for {img.name}
                 </label>
                 <div
                   className={`border-2 border-dashed ${darkMode
-                    ? 'border-gray-600 hover:border-teal-400'
-                    : 'border-gray-300 hover:border-purple-400'
-                    } rounded-lg p-4 transition`}
+                    ? 'border-gray-700 bg-gray-900/30'
+                    : 'border-gray-300 bg-white'
+                    } p-4 transition hover:border-emerald-500`}
+                  style={{ borderRadius: '2px' }}
                 >
                   <input
                     type="file"
@@ -303,9 +233,10 @@ export default function ServiceUploadCard({
                           <img
                             key={i}
                             src={URL.createObjectURL(view)}
-                            className="w-16 h-16 object-cover rounded border"
+                            className="w-16 h-16 object-cover border"
                             style={{
-                              borderColor: darkMode ? '#4B5563' : '#E5E7EB',
+                              borderColor: darkMode ? '#374151' : '#E5E7EB',
+                              borderRadius: '2px',
                             }}
                             alt="View preview"
                           />
@@ -318,10 +249,7 @@ export default function ServiceUploadCard({
                           className={`mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'
                             }`}
                         />
-                        <p
-                          className={`text-center ${darkMode ? 'text-gray-400' : 'text-gray-500'
-                            }`}
-                        >
+                        <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-455' : 'text-gray-500'}`}>
                           Click to upload view images
                         </p>
                       </>
@@ -332,17 +260,15 @@ export default function ServiceUploadCard({
             ))}
 
             <div>
-              <label
-                className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-              >
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Service Videos
               </label>
               <div
                 className={`border-2 border-dashed ${darkMode
-                  ? 'border-gray-600 hover:border-teal-400'
-                  : 'border-gray-300 hover:border-purple-400'
-                  } rounded-lg p-4 flex flex-col items-center justify-center transition`}
+                  ? 'border-gray-700 bg-gray-900/30'
+                  : 'border-gray-300 bg-white'
+                  } p-4 flex flex-col items-center justify-center transition hover:border-emerald-500`}
+                style={{ borderRadius: '2px' }}
               >
                 <input
                   type="file"
@@ -361,8 +287,9 @@ export default function ServiceUploadCard({
                       {serviceVideos.map((video, i) => (
                         <div
                           key={i}
-                          className={`text-xs truncate ${darkMode ? 'text-gray-400' : 'text-gray-500'
-                            } bg-purple-100 dark:bg-purple-900/20 px-2 py-1 rounded`}
+                          className={`text-[10px] font-bold uppercase tracking-wider truncate ${darkMode ? 'text-red-400' : 'text-red-655'
+                            } bg-emerald-500/10 px-2 py-1 border border-emerald-500/25`}
+                          style={{ borderRadius: '2px' }}
                         >
                           🎥 {video.name}
                         </div>
@@ -375,14 +302,11 @@ export default function ServiceUploadCard({
                         className={`mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'
                           }`}
                       />
-                      <p
-                        className={`text-center ${darkMode ? 'text-gray-400' : 'text-gray-500'
-                          }`}
-                      >
+                      <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-455' : 'text-gray-500'}`}>
                         Click to upload service videos
                       </p>
                       <p
-                        className={`text-xs text-center mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-400'
+                        className={`text-[9px] font-bold uppercase tracking-wider text-center mt-1.5 ${darkMode ? 'text-gray-500' : 'text-gray-400'
                           }`}
                       >
                         Supported: MP4, MOV, AVI (Max 50MB per video)
@@ -392,6 +316,105 @@ export default function ServiceUploadCard({
                 </label>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Bottom Section: Price & Features */}
+        <div className="grid md:grid-cols-2 gap-6 border-t border-gray-150 dark:border-gray-700 pt-6">
+          {leftFeatures.length > 0 ? (
+            <div className="space-y-4">
+              {/* Row 1: Price and the first left feature side-by-side */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        
+                <div>
+                  {leftFeatures[0] && (
+                    <FeatureFieldRenderer
+                      feature={leftFeatures[0]}
+                      values={featureValues}
+                      onChange={(featureName: string, value: any) => {
+                        setFeatureValues({
+                          ...featureValues,
+                          [featureName]: value
+                        });
+                      }}
+                      darkMode={darkMode}
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Row 2+: The remaining left features taking the full width of the left column */}
+              {leftFeatures.slice(1).map((feature, index) => (
+                <div key={index}>
+                  <FeatureFieldRenderer
+                    feature={feature}
+                    values={featureValues}
+                    onChange={(featureName: string, value: any) => {
+                      setFeatureValues({
+                        ...featureValues,
+                        [featureName]: value
+                      });
+                    }}
+                    darkMode={darkMode}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  Base Price ($)
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={servicePrice}
+                  onChange={(e) => setServicePrice(e.target.value)}
+                  className={`w-full p-2.5 border text-sm ${darkMode
+                    ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                    : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                    } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                  style={{ borderRadius: '2px' }}
+                  placeholder="99.99"
+                />
+              </div>
+
+              {service?.specific_features && (!service?.features || service.features.length === 0) && (
+                <div
+                  className={`p-4 border mt-4 ${darkMode
+                    ? 'bg-gray-900/40 border-gray-750'
+                    : 'bg-white border-gray-200'
+                    }`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  <ServiceFeaturesFields
+                    featureData={extraFieldsData}
+                    setFeatureData={(newData) =>
+                      setExtraFieldsData((prev) => ({ ...prev, ...newData }))
+                    }
+                    darkMode={darkMode}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {rightFeatures.map((feature, index) => (
+              <FeatureFieldRenderer
+                key={index}
+                feature={feature}
+                values={featureValues}
+                onChange={(featureName: string, value: any) => {
+                  setFeatureValues({
+                    ...featureValues,
+                    [featureName]: value
+                  });
+                }}
+                darkMode={darkMode}
+              />
+            ))}
           </div>
         </div>
 
@@ -407,10 +430,12 @@ export default function ServiceUploadCard({
             type="button"
             onClick={onReset}
             disabled={isUploading}
-            className={`px-4 py-2 rounded-lg font-medium ${darkMode
-              ? 'bg-gray-700 hover:bg-gray-600 text-white'
-              : 'bg-gray-200 hover:bg-gray-300'
-              } transition`}
+            className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border
+              ${darkMode
+                ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
+              }`}
+            style={{ borderRadius: '2px' }}
           >
             Reset
           </button>
@@ -420,12 +445,12 @@ export default function ServiceUploadCard({
             disabled={
               subscription?.subscription?.status !== 'active' || !serviceImages.length || isUploading
             }
-            className={`px-6 py-2 rounded-lg font-medium ${subscription?.subscription?.status === 'active'
-              ? darkMode
-                ? 'bg-gradient-to-r from-teal-600 to-teal-800 hover:from-teal-700 hover:to-teal-900'
-                : 'bg-gradient-to-r from-purple-600 to-teal-500 hover:from-purple-700 hover:to-teal-600'
-              : 'bg-gray-400 cursor-not-allowed'
-              } text-white transition shadow-lg`}
+            className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider
+              ${subscription?.subscription?.status === 'active' && serviceImages.length
+                ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm'
+                : 'bg-gray-450 text-gray-200 cursor-not-allowed'
+              }`}
+            style={{ borderRadius: '2px' }}
           >
             {isUploading ? (
               <span className="inline-flex items-center gap-2">

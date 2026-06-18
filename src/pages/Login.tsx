@@ -269,22 +269,21 @@ const Login = () => {
   const handleGoogleError = () => {
     setError('Google sign-in was cancelled or failed');
   };
-
   return (
     <div
       ref={containerRef}
-      className={`min-h-screen pt-2  pb-8 p-0 ${darkMode
-        ? 'bg-gray-900'
-        : 'bg-gray-50'
-        }`}
+      className={`min-h-screen pt-2 pb-8 p-0 transition-colors duration-300 ${
+        darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'
+      }`}
     >
       <div className="w-full max-w-md mx-auto">
         {/* Back Button for Recovery */}
         {showRecovery && (
           <button
             onClick={() => setShowRecovery(false)}
-            className={`mb-4 flex items-center text-sm font-medium transition-colors ${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-700'
-              }`}
+            className={`mb-4 flex items-center text-sm font-medium transition-colors ${
+              darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-650 hover:text-gray-900'
+            }`}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Login
@@ -292,17 +291,18 @@ const Login = () => {
         )}
 
         {/* Main Card */}
-        <div className={`rounded-lg p-4 ${darkMode
-          ? 'bg-gray-900 border border-gray-800 border-2'
-          : 'bg-white border border-gray-200'
-          }`}>
+        <div
+          className={`p-6 border transition-all duration-300 ${
+            darkMode ? 'bg-gray-800 border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
+          }`}
+          style={{ borderRadius: '2px' }}
+        >
           {/* Header */}
-          <div className="mb-8">
-            <h1 className={`text-2xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'
-              }`}>
+          <div className="mb-6">
+            <h1 className={`text-2xl font-bold uppercase tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'}`}>
               {showRecovery ? 'Reset Password' : 'Welcome back'}
             </h1>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`text-xs font-bold uppercase tracking-wider mt-1 ${darkMode ? 'text-gray-455' : 'text-gray-500'}`}>
               {showRecovery
                 ? 'Enter your email to reset your password'
                 : 'Sign in to continue to HafiConnect'
@@ -312,18 +312,26 @@ const Login = () => {
 
           {/* Error/Success Messages */}
           {error && (
-            <div className={`flex items-start gap-3 p-3 rounded-lg mb-6 ${darkMode ? 'bg-red-900/20 border border-red-800' : 'bg-red-50 border border-red-200'
-              }`}>
+            <div
+              className={`flex items-start gap-3 p-3 border mb-6 ${
+                darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-655'
+              }`}
+              style={{ borderRadius: '2px' }}
+            >
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-              <span className={`text-sm ${darkMode ? 'text-red-300' : 'text-red-700'}`}>{error}</span>
+              <span className="text-sm font-semibold">{error}</span>
             </div>
           )}
 
           {recoveryMessage && (
-            <div className={`flex items-start gap-3 p-3 rounded-lg mb-6 ${darkMode ? 'bg-green-900/20 border border-green-800' : 'bg-green-50 border border-green-200'
-              }`}>
+            <div
+              className={`flex items-start gap-3 p-3 border mb-6 ${
+                darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-505 text-emerald-600'
+              }`}
+              style={{ borderRadius: '2px' }}
+            >
               <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-              <span className={`text-sm ${darkMode ? 'text-green-300' : 'text-green-700'}`}>{recoveryMessage}</span>
+              <span className="text-sm font-semibold">{recoveryMessage}</span>
             </div>
           )}
 
@@ -331,19 +339,20 @@ const Login = () => {
           {showRecovery ? (
             <div className="space-y-4">
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
                   Email address
                 </label>
                 <div className="relative">
-                  <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'
-                    }`} />
+                  <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                   <input
                     type="email"
                     placeholder="Enter your email"
-                    className={`w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm transition-colors ${darkMode
-                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500'
-                      } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                    className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
+                      darkMode
+                        ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                        : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                    } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                    style={{ borderRadius: '2px' }}
                     value={recoveryEmail}
                     onChange={(e) => setRecoveryEmail(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -353,7 +362,12 @@ const Login = () => {
 
               <button
                 onClick={handleRecover}
-                className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                className={`w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border ${
+                  darkMode
+                    ? 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500'
+                    : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm'
+                }`}
+                style={{ borderRadius: '2px' }}
               >
                 Send recovery email
               </button>
@@ -370,36 +384,34 @@ const Login = () => {
                   theme={darkMode ? 'filled_black' : 'outline'}
                   size="large"
                   text="signin_with"
-                  shape="pill"
+                  shape="rectangular"
                   logo_alignment="center"
                 />
               </div>
 
               {/* Divider */}
               <div className="relative flex items-center py-2">
-                <div className={`flex-grow border-t ${darkMode ? 'border-gray-700' : 'border-gray-300'
-                  }`}></div>
-                <span className={`flex-shrink mx-4 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'
-                  }`}>or</span>
-                <div className={`flex-grow border-t ${darkMode ? 'border-gray-700' : 'border-gray-300'
-                  }`}></div>
+                <div className={`flex-grow border-t ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}></div>
+                <span className={`flex-shrink mx-4 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>or</span>
+                <div className={`flex-grow border-t ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}></div>
               </div>
 
               {/* Email Field */}
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
                   Email address
                 </label>
                 <div className="relative">
-                  <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'
-                    }`} />
+                  <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                   <input
                     type="email"
                     placeholder="Enter your email"
-                    className={`w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm transition-colors ${darkMode
-                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500'
-                      } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                    className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
+                      darkMode
+                        ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                        : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                    } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                    style={{ borderRadius: '2px' }}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -409,19 +421,20 @@ const Login = () => {
 
               {/* Password Field */}
               <div>
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'
-                    }`} />
+                  <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    className={`w-full pl-10 pr-12 py-2.5 rounded-lg border text-sm transition-colors ${darkMode
-                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500'
-                      } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                    className={`w-full pl-10 pr-12 py-2.5 border text-sm transition-colors ${
+                      darkMode
+                        ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-555'
+                        : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                    } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                    style={{ borderRadius: '2px' }}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -429,8 +442,9 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className={`absolute right-3 top-2.5 transition-colors ${darkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-400 hover:text-gray-600'
-                      }`}
+                    className={`absolute right-3 top-2.5 transition-colors ${
+                      darkMode ? 'text-gray-500 hover:text-gray-350' : 'text-gray-400 hover:text-gray-600'
+                    }`}
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -441,10 +455,9 @@ const Login = () => {
               <div className="flex justify-end">
                 <button
                   onClick={() => setShowRecovery(true)}
-                  className={`text-sm font-medium transition-colors ${darkMode
-                    ? 'text-blue-400 hover:text-blue-300'
-                    : 'text-blue-600 hover:text-blue-700'
-                    }`}
+                  className={`text-sm font-medium transition-colors ${
+                    darkMode ? 'text-emerald-450 hover:text-emerald-350' : 'text-emerald-600 hover:text-emerald-700'
+                  }`}
                 >
                   Forgot password?
                 </button>
@@ -454,15 +467,17 @@ const Login = () => {
               <button
                 onClick={handleLogin}
                 disabled={loading}
-                className={`w-full py-2.5 px-4 text-white text-sm font-medium rounded-lg transition-colors ${loading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700'
-                  }`}
+                className={`w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border ${
+                  loading
+                    ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                    : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm'
+                }`}
+                style={{ borderRadius: '2px' }}
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    Signing in...
+                    <span>Signing in...</span>
                   </div>
                 ) : (
                   'Sign in'
@@ -471,18 +486,16 @@ const Login = () => {
 
               {/* Divider */}
               <div className="relative flex items-center py-2">
-                <div className={`flex-grow border-t ${darkMode ? 'border-gray-700' : 'border-gray-300'
-                  }`}></div>
+                <div className={`flex-grow border-t ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}></div>
               </div>
 
               {/* Register Link */}
               <div className="text-center">
                 <Link
                   to="/register"
-                  className={`inline-flex items-center gap-2 text-sm font-medium transition-colors ${darkMode
-                    ? 'text-gray-400 hover:text-gray-300'
-                    : 'text-gray-600 hover:text-gray-'
-                    }`}
+                  className={`inline-flex items-center gap-2 text-sm font-medium transition-colors ${
+                    darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-650 hover:text-gray-900'
+                  }`}
                 >
                   <UserPlus className="w-4 h-4" />
                   Don't have an account? Sign up
@@ -490,13 +503,6 @@ const Login = () => {
               </div>
             </div>
           )}
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-6">
-          <p className={`text-xs ${darkMode ? 'text-gray-600' : 'text-gray-500'}`}>
-            Secure login powered by encryption
-          </p>
         </div>
       </div>
     </div>

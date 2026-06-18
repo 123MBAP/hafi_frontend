@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
@@ -235,7 +235,7 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
       case "mtn": return <Smartphone className="w-5 h-5 text-yellow-600" />;
       case "airtel": return <Wifi className="w-5 h-5 text-red-600" />;
       case "momoPay": return <Building className="w-5 h-5 text-blue-600" />;
-      default: return <CreditCard className="w-5 h-5 text-gray-600" />;
+      default: return <CreditCard className="w-5 h-5 text-gray-655" />;
     }
   };
 
@@ -250,9 +250,8 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
 
   if (loading) {
     return (
-      <div className={`flex items-center justify-center py-8 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mr-3"></div>
-        Loading payment methods...
+      <div className="flex items-center justify-center py-8">
+        <LoadingSpinner size="md" message="Loading payment methods..." variant="dots" />
       </div>
     );
   }
@@ -262,17 +261,23 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
   return (
     <div className={className}>
       {/* Payment Methods Section */}
-      <div className={`rounded-2xl border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-lg overflow-hidden`}>
+      <div 
+        className={`border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm overflow-hidden`}
+        style={{ borderRadius: '2px' }}
+      >
         <div className={`px-6 py-4 border-b ${darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>
           <div className="flex items-center">
-            <div className="p-2 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg mr-3">
-              <CreditCard className="w-5 h-5 text-white" />
+            <div 
+              className={`p-2 border ${darkMode ? 'bg-gray-900 border-gray-750 text-emerald-400' : 'bg-white border-gray-150 text-emerald-600'}`}
+              style={{ borderRadius: '2px' }}
+            >
+              <CreditCard className="w-4 h-4 text-emerald-500" />
             </div>
-            <h3 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            <h3 className={`text-base font-bold uppercase tracking-tight ml-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
               Payment Methods
             </h3>
           </div>
-          <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             Manage your payment credentials securely
           </p>
         </div>
@@ -286,26 +291,36 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
               const isAuthorized = authorized[method];
 
               return (
-                <div key={method} className={`rounded-xl border-2 ${darkMode ? 'border-gray-700 bg-gray-800/50' : 'border-gray-200 bg-gray-50'} p-5 transition-all duration-200 hover:border-teal-300 hover:shadow-md`}>
+                <div 
+                  key={method} 
+                  className={`border ${darkMode ? 'border-gray-700 bg-gray-850 bg-gray-800/40' : 'border-gray-200 bg-gray-50/50'} p-5 transition-all duration-200 hover:border-emerald-500 hover:shadow-sm`}
+                  style={{ borderRadius: '2px' }}
+                >
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600">
+                      <div 
+                        className={`p-2 border ${darkMode ? 'bg-gray-900 border-gray-750' : 'bg-white border-gray-200'}`}
+                        style={{ borderRadius: '2px' }}
+                      >
                         {getMethodIcon(method)}
                       </div>
                       <div className="ml-3">
-                        <h4 className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <h4 className={`font-bold text-xs uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           {getMethodDisplayName(method)}
                         </h4>
-                        <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        <p className={`text-[10px] uppercase font-bold tracking-wider ${darkMode ? 'text-gray-450' : 'text-gray-500'}`}>
                           {val ? "Configured" : "Not configured"}
                         </p>
                       </div>
                     </div>
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${val
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                      : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400'
-                      }`}>
+                    <div 
+                      className={`px-2 py-0.5 border text-[9px] font-bold uppercase ${val
+                        ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                        : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 border-gray-200 dark:border-gray-700'
+                        }`}
+                      style={{ borderRadius: '2px' }}
+                    >
                       {val ? "Active" : "Inactive"}
                     </div>
                   </div>
@@ -313,19 +328,25 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                   {/* Display existing credentials in card format */}
                   {val && !isEditing && (
                     <div className="space-y-3 mb-4">
-                      <div className={`p-3 rounded-lg ${darkMode ? 'bg-gray-700/50' : 'bg-white'} border ${darkMode ? 'border-gray-600' : 'border-gray-200'}`}>
-                        <div className={`text-xs font-medium mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      <div 
+                        className={`p-3 border ${darkMode ? 'bg-gray-900/20 border-gray-700' : 'bg-white border-gray-200'}`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        <div className={`text-[9px] uppercase font-bold tracking-wider mb-1 ${darkMode ? 'text-gray-450' : 'text-gray-500'}`}>
                           {method === "momoPay" ? "Merchant Code" : "Phone Number"}
                         </div>
-                        <div className={`font-mono text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <div className={`font-mono text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           {method === "momoPay" ? val.code : val.phone}
                         </div>
                       </div>
-                      <div className={`p-3 rounded-lg ${darkMode ? 'bg-gray-700/50' : 'bg-white'} border ${darkMode ? 'border-gray-600' : 'border-gray-200'}`}>
-                        <div className={`text-xs font-medium mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      <div 
+                        className={`p-3 border ${darkMode ? 'bg-gray-900/20 border-gray-700' : 'bg-white border-gray-200'}`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        <div className={`text-[9px] uppercase font-bold tracking-wider mb-1 ${darkMode ? 'text-gray-455' : 'text-gray-500'}`}>
                           Registered Name
                         </div>
-                        <div className={`text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <div className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           {val.registeredName}
                         </div>
                       </div>
@@ -341,18 +362,22 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                           setPasswordInputs((p) => ({ ...p, [method]: "" }));
                           setError(null);
                         }}
-                        className={`w-full py-2.5 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${val
-                          ? 'bg-teal-600 hover:bg-teal-700 text-white'
-                          : 'bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white'
-                          }`}
+                        className={`w-full py-2 px-4 font-semibold text-xs transition-all duration-200 uppercase tracking-wider
+                          ${darkMode
+                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm'
+                            : 'bg-emerald-500 hover:bg-emerald-650 hover:bg-emerald-600 text-white shadow-sm'}`}
+                        style={{ borderRadius: '2px' }}
                       >
                         {val ? "Edit Credentials" : "Set Up Payment"}
                       </button>
                       {!val && (
-                        <button className={`w-full py-2 px-4 rounded-lg font-medium text-sm border transition-colors ${darkMode
-                          ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                          : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                          }`}>
+                        <button 
+                          className={`w-full py-2 px-4 font-semibold text-xs border transition-colors uppercase tracking-wider ${darkMode
+                            ? 'border-gray-650 bg-gray-800 text-gray-300 hover:bg-gray-700'
+                            : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                            }`}
+                          style={{ borderRadius: '2px' }}
+                        >
                           Learn More
                         </button>
                       )}
@@ -361,16 +386,17 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
 
                   {/* Editing form */}
                   {!readOnly && (isEditing || isAuthorized) && (
-                    <div className="space-y-4 animate-fadeIn">
+                    <div className="space-y-4">
                       <div>
-                        <label className={`block text-xs font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-350' : 'text-gray-600'}`}>
                           {method === "momoPay" ? "Merchant Code" : "Phone Number"}
                         </label>
                         <input
-                          className={`w-full p-3 rounded-lg border text-sm ${darkMode
-                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                            } focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all`}
+                          className={`w-full p-2.5 border text-sm ${darkMode
+                            ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500'
+                            : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                            } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                          style={{ borderRadius: '2px' }}
                           value={
                             method === "momoPay"
                               ? (tempMethods as any)[method]?.code || ""
@@ -384,14 +410,15 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                       </div>
 
                       <div>
-                        <label className={`block text-xs font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-350' : 'text-gray-600'}`}>
                           Registered Name
                         </label>
                         <input
-                          className={`w-full p-3 rounded-lg border text-sm ${darkMode
-                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                            } focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all`}
+                          className={`w-full p-2.5 border text-sm ${darkMode
+                            ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500'
+                            : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                            } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                          style={{ borderRadius: '2px' }}
                           value={(tempMethods as any)[method]?.registeredName || ""}
                           onChange={(e) => setField(method, "registeredName", e.target.value)}
                           placeholder="Enter name"
@@ -401,9 +428,10 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                       <div className="space-y-2">
                         <button
                           onClick={() => saveMethod(method)}
-                          className="w-full py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center"
+                          className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs transition-all duration-200 flex items-center justify-center uppercase tracking-wider"
+                          style={{ borderRadius: '2px' }}
                         >
-                          <CheckCircle className="w-4 h-4 mr-2" />
+                          <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
                           Save
                         </button>
                         <button
@@ -418,10 +446,11 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                               });
                             }
                           }}
-                          className={`w-full py-2 px-4 border rounded-lg font-medium text-sm transition-colors ${darkMode
-                            ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                          className={`w-full py-2 px-4 border font-semibold text-xs transition-colors uppercase tracking-wider ${darkMode
+                            ? 'border-gray-750 bg-gray-800 text-gray-300 hover:bg-gray-700'
+                            : 'border-gray-250 bg-white text-gray-700 hover:bg-gray-50'
                             }`}
+                          style={{ borderRadius: '2px' }}
                         >
                           Cancel
                         </button>
@@ -429,16 +458,19 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                     </div>
                   )}
 
-                  {/* Password prompt */}
+                  {/* Password verification prompt */}
                   {!readOnly && authPromptFor === method && !authorized[method] && (
-                    <div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 border border-orange-200 dark:border-orange-800">
+                    <div 
+                      className={`mt-4 p-4 border ${darkMode ? 'bg-gray-900/40 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
+                      style={{ borderRadius: '2px' }}
+                    >
                       <div className="flex items-center mb-3">
-                        <Shield className="w-4 h-4 text-orange-600 mr-2" />
-                        <h5 className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <Shield className="w-4 h-4 text-emerald-500 mr-2" />
+                        <h5 className={`font-bold text-xs uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           Security Verification
                         </h5>
                       </div>
-                      <p className={`text-xs mb-3 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      <p className={`text-[10px] uppercase font-bold tracking-wider mb-3 ${darkMode ? 'text-gray-450' : 'text-gray-500'}`}>
                         Enter your payment password to modify credentials
                       </p>
                       <div className="relative mb-3">
@@ -446,27 +478,30 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                           type="password"
                           value={passwordInputs[method] || ""}
                           onChange={(e) => setPasswordInput(method, e.target.value)}
-                          className={`w-full p-2.5 rounded-lg border text-sm ${darkMode
-                            ? 'bg-gray-700 border-gray-600 text-white'
-                            : 'bg-white border-gray-300 text-gray-900'
-                            } focus:ring-2 focus:ring-orange-500 focus:border-transparent pr-8`}
+                          className={`w-full p-2.5 border text-sm ${darkMode
+                            ? 'bg-gray-900 border-gray-700 text-white'
+                            : 'bg-white border-gray-250 text-gray-900'
+                            } focus:ring-1 focus:ring-emerald-500 focus:outline-none pr-8`}
+                          style={{ borderRadius: '2px' }}
                           placeholder="Payment password"
                         />
-                        <Lock className="absolute right-2.5 top-2.5 w-4 h-4 text-gray-400" />
+                        <Lock className="absolute right-2.5 top-3 w-4 h-4 text-gray-450" />
                       </div>
                       <div className="space-y-2">
                         <button
                           onClick={() => handleAuthSubmit(method)}
-                          className="w-full py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg font-medium text-sm transition-all duration-200"
+                          className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs transition-all duration-200 uppercase tracking-wider"
+                          style={{ borderRadius: '2px' }}
                         >
                           Verify & Continue
                         </button>
                         <button
                           onClick={() => setAuthPromptFor(null)}
-                          className={`w-full py-2 px-4 border rounded-lg font-medium text-sm transition-colors ${darkMode
-                            ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                          className={`w-full py-2 px-4 border font-semibold text-xs transition-colors uppercase tracking-wider ${darkMode
+                            ? 'border-gray-750 bg-gray-800 text-gray-300 hover:bg-gray-700'
+                            : 'border-gray-250 bg-white text-gray-750 hover:bg-gray-50'
                             }`}
+                          style={{ borderRadius: '2px' }}
                         >
                           Cancel
                         </button>
@@ -480,25 +515,34 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
         </div>
 
         {error && (
-          <div className="mx-6 mb-6 flex items-center p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-            <AlertCircle className="w-5 h-5 text-red-600 mr-3" />
-            <span className={`text-sm ${darkMode ? 'text-red-400' : 'text-red-800'}`}>{error}</span>
+          <div 
+            className="mx-6 mb-6 flex items-center p-4 border bg-red-50 dark:bg-red-905 bg-red-500/10 border-red-500/20 text-red-700 dark:text-red-400"
+            style={{ borderRadius: '2px' }}
+          >
+            <AlertCircle className="w-4 h-4 mr-3" />
+            <span className="text-xs font-semibold">{error}</span>
           </div>
         )}
       </div>
 
       {/* Password Management Section */}
-      <div className={`mt-6 rounded-2xl border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-lg overflow-hidden`}>
+      <div 
+        className={`mt-6 border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm overflow-hidden`}
+        style={{ borderRadius: '2px' }}
+      >
         <div className={`px-6 py-4 border-b ${darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>
           <div className="flex items-center">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg mr-3">
-              <Lock className="w-5 h-5 text-white" />
+            <div 
+              className={`p-2 border ${darkMode ? 'bg-gray-900 border-gray-750 text-emerald-450' : 'bg-white border-gray-150 text-emerald-650'}`}
+              style={{ borderRadius: '2px' }}
+            >
+              <Lock className="w-4 h-4 text-emerald-500" />
             </div>
-            <h3 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            <h3 className={`text-base font-bold uppercase tracking-tight ml-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
               {hasPassword ? "Change Payment Password" : "Create Payment Password"}
             </h3>
           </div>
-          <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             Secure your payment credentials with a strong password
           </p>
         </div>
@@ -508,18 +552,22 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
             <>
               {!showCreateFields ? (
                 <div className="text-center py-6">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                    <Lock className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                  <div 
+                    className={`w-14 h-14 mx-auto mb-4 border flex items-center justify-center ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-550 bg-gray-50 border-gray-200 text-emerald-600'}`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    <Lock className="w-6 h-6 text-emerald-500" />
                   </div>
-                  <h4 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <h4 className={`text-sm font-bold uppercase tracking-tight mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                     No Payment Password Set
                   </h4>
-                  <p className={`mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className={`text-xs mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     Create a secure password to protect your payment credentials
                   </p>
                   <button
                     onClick={() => setShowCreateFields(true)}
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-8 rounded-lg font-medium transition-all duration-200 shadow-lg"
+                    className="bg-emerald-500 hover:bg-emerald-650 hover:bg-emerald-600 text-white py-2.5 px-6 font-semibold text-xs uppercase tracking-wider transition-all duration-200"
+                    style={{ borderRadius: '2px' }}
                   >
                     Create Payment Password
                   </button>
@@ -528,7 +576,7 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-350' : 'text-gray-600'}`}>
                         New Password
                       </label>
                       <div className="relative">
@@ -536,16 +584,17 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                           type={showNewPassword ? "text" : "password"}
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className={`w-full p-3 rounded-lg border ${darkMode
-                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                            } focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10 transition-all`}
+                          className={`w-full p-2.5 border text-sm ${darkMode
+                            ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500'
+                            : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                            } focus:ring-1 focus:ring-emerald-500 focus:outline-none pr-10 transition-all`}
+                          style={{ borderRadius: '2px' }}
                           placeholder="Enter new password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowNewPassword(!showNewPassword)}
-                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          className="absolute right-3 top-3.5 text-gray-450 hover:text-gray-650"
                         >
                           {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -553,7 +602,7 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                     </div>
 
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-350' : 'text-gray-600'}`}>
                         Confirm Password
                       </label>
                       <div className="relative">
@@ -561,16 +610,17 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                           type={showConfirmPassword ? "text" : "password"}
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          className={`w-full p-3 rounded-lg border ${darkMode
-                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                            } focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10 transition-all`}
+                          className={`w-full p-2.5 border text-sm ${darkMode
+                            ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500'
+                            : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                            } focus:ring-1 focus:ring-emerald-500 focus:outline-none pr-10 transition-all`}
+                          style={{ borderRadius: '2px' }}
                           placeholder="Confirm your password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          className="absolute right-3 top-3.5 text-gray-450 hover:text-gray-650"
                         >
                           {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -579,19 +629,22 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                   </div>
 
                   {/* Password Requirements */}
-                  <div className={`p-4 rounded-xl border ${darkMode ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}>
-                    <h5 className={`font-medium mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <div 
+                    className={`p-4 border ${darkMode ? 'bg-gray-900/30 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    <h5 className={`text-xs font-bold uppercase tracking-wider mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                       Password Requirements:
                     </h5>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
                       {Object.entries(rules).map(([key, met]) => (
                         <div key={key} className="flex items-center">
                           {met ? (
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-3.5 h-3.5 text-emerald-500 mr-2" />
                           ) : (
-                            <XCircle className="w-4 h-4 text-red-500 mr-2" />
+                            <XCircle className="w-3.5 h-3.5 text-red-500 mr-2" />
                           )}
-                          <span className={met ? (darkMode ? 'text-green-400' : 'text-green-700') : (darkMode ? 'text-red-400' : 'text-red-700')}>
+                          <span className={met ? (darkMode ? 'text-emerald-400' : 'text-emerald-600') : (darkMode ? 'text-red-400' : 'text-red-700')}>
                             {key === 'length' && 'At least 8 characters'}
                             {key === 'uppercase' && 'One uppercase letter'}
                             {key === 'lowercase' && 'One lowercase letter'}
@@ -607,9 +660,10 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                     <button
                       onClick={handleCreatePasswordAndSave}
                       disabled={!Object.values(rules).every(Boolean) || newPassword !== confirmPassword}
-                      className="flex-1 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-all duration-200 flex items-center justify-center"
+                      className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-450 disabled:hover:bg-gray-450 disabled:cursor-not-allowed text-white font-semibold text-xs transition-all duration-200 flex items-center justify-center uppercase tracking-wider"
+                      style={{ borderRadius: '2px' }}
                     >
-                      <Lock className="w-4 h-4 mr-2" />
+                      <Lock className="w-3.5 h-3.5 mr-1.5" />
                       Save Payment Password
                     </button>
                     <button
@@ -619,16 +673,23 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                         setConfirmPassword("");
                         setPasswordError(null);
                       }}
-                      className="py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors"
+                      className={`py-2.5 px-6 border font-semibold text-xs transition-colors uppercase tracking-wider ${darkMode
+                        ? 'border-gray-700 text-gray-300 hover:bg-gray-700'
+                        : 'border-gray-250 text-gray-750 hover:bg-gray-50'
+                        }`}
+                      style={{ borderRadius: '2px' }}
                     >
                       Cancel
                     </button>
                   </div>
 
                   {passwordError && (
-                    <div className="flex items-center p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                      <AlertCircle className="w-4 h-4 text-red-600 mr-2" />
-                      <span className={`text-sm ${darkMode ? 'text-red-400' : 'text-red-700'}`}>{passwordError}</span>
+                    <div 
+                      className="flex items-center p-3 border bg-red-50 dark:bg-red-905 bg-red-500/10 border-red-500/20 text-red-700 dark:text-red-400"
+                      style={{ borderRadius: '2px' }}
+                    >
+                      <AlertCircle className="w-4 h-4 mr-2" />
+                      <span className="text-xs font-semibold">{passwordError}</span>
                     </div>
                   )}
                 </div>
@@ -638,18 +699,22 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
             <>
               {!showPasswordFields ? (
                 <div className="text-center py-6">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                    <Shield className="w-8 h-8 text-green-600 dark:text-green-400" />
+                  <div 
+                    className={`w-14 h-14 mx-auto mb-4 border flex items-center justify-center ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-550 bg-gray-50 border-gray-200 text-emerald-650'}`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    <Shield className="w-6 h-6 text-emerald-500" />
                   </div>
-                  <h4 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <h4 className={`text-sm font-bold uppercase tracking-tight mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                     Payment Password Active
                   </h4>
-                  <p className={`mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className={`text-xs mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     Your payment credentials are secured with a password
                   </p>
                   <button
                     onClick={() => setShowPasswordFields(true)}
-                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-8 rounded-lg font-medium transition-all duration-200 shadow-lg"
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white py-2.5 px-6 font-semibold text-xs uppercase tracking-wider transition-all duration-200"
+                    style={{ borderRadius: '2px' }}
                   >
                     Change Password
                   </button>
@@ -658,7 +723,7 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-350' : 'text-gray-600'}`}>
                         Current Password
                       </label>
                       <div className="relative">
@@ -666,16 +731,17 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                           type={showOldPassword ? "text" : "password"}
                           value={oldPassword}
                           onChange={(e) => setOldPassword(e.target.value)}
-                          className={`w-full p-3 rounded-lg border ${darkMode
-                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                            } focus:ring-2 focus:ring-green-500 focus:border-transparent pr-10 transition-all`}
+                          className={`w-full p-2.5 border text-sm ${darkMode
+                            ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500'
+                            : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                            } focus:ring-1 focus:ring-emerald-500 focus:outline-none pr-10 transition-all`}
+                          style={{ borderRadius: '2px' }}
                           placeholder="Enter current password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowOldPassword(!showOldPassword)}
-                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          className="absolute right-3 top-3.5 text-gray-450 hover:text-gray-650"
                         >
                           {showOldPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -683,7 +749,7 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                     </div>
 
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-350' : 'text-gray-600'}`}>
                         New Password
                       </label>
                       <div className="relative">
@@ -691,16 +757,17 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                           type={showNewPassword ? "text" : "password"}
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className={`w-full p-3 rounded-lg border ${darkMode
-                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                            } focus:ring-2 focus:ring-green-500 focus:border-transparent pr-10 transition-all`}
+                          className={`w-full p-2.5 border text-sm ${darkMode
+                            ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500'
+                            : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                            } focus:ring-1 focus:ring-emerald-500 focus:outline-none pr-10 transition-all`}
+                          style={{ borderRadius: '2px' }}
                           placeholder="Enter new password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowNewPassword(!showNewPassword)}
-                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          className="absolute right-3 top-3.5 text-gray-450 hover:text-gray-650"
                         >
                           {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -708,7 +775,7 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                     </div>
 
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-350' : 'text-gray-600'}`}>
                         Confirm New Password
                       </label>
                       <div className="relative">
@@ -716,16 +783,17 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                           type={showConfirmPassword ? "text" : "password"}
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          className={`w-full p-3 rounded-lg border ${darkMode
-                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                            } focus:ring-2 focus:ring-green-500 focus:border-transparent pr-10 transition-all`}
+                          className={`w-full p-2.5 border text-sm ${darkMode
+                            ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500'
+                            : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                            } focus:ring-1 focus:ring-emerald-500 focus:outline-none pr-10 transition-all`}
+                          style={{ borderRadius: '2px' }}
                           placeholder="Confirm new password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          className="absolute right-3 top-3.5 text-gray-450 hover:text-gray-650"
                         >
                           {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -737,9 +805,10 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                     <button
                       onClick={handleChangePassword}
                       disabled={!oldPassword || !newPassword || newPassword !== confirmPassword}
-                      className="flex-1 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-all duration-200 flex items-center justify-center"
+                      className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-450 disabled:hover:bg-gray-450 disabled:cursor-not-allowed text-white font-semibold text-xs transition-all duration-200 flex items-center justify-center uppercase tracking-wider"
+                      style={{ borderRadius: '2px' }}
                     >
-                      <Shield className="w-4 h-4 mr-2" />
+                      <Shield className="w-3.5 h-3.5 mr-1.5" />
                       Update Password
                     </button>
                     <button
@@ -750,16 +819,23 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                         setConfirmPassword("");
                         setPasswordError(null);
                       }}
-                      className="py-3 px-6 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors"
+                      className={`py-2.5 px-6 border font-semibold text-xs transition-colors uppercase tracking-wider ${darkMode
+                        ? 'border-gray-700 text-gray-300 hover:bg-gray-700'
+                        : 'border-gray-250 text-gray-750 hover:bg-gray-50'
+                        }`}
+                      style={{ borderRadius: '2px' }}
                     >
                       Cancel
                     </button>
                   </div>
 
                   {passwordError && (
-                    <div className="flex items-center p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                      <AlertCircle className="w-4 h-4 text-red-600 mr-2" />
-                      <span className={`text-sm ${darkMode ? 'text-red-400' : 'text-red-700'}`}>{passwordError}</span>
+                    <div 
+                      className="flex items-center p-3 border bg-red-50 dark:bg-red-905 bg-red-500/10 border-red-500/20 text-red-700 dark:text-red-400"
+                      style={{ borderRadius: '2px' }}
+                    >
+                      <AlertCircle className="w-4 h-4 mr-2" />
+                      <span className="text-xs font-semibold">{passwordError}</span>
                     </div>
                   )}
                 </div>

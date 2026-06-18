@@ -2,6 +2,7 @@
 import NestedFeatureBuilder from '@/components/NestedFeatureBuilder';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { useAuth } from '@/context/AuthContext';
+import { useDarkMode } from '@/context/DarkMode';
 import { ServiceFeature } from '@/types/features';
 import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
@@ -62,6 +63,7 @@ interface UploadCategory {
 }
 
 export default function AdminDashboard() {
+  const { darkMode } = useDarkMode();
   // Service fields
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -683,34 +685,40 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">
+      <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
         <div className="text-center">
-          <LoadingSpinner />
-          <p className="mt-4 text-gray-600">Loading Admin Dashboard...</p>
+          <LoadingSpinner size="lg" message="Loading Admin Dashboard..." variant="dots" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
+    <div className={`min-h-screen p-6 transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className={`rounded-3xl shadow-2xl border-2 backdrop-blur-sm mb-8 ${localStorage.theme === 'dark'
-          ? 'bg-gray-800/80 border-gray-700'
-          : 'bg-white/90 border-gray-200'
-          }`}>
-          <div className="p-8">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex items-center space-x-4 mb-4 lg:mb-0">
-                <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 shadow-lg">
-                  <Settings className="w-8 h-8 text-white" />
+        <div
+          className={`border transition-all duration-300 mb-8 overflow-hidden ${
+            darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-250'
+          } shadow-sm`}
+          style={{ borderRadius: '2px' }}
+        >
+          <div className="p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div className="flex items-center space-x-4">
+                <div
+                  className={`p-3 border flex items-center justify-center ${
+                    darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-450' : 'bg-emerald-50 border-emerald-500/10 text-emerald-600'
+                  }`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  <Settings className="w-6 h-6" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  <h1 className={`text-2xl font-bold tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                     Admin Dashboard
                   </h1>
-                  <p className="text-gray-600 mt-2">
+                  <p className={`text-xs font-bold uppercase tracking-wider mt-1 ${darkMode ? 'text-gray-455' : 'text-gray-500'}`}>
                     Manage services and product categories
                   </p>
                 </div>
@@ -719,20 +727,30 @@ export default function AdminDashboard() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleSubscriptions}
-                  className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-green-500/25"
+                  className={`flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors border ${
+                    darkMode
+                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-455 hover:bg-emerald-500/20'
+                      : 'bg-emerald-50 border-emerald-500/10 text-emerald-600 hover:bg-emerald-100/50'
+                  }`}
+                  style={{ borderRadius: '2px' }}
                 >
-                  <Database className="w-5 h-5" />
+                  <Database className="w-4 h-4" />
                   <span>Subscription Plans</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => {
                     localStorage.removeItem('token');
                     navigate('/admin/login');
                   }}
-                  className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-red-500/25"
+                  className={`flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors border ${
+                    darkMode
+                      ? 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20'
+                      : 'bg-red-50 border-red-200 text-red-655 hover:bg-red-100/50'
+                  }`}
+                  style={{ borderRadius: '2px' }}
                 >
-                  <LogOut className="w-5 h-5" />
+                  <LogOut className="w-4 h-4" />
                   <span>Logout</span>
                 </button>
               </div>
@@ -742,22 +760,27 @@ export default function AdminDashboard() {
 
         {/* Message Alert */}
         {message && (
-          <div className={`mb-8 p-4 rounded-2xl border-2 backdrop-blur-sm transition-all duration-300 ${message.startsWith('✅') || message.startsWith('🗑️')
-            ? 'bg-green-50 border-green-200 text-green-700'
-            : 'bg-red-50 border-red-200 text-red-700'
-            }`}>
+          <div
+            className={`mb-8 p-4 border transition-all duration-300 ${
+              message.startsWith('✅') || message.startsWith('🗑️')
+                ? darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-500/10 text-emerald-600'
+                : darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-655'
+            }`}
+            style={{ borderRadius: '2px' }}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 {(message.startsWith('✅') || message.startsWith('🗑️')) ? (
-                  <Check className="w-5 h-5 text-green-600" />
+                  <Check className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
                 ) : (
-                  <AlertCircle className="w-5 h-5 text-red-600" />
+                  <AlertCircle className="w-5 h-5 text-red-500" />
                 )}
-                <span className="font-medium">{message}</span>
+                <span className="text-sm font-semibold">{message}</span>
               </div>
               <button
                 onClick={() => setMessage('')}
-                className="ml-4 p-1 rounded-lg hover:bg-black/5 transition-colors"
+                className="p-1 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                style={{ borderRadius: '2px' }}
                 aria-label="Close message"
               >
                 <X className="w-4 h-4" />
@@ -767,424 +790,628 @@ export default function AdminDashboard() {
         )}
 
         {/* Tab Navigation */}
-        <div className="flex space-x-1 p-1 rounded-2xl bg-white/50 backdrop-blur-sm border border-gray-200 shadow-sm mb-8 flex-wrap gap-1">
+        <div
+          className={`flex border p-1 mb-8 flex-wrap gap-1 ${
+            darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'
+          }`}
+          style={{ borderRadius: '2px' }}
+        >
           <button
             onClick={() => setActiveTab('services')}
-            className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 flex-1 ${activeTab === 'services'
-              ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
-              : 'text-gray-600 hover:text-purple-600 hover:bg-gray-100'
-              }`}
+            className={`flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+              activeTab === 'services'
+                ? darkMode
+                  ? 'bg-emerald-500/10 text-emerald-455 border-emerald-500/20'
+                  : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                : darkMode
+                ? 'bg-gray-800 border-transparent text-gray-400 hover:bg-gray-700/50 hover:text-gray-200'
+                : 'bg-transparent border-transparent text-gray-550 hover:bg-gray-100 hover:text-gray-700'
+            }`}
+            style={{ borderRadius: '2px' }}
           >
-            <Package className="w-5 h-5" />
+            <Package className="w-4 h-4" />
             <span>Services</span>
           </button>
           <button
             onClick={() => setActiveTab('categories')}
-            className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 flex-1 ${activeTab === 'categories'
-              ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
-              : 'text-gray-600 hover:text-blue-600 hover:bg-gray-100'
-              }`}
+            className={`flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+              activeTab === 'categories'
+                ? darkMode
+                  ? 'bg-emerald-500/10 text-emerald-455 border-emerald-500/20'
+                  : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                : darkMode
+                ? 'bg-gray-800 border-transparent text-gray-400 hover:bg-gray-700/50 hover:text-gray-200'
+                : 'bg-transparent border-transparent text-gray-555 hover:bg-gray-100 hover:text-gray-700'
+            }`}
+            style={{ borderRadius: '2px' }}
           >
-            <ShoppingBag className="w-5 h-5" />
+            <ShoppingBag className="w-4 h-4" />
             <span>Market</span>
           </button>
           <button
             onClick={() => setActiveTab('uploadCategories')}
-            className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 flex-1 ${activeTab === 'uploadCategories'
-              ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg'
-              : 'text-gray-600 hover:text-green-600 hover:bg-gray-100'
-              }`}
+            className={`flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+              activeTab === 'uploadCategories'
+                ? darkMode
+                  ? 'bg-emerald-500/10 text-emerald-455 border-emerald-500/20'
+                  : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                : darkMode
+                ? 'bg-gray-800 border-transparent text-gray-400 hover:bg-gray-700/50 hover:text-gray-200'
+                : 'bg-transparent border-transparent text-gray-555 hover:bg-gray-100 hover:text-gray-700'
+            }`}
+            style={{ borderRadius: '2px' }}
           >
-            <LayoutGrid className="w-5 h-5" />
+            <LayoutGrid className="w-4 h-4" />
             <span>Upload Categories</span>
           </button>
           <button
             onClick={() => { setActiveTab('phases'); setPhaseMsg(''); }}
-            className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-medium transition-all duration-300 flex-1 ${activeTab === 'phases'
-              ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white shadow-lg'
-              : 'text-gray-600 hover:text-orange-600 hover:bg-gray-100'
-              }`}
+            className={`flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+              activeTab === 'phases'
+                ? darkMode
+                  ? 'bg-emerald-500/10 text-emerald-455 border-emerald-500/20'
+                  : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                : darkMode
+                ? 'bg-gray-800 border-transparent text-gray-400 hover:bg-gray-700/50 hover:text-gray-200'
+                : 'bg-transparent border-transparent text-gray-555 hover:bg-gray-100 hover:text-gray-700'
+            }`}
+            style={{ borderRadius: '2px' }}
           >
-            <Layers className="w-5 h-5" />
+            <Layers className="w-4 h-4" />
             <span>App Phases</span>
           </button>
-
-        </div>
-
-        {/* Services Tab */}
+        </div>ers         {/* Services Tab */}
         {activeTab === 'services' && (
           <div className="space-y-8">
             {/* Create Service Form */}
-            <div className={`rounded-3xl shadow-2xl border-2 backdrop-blur-sm ${localStorage.theme === 'dark'
-              ? 'bg-gray-800/80 border-gray-700'
-              : 'bg-white/90 border-gray-200'
-              }`}>
-              <div className="p-8">
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className="p-2 rounded-xl bg-purple-100">
-                    <Plus className="w-6 h-6 text-purple-600" />
-                  </div>
+            <div
+              className={`border transition-all duration-300 ${
+                darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-250'
+              } shadow-sm overflow-hidden`}
+              style={{ borderRadius: '2px' }}
+            >
+              <div
+                className={`px-6 py-4 border-b ${
+                  darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'
+                } flex justify-between items-center`}
+              >
+                <h3 className={`text-base font-bold uppercase tracking-tight flex items-center gap-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Create New Service
+                </h3>
+              </div>
+
+              <form onSubmit={handleCreateService} className="p-6 space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div>
-                    <h2 className="text-2xl font-bold">Create New Service</h2>
-                    <p className="text-gray-600">Add a new service to your platform</p>
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Service Title
+                    </label>
+                    <input
+                      type="text"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      required
+                      className={`w-full p-2.5 border text-sm ${
+                        darkMode
+                          ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                      } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                      style={{ borderRadius: '2px' }}
+                      placeholder="e.g. Web Development"
+                    />
+                  </div>
+
+                  <div>
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Image URL
+                    </label>
+                    <input
+                      type="url"
+                      value={image}
+                      onChange={(e) => setImage(e.target.value)}
+                      required
+                      className={`w-full p-2.5 border text-sm ${
+                        darkMode
+                          ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                      } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                      style={{ borderRadius: '2px' }}
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+
+                  <div>
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Service Type
+                    </label>
+                    <input
+                      type="text"
+                      value={customType}
+                      onChange={(e) => setCustomType(e.target.value)}
+                      className={`w-full p-2.5 border text-sm ${
+                        darkMode
+                          ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                      } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                      style={{ borderRadius: '2px' }}
+                      placeholder="general"
+                    />
+                    <p className={`text-[9px] font-bold uppercase mt-1.5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                      Default is "general". Cannot be changed after creation.
+                    </p>
                   </div>
                 </div>
 
-                <form onSubmit={handleCreateService} className="space-y-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Service Title
-                      </label>
-                      <div className="relative">
-                        <Tag className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                        <input
-                          type="text"
-                          value={title}
-                          onChange={(e) => setTitle(e.target.value)}
-                          required
-                          className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                          placeholder="e.g. Web Development"
-                        />
-                      </div>
-                    </div>
+                <div>
+                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Description
+                  </label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                    className={`w-full p-2.5 border text-sm ${
+                      darkMode
+                        ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                        : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                    } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all h-24`}
+                    style={{ borderRadius: '2px' }}
+                    placeholder="Short description of the service..."
+                  />
+                </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Image URL
-                      </label>
-                      <div className="relative">
-                        <ImageIcon className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                        <input
-                          type="url"
-                          value={image}
-                          onChange={(e) => setImage(e.target.value)}
-                          required
-                          className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                          placeholder="https://example.com/image.jpg"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Service Type
-                      </label>
-                      <div className="relative">
-                        <Database className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                        <input
-                          type="text"
-                          value={customType}
-                          onChange={(e) => setCustomType(e.target.value)}
-                          className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                          placeholder="general"
-                        />
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2">Default is "general". Cannot be changed after creation.</p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Description
+                {/* Service Options */}
+                <div
+                  className={`p-4 border ${darkMode ? 'bg-gray-900/40 border-gray-750' : 'bg-gray-55 border-gray-200'}`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-4 flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    <Settings className="w-4 h-4 mr-2" />
+                    Service Options
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <label
+                      className={`flex items-center space-x-3 p-3 border cursor-pointer transition-all ${
+                        darkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' : 'bg-white border-gray-200 hover:bg-gray-50'
+                      }`}
+                      style={{ borderRadius: '2px' }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={specificFeatures}
+                        onChange={(e) => {
+                          setSpecificFeatures(e.target.checked);
+                          if (!e.target.checked) {
+                            setFeaturesList([]);
+                          }
+                        }}
+                        className={`h-4 w-4 ${
+                          darkMode
+                            ? 'bg-gray-900 border-gray-750 text-emerald-500 focus:ring-emerald-500'
+                            : 'border-gray-350 text-emerald-600 focus:ring-emerald-500'
+                        }`}
+                        style={{ borderRadius: '2px' }}
+                      />
+                      <Shield className="w-4 h-4 text-emerald-500" />
+                      <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Specific Features
+                      </span>
                     </label>
-                    <div className="relative">
-                      <FileText className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                      <textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        required
-                        className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 h-24"
-                        placeholder="Short description of the service..."
+                    <label
+                      className={`flex items-center space-x-3 p-3 border cursor-pointer transition-all ${
+                        darkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' : 'bg-white border-gray-200 hover:bg-gray-50'
+                      }`}
+                      style={{ borderRadius: '2px' }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={noNavigation}
+                        onChange={(e) => setNoNavigation(e.target.checked)}
+                        className={`h-4 w-4 ${
+                          darkMode
+                            ? 'bg-gray-900 border-gray-750 text-emerald-500 focus:ring-emerald-500'
+                            : 'border-gray-355 text-emerald-600 focus:ring-emerald-500'
+                        }`}
+                        style={{ borderRadius: '2px' }}
                       />
-                    </div>
+                      <LayoutGrid className="w-4 h-4 text-emerald-500" />
+                      <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        No Navigation
+                      </span>
+                    </label>
+                    <label
+                      className={`flex items-center space-x-3 p-3 border cursor-pointer transition-all ${
+                        darkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' : 'bg-white border-gray-200 hover:bg-gray-50'
+                      }`}
+                      style={{ borderRadius: '2px' }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={freePlan}
+                        onChange={(e) => setFreePlan(e.target.checked)}
+                        className={`h-4 w-4 ${
+                          darkMode
+                            ? 'bg-gray-900 border-gray-750 text-emerald-500 focus:ring-emerald-500'
+                            : 'border-gray-355 text-emerald-600 focus:ring-emerald-500'
+                        }`}
+                        style={{ borderRadius: '2px' }}
+                      />
+                      <Users className="w-4 h-4 text-emerald-500" />
+                      <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        Free Plan
+                      </span>
+                    </label>
                   </div>
+                </div>
 
-                  {/* Service Options */}
-                  <div className="bg-purple-50 rounded-2xl p-6 border border-purple-200">
-                    <h3 className="text-lg font-semibold text-purple-800 mb-4 flex items-center">
-                      <Settings className="w-5 h-5 mr-2" />
-                      Service Options
+                {/* Specific Features Input Fields */}
+                {specificFeatures && (
+                  <div
+                    className={`p-4 border ${darkMode ? 'bg-gray-900/40 border-gray-750 shadow-inner' : 'bg-gray-50 border-gray-200'}`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-4 flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      <Shield className="w-4 h-4 mr-2" />
+                      Service Features
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <label className="flex items-center space-x-3 p-3 rounded-xl bg-white border border-purple-200 cursor-pointer transition-all duration-200 hover:shadow-md">
-                        <input
-                          type="checkbox"
-                          checked={specificFeatures}
-                          onChange={(e) => {
-                            setSpecificFeatures(e.target.checked);
-                            if (!e.target.checked) {
-                              setFeaturesList([]);
-                            }
-                          }}
-                          className="h-5 w-5 text-purple-600 focus:ring-purple-500 border-gray-300 rounded transition-all duration-200"
-                        />
-                        <Shield className="w-5 h-5 text-purple-600" />
-                        <span className="font-medium text-purple-700">Specific Features</span>
-                      </label>
-                      <label className="flex items-center space-x-3 p-3 rounded-xl bg-white border border-purple-200 cursor-pointer transition-all duration-200 hover:shadow-md">
-                        <input
-                          type="checkbox"
-                          checked={noNavigation}
-                          onChange={(e) => setNoNavigation(e.target.checked)}
-                          className="h-5 w-5 text-purple-600 focus:ring-purple-500 border-gray-300 rounded transition-all duration-200"
-                        />
-                        <LayoutGrid className="w-5 h-5 text-purple-600" />
-                        <span className="font-medium text-purple-700">No Navigation</span>
-                      </label>
-                      <label className="flex items-center space-x-3 p-3 rounded-xl bg-white border border-purple-200 cursor-pointer transition-all duration-200 hover:shadow-md">
-                        <input
-                          type="checkbox"
-                          checked={freePlan}
-                          onChange={(e) => setFreePlan(e.target.checked)}
-                          className="h-5 w-5 text-purple-600 focus:ring-purple-500 border-gray-300 rounded transition-all duration-200"
-                        />
-                        <Users className="w-5 h-5 text-purple-600" />
-                        <span className="font-medium text-purple-700">Free Plan</span>
-                      </label>
-                    </div>
+                    <NestedFeatureBuilder
+                      features={featuresList}
+                      onChange={setFeaturesList}
+                      darkMode={darkMode}
+                    />
                   </div>
+                )}
 
-                  {/* Specific Features Input Fields */}
-                  {specificFeatures && (
-                    <div className="bg-blue-50 rounded-2xl p-6 border border-blue-200">
-                      <h3 className="text-lg font-semibold text-blue-800 flex items-center mb-4">
-                        <Shield className="w-5 h-5 mr-2" />
-                        Service Features
-                      </h3>
-                      <NestedFeatureBuilder
-                        features={featuresList}
-                        onChange={setFeaturesList}
-                        darkMode={false}
-                      />
-                    </div>
-                  )}
-
+                <div className="flex justify-end pt-2">
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex items-center space-x-2 px-8 py-4 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border flex items-center gap-2 ${
+                      isSubmitting
+                        ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                        : 'bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500 shadow-sm'
+                    }`}
+                    style={{ borderRadius: '2px' }}
                   >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        <span>Creating Service...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="w-5 h-5" />
-                        <span>Create Service</span>
-                      </>
-                    )}
+                    {isSubmitting ? 'Creating...' : 'Create Service'}
                   </button>
-                </form>
-              </div>
+                </div>
+              </form>
             </div>
 
             {/* Edit Service Modal */}
             {editingServiceId && (
-              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                <div className={`max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl ${localStorage.theme === 'dark'
-                  ? 'bg-gray-800 border-gray-700'
-                  : 'bg-white border-gray-200'
-                  } border-2`}>
-                  <div className="p-8">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-bold">Edit Service</h2>
-                      <button
-                        onClick={cancelEditingService}
-                        className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                      >
-                        <X className="w-6 h-6" />
-                      </button>
-                    </div>
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                <div
+                  className={`max-w-4xl w-full max-h-[90vh] overflow-y-auto border transition-all duration-300 ${
+                    darkMode ? 'bg-gray-800 border-gray-750 text-white' : 'bg-white border-gray-200 text-gray-900'
+                  } shadow-2xl`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  <div
+                    className={`px-6 py-4 border-b ${
+                      darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'
+                    } flex justify-between items-center`}
+                  >
+                    <h3 className={`text-base font-bold uppercase tracking-tight flex items-center gap-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      Edit Service
+                    </h3>
+                    <button
+                      onClick={cancelEditingService}
+                      className={`p-1.5 border transition-colors ${
+                        darkMode
+                          ? 'border-gray-700 hover:bg-gray-700 text-gray-400'
+                          : 'border-gray-200 hover:bg-gray-50 text-gray-550'
+                      }`}
+                      style={{ borderRadius: '2px' }}
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
 
-                    <form onSubmit={handleUpdateService} className="space-y-6">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Service Title</label>
-                          <input
-                            type="text"
-                            value={editServiceTitle}
-                            onChange={(e) => setEditServiceTitle(e.target.value)}
-                            required
-                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
-                          <input
-                            type="url"
-                            value={editServiceImage}
-                            onChange={(e) => setEditServiceImage(e.target.value)}
-                            required
-                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                          />
-                        </div>
-                      </div>
-
+                  <form onSubmit={handleUpdateService} className="p-6 space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Service Type</label>
+                        <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          Service Title
+                        </label>
                         <input
                           type="text"
-                          value={editCustomType}
-                          disabled
-                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                        <textarea
-                          value={editServiceDescription}
-                          onChange={(e) => setEditServiceDescription(e.target.value)}
+                          value={editServiceTitle}
+                          onChange={(e) => setEditServiceTitle(e.target.value)}
                           required
-                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 h-24"
+                          className={`w-full p-2.5 border text-sm ${
+                            darkMode
+                              ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                              : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                          } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                          style={{ borderRadius: '2px' }}
                         />
                       </div>
-
-                      <div className="bg-purple-50 rounded-2xl p-6 border border-purple-200">
-                        <h3 className="text-lg font-semibold text-purple-800 mb-4">Service Options</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <label className="flex items-center space-x-3 p-3 rounded-xl bg-white border border-purple-200 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={editSpecificFeatures}
-                              onChange={(e) => {
-                                setEditSpecificFeatures(e.target.checked);
-                                if (!e.target.checked) setEditFeaturesList([]);
-                              }}
-                              className="h-5 w-5 text-purple-600"
-                            />
-                            <span className="font-medium text-purple-700">Specific Features</span>
-                          </label>
-                          <label className="flex items-center space-x-3 p-3 rounded-xl bg-white border border-purple-200 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={editNoNavigation}
-                              onChange={(e) => setEditNoNavigation(e.target.checked)}
-                              className="h-5 w-5 text-purple-600"
-                            />
-                            <span className="font-medium text-purple-700">No Navigation</span>
-                          </label>
-                          <label className="flex items-center space-x-3 p-3 rounded-xl bg-white border border-purple-200 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={editFreePlan}
-                              onChange={(e) => setEditFreePlan(e.target.checked)}
-                              className="h-5 w-5 text-purple-600"
-                            />
-                            <span className="font-medium text-purple-700">Free Plan</span>
-                          </label>
-                        </div>
+                      <div>
+                        <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          Image URL
+                        </label>
+                        <input
+                          type="url"
+                          value={editServiceImage}
+                          onChange={(e) => setEditServiceImage(e.target.value)}
+                          required
+                          className={`w-full p-2.5 border text-sm ${
+                            darkMode
+                              ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                              : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                          } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                          style={{ borderRadius: '2px' }}
+                        />
                       </div>
+                    </div>
 
-                      {editSpecificFeatures && (
-                        <div className="bg-blue-50 rounded-2xl p-6 border border-blue-200">
-                          <h3 className="text-lg font-semibold text-blue-800 flex items-center mb-4">
-                            <Shield className="w-5 h-5 mr-2" />
-                            Service Features
-                          </h3>
-                          <NestedFeatureBuilder
-                            features={editFeaturesList}
-                            onChange={setEditFeaturesList}
-                            darkMode={false}
+                    <div>
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        Service Type
+                      </label>
+                      <input
+                        type="text"
+                        value={editCustomType}
+                        disabled
+                        className={`w-full p-2.5 border text-sm ${
+                          darkMode ? 'bg-gray-900/50 border-gray-700 text-gray-500' : 'bg-gray-50 border-gray-200 text-gray-400'
+                        }`}
+                        style={{ borderRadius: '2px' }}
+                      />
+                    </div>
+
+                    <div>
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        Description
+                      </label>
+                      <textarea
+                        value={editServiceDescription}
+                        onChange={(e) => setEditServiceDescription(e.target.value)}
+                        required
+                        className={`w-full p-2.5 border text-sm ${
+                          darkMode
+                            ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                            : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                        } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all h-24`}
+                        style={{ borderRadius: '2px' }}
+                      />
+                    </div>
+
+                    <div
+                      className={`p-4 border ${darkMode ? 'bg-gray-900/40 border-gray-750' : 'bg-gray-55 border-gray-200'}`}
+                      style={{ borderRadius: '2px' }}
+                    >
+                      <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-4 flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        <Settings className="w-4 h-4 mr-2" />
+                        Service Options
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <label
+                          className={`flex items-center space-x-3 p-3 border cursor-pointer transition-all ${
+                            darkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-755' : 'bg-white border-gray-200 hover:bg-gray-50'
+                          }`}
+                          style={{ borderRadius: '2px' }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={editSpecificFeatures}
+                            onChange={(e) => {
+                              setEditSpecificFeatures(e.target.checked);
+                              if (!e.target.checked) setEditFeaturesList([]);
+                            }}
+                            className={`h-4 w-4 ${
+                              darkMode
+                                ? 'bg-gray-900 border-gray-750 text-emerald-500 focus:ring-emerald-500'
+                                : 'border-gray-350 text-emerald-600 focus:ring-emerald-500'
+                            }`}
+                            style={{ borderRadius: '2px' }}
                           />
-                        </div>
-                      )}
-
-                      <div className="flex gap-3">
-                        <button
-                          type="submit"
-                          disabled={isSubmitting}
-                          className="flex-1 flex items-center justify-center space-x-2 px-8 py-4 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold hover:scale-105 transition-all disabled:opacity-50"
+                          <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Specific Features
+                          </span>
+                        </label>
+                        <label
+                          className={`flex items-center space-x-3 p-3 border cursor-pointer transition-all ${
+                            darkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-755' : 'bg-white border-gray-200 hover:bg-gray-50'
+                          }`}
+                          style={{ borderRadius: '2px' }}
                         >
-                          {isSubmitting ? (
-                            <>
-                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                              <span>Updating...</span>
-                            </>
-                          ) : (
-                            <>
-                              <Save className="w-5 h-5" />
-                              <span>Update Service</span>
-                            </>
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={cancelEditingService}
-                          className="px-8 py-4 rounded-xl bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-colors"
+                          <input
+                            type="checkbox"
+                            checked={editNoNavigation}
+                            onChange={(e) => setEditNoNavigation(e.target.checked)}
+                            className={`h-4 w-4 ${
+                              darkMode
+                                ? 'bg-gray-900 border-gray-750 text-emerald-500 focus:ring-emerald-500'
+                                : 'border-gray-350 text-emerald-600 focus:ring-emerald-500'
+                            }`}
+                            style={{ borderRadius: '2px' }}
+                          />
+                          <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            No Navigation
+                          </span>
+                        </label>
+                        <label
+                          className={`flex items-center space-x-3 p-3 border cursor-pointer transition-all ${
+                            darkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-755' : 'bg-white border-gray-200 hover:bg-gray-50'
+                          }`}
+                          style={{ borderRadius: '2px' }}
                         >
-                          Cancel
-                        </button>
+                          <input
+                            type="checkbox"
+                            checked={editFreePlan}
+                            onChange={(e) => setEditFreePlan(e.target.checked)}
+                            className={`h-4 w-4 ${
+                              darkMode
+                                ? 'bg-gray-900 border-gray-750 text-emerald-500 focus:ring-emerald-500'
+                                : 'border-gray-350 text-emerald-600 focus:ring-emerald-500'
+                            }`}
+                            style={{ borderRadius: '2px' }}
+                          />
+                          <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Free Plan
+                          </span>
+                        </label>
                       </div>
-                    </form>
-                  </div>
+                    </div>
+
+                    {editSpecificFeatures && (
+                      <div
+                        className={`p-4 border ${darkMode ? 'bg-gray-900/40 border-gray-750 shadow-inner' : 'bg-gray-50 border-gray-200'}`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-4 flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          <Shield className="w-4 h-4 mr-2" />
+                          Service Features
+                        </h3>
+                        <NestedFeatureBuilder
+                          features={editFeaturesList}
+                          onChange={setEditFeaturesList}
+                          darkMode={darkMode}
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex justify-end gap-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={cancelEditingService}
+                        className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border ${
+                          darkMode
+                            ? 'bg-gray-800 border-gray-755 text-gray-300 hover:bg-gray-700'
+                            : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
+                        }`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border flex items-center gap-2 ${
+                          isSubmitting
+                            ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                            : 'bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500 shadow-sm'
+                        }`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        {isSubmitting ? 'Updating...' : 'Update Service'}
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             )}
 
             {/* Services List */}
             <div>
-              <h3 className="text-2xl font-bold mb-6 flex items-center">
-                <Package className="w-6 h-6 mr-3" />
+              <h3 className={`text-base font-bold uppercase tracking-tight mb-6 flex items-center gap-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                <Package className="w-5 h-5" />
                 Manage Services
-                <span className="ml-3 px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-sm font-medium">
+                <span
+                  className={`text-xs px-2 py-0.5 border font-bold uppercase ${
+                    darkMode ? 'bg-emerald-500/10 text-emerald-450 border-emerald-500/20' : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                  }`}
+                  style={{ borderRadius: '2px' }}
+                >
                   {services.length} services
                 </span>
               </h3>
 
               {services.length === 0 ? (
-                <div className="text-center py-12 bg-white/50 rounded-3xl border-2 border-dashed border-gray-300">
-                  <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h4 className="text-xl font-semibold text-gray-600 mb-2">No Services Yet</h4>
-                  <p className="text-gray-500">Create your first service to get started</p>
+                <div
+                  className={`text-center py-12 border-2 border-dashed ${
+                    darkMode ? 'border-gray-700 bg-gray-800/30' : 'border-gray-300 bg-white/50'
+                  }`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  <Package className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <h4 className={`text-sm font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>
+                    No Services Yet
+                  </h4>
+                  <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                    Create your first service to get started
+                  </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                   {services.map((service, index) => (
                     <div
                       key={service.id}
-                      className={`rounded-3xl border-2 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:scale-105 ${localStorage.theme === 'dark'
-                        ? 'bg-gray-800/80 border-gray-700'
-                        : 'bg-white/90 border-gray-200'
-                        }`}
-                      style={{ animationDelay: `${index * 100}ms` }}
+                      className={`border transition-all duration-300 ${
+                        darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-250'
+                      } shadow-sm overflow-hidden`}
+                      style={{ borderRadius: '2px', animationDelay: `${index * 50}ms` }}
                     >
-                      <div className="p-6">
-                        <div className="h-48 rounded-2xl bg-gray-100 overflow-hidden mb-4">
+                      <div>
+                        <div
+                          className={`h-48 bg-gray-100 overflow-hidden border-b ${
+                            darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'
+                          }`}
+                        >
                           <img
                             src={service.image}
                             alt={service.title}
-                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                            className="w-full h-full object-cover"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Service+Image';
                             }}
                           />
                         </div>
 
-                        <div className="space-y-3">
-                          <h4 className="text-xl font-bold text-gray-900 line-clamp-1">{service.title}</h4>
-                          <p className="text-gray-600 text-sm line-clamp-2">{service.description}</p>
+                        <div className="p-5 space-y-3">
+                          <h4 className={`text-base font-bold uppercase tracking-tight mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                            {service.title}
+                          </h4>
+                          <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'} line-clamp-2`}>
+                            {service.description}
+                          </p>
 
                           {/* Service Features */}
-                          <div className="flex flex-wrap gap-2">
-                            <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                          <div className="flex flex-wrap gap-1.5 pt-1">
+                            <span
+                              className={`text-[9px] px-1.5 py-0.5 border font-bold uppercase ${
+                                darkMode ? 'bg-gray-900 border-gray-700 text-gray-300' : 'bg-gray-55 border-gray-200 text-gray-650'
+                              }`}
+                              style={{ borderRadius: '2px' }}
+                            >
                               {(service.custom_type || 'general').toUpperCase()}
                             </span>
                             {service.specific_features && (
-                              <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                              <span
+                                className={`text-[9px] px-1.5 py-0.5 border font-bold uppercase ${
+                                  darkMode
+                                    ? 'bg-emerald-500/10 text-emerald-450 border-emerald-500/20'
+                                    : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                                }`}
+                                style={{ borderRadius: '2px' }}
+                              >
                                 Features
                               </span>
                             )}
                             {service.no_navigation && (
-                              <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                              <span
+                                className={`text-[9px] px-1.5 py-0.5 border font-bold uppercase ${
+                                  darkMode
+                                    ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                                    : 'bg-blue-50 text-blue-700 border-blue-205'
+                                }`}
+                                style={{ borderRadius: '2px' }}
+                              >
                                 No Nav
                               </span>
                             )}
                             {service.free_plan && (
-                              <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                              <span
+                                className={`text-[9px] px-1.5 py-0.5 border font-bold uppercase ${
+                                  darkMode
+                                    ? 'bg-emerald-500/10 text-emerald-450 border-emerald-500/20'
+                                    : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                                }`}
+                                style={{ borderRadius: '2px' }}
+                              >
                                 Free Plan
                               </span>
                             )}
@@ -1193,16 +1420,26 @@ export default function AdminDashboard() {
                           <div className="flex gap-2 pt-3">
                             <button
                               onClick={() => startEditingService(service)}
-                              className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-blue-100 text-blue-700 font-medium transition-all duration-300 hover:scale-105 hover:bg-blue-200 flex-1 justify-center"
+                              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+                                darkMode
+                                  ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500/20'
+                                  : 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100/50'
+                              }`}
+                              style={{ borderRadius: '2px' }}
                             >
-                              <Edit3 className="w-4 h-4" />
+                              <Edit3 className="w-3.5 h-3.5" />
                               <span>Edit</span>
                             </button>
                             <button
                               onClick={() => handleDeleteService(service.id)}
-                              className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-red-100 text-red-700 font-medium transition-all duration-300 hover:scale-105 hover:bg-red-200 flex-1 justify-center"
+                              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+                                darkMode
+                                  ? 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20'
+                                  : 'bg-red-50 border-red-200 text-red-655 hover:bg-red-100/50'
+                              }`}
+                              style={{ borderRadius: '2px' }}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3.5 h-3.5" />
                               <span>Delete</span>
                             </button>
                           </div>
@@ -1215,167 +1452,207 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
-
-        {/* Categories Tab */}
+                       {/* Categories Tab */}
         {activeTab === 'categories' && (
           <div className="space-y-8">
             {/* Create Category Form */}
-            <div className={`rounded-3xl shadow-2xl border-2 backdrop-blur-sm ${localStorage.theme === 'dark'
-              ? 'bg-gray-800/80 border-gray-700'
-              : 'bg-white/90 border-gray-200'
-              }`}>
-              <div className="p-8">
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className="p-2 rounded-xl bg-blue-100">
-                    <Plus className="w-6 h-6 text-blue-600" />
-                  </div>
+            <div
+              className={`border transition-all duration-300 ${
+                darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-250'
+              } shadow-sm overflow-hidden`}
+              style={{ borderRadius: '2px' }}
+            >
+              <div
+                className={`px-6 py-4 border-b ${
+                  darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'
+                } flex justify-between items-center`}
+              >
+                <h3 className={`text-base font-bold uppercase tracking-tight flex items-center gap-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {editingProductCatId ? 'Edit Product Category' : 'Create Product Category'}
+                </h3>
+              </div>
+
+              <form onSubmit={editingProductCatId ? handleUpdateProductCat : handleCreateProductCat} className="p-6 space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
-                    <h2 className="text-2xl font-bold">{editingProductCatId ? 'Edit Product Category' : 'Create Product Category'}</h2>
-                    <p className="text-gray-600">{editingProductCatId ? 'Update an existing product category' : 'Add a new product category to the market'}</p>
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Category Name
+                    </label>
+                    <input
+                      type="text"
+                      value={editingProductCatId ? editProductCatName : productCatName}
+                      onChange={(e) => editingProductCatId ? setEditProductCatName(e.target.value) : setProductCatName(e.target.value)}
+                      required
+                      className={`w-full p-2.5 border text-sm ${
+                        darkMode
+                          ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                      } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                      style={{ borderRadius: '2px' }}
+                      placeholder="e.g. Electronics"
+                    />
+                  </div>
+
+                  <div>
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Image URL
+                    </label>
+                    <input
+                      type="url"
+                      value={editingProductCatId ? editProductCatImageUrl : productCatImageUrl}
+                      onChange={(e) => editingProductCatId ? setEditProductCatImageUrl(e.target.value) : setProductCatImageUrl(e.target.value)}
+                      required
+                      className={`w-full p-2.5 border text-sm ${
+                        darkMode
+                          ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                      } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                      style={{ borderRadius: '2px' }}
+                      placeholder="https://example.com/category-image.jpg"
+                    />
                   </div>
                 </div>
 
-                <form onSubmit={editingProductCatId ? handleUpdateProductCat : handleCreateProductCat} className="space-y-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Category Name
-                      </label>
-                      <div className="relative">
-                        <Tag className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                        <input
-                          type="text"
-                          value={editingProductCatId ? editProductCatName : productCatName}
-                          onChange={(e) => editingProductCatId ? setEditProductCatName(e.target.value) : setProductCatName(e.target.value)}
-                          required
-                          className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                          placeholder="e.g. Electronics"
-                        />
-                      </div>
-                    </div>
+                <div>
+                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Category Description
+                  </label>
+                  <textarea
+                    value={editingProductCatId ? editProductCatDescription : productCatDescription}
+                    onChange={(e) => editingProductCatId ? setEditProductCatDescription(e.target.value) : setProductCatDescription(e.target.value)}
+                    required
+                    className={`w-full p-2.5 border text-sm ${
+                      darkMode
+                        ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                        : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                    } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all h-24`}
+                    style={{ borderRadius: '2px' }}
+                    placeholder="Short description of the product category..."
+                  />
+                </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Image URL
-                      </label>
-                      <div className="relative">
-                        <ImageIcon className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                        <input
-                          type="url"
-                          value={editingProductCatId ? editProductCatImageUrl : productCatImageUrl}
-                          onChange={(e) => editingProductCatId ? setEditProductCatImageUrl(e.target.value) : setProductCatImageUrl(e.target.value)}
-                          required
-                          className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                          placeholder="https://example.com/category-image.jpg"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Category Description
-                    </label>
-                    <div className="relative">
-                      <FileText className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                      <textarea
-                        value={editingProductCatId ? editProductCatDescription : productCatDescription}
-                        onChange={(e) => editingProductCatId ? setEditProductCatDescription(e.target.value) : setProductCatDescription(e.target.value)}
-                        required
-                        className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 h-24"
-                        placeholder="Short description of the product category..."
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="flex items-center space-x-2 px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        <span>{editingProductCatId ? 'Updating Category...' : 'Creating Category...'}</span>
-                      </>
-                    ) : (
-                      <>
-                        {editingProductCatId ? <Save className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-                        <span>{editingProductCatId ? 'Update Category' : 'Create Category'}</span>
-                      </>
-                    )}
-                  </button>
-
+                <div className="flex justify-end gap-3 pt-2">
                   {editingProductCatId && (
                     <button
                       type="button"
                       onClick={cancelEditingProductCat}
-                      className="flex items-center space-x-2 px-8 py-4 rounded-xl bg-gray-200 text-gray-700 font-semibold transition-all duration-300 hover:bg-gray-300"
+                      className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border ${
+                        darkMode
+                          ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                          : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
+                      }`}
+                      style={{ borderRadius: '2px' }}
                     >
-                      <X className="w-5 h-5" />
-                      <span>Cancel Editing</span>
+                      Cancel
                     </button>
                   )}
-                </form>
-              </div>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border flex items-center gap-2 ${
+                      isSubmitting
+                        ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                        : 'bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500 shadow-sm'
+                    }`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    {isSubmitting
+                      ? 'Saving...'
+                      : editingProductCatId
+                      ? 'Update Category'
+                      : 'Create Category'}
+                  </button>
+                </div>
+              </form>
             </div>
 
             {/* Categories List */}
             <div>
-              <h3 className="text-2xl font-bold mb-6 flex items-center">
-                <ShoppingBag className="w-6 h-6 mr-3" />
+              <h3 className={`text-base font-bold uppercase tracking-tight mb-6 flex items-center gap-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                <ShoppingBag className="w-5 h-5" />
                 Manage Product Categories
-                <span className="ml-3 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">
+                <span
+                  className={`text-xs px-2 py-0.5 border font-bold uppercase ${
+                    darkMode ? 'bg-emerald-500/10 text-emerald-455 border-emerald-500/20' : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                  }`}
+                  style={{ borderRadius: '2px' }}
+                >
                   {marketProductCats.length} categories
                 </span>
               </h3>
 
               {marketProductCats.length === 0 ? (
-                <div className="text-center py-12 bg-white/50 rounded-3xl border-2 border-dashed border-gray-300">
-                  <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h4 className="text-xl font-semibold text-gray-600 mb-2">No Categories Yet</h4>
-                  <p className="text-gray-500">Create your first product category to get started</p>
+                <div
+                  className={`text-center py-12 border-2 border-dashed ${
+                    darkMode ? 'border-gray-700 bg-gray-800/30' : 'border-gray-300 bg-white/50'
+                  }`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  <ShoppingBag className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <h4 className={`text-sm font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>
+                    No Categories Yet
+                  </h4>
+                  <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                    Create your first product category to get started
+                  </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                   {marketProductCats.map((cat, index) => (
                     <div
                       key={cat.id}
-                      className={`rounded-3xl border-2 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:scale-105 ${localStorage.theme === 'dark'
-                        ? 'bg-gray-800/80 border-gray-700'
-                        : 'bg-white/90 border-gray-200'
-                        }`}
-                      style={{ animationDelay: `${index * 100}ms` }}
+                      className={`border transition-all duration-300 ${
+                        darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-250'
+                      } shadow-sm overflow-hidden`}
+                      style={{ borderRadius: '2px', animationDelay: `${index * 50}ms` }}
                     >
-                      <div className="p-6">
-                        <div className="h-48 rounded-2xl bg-gray-100 overflow-hidden mb-4">
+                      <div>
+                        <div
+                          className={`h-48 bg-gray-100 overflow-hidden border-b ${
+                            darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'
+                          }`}
+                        >
                           <img
                             src={cat.image_url}
                             alt={cat.name}
-                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                            className="w-full h-full object-cover"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Category+Image';
                             }}
                           />
                         </div>
 
-                        <div className="space-y-3">
-                          <h4 className="text-xl font-bold text-gray-900 line-clamp-1">{cat.name}</h4>
-                          <p className="text-gray-600 text-sm line-clamp-2">{cat.description}</p>
+                        <div className="p-5 space-y-3">
+                          <h4 className={`text-base font-bold uppercase tracking-tight mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                            {cat.name}
+                          </h4>
+                          <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'} line-clamp-2`}>
+                            {cat.description}
+                          </p>
 
                           <div className="flex gap-2 pt-3">
                             <button
                               onClick={() => startEditingProductCat(cat)}
-                              className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-blue-100 text-blue-700 font-medium transition-all duration-300 hover:scale-105 hover:bg-blue-200 flex-1 justify-center"
+                              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+                                darkMode
+                                  ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500/20'
+                                  : 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100/50'
+                              }`}
+                              style={{ borderRadius: '2px' }}
                             >
-                              <Edit3 className="w-4 h-4" />
+                              <Edit3 className="w-3.5 h-3.5" />
                               <span>Edit</span>
                             </button>
                             <button
                               onClick={() => handleDeleteProductCat(cat.id)}
-                              className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-red-100 text-red-700 font-medium transition-all duration-300 hover:scale-105 hover:bg-red-200 flex-1 justify-center"
+                              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+                                darkMode
+                                  ? 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20'
+                                  : 'bg-red-50 border-red-200 text-red-655 hover:bg-red-100/50'
+                              }`}
+                              style={{ borderRadius: '2px' }}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3.5 h-3.5" />
                               <span>Delete</span>
                             </button>
                           </div>
@@ -1393,157 +1670,187 @@ export default function AdminDashboard() {
         {activeTab === 'uploadCategories' && (
           <div className="space-y-8">
             {/* Create Upload Category Form */}
-            <div className={`rounded-3xl shadow-2xl border-2 backdrop-blur-sm ${localStorage.theme === 'dark'
-              ? 'bg-gray-800/80 border-gray-700'
-              : 'bg-white/90 border-gray-200'
-              }`}>
-              <div className="p-8">
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className="p-2 rounded-xl bg-green-100">
-                    <Plus className="w-6 h-6 text-green-600" />
-                  </div>
+            <div
+              className={`border transition-all duration-300 ${
+                darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-250'
+              } shadow-sm overflow-hidden`}
+              style={{ borderRadius: '2px' }}
+            >
+              <div
+                className={`px-6 py-4 border-b ${
+                  darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'
+                } flex justify-between items-center`}
+              >
+                <h3 className={`text-base font-bold uppercase tracking-tight flex items-center gap-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {editingUploadCatId ? 'Edit Upload Category' : 'Create Upload Category'}
+                </h3>
+              </div>
+
+              <form onSubmit={editingUploadCatId ? handleUpdateUploadCat : handleCreateUploadCat} className="p-6 space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
-                    <h2 className="text-2xl font-bold">Create Upload Category</h2>
-                    <p className="text-gray-600">Add categories for uploads</p>
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Category Name
+                    </label>
+                    <input
+                      type="text"
+                      value={editingUploadCatId ? editUploadCatName : uploadCatName}
+                      onChange={(e) => editingUploadCatId ? setEditUploadCatName(e.target.value) : setUploadCatName(e.target.value)}
+                      required
+                      className={`w-full p-2.5 border text-sm ${
+                        darkMode
+                          ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                      } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                      style={{ borderRadius: '2px' }}
+                      placeholder="e.g., Men, Women, Kids, Culture"
+                    />
                   </div>
+
+                  {!serviceOnlyMode && (
+                    <div>
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        Type
+                      </label>
+                      <select
+                        value={editingUploadCatId ? editUploadCatType : uploadCatType}
+                        onChange={(e) => editingUploadCatId ? setEditUploadCatType(e.target.value as 'product' | 'service') : setUploadCatType(e.target.value as 'product' | 'service')}
+                        className={`w-full p-2.5 border text-sm appearance-none cursor-pointer ${
+                          darkMode
+                            ? 'bg-gray-900 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
+                            : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
+                        }`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        <option value="product">Product</option>
+                        <option value="service">Service</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
 
-                <form onSubmit={editingUploadCatId ? handleUpdateUploadCat : handleCreateUploadCat} className="space-y-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Category Name
-                      </label>
-                      <div className="relative">
-                        <Tag className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                        <input
-                          type="text"
-                          value={editingUploadCatId ? editUploadCatName : uploadCatName}
-                          onChange={(e) => editingUploadCatId ? setEditUploadCatName(e.target.value) : setUploadCatName(e.target.value)}
-                          required
-                          className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
-                          placeholder="e.g., Men, Women, Kids, Culture"
-                        />
-                      </div>
-                    </div>
-
-                    {!serviceOnlyMode && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Type
-                        </label>
-                        <div className="relative">
-                          <LayoutGrid className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                          <select
-                            value={editingUploadCatId ? editUploadCatType : uploadCatType}
-                            onChange={(e) => editingUploadCatId ? setEditUploadCatType(e.target.value as 'product' | 'service') : setUploadCatType(e.target.value as 'product' | 'service')}
-                            className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer"
-                          >
-                            <option value="product">Product</option>
-                            <option value="service">Service</option>
-                          </select>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-green-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>{editingUploadCatId ? 'Updating...' : 'Creating...'}</span>
-                      </>
-                    ) : (
-                      <>
-                        {editingUploadCatId ? (
-                          <>
-                            <Save className="w-5 h-5" />
-                            <span>Update Category</span>
-                          </>
-                        ) : (
-                          <>
-                            <Plus className="w-5 h-5" />
-                            <span>Create Category</span>
-                          </>
-                        )}
-                      </>
-                    )}
-                  </button>
-
+                <div className="flex justify-end gap-3 pt-2">
                   {editingUploadCatId && (
                     <button
                       type="button"
                       onClick={cancelEditingUploadCat}
-                      className="w-full flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-gray-200 text-gray-700 font-semibold transition-all duration-300 hover:bg-gray-300"
+                      className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border ${
+                        darkMode
+                          ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                          : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
+                      }`}
+                      style={{ borderRadius: '2px' }}
                     >
-                      <X className="w-5 h-5" />
-                      <span>Cancel Editing</span>
+                      Cancel
                     </button>
                   )}
-                </form>
-              </div>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border flex items-center gap-2 ${
+                      isSubmitting
+                        ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                        : 'bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500 shadow-sm'
+                    }`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    {isSubmitting
+                      ? 'Saving...'
+                      : editingUploadCatId
+                      ? 'Update Category'
+                      : 'Create Category'}
+                  </button>
+                </div>
+              </form>
             </div>
 
             {/* Upload Categories List */}
             <div>
-              <h3 className="text-2xl font-bold mb-6 flex items-center">
-                <LayoutGrid className="w-6 h-6 mr-3" />
+              <h3 className={`text-base font-bold uppercase tracking-tight mb-6 flex items-center gap-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                <LayoutGrid className="w-5 h-5" />
                 Manage Upload Categories
-                <span className="ml-3 px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
+                <span
+                  className={`text-xs px-2 py-0.5 border font-bold uppercase ${
+                    darkMode ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-green-50 text-green-700 border-green-500/10'
+                  }`}
+                  style={{ borderRadius: '2px' }}
+                >
                   {uploadCategories.length} categories
                 </span>
               </h3>
 
               {uploadCategories.length === 0 ? (
-                <div className="text-center py-12 bg-white/50 rounded-3xl border-2 border-dashed border-gray-300">
-                  <LayoutGrid className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h4 className="text-xl font-semibold text-gray-600 mb-2">No Upload Categories Yet</h4>
-                  <p className="text-gray-500">Create your first upload category to organize products and services</p>
+                <div
+                  className={`text-center py-12 border-2 border-dashed ${
+                    darkMode ? 'border-gray-700 bg-gray-800/30' : 'border-gray-300 bg-white/50'
+                  }`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  <LayoutGrid className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <h4 className={`text-sm font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>
+                    No Upload Categories Yet
+                  </h4>
+                  <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                    Create your first upload category to organize products and services
+                  </p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {/* Product Categories */}
                   {!serviceOnlyMode && (
                     <div>
-                      <h4 className="text-lg font-semibold mb-3 flex items-center text-blue-600">
-                        <ShoppingBag className="w-5 h-5 mr-2" />
+                      <h4 className={`text-xs font-bold uppercase tracking-wider mb-3 flex items-center gap-2 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                        <ShoppingBag className="w-4 h-4" />
                         Product Categories ({uploadCategories.filter(c => c.type === 'product').length})
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         {uploadCategories.filter(c => c.type === 'product').map((cat) => (
                           <div
                             key={cat.id}
-                            className={`rounded-2xl border-2 backdrop-blur-sm transition-all duration-300 hover:shadow-lg ${localStorage.theme === 'dark'
-                              ? 'bg-gray-800/80 border-gray-700'
-                              : 'bg-white/90 border-blue-200'
-                              }`}
+                            className={`border transition-all duration-300 ${
+                              darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-blue-200'
+                            } shadow-sm`}
+                            style={{ borderRadius: '2px' }}
                           >
-                            <div className="p-5">
-                              <div className="flex items-center justify-between mb-3">
-                                <h5 className="text-lg font-bold text-gray-900">{cat.name}</h5>
-                                <span className="px-2 py-1 rounded-lg bg-blue-100 text-blue-700 text-xs font-semibold">
+                            <div className="p-5 space-y-3">
+                              <div className="flex items-center justify-between">
+                                <h5 className={`text-sm font-bold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                  {cat.name}
+                                </h5>
+                                <span
+                                  className={`text-[8px] px-1.5 py-0.5 border font-bold uppercase ${
+                                    darkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'
+                                  }`}
+                                  style={{ borderRadius: '2px' }}
+                                >
                                   Product
                                 </span>
                               </div>
 
-                              <div className="flex gap-2">
+                              <div className="flex gap-2 pt-1">
                                 <button
                                   onClick={() => startEditingUploadCat(cat)}
-                                  className="flex items-center justify-center space-x-1 px-3 py-2 rounded-lg bg-blue-100 text-blue-700 font-medium transition-all duration-300 hover:bg-blue-200 flex-1"
+                                  className={`flex items-center justify-center gap-1 px-3 py-1 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+                                    darkMode
+                                      ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 hover:bg-blue-500/20'
+                                      : 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100/50'
+                                  }`}
+                                  style={{ borderRadius: '2px' }}
                                 >
-                                  <Edit3 className="w-4 h-4" />
-                                  <span className="text-sm">Edit</span>
+                                  <Edit3 className="w-3 h-3" />
+                                  <span>Edit</span>
                                 </button>
                                 <button
                                   onClick={() => handleDeleteUploadCat(cat.id)}
-                                  className="flex items-center justify-center space-x-1 px-3 py-2 rounded-lg bg-red-100 text-red-700 font-medium transition-all duration-300 hover:bg-red-200 flex-1"
+                                  className={`flex items-center justify-center gap-1 px-3 py-1 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+                                    darkMode
+                                      ? 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20'
+                                      : 'bg-red-50 border-red-200 text-red-655 hover:bg-red-100/50'
+                                  }`}
+                                  style={{ borderRadius: '2px' }}
                                 >
-                                  <Trash2 className="w-4 h-4" />
-                                  <span className="text-sm">Delete</span>
+                                  <Trash2 className="w-3 h-3" />
+                                  <span>Delete</span>
                                 </button>
                               </div>
                             </div>
@@ -1555,41 +1862,60 @@ export default function AdminDashboard() {
 
                   {/* Service Categories */}
                   <div>
-                    <h4 className="text-lg font-semibold mb-3 flex items-center text-purple-600 mt-8">
-                      <Package className="w-5 h-5 mr-2" />
+                    <h4 className={`text-xs font-bold uppercase tracking-wider mb-3 flex items-center gap-2 ${darkMode ? 'text-purple-400' : 'text-purple-650'}`}>
+                      <Package className="w-4 h-4" />
                       Service Categories ({uploadCategories.filter(c => c.type === 'service').length})
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                       {uploadCategories.filter(c => c.type === 'service').map((cat) => (
                         <div
                           key={cat.id}
-                          className={`rounded-2xl border-2 backdrop-blur-sm transition-all duration-300 hover:shadow-lg ${localStorage.theme === 'dark'
-                            ? 'bg-gray-800/80 border-gray-700'
-                            : 'bg-white/90 border-purple-200'
-                            }`}
+                          className={`border transition-all duration-300 ${
+                            darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-purple-200'
+                          } shadow-sm`}
+                          style={{ borderRadius: '2px' }}
                         >
-                          <div className="p-5">
-                            <div className="flex items-center justify-between mb-3">
-                              <h5 className="text-lg font-bold text-gray-900">{cat.name}</h5>
-                              <span className="px-2 py-1 rounded-lg bg-purple-100 text-purple-700 text-xs font-semibold">
+                          <div className="p-5 space-y-3">
+                            <div className="flex items-center justify-between">
+                              <h5 className={`text-sm font-bold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                {cat.name}
+                              </h5>
+                              <span
+                                className={`text-[8px] px-1.5 py-0.5 border font-bold uppercase ${
+                                  darkMode
+                                    ? 'bg-purple-500/10 border-purple-500/20 text-purple-400'
+                                    : 'bg-purple-50 border-purple-200 text-purple-700'
+                                }`}
+                                style={{ borderRadius: '2px' }}
+                              >
                                 Service
                               </span>
                             </div>
 
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 pt-1">
                               <button
                                 onClick={() => startEditingUploadCat(cat)}
-                                className="flex items-center justify-center space-x-1 px-3 py-2 rounded-lg bg-purple-100 text-purple-700 font-medium transition-all duration-300 hover:bg-purple-200 flex-1"
+                                className={`flex items-center justify-center gap-1 px-3 py-1 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+                                  darkMode
+                                    ? 'bg-purple-500/10 border-purple-500/20 text-purple-400 hover:bg-purple-500/20'
+                                    : 'bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100/50'
+                                }`}
+                                style={{ borderRadius: '2px' }}
                               >
-                                <Edit3 className="w-4 h-4" />
-                                <span className="text-sm">Edit</span>
+                                <Edit3 className="w-3 h-3" />
+                                <span>Edit</span>
                               </button>
                               <button
                                 onClick={() => handleDeleteUploadCat(cat.id)}
-                                className="flex items-center justify-center space-x-1 px-3 py-2 rounded-lg bg-red-100 text-red-700 font-medium transition-all duration-300 hover:bg-red-200 flex-1"
+                                className={`flex items-center justify-center gap-1 px-3 py-1 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+                                  darkMode
+                                    ? 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20'
+                                    : 'bg-red-50 border-red-200 text-red-655 hover:bg-red-100/50'
+                                }`}
+                                style={{ borderRadius: '2px' }}
                               >
-                                <Trash2 className="w-4 h-4" />
-                                <span className="text-sm">Delete</span>
+                                <Trash2 className="w-3 h-3" />
+                                <span>Delete</span>
                               </button>
                             </div>
                           </div>
@@ -1602,185 +1928,309 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+
         {/* App Phases Tab */}
         {activeTab === 'phases' && (
           <div className="space-y-8">
-
             {/* Phase message */}
             {phaseMsg && (
-              <div className={`p-4 rounded-2xl border-2 transition-all duration-300 ${phaseMsg.startsWith('✅') ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'
-                }`}>
+              <div
+                className={`p-4 border transition-all duration-300 ${
+                  phaseMsg.startsWith('✅')
+                    ? darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-455' : 'bg-emerald-50 border-emerald-500/10 text-emerald-600'
+                    : darkMode ? 'bg-red-500/10 border-red-500/20 text-red-455' : 'bg-red-50 border-red-200 text-red-655'
+                }`}
+                style={{ borderRadius: '2px' }}
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    {phaseMsg.startsWith('✅') ? <Check className="w-5 h-5 text-green-600" /> : <AlertCircle className="w-5 h-5 text-red-600" />}
-                    <span className="font-medium">{phaseMsg}</span>
+                    {phaseMsg.startsWith('✅') ? (
+                      <Check className={`w-5 h-5 ${darkMode ? 'text-emerald-455' : 'text-green-600'}`} />
+                    ) : (
+                      <AlertCircle className="w-5 h-5 text-red-500" />
+                    )}
+                    <span className="text-sm font-semibold">{phaseMsg}</span>
                   </div>
-                  <button onClick={() => setPhaseMsg('')} className="p-1 rounded-lg hover:bg-black/5"><X className="w-4 h-4" /></button>
+                  <button onClick={() => setPhaseMsg('')} className="p-1 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             )}
 
             {/* Create Phase Form */}
-            <div className="rounded-3xl shadow-2xl border-2 backdrop-blur-sm bg-white/90 border-gray-200">
-              <div className="p-8">
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className="p-2 rounded-xl bg-orange-100">
-                    <Layers className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold">Create App Phase</h2>
-                    <p className="text-gray-500 text-sm">Define a phase key to gate features. The key is permanent; only label &amp; description can be edited later.</p>
-                  </div>
-                </div>
+            <div
+              className={`border transition-all duration-300 ${
+                darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-250'
+              } shadow-sm overflow-hidden`}
+              style={{ borderRadius: '2px' }}
+            >
+              <div
+                className={`px-6 py-4 border-b ${
+                  darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'
+                } flex justify-between items-center`}
+              >
+                <h3 className={`text-base font-bold uppercase tracking-tight flex items-center gap-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Create App Phase
+                </h3>
+              </div>
 
-                <form onSubmit={handleCreatePhase} className="space-y-5">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Phase Key <span className="text-orange-500">*</span></label>
-                      <div className="relative">
-                        <Tag className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                        <input
-                          type="text"
-                          value={newPhaseName}
-                          onChange={(e) => setNewPhaseName(e.target.value)}
-                          placeholder="e.g. phase_1 or marketplace"
-                          required
-                          className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all"
-                        />
-                      </div>
-                      <p className="text-xs text-gray-400 mt-1">Lowercase snake_case. Cannot be changed after creation.</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Label <span className="text-orange-500">*</span></label>
-                      <div className="relative">
-                        <FileText className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                        <input
-                          type="text"
-                          value={newPhaseLabel}
-                          onChange={(e) => setNewPhaseLabel(e.target.value)}
-                          placeholder="e.g. Phase 1 – Core Features"
-                          required
-                          className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all"
-                        />
-                      </div>
-                    </div>
+              <form onSubmit={handleCreatePhase} className="p-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Phase Key <span className="text-orange-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={newPhaseName}
+                      onChange={(e) => setNewPhaseName(e.target.value)}
+                      placeholder="e.g. phase_1 or marketplace"
+                      required
+                      className={`w-full p-2.5 border text-sm ${
+                        darkMode
+                          ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                      } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                      style={{ borderRadius: '2px' }}
+                    />
+                    <p className={`text-[9px] font-bold uppercase mt-1.5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                      Lowercase snake_case. Cannot be changed after creation.
+                    </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Description (optional)</label>
-                    <textarea
-                      value={newPhaseDesc}
-                      onChange={(e) => setNewPhaseDesc(e.target.value)}
-                      placeholder="What features does this phase enable?"
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all h-20"
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Label <span className="text-orange-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={newPhaseLabel}
+                      onChange={(e) => setNewPhaseLabel(e.target.value)}
+                      placeholder="e.g. Phase 1 – Core Features"
+                      required
+                      className={`w-full p-2.5 border text-sm ${
+                        darkMode
+                          ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                      } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                      style={{ borderRadius: '2px' }}
                     />
                   </div>
+                </div>
+                <div>
+                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Description (optional)
+                  </label>
+                  <textarea
+                    value={newPhaseDesc}
+                    onChange={(e) => setNewPhaseDesc(e.target.value)}
+                    placeholder="What features does this phase enable?"
+                    className={`w-full p-2.5 border text-sm ${
+                      darkMode
+                        ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                        : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                    } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all h-24`}
+                    style={{ borderRadius: '2px' }}
+                  />
+                </div>
+                <div className="flex justify-end pt-2">
                   <button
                     type="submit"
-                    className="flex items-center space-x-2 px-8 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-rose-500 text-white font-semibold transition-all hover:scale-105 hover:shadow-lg"
+                    className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500 shadow-sm`}
+                    style={{ borderRadius: '2px' }}
                   >
-                    <Plus className="w-5 h-5" />
+                    <Plus className="w-4 h-4" />
                     <span>Create Phase</span>
                   </button>
-                </form>
-              </div>
+                </div>
+              </form>
             </div>
 
             {/* Phase List */}
-            <div className="rounded-3xl shadow-2xl border-2 backdrop-blur-sm bg-white/90 border-gray-200">
-              <div className="p-8">
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className="p-2 rounded-xl bg-orange-100">
-                    <Layers className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <h2 className="text-2xl font-bold">All Phases ({phases.length})</h2>
-                </div>
+            <div
+              className={`border transition-all duration-300 ${
+                darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-250'
+              } shadow-sm overflow-hidden`}
+              style={{ borderRadius: '2px' }}
+            >
+              <div
+                className={`px-6 py-4 border-b ${
+                  darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'
+                } flex justify-between items-center`}
+              >
+                <h3 className={`text-base font-bold uppercase tracking-tight flex items-center gap-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  All Phases
+                  <span
+                    className={`text-xs px-2 py-0.5 border font-bold uppercase ${
+                      darkMode ? 'bg-emerald-500/10 text-emerald-455 border-emerald-500/20' : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                    }`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    {phases.length} phases
+                  </span>
+                </h3>
+              </div>
 
+              <div className="p-6">
                 {phases.length === 0 ? (
-                  <div className="text-center py-16 text-gray-400">
-                    <Layers className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                    <p className="text-lg font-medium">No phases yet</p>
-                    <p className="text-sm">Create a phase above to start managing your app rollout.</p>
+                  <div
+                    className={`text-center py-12 border-2 border-dashed ${
+                      darkMode ? 'border-gray-700 bg-gray-800/30' : 'border-gray-300 bg-white/50'
+                    }`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    <Layers className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <h4 className={`text-sm font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>
+                      No phases yet
+                    </h4>
+                    <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                      Create a phase above to start managing your app rollout
+                    </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {phases.map((phase) => (
                       <div
                         key={phase.id}
-                        className={`rounded-2xl border-2 transition-all duration-300 hover:shadow-lg ${phase.is_enabled ? 'border-green-300 bg-green-50' : 'border-gray-200 bg-white'
-                          }`}
+                        className={`border transition-all duration-300 ${
+                          phase.is_enabled
+                            ? darkMode
+                              ? 'bg-emerald-950/20 border-emerald-800'
+                              : 'bg-emerald-50/50 border-emerald-200'
+                            : darkMode
+                            ? 'bg-gray-900 border-gray-750'
+                            : 'bg-white border-gray-200'
+                        }`}
+                        style={{ borderRadius: '2px' }}
                       >
                         {editingPhaseId === phase.id ? (
                           /* Inline edit form */
-                          <form onSubmit={handleUpdatePhase} className="p-5 space-y-3">
-                            <input
-                              type="text"
-                              value={editPhaseLabel}
-                              onChange={(e) => setEditPhaseLabel(e.target.value)}
-                              required
-                              className="w-full px-3 py-2 rounded-lg border-2 border-orange-300 focus:ring-2 focus:ring-orange-400 text-sm"
-                              placeholder="Label"
-                            />
-                            <textarea
-                              value={editPhaseDesc}
-                              onChange={(e) => setEditPhaseDesc(e.target.value)}
-                              className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 text-sm h-16"
-                              placeholder="Description (optional)"
-                            />
+                          <form onSubmit={handleUpdatePhase} className="p-5 space-y-4">
+                            <div>
+                              <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+                                Label
+                              </label>
+                              <input
+                                type="text"
+                                value={editPhaseLabel}
+                                onChange={(e) => setEditPhaseLabel(e.target.value)}
+                                required
+                                className={`w-full p-2 border text-xs ${
+                                  darkMode
+                                    ? 'bg-gray-900 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
+                                    : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
+                                }`}
+                                style={{ borderRadius: '2px' }}
+                              />
+                            </div>
+                            <div>
+                              <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                                Description
+                              </label>
+                              <textarea
+                                value={editPhaseDesc}
+                                onChange={(e) => setEditPhaseDesc(e.target.value)}
+                                className={`w-full p-2 border text-xs h-16 ${
+                                  darkMode
+                                    ? 'bg-gray-900 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
+                                    : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
+                                }`}
+                                style={{ borderRadius: '2px' }}
+                              />
+                            </div>
                             <div className="flex gap-2">
-                              <button type="submit" className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 rounded-lg bg-orange-500 text-white font-medium text-sm hover:bg-orange-600 transition-colors">
-                                <Save className="w-4 h-4" /><span>Save</span>
+                              <button
+                                type="submit"
+                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider border transition-colors bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500 shadow-sm"
+                                style={{ borderRadius: '2px' }}
+                              >
+                                <Save className="w-3.5 h-3.5" />
+                                <span>Save</span>
                               </button>
-                              <button type="button" onClick={() => { setEditingPhaseId(null); setPhaseMsg(''); }} className="flex items-center justify-center px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
-                                <X className="w-4 h-4" />
+                              <button
+                                type="button"
+                                onClick={() => { setEditingPhaseId(null); setPhaseMsg(''); }}
+                                className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider border transition-colors ${
+                                  darkMode
+                                    ? 'bg-gray-800 border-gray-755 text-gray-300 hover:bg-gray-700'
+                                    : 'bg-white border-gray-250 text-gray-750 hover:bg-gray-50'
+                                }`}
+                                style={{ borderRadius: '2px' }}
+                              >
+                                <X className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           </form>
                         ) : (
-                          <div className="p-5">
-                            {/* Header row: label + status badge */}
-                            <div className="flex items-start justify-between mb-1">
-                              <h3 className="text-base font-bold text-gray-900 leading-tight pr-2">{phase.label}</h3>
-                              <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-semibold ${phase.is_enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                                }`}>
+                          <div className="p-5 space-y-3">
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <h3 className={`text-base font-bold uppercase tracking-tight leading-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                  {phase.label}
+                                </h3>
+                                <p className="text-[10px] text-gray-400 font-mono mt-1">{phase.name}</p>
+                              </div>
+                              <span
+                                className={`text-[8px] px-1.5 py-0.5 border font-bold uppercase shrink-0 ${
+                                  phase.is_enabled
+                                    ? darkMode
+                                      ? 'bg-emerald-500/10 text-emerald-455 border-emerald-500/20'
+                                      : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                                    : darkMode
+                                    ? 'bg-gray-900/80 border-gray-700 text-gray-550'
+                                    : 'bg-gray-100 border-gray-200 text-gray-500'
+                                }`}
+                                style={{ borderRadius: '2px' }}
+                              >
                                 {phase.is_enabled ? 'Enabled' : 'Disabled'}
                               </span>
                             </div>
-                            {/* Key */}
-                            <p className="text-xs text-gray-400 font-mono mb-2">{phase.name}</p>
-                            {/* Description */}
+
                             {phase.description && (
-                              <p className="text-sm text-gray-500 mb-4 leading-snug">{phase.description}</p>
+                              <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} leading-relaxed`}>
+                                {phase.description}
+                              </p>
                             )}
 
-                            {/* Actions */}
-                            <div className="flex items-center gap-2 mt-3">
-                              {/* Toggle switch */}
+                            <div className="flex items-center gap-2 pt-2">
                               <button
                                 onClick={() => handleTogglePhase(phase.id)}
                                 title={phase.is_enabled ? 'Disable phase' : 'Enable phase'}
-                                className={`flex items-center space-x-1 px-3 py-2 rounded-lg font-medium text-sm transition-all hover:scale-105 ${phase.is_enabled
-                                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                  }`}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider border transition-colors ${
+                                  phase.is_enabled
+                                    ? darkMode
+                                      ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-450 hover:bg-emerald-500/20'
+                                      : 'bg-emerald-50 border-emerald-500/20 text-emerald-600 hover:bg-emerald-100/50'
+                                    : darkMode
+                                    ? 'bg-gray-800 border-gray-750 text-gray-400 hover:bg-gray-700/50'
+                                    : 'bg-white border-gray-250 text-gray-600 hover:bg-gray-55'
+                                }`}
+                                style={{ borderRadius: '2px' }}
                               >
-                                {phase.is_enabled
-                                  ? <ToggleRight className="w-5 h-5" />
-                                  : <ToggleLeft className="w-5 h-5" />}
+                                {phase.is_enabled ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
                                 <span>{phase.is_enabled ? 'On' : 'Off'}</span>
                               </button>
-                              {/* Edit */}
                               <button
                                 onClick={() => startEditingPhase(phase)}
-                                className="flex items-center justify-center px-3 py-2 rounded-lg bg-orange-100 text-orange-700 hover:bg-orange-200 transition-all text-sm"
+                                className={`flex items-center justify-center p-2 border transition-colors ${
+                                  darkMode
+                                    ? 'bg-orange-500/10 border-orange-500/20 text-orange-400 hover:bg-orange-500/20'
+                                    : 'bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100/50'
+                                }`}
+                                style={{ borderRadius: '2px' }}
                               >
-                                <Edit3 className="w-4 h-4" />
+                                <Edit3 className="w-3.5 h-3.5" />
                               </button>
-                              {/* Delete */}
                               <button
                                 onClick={() => handleDeletePhase(phase.id, phase.label)}
-                                className="flex items-center justify-center px-3 py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition-all text-sm"
+                                className={`flex items-center justify-center p-2 border transition-colors ${
+                                  darkMode
+                                    ? 'bg-red-500/10 border-red-500/20 text-red-455 hover:bg-red-500/20'
+                                    : 'bg-red-50 border-red-200 text-red-655 hover:bg-red-100/50'
+                                }`}
+                                style={{ borderRadius: '2px' }}
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           </div>
@@ -1793,21 +2243,35 @@ export default function AdminDashboard() {
             </div>
 
             {/* Usage hint */}
-            <div className="rounded-2xl border-2 border-blue-200 bg-blue-50 p-6">
+            <div
+              className={`p-4 border ${
+                darkMode ? 'bg-blue-950/20 border-blue-900 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-800'
+              }`}
+              style={{ borderRadius: '2px' }}
+            >
               <div className="flex items-start space-x-3">
-                <Shield className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+                <Shield className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
                 <div>
-                  <h4 className="font-semibold text-blue-800 mb-1">How to gate a feature behind a phase</h4>
-                  <p className="text-sm text-blue-700 mb-2">Import <code className="bg-blue-100 px-1 rounded font-mono">usePhases</code> from <code className="bg-blue-100 px-1 rounded font-mono">@/context/PhaseContext</code> in any component:</p>
-                  <pre className="bg-white rounded-xl p-3 text-xs text-gray-700 overflow-x-auto border border-blue-200">{`const { isPhaseEnabled } = usePhases();
-if (!isPhaseEnabled('phase_1')) return null; // 👈 feature hidden until enabled`}</pre>
+                  <h4 className="font-bold text-xs uppercase tracking-wider mb-2">
+                    How to gate a feature behind a phase
+                  </h4>
+                  <p className="text-xs mb-2 leading-relaxed">
+                    Import <code className={`px-1 py-0.5 font-mono text-xs border ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-blue-100'}`} style={{ borderRadius: '2px' }}>usePhases</code> from <code className={`px-1 py-0.5 font-mono text-xs border ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-blue-100'}`} style={{ borderRadius: '2px' }}>@/context/PhaseContext</code> in any component:
+                  </p>
+                  <pre
+                    className={`p-3 text-xs overflow-x-auto border ${
+                      darkMode ? 'bg-gray-900 border-gray-800 text-gray-300' : 'bg-white border-blue-250 text-gray-700'
+                    }`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    {`const { isPhaseEnabled } = usePhases();
+if (!isPhaseEnabled('phase_1')) return null; // 👈 feature hidden until enabled`}
+                  </pre>
                 </div>
               </div>
             </div>
-
           </div>
         )}
-
       </div>
     </div>
   );

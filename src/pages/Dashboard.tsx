@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 // import { Images } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useDarkMode } from '@/context/DarkMode';
-import { ServiceFeature } from '@/types/features';
-import DashboardOverviewCards from '../components/DashboardParts/DashboardOverviewCards'; // adjust path if needed
+import { ServiceFeature } from '@/types/features';// adjust path if needed
 import MediaManagementSection from '../components/DashboardParts/MediaManagementSection';
 import SubscriptionBanner from '../components/DashboardParts/PlansScrollingBanner';
 import ProductUploadCard from '../components/DashboardParts/ProductUploadCard';
@@ -460,16 +459,6 @@ export default function Dashboard() {
 
     if (isUploadingService) return;
     setIsUploadingService(true);
-
-    // Debug logging for feature data
-    // console.log('═══════════════════════════════════════════════════════');
-    // console.log('🚀 [FRONTEND] Starting Service Upload');
-    // console.log('═══════════════════════════════════════════════════════');
-    // console.log('📦 Service has specific_features:', service?.specific_features);
-    // console.log('📦 Service features defined:', service?.features);
-    // console.log('📦 Current featureValues state:', JSON.stringify(featureValues, null, 2));
-    // console.log('═══════════════════════════════════════════════════════');
-
     try {
 
       // Upload images
@@ -992,46 +981,38 @@ export default function Dashboard() {
         <SubscriptionBanner />
       </div>
 
-      <h2 className={`text-4xl font-bold mb-2 text-center ${darkMode ? "text-teal-300" : "text-hafi-teal"}`}>Service Provider's Dashboard</h2>
+      <h2 className={`text-2xl font-bold tracking-tighter uppercase text-center mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>Service Provider's Dashboard</h2>
       {service?.title && (
-        <p className={`text-center mb-6 text-lg ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
-          Service: <span className={`font-semibold ${darkMode ? "text-teal-400" : "text-hafi-teal"}`}>{service.title}</span>
+        <p className={`text-center mb-6 text-xs font-bold uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+          Service: <span className="text-emerald-500">{service.title}</span>
         </p>
       )}
-      <section className="py-4 px-0 md:p-8 ">
-        {user?.roles?.includes('service_provider') && !service ? (
-          <ServicePromptBanner darkMode={darkMode} />
-        ) : (
-          <WhatsAppPromptBanner providerId={providerId} darkMode={darkMode} />
-        )}
-        <DashboardOverviewCards />
-      </section>
-
+    
       {!serviceOnlyMode && (
         <div className="flex justify-center space-x-4 mb-6">
           <button
             onClick={() => setSelectedCard('product')}
-            className={`px-4 py-2 rounded transition-colors ${selectedCard === 'product'
-              ? darkMode
-                ? 'bg-teal-600 text-white'
-                : 'bg-hafi-green text-white'
-              : darkMode
-                ? 'bg-gray-700 hover:bg-gray-600'
-                : 'bg-gray-200 hover:bg-gray-300'
+            className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border
+              ${selectedCard === 'product'
+                ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm'
+                : darkMode
+                  ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                  : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
               }`}
+            style={{ borderRadius: '2px' }}
           >
             Product Upload
           </button>
           <button
             onClick={() => setSelectedCard('service')}
-            className={`px-4 py-2 rounded transition-colors ${selectedCard === 'service'
-              ? darkMode
-                ? 'bg-teal-600 text-white'
-                : 'bg-hafi-green text-white'
-              : darkMode
-                ? 'bg-gray-700 hover:bg-gray-600'
-                : 'bg-gray-200 hover:bg-gray-300'
+            className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border
+              ${selectedCard === 'service'
+                ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm'
+                : darkMode
+                  ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                  : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
               }`}
+            style={{ borderRadius: '2px' }}
           >
             Service Upload
           </button>

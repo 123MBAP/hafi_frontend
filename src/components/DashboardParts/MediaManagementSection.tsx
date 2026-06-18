@@ -122,20 +122,15 @@ export default function MediaManagementSection({
         {/* Products Section */}
         {!hideProducts && (
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <h2
-                className={`text-2xl font-bold ${darkMode ? 'text-teal-300' : 'text-hafi-teal'
-                  }`}
-              >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className={`text-base font-bold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                 Product Images
               </h2>
               {selectedProductImages.size > 0 && (
                 <div className="space-x-2">
                   <button
-                    className={`px-3 py-1 rounded transition-colors ${darkMode
-                      ? 'bg-red-700 hover:bg-red-600'
-                      : 'bg-red-600 hover:bg-red-700'
-                      } text-white`}
+                    className="px-3 py-1 font-semibold text-xs uppercase tracking-wider bg-red-500 hover:bg-red-650 hover:bg-red-600 text-white transition-colors"
+                    style={{ borderRadius: '2px' }}
                     onClick={() => deleteSelected('product')}
                     disabled={bulkDeletingProducts || bulkHidingProducts}
                   >
@@ -148,10 +143,11 @@ export default function MediaManagementSection({
                     )}
                   </button>
                   <button
-                    className={`px-3 py-1 rounded transition-colors ${darkMode
-                      ? 'bg-gray-700 hover:bg-gray-600'
-                      : 'bg-gray-500 hover:bg-gray-600'
-                      } text-white`}
+                    className={`px-3 py-1 font-semibold text-xs uppercase tracking-wider border transition-colors ${darkMode
+                      ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                      : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
+                      }`}
+                    style={{ borderRadius: '2px' }}
                     onClick={() => hideSelected('product')}
                     disabled={bulkDeletingProducts || bulkHidingProducts}
                   >
@@ -179,13 +175,14 @@ export default function MediaManagementSection({
                 return (
                   <div
                     key={idx}
-                    className={`flex flex-col border shadow-md rounded-lg overflow-hidden transition-all duration-300 relative ${darkMode
+                    className={`flex flex-col border shadow-sm transition-all duration-300 relative ${darkMode
                       ? 'bg-gray-800 border-gray-700'
                       : 'bg-white border-gray-200'
                       } ${isDeleting && !isPendingUndo
                         ? 'opacity-50 pointer-events-none'
-                        : 'opacity-100 hover:shadow-lg'
+                        : 'opacity-100 hover:border-emerald-500 hover:shadow-md'
                       }`}
+                    style={{ borderRadius: '2px' }}
                   >
                     {/* Checkbox */}
                     <div className="absolute top-2 left-2 z-30">
@@ -193,8 +190,8 @@ export default function MediaManagementSection({
                         type="checkbox"
                         checked={selectedProductImages.has(item.id)}
                         onChange={() => toggleSelectProduct(item.id)}
-                        className={`h-4 w-4 rounded ${darkMode ? 'text-teal-500' : 'text-hafi-teal'
-                          }`}
+                        className="h-4 w-4 text-emerald-600 focus:ring-emerald-500"
+                        style={{ borderRadius: '2px' }}
                       />
                     </div>
 
@@ -205,21 +202,28 @@ export default function MediaManagementSection({
                     >
                       {/* Made in Rwanda Badge */}
                       {item.madeInRwanda && (
-                        <div className="absolute top-2 left-10 z-20 bg-gradient-to-r from-blue-500 to-yellow-400 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+                        <div 
+                          className="absolute top-2 left-10 z-20 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-3 py-1 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm border border-emerald-500/20"
+                          style={{ borderRadius: '2px' }}
+                        >
                           🇷🇼 Made in Rwanda
                         </div>
                       )}
 
                       {/* Video Badge */}
                       {(item.fileType === 'video' || item.fileType === 'mixed') && (
-                        <div className="absolute top-2 right-2 z-20 bg-black/60 text-white px-2 py-1 rounded-full text-xs font-medium shadow-lg flex items-center gap-1">
+                        <div 
+                          className="absolute top-2 right-2 z-20 bg-black/70 text-white px-2 py-1 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm border border-white/10"
+                          style={{ borderRadius: '2px' }}
+                        >
                           <FiVideo size={12} /> Video
                         </div>
                       )}
 
                       <div
-                        className={`w-full aspect-[4/3] flex items-center justify-center ${darkMode ? 'bg-gray-700' : 'bg-gray-100'
+                        className={`w-full aspect-[4/3] flex items-center justify-center ${darkMode ? 'bg-gray-700/50' : 'bg-gray-100'
                           }`}
+                        style={{ borderRadius: '2px 2px 0 0' }}
                       >
                         {item.fileType === 'mixed' && item.mediaFiles ? (
                           <div className="relative w-full h-full group cursor-pointer">
@@ -227,14 +231,15 @@ export default function MediaManagementSection({
                               images={item.mediaFiles.filter((media: any) => media.type === 'image').map((media: any) => media.url)}
                               alt={item.title}
                               API_BASE={apiBase}
-                              className="w-full aspect-[4/3] flex items-center justify-center rounded-t"
+                              className="w-full aspect-[4/3] flex items-center justify-center"
+                              style={{ borderRadius: '2px 2px 0 0' }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent group-hover:from-black/60 transition-all duration-200 pointer-events-none" />
-                            <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded pointer-events-none">
+                            <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white text-[10px] px-2 py-1 pointer-events-none" style={{ borderRadius: '2px' }}>
                               {item.mediaFiles.filter((m: any) => m.type === 'image').length} images,{' '}
                               {item.mediaFiles.filter((m: any) => m.type === 'video').length} videos
                             </div>
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-70 rounded-full p-2 group-hover:scale-110 transition-transform duration-200 pointer-events-none">
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-70 p-2 group-hover:scale-110 transition-transform duration-200 pointer-events-none" style={{ borderRadius: '2px' }}>
                               <svg
                                 className="w-6 h-6 text-white"
                                 fill="currentColor"
@@ -257,18 +262,20 @@ export default function MediaManagementSection({
                                 images={imageViews}
                                 alt={item.title}
                                 API_BASE={apiBase}
-                                className="w-full aspect-[4/3] flex items-center justify-center rounded-t"
+                                className="w-full aspect-[4/3] flex items-center justify-center"
+                                style={{ borderRadius: '2px 2px 0 0' }}
                               />
                             ) : (
                               <div className="relative w-full h-full group cursor-pointer">
                                 <video
-                                  className="w-full h-full object-cover rounded-t pointer-events-none"
+                                  className="w-full h-full object-cover pointer-events-none"
+                                  style={{ borderRadius: '2px 2px 0 0' }}
                                   src={resolveUrl(item.url)}
                                   preload="metadata"
                                   muted
                                 />
                                 <div className="absolute inset-0 bg-black bg-opacity-30 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center pointer-events-none">
-                                  <div className="bg-black bg-opacity-70 rounded-full p-3 group-hover:scale-110 transition-transform duration-200">
+                                  <div className="bg-black bg-opacity-70 p-3 group-hover:scale-110 transition-transform duration-200" style={{ borderRadius: '2px' }}>
                                     <svg
                                       className="w-8 h-8 text-white"
                                       fill="currentColor"
@@ -278,7 +285,7 @@ export default function MediaManagementSection({
                                     </svg>
                                   </div>
                                 </div>
-                                <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded pointer-events-none">
+                                <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white text-[10px] px-2 py-0.5 pointer-events-none" style={{ borderRadius: '2px' }}>
                                   Click to play
                                 </div>
                               </div>
@@ -289,29 +296,21 @@ export default function MediaManagementSection({
                             images={[item.url, ...(item.views ?? [])]}
                             alt={item.title}
                             API_BASE={apiBase}
-                            className="w-full aspect-[4/3] flex items-center justify-center rounded-t"
+                            className="w-full aspect-[4/3] flex items-center justify-center"
+                            style={{ borderRadius: '2px 2px 0 0' }}
                           />
                         )}
                       </div>
                     </button>
 
                     {/* Info */}
-                    <div
-                      className={`text-base font-bold text-center mt-3 mb-1 px-2 ${darkMode ? 'text-teal-300' : 'text-hafi-teal'
-                        }`}
-                    >
+                    <div className={`font-bold text-sm uppercase tracking-tight text-center mt-3 mb-1 px-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                       {item.title}
                     </div>
-                    <div
-                      className={`text-center text-sm mb-1 px-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                        }`}
-                    >
+                    <div className={`text-center text-xs mb-1 px-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                       {item.desc}
                     </div>
-                    <div
-                      className={`font-semibold text-center mb-2 ${darkMode ? 'text-teal-400' : 'text-hafi-green'
-                        }`}
-                    >
+                    <div className="font-bold text-sm text-center text-emerald-500 mb-2">
                       Price: ${item.price}
                     </div>
 
@@ -323,9 +322,10 @@ export default function MediaManagementSection({
                             e.stopPropagation();
                             openModal(item, true); // Start at video
                           }}
-                          className="w-full py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 flex items-center justify-center gap-2 font-medium transition shadow-md"
+                          className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center gap-2 font-semibold text-xs transition-colors uppercase tracking-wider"
+                          style={{ borderRadius: '2px' }}
                         >
-                          <FiVideo size={18} /> View Video
+                          <FiVideo size={14} /> View Video
                         </button>
                       </div>
                     )}
@@ -337,20 +337,15 @@ export default function MediaManagementSection({
                           }`}
                       >
                         <div className="flex items-center gap-2">
-                          <Loader2 className="animate-spin w-4 h-4 text-red-600" />
-                          <span
-                            className={`text-sm ${darkMode ? 'text-red-400' : 'text-red-600'
-                              }`}
-                          >
+                          <Loader2 className="animate-spin w-4 h-4 text-red-650" />
+                          <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-red-400' : 'text-red-600'}`}>
                             Deleting...
                           </span>
                         </div>
                         <button
                           onClick={handleUndo}
-                          className={`px-2 py-1 text-xs rounded transition-colors ${darkMode
-                            ? 'bg-teal-600 hover:bg-teal-500'
-                            : 'bg-hafi-teal hover:bg-teal-600'
-                            } text-white`}
+                          className="px-2 py-1 font-semibold text-xs transition-colors uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-white"
+                          style={{ borderRadius: '2px' }}
                         >
                           Undo
                         </button>
@@ -358,22 +353,21 @@ export default function MediaManagementSection({
                     )}
 
                     {/* Edit/Delete */}
-                    <div className="flex justify-center gap-2 mb-2 mt-2 z-0">
+                    <div className="flex justify-center gap-2 mb-2 mt-2 z-0 px-4">
                       <button
-                        className={`px-3 py-1 rounded transition-colors ${darkMode
-                          ? 'bg-teal-600 hover:bg-teal-500'
-                          : 'bg-hafi-teal hover:bg-teal-600'
-                          } text-white`}
+                        className={`flex-1 py-1.5 font-semibold text-xs border uppercase tracking-wider transition-colors ${darkMode
+                          ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                          : 'bg-white border-gray-250 text-gray-750 hover:bg-gray-50'
+                          }`}
+                        style={{ borderRadius: '2px' }}
                         onClick={() => startEditing(item)}
                         disabled={isDeleting}
                       >
                         Edit
                       </button>
                       <button
-                        className={`px-3 py-1 rounded transition-colors ${darkMode
-                          ? 'bg-red-700 hover:bg-red-600'
-                          : 'bg-red-600 hover:bg-red-700'
-                          } text-white`}
+                        className="flex-1 py-1.5 font-semibold text-xs uppercase tracking-wider bg-red-500 hover:bg-red-600 text-white transition-colors"
+                        style={{ borderRadius: '2px' }}
                         onClick={() => deleteImage(item)}
                         disabled={isDeleting}
                       >
@@ -382,10 +376,7 @@ export default function MediaManagementSection({
                     </div>
 
                     {!item.visible && (
-                      <div
-                        className={`text-xs text-center italic mb-2 ${darkMode ? 'text-red-400' : 'text-red-500'
-                          }`}
-                      >
+                      <div className={`text-[10px] font-bold uppercase text-center tracking-wider mb-2 ${darkMode ? 'text-red-400' : 'text-red-500'}`}>
                         Hidden from customers
                       </div>
                     )}
@@ -398,20 +389,15 @@ export default function MediaManagementSection({
 
         {/* Services Section */}
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <h2
-              className={`text-2xl font-bold ${darkMode ? 'text-teal-300' : 'text-hafi-teal'
-                }`}
-            >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className={`text-base font-bold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
               Service Images
             </h2>
             {selectedServiceImages.size > 0 && (
               <div className="space-x-2">
                 <button
-                  className={`px-3 py-1 rounded transition-colors ${darkMode
-                    ? 'bg-red-700 hover:bg-red-600'
-                    : 'bg-red-600 hover:bg-red-700'
-                    } text-white`}
+                  className="px-3 py-1 font-semibold text-xs uppercase tracking-wider bg-red-500 hover:bg-red-650 hover:bg-red-600 text-white transition-colors"
+                  style={{ borderRadius: '2px' }}
                   onClick={() => deleteSelected('service')}
                   disabled={bulkDeletingServices || bulkHidingServices}
                 >
@@ -424,10 +410,11 @@ export default function MediaManagementSection({
                   )}
                 </button>
                 <button
-                  className={`px-3 py-1 rounded transition-colors ${darkMode
-                    ? 'bg-gray-700 hover:bg-gray-600'
-                    : 'bg-gray-500 hover:bg-gray-600'
-                    } text-white`}
+                  className={`px-3 py-1 font-semibold text-xs uppercase tracking-wider border transition-colors ${darkMode
+                    ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                    : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  style={{ borderRadius: '2px' }}
                   onClick={() => hideSelected('service')}
                   disabled={bulkDeletingServices || bulkHidingServices}
                 >
@@ -455,13 +442,14 @@ export default function MediaManagementSection({
               return (
                 <div
                   key={idx}
-                  className={`flex flex-col border shadow-md rounded-lg overflow-hidden transition-all duration-300 relative ${darkMode
+                  className={`flex flex-col border shadow-sm transition-all duration-300 relative ${darkMode
                     ? 'bg-gray-800 border-gray-700'
                     : 'bg-white border-gray-200'
                     } ${isDeleting && !isPendingUndo
                       ? 'opacity-50 pointer-events-none'
-                      : 'opacity-100 hover:shadow-lg'
+                      : 'opacity-100 hover:border-emerald-500 hover:shadow-md'
                     }`}
+                  style={{ borderRadius: '2px' }}
                 >
                   {/* Checkbox */}
                   <div className="absolute top-2 left-2 z-30">
@@ -469,8 +457,8 @@ export default function MediaManagementSection({
                       type="checkbox"
                       checked={selectedServiceImages.has(item.id)}
                       onChange={() => toggleSelectService(item.id)}
-                      className={`h-4 w-4 rounded ${darkMode ? 'text-teal-500' : 'text-hafi-teal'
-                        }`}
+                      className="h-4 w-4 text-emerald-600 focus:ring-emerald-500"
+                      style={{ borderRadius: '2px' }}
                     />
                   </div>
 
@@ -481,14 +469,18 @@ export default function MediaManagementSection({
                   >
                     {/* Video Badge */}
                     {item.fileType === 'video' && (
-                      <div className="absolute top-2 right-2 z-20 bg-black/60 text-white px-2 py-1 rounded-full text-xs font-medium shadow-lg flex items-center gap-1">
+                      <div 
+                        className="absolute top-2 right-2 z-20 bg-black/70 text-white px-2 py-1 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm border border-white/10"
+                        style={{ borderRadius: '2px' }}
+                      >
                         <FiVideo size={12} /> Video
                       </div>
                     )}
 
                     <div
-                      className={`w-full aspect-[4/3] flex items-center justify-center relative ${darkMode ? 'bg-gray-700' : 'bg-gray-100'
+                      className={`w-full aspect-[4/3] flex items-center justify-center relative ${darkMode ? 'bg-gray-700/50' : 'bg-gray-100'
                         }`}
+                      style={{ borderRadius: '2px 2px 0 0' }}
                     >
                       {item.fileType === 'video' ? (
                         (() => {
@@ -503,18 +495,20 @@ export default function MediaManagementSection({
                               images={imageViews}
                               alt={item.title}
                               API_BASE={apiBase}
-                              className="w-full aspect-[4/3] flex items-center justify-center rounded-t"
+                              className="w-full aspect-[4/3] flex items-center justify-center"
+                              style={{ borderRadius: '2px 2px 0 0' }}
                             />
                           ) : (
                             <div className="relative w-full h-full group cursor-pointer">
                               <video
                                 src={resolveUrl(item.url)}
-                                className="w-full h-full object-cover rounded-t pointer-events-none"
+                                className="w-full h-full object-cover pointer-events-none"
+                                style={{ borderRadius: '2px 2px 0 0' }}
                                 preload="metadata"
                                 muted
                               />
                               <div className="absolute inset-0 bg-black bg-opacity-30 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center pointer-events-none">
-                                <div className="bg-black bg-opacity-70 rounded-full p-3 group-hover:scale-110 transition-transform duration-200">
+                                <div className="bg-black bg-opacity-70 p-3 group-hover:scale-110 transition-transform duration-200" style={{ borderRadius: '2px' }}>
                                   <svg
                                     className="w-8 h-8 text-white"
                                     fill="currentColor"
@@ -524,7 +518,7 @@ export default function MediaManagementSection({
                                   </svg>
                                 </div>
                               </div>
-                              <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded pointer-events-none">
+                              <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white text-[10px] px-2 py-1 pointer-events-none" style={{ borderRadius: '2px' }}>
                                 Click to play
                               </div>
                             </div>
@@ -535,29 +529,21 @@ export default function MediaManagementSection({
                           images={[item.url, ...(item.views ?? [])]}
                           alt={item.title}
                           API_BASE={apiBase}
-                          className="w-full aspect-[4/3] flex items-center justify-center rounded-t"
+                          className="w-full aspect-[4/3] flex items-center justify-center"
+                          style={{ borderRadius: '2px 2px 0 0' }}
                         />
                       )}
                     </div>
                   </button>
 
                   {/* Info */}
-                  <div
-                    className={`text-base font-bold text-center mt-3 mb-1 px-2 ${darkMode ? 'text-teal-300' : 'text-hafi-teal'
-                      }`}
-                  >
+                  <div className={`font-bold text-sm uppercase tracking-tight text-center mt-3 mb-1 px-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                     {item.title}
                   </div>
-                  <div
-                    className={`text-center text-sm mb-1 px-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                      }`}
-                  >
+                  <div className={`text-center text-xs mb-1 px-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     {item.desc}
                   </div>
-                  <div
-                    className={`font-semibold text-center mb-2 ${darkMode ? 'text-teal-400' : 'text-hafi-green'
-                      }`}
-                  >
+                  <div className="font-bold text-sm text-center text-emerald-500 mb-2">
                     Price: ${item.price}
                   </div>
 
@@ -569,9 +555,10 @@ export default function MediaManagementSection({
                           e.stopPropagation();
                           openModal(item, true); // Start at video
                         }}
-                        className="w-full py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 flex items-center justify-center gap-2 font-medium transition shadow-md"
+                        className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center gap-2 font-semibold text-xs transition-colors uppercase tracking-wider"
+                        style={{ borderRadius: '2px' }}
                       >
-                        <FiVideo size={18} /> View Video
+                        <FiVideo size={14} /> View Video
                       </button>
                     </div>
                   )}
@@ -583,20 +570,15 @@ export default function MediaManagementSection({
                         }`}
                     >
                       <div className="flex items-center gap-2">
-                        <Loader2 className="animate-spin w-4 h-4 text-red-600" />
-                        <span
-                          className={`text-sm ${darkMode ? 'text-red-400' : 'text-red-600'
-                            }`}
-                        >
+                        <Loader2 className="animate-spin w-4 h-4 text-red-650" />
+                        <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-red-400' : 'text-red-650'}`}>
                           Deleting...
                         </span>
                       </div>
                       <button
                         onClick={handleUndo}
-                        className={`px-2 py-1 text-xs rounded transition-colors ${darkMode
-                          ? 'bg-teal-600 hover:bg-teal-500'
-                          : 'bg-hafi-teal hover:bg-teal-600'
-                          } text-white`}
+                        className="px-2 py-1 font-semibold text-xs transition-colors uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-white"
+                        style={{ borderRadius: '2px' }}
                       >
                         Undo
                       </button>
@@ -604,22 +586,21 @@ export default function MediaManagementSection({
                   )}
 
                   {/* Edit/Delete */}
-                  <div className="flex justify-center gap-2 mb-2 mt-2 z-0">
+                  <div className="flex justify-center gap-2 mb-2 mt-2 z-0 px-4">
                     <button
-                      className={`px-3 py-1 rounded transition-colors ${darkMode
-                        ? 'bg-teal-600 hover:bg-teal-500'
-                        : 'bg-hafi-teal hover:bg-teal-600'
-                        } text-white`}
+                      className={`flex-1 py-1.5 font-semibold text-xs border uppercase tracking-wider transition-colors ${darkMode
+                        ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                        : 'bg-white border-gray-250 text-gray-750 hover:bg-gray-50'
+                        }`}
+                      style={{ borderRadius: '2px' }}
                       onClick={() => startEditing(item)}
                       disabled={isDeleting}
                     >
                       Edit
                     </button>
                     <button
-                      className={`px-3 py-1 rounded transition-colors ${darkMode
-                        ? 'bg-red-700 hover:bg-red-600'
-                        : 'bg-red-600 hover:bg-red-700'
-                        } text-white`}
+                      className="flex-1 py-1.5 font-semibold text-xs uppercase tracking-wider bg-red-500 hover:bg-red-650 hover:bg-red-600 text-white transition-colors"
+                      style={{ borderRadius: '2px' }}
                       onClick={() => deleteImage(item)}
                       disabled={isDeleting}
                     >
@@ -628,10 +609,7 @@ export default function MediaManagementSection({
                   </div>
 
                   {!item.visible && (
-                    <div
-                      className={`text-xs text-center italic mb-2 ${darkMode ? 'text-red-400' : 'text-red-500'
-                        }`}
-                    >
+                    <div className={`text-[10px] font-bold uppercase text-center tracking-wider mb-2 ${darkMode ? 'text-red-400' : 'text-red-500'}`}>
                       Hidden from customers
                     </div>
                   )}
@@ -646,65 +624,59 @@ export default function MediaManagementSection({
       {editingImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
           <div
-            className={`rounded-lg shadow-lg p-8 relative w-full max-w-md max-h-[90vh] overflow-y-auto border ${darkMode
+            className={`shadow-lg p-8 relative w-full max-w-md max-h-[90vh] overflow-y-auto border ${darkMode
               ? 'bg-gray-800 border-gray-700'
               : 'bg-white border-gray-200'
               }`}
+            style={{ borderRadius: '2px' }}
           >
             <button
-              className={`absolute top-2 right-2 rounded-full p-2 transition-colors ${darkMode
-                ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-                : 'bg-gray-200 hover:bg-gray-300'
+              className={`absolute top-2 right-2 p-2 transition-colors border ${darkMode
+                ? 'bg-gray-800 border-gray-750 text-gray-350 hover:bg-gray-700'
+                : 'bg-white border-gray-250 text-gray-750 hover:bg-gray-50'
                 }`}
+              style={{ borderRadius: '2px' }}
               onClick={onCloseEdit}
             >
               ✕
             </button>
-            <h3
-              className={`text-2xl font-semibold mb-4 ${darkMode ? 'text-teal-300' : 'text-hafi-teal'
-                }`}
-            >
-              Edit Image
+            <h3 className={`text-base font-bold uppercase tracking-tight mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              Edit Item
             </h3>
-            <label
-              className={`block font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}
-            >
+            <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               Title
             </label>
             <input
-              className={`border rounded px-2 py-1 w-full mb-2 ${darkMode
-                ? 'bg-gray-700 border-gray-600 text-white'
-                : 'bg-white border-gray-300'
+              className={`border p-2 w-full mb-3 text-sm ${darkMode
+                ? 'bg-gray-900 border-gray-750 text-white focus:ring-1 focus:ring-emerald-500 focus:outline-none'
+                : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500 focus:outline-none'
                 }`}
+              style={{ borderRadius: '2px' }}
               value={editingTitle}
               onChange={(e) => setEditingTitle(e.target.value)}
             />
-            <label
-              className={`block font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}
-            >
+            <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               Description
             </label>
-            <input
-              className={`border rounded px-2 py-1 w-full mb-2 ${darkMode
-                ? 'bg-gray-700 border-gray-600 text-white'
-                : 'bg-white border-gray-300'
+            <textarea
+              className={`border p-2 w-full mb-3 text-sm ${darkMode
+                ? 'bg-gray-900 border-gray-750 text-white focus:ring-1 focus:ring-emerald-500 focus:outline-none'
+                : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500 focus:outline-none'
                 }`}
+              style={{ borderRadius: '2px' }}
+              rows={4}
               value={editingDesc}
               onChange={(e) => setEditingDesc(e.target.value)}
             />
-            <label
-              className={`block font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}
-            >
+            <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               Price
             </label>
             <input
-              className={`border rounded px-2 py-1 w-full mb-2 ${darkMode
-                ? 'bg-gray-700 border-gray-600 text-white'
-                : 'bg-white border-gray-300'
+              className={`border p-2 w-full mb-3 text-sm ${darkMode
+                ? 'bg-gray-900 border-gray-750 text-white focus:ring-1 focus:ring-emerald-500 focus:outline-none'
+                : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500 focus:outline-none'
                 }`}
+              style={{ borderRadius: '2px' }}
               type="number"
               min={0}
               value={editingPrice ?? ''}
@@ -718,7 +690,7 @@ export default function MediaManagementSection({
             {/* Feature Fields for Services */}
             {editingImage.type === 'service' && service?.specific_features && service?.features && (
               <div className="mt-4 space-y-3">
-                <h4 className={`text-lg font-semibold ${darkMode ? 'text-teal-300' : 'text-hafi-teal'}`}>
+                <h4 className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   Service Features
                 </h4>
                 {service.features
@@ -737,10 +709,8 @@ export default function MediaManagementSection({
             )}
 
             <button
-              className={`px-4 py-2 rounded transition-colors mt-4 ${darkMode
-                ? 'bg-teal-600 hover:bg-teal-500'
-                : 'bg-hafi-green hover:bg-green-600'
-                } text-white`}
+              className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs transition-all uppercase tracking-wider mt-4"
+              style={{ borderRadius: '2px' }}
               onClick={saveEdit}
             >
               Save
@@ -762,7 +732,8 @@ export default function MediaManagementSection({
             >
               <button
                 onClick={closeModal}
-                className="absolute top-4 right-4 z-10 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full p-3 transition-all duration-200 backdrop-blur-sm"
+                className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-3 border border-white/20 transition"
+                style={{ borderRadius: '2px' }}
                 aria-label="Close"
               >
                 <svg
@@ -783,7 +754,8 @@ export default function MediaManagementSection({
               {modalViews.length > 1 && (
                 <>
                   <button
-                    className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full p-3 transition-all duration-200 backdrop-blur-sm"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-3 border border-white/20 transition"
+                    style={{ borderRadius: '2px' }}
                     aria-label="Previous"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -805,7 +777,8 @@ export default function MediaManagementSection({
                     </svg>
                   </button>
                   <button
-                    className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full p-3 transition-all duration-200 backdrop-blur-sm"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-3 border border-white/20 transition"
+                    style={{ borderRadius: '2px' }}
                     aria-label="Next"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -829,7 +802,7 @@ export default function MediaManagementSection({
                 </>
               )}
 
-              <div className="bg-black rounded-lg overflow-hidden shadow-2xl">
+              <div className="bg-black border border-white/10 overflow-hidden shadow-2xl" style={{ borderRadius: '2px' }}>
                 {(() => {
                   const currentUrl = modalViews[modalViewIndex] || '';
                   const lowerUrl = currentUrl.toLowerCase();
@@ -864,22 +837,22 @@ export default function MediaManagementSection({
                 })()}
               </div>
 
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-lg backdrop-blur-sm">
-                <div className="flex items-center gap-4 text-sm">
-                  <span className="font-medium">
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 border border-white/10 backdrop-blur-sm" style={{ borderRadius: '2px' }}>
+                <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-wider">
+                  <span>
                     {selectedModalItem.title}
                   </span>
-                  <span className="text-gray-300">
+                  <span className="text-gray-405">
                     View {modalViewIndex + 1} of {modalViews.length}
                   </span>
                   {selectedModalItem.fileType === 'mixed' && (
-                    <span className="bg-purple-600 px-2 py-1 rounded text-xs">
-                      🎭 MIXED MEDIA
+                    <span className="bg-emerald-500 px-2 py-0.5 text-[10px] font-bold">
+                      MIXED MEDIA
                     </span>
                   )}
                   {selectedModalItem.fileType === 'video' && (
-                    <span className="bg-red-600 px-2 py-1 rounded text-xs">
-                      🎥 VIDEO
+                    <span className="bg-emerald-500 px-2 py-0.5 text-[10px] font-bold">
+                      VIDEO
                     </span>
                   )}
                 </div>
@@ -891,4 +864,3 @@ export default function MediaManagementSection({
     </>
   );
 }
-

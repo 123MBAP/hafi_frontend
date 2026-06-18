@@ -24,11 +24,11 @@ export default function FeatureFieldRenderer({ feature, values, onChange, darkMo
                     type="text"
                     value={values?.[simpleFeature.name] ?? ''}
                     onChange={(e) => onChange(simpleFeature.name, e.target.value)}
-                    className={`w-full px-4 py-2 rounded-lg border ${darkMode
-                        ? 'bg-gray-700 border-gray-600 focus:border-teal-500 text-white'
-                        : 'bg-white border-gray-300 focus:border-blue-400'
-                        } focus:ring-2 ${darkMode ? 'focus:ring-teal-500/30' : 'focus:ring-blue-200'
-                        } transition`}
+                    className={`w-full px-4 py-2 border ${darkMode
+                        ? 'bg-gray-700 border-gray-600 focus:border-emerald-500 text-white'
+                        : 'bg-white border-gray-300 focus:border-emerald-500 text-gray-900'
+                        } focus:outline-none focus:ring-1 focus:ring-emerald-500 transition`}
+                    style={{ borderRadius: '2px' }}
                     placeholder={`Enter ${simpleFeature.name.toLowerCase()}`}
                 />
             </div>
@@ -85,11 +85,11 @@ export default function FeatureFieldRenderer({ feature, values, onChange, darkMo
                     <select
                         value={fieldValue}
                         onChange={(e) => handleNestedChange(fieldName, e.target.value)}
-                        className={`w-full px-4 py-2 rounded-lg border ${darkMode
-                            ? 'bg-gray-700 border-gray-600 focus:border-teal-500 text-white'
-                            : 'bg-white border-gray-300 focus:border-blue-400'
-                            } focus:ring-2 ${darkMode ? 'focus:ring-teal-500/30' : 'focus:ring-blue-200'
-                            } transition`}
+                        className={`w-full px-4 py-2 border ${darkMode
+                            ? 'bg-gray-700 border-gray-600 focus:border-emerald-500 text-white'
+                            : 'bg-white border-gray-300 focus:border-emerald-500 text-gray-900'
+                            } focus:outline-none focus:ring-1 focus:ring-emerald-500 transition`}
+                        style={{ borderRadius: '2px' }}
                     >
                         <option value="">{fieldConfig.placeholder || 'Select...'}</option>
                         {fieldConfig.options.map((option) => (
@@ -136,10 +136,10 @@ export default function FeatureFieldRenderer({ feature, values, onChange, darkMo
                             {fieldConfig.label}
                             {fieldConfig.required && <span className="text-red-500 ml-1">*</span>}
                         </label>
-                        <div className={`space-y-2 p-3 rounded-lg border ${darkMode
+                        <div className={`space-y-2 p-3 border ${darkMode
                             ? 'bg-gray-700/50 border-gray-600'
                             : 'bg-gray-50 border-gray-300'
-                            }`}>
+                            }`} style={{ borderRadius: '2px' }}>
                             {fieldConfig.options.map((option) => {
                                 const isSelected = selectedValues[option] !== undefined;
                                 return (
@@ -150,10 +150,11 @@ export default function FeatureFieldRenderer({ feature, values, onChange, darkMo
                                                 id={`${objectFeature.name}-${fieldName}-${option}`}
                                                 checked={isSelected}
                                                 onChange={() => toggleOption(option)}
-                                                className={`mr-2 h-4 w-4 rounded ${darkMode
-                                                    ? 'bg-gray-600 border-gray-500 text-teal-500 focus:ring-teal-500'
-                                                    : 'border-gray-300 text-blue-600 focus:ring-blue-500'
+                                                className={`mr-2 h-4 w-4 ${darkMode
+                                                    ? 'bg-gray-600 border-gray-500 text-emerald-500 focus:ring-emerald-500'
+                                                    : 'border-gray-300 text-emerald-600 focus:ring-emerald-500'
                                                     }`}
+                                                style={{ borderRadius: '2px' }}
                                             />
                                             <label
                                                 htmlFor={`${objectFeature.name}-${fieldName}-${option}`}
@@ -170,11 +171,11 @@ export default function FeatureFieldRenderer({ feature, values, onChange, darkMo
                                                     value={selectedValues[option] || ''}
                                                     onChange={(e) => updateValue(option, e.target.value)}
                                                     placeholder={`Enter value (e.g., 4)`}
-                                                    className={`w-full px-3 py-1.5 text-sm rounded-lg border ${darkMode
-                                                        ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400 focus:border-teal-500'
-                                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500'
-                                                        } focus:ring-2 ${darkMode ? 'focus:ring-teal-500/30' : 'focus:ring-blue-200'
-                                                        } transition`}
+                                                    className={`w-full px-3 py-1.5 text-sm border ${darkMode
+                                                        ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400 focus:border-emerald-500'
+                                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-emerald-500'
+                                                        } focus:outline-none focus:ring-1 focus:ring-emerald-500 transition`}
+                                                    style={{ borderRadius: '2px' }}
                                                 />
                                             </div>
                                         )}
@@ -211,10 +212,10 @@ export default function FeatureFieldRenderer({ feature, values, onChange, darkMo
                             {fieldConfig.label}
                             {fieldConfig.required && <span className="text-red-500 ml-1">*</span>}
                         </label>
-                        <div className={`space-y-2 p-3 rounded-lg border ${darkMode
+                        <div className={`space-y-2 p-3 border ${darkMode
                             ? 'bg-gray-700/50 border-gray-600'
                             : 'bg-gray-50 border-gray-300'
-                            }`}>
+                            }`} style={{ borderRadius: '2px' }}>
                             {fieldConfig.options.map((option) => (
                                 <div key={option} className="flex items-center">
                                     <input
@@ -222,10 +223,11 @@ export default function FeatureFieldRenderer({ feature, values, onChange, darkMo
                                         id={`${objectFeature.name}-${fieldName}-${option}`}
                                         checked={selectedValues.includes(option)}
                                         onChange={() => toggleOption(option)}
-                                        className={`mr-2 h-4 w-4 rounded ${darkMode
-                                            ? 'bg-gray-600 border-gray-500 text-teal-500 focus:ring-teal-500'
-                                            : 'border-gray-300 text-blue-600 focus:ring-blue-500'
+                                        className={`mr-2 h-4 w-4 ${darkMode
+                                            ? 'bg-gray-600 border-gray-500 text-emerald-500 focus:ring-emerald-500'
+                                            : 'border-gray-300 text-emerald-600 focus:ring-emerald-500'
                                             }`}
+                                        style={{ borderRadius: '2px' }}
                                     />
                                     <label
                                         htmlFor={`${objectFeature.name}-${fieldName}-${option}`}
@@ -256,7 +258,8 @@ export default function FeatureFieldRenderer({ feature, values, onChange, darkMo
                         id={`${objectFeature.name}-${fieldName}`}
                         checked={fieldValue === true || fieldValue === 'true'}
                         onChange={(e) => handleNestedChange(fieldName, e.target.checked)}
-                        className="mr-2 h-4 w-4 rounded"
+                        className={`mr-2 h-4 w-4 ${darkMode ? 'bg-gray-600 border-gray-500 text-emerald-500 focus:ring-emerald-500' : 'border-gray-300 text-emerald-600 focus:ring-emerald-500'}`}
+                    style={{ borderRadius: '2px' }}
                     />
                     <label
                         htmlFor={`${objectFeature.name}-${fieldName}`}
@@ -284,11 +287,11 @@ export default function FeatureFieldRenderer({ feature, values, onChange, darkMo
                         type="number"
                         value={fieldValue}
                         onChange={(e) => handleNestedChange(fieldName, e.target.value)}
-                        className={`w-full px-4 py-2 rounded-lg border ${darkMode
-                            ? 'bg-gray-700 border-gray-600 focus:border-teal-500 text-white'
-                            : 'bg-white border-gray-300 focus:border-blue-400'
-                            } focus:ring-2 ${darkMode ? 'focus:ring-teal-500/30' : 'focus:ring-blue-200'
-                            } transition`}
+                        className={`w-full px-4 py-2 border ${darkMode
+                            ? 'bg-gray-700 border-gray-600 focus:border-emerald-500 text-white'
+                            : 'bg-white border-gray-300 focus:border-emerald-500 text-gray-900'
+                            } focus:outline-none focus:ring-1 focus:ring-emerald-500 transition`}
+                        style={{ borderRadius: '2px' }}
                         placeholder={fieldConfig.placeholder}
                     />
                 </div>
@@ -309,11 +312,11 @@ export default function FeatureFieldRenderer({ feature, values, onChange, darkMo
                     type="text"
                     value={fieldValue}
                     onChange={(e) => handleNestedChange(fieldName, e.target.value)}
-                    className={`w-full px-4 py-2 rounded-lg border ${darkMode
-                        ? 'bg-gray-700 border-gray-600 focus:border-teal-500 text-white'
-                        : 'bg-white border-gray-300 focus:border-blue-400'
-                        } focus:ring-2 ${darkMode ? 'focus:ring-teal-500/30' : 'focus:ring-blue-200'
-                        } transition`}
+                    className={`w-full px-4 py-2 border ${darkMode
+                        ? 'bg-gray-700 border-gray-600 focus:border-emerald-500 text-white'
+                        : 'bg-white border-gray-300 focus:border-emerald-500 text-gray-900'
+                        } focus:outline-none focus:ring-1 focus:ring-emerald-500 transition`}
+                    style={{ borderRadius: '2px' }}
                     placeholder={fieldConfig.placeholder}
                 />
             </div>

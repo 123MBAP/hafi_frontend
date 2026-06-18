@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDarkMode } from "@/context/DarkMode";
 import { useAuth } from "@/context/AuthContext";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface CustomServiceRequest {
   id: string;
@@ -25,7 +26,6 @@ export default function ProviderCustomizationRequests() {
   const [editingRequestId, setEditingRequestId] = useState<string | null>(null);
   const [customPrice, setCustomPrice] = useState("");
   const { token } = useAuth();
-  // const [selectedRequest, setSelectedRequest] = useState<CustomServiceRequest | null>(null);
 
   useEffect(() => {
     fetchRequests();
@@ -90,17 +90,26 @@ export default function ProviderCustomizationRequests() {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusColors = {
-      pending: "bg-yellow-100 text-yellow-800",
-      quoted: "bg-blue-100 text-blue-800",
-      accepted: "bg-green-100 text-green-800",
-      rejected: "bg-red-100 text-red-800",
-      completed: "bg-gray-100 text-gray-800"
+    const statusColors = darkMode ? {
+      pending: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+      quoted: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+      accepted: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+      rejected: "bg-red-500/10 text-red-400 border-red-500/20",
+      completed: "bg-gray-800 text-gray-400 border-gray-700"
+    } : {
+      pending: "bg-amber-50 text-amber-850 border-amber-250",
+      quoted: "bg-blue-50 text-blue-850 border-blue-205",
+      accepted: "bg-emerald-50 text-emerald-850 border-emerald-205",
+      rejected: "bg-red-50 text-red-850 border-red-205",
+      completed: "bg-gray-50 text-gray-800 border-gray-250"
     };
 
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status as keyof typeof statusColors]}`}>
-        {status.toUpperCase()}
+      <span
+        className={`px-2 py-0.5 border text-[10px] font-bold uppercase tracking-wider ${statusColors[status as keyof typeof statusColors]}`}
+        style={{ borderRadius: '2px' }}
+      >
+        {status}
       </span>
     );
   };
@@ -117,65 +126,54 @@ export default function ProviderCustomizationRequests() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-gray-50"} p-6`}>
-        <div className="max-w-6xl mx-auto">
-          <div className="animate-pulse">
-            <div className={`h-8 bg-gray-300 rounded w-1/4 mb-6`}></div>
-            <div className="space-y-4">
-              {[1, 2, 3].map((n) => (
-                <div key={n} className={`p-4 rounded-lg ${darkMode ? "bg-gray-800" : "bg-white"} shadow`}>
-                  <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-gray-50"} p-6 flex items-center justify-center`}>
+        <LoadingSpinner variant="dots" size="lg" message="Loading customization requests..." />
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen ${darkMode ? "bg-gray-900" : "bg-gray-50"} p-6`}>
+    <div className={`min-h-screen ${darkMode ? "bg-gray-900 text-gray-205" : "bg-gray-50 text-gray-800"} p-6`}>
       <div className="max-w-6xl mx-auto">
-        <h1 className={`text-3xl font-bold mb-6 ${darkMode ? "text-white" : "text-gray-900"}`}>
+        <h1 className={`text-2xl font-bold tracking-tighter uppercase mb-6 ${darkMode ? "text-white" : "text-gray-900"}`}>
           Customization Requests
         </h1>
 
         {requests.length === 0 ? (
-          <div className={`text-center py-12 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
-            <p className="text-lg">No customization requests found.</p>
-            <p className="text-sm">When customers request custom services, they'll appear here.</p>
+          <div className={`text-center py-12 border ${darkMode ? "bg-gray-850 border-gray-750 text-gray-400" : "bg-white border-gray-200 text-gray-500"}`} style={{ borderRadius: '2px' }}>
+            <p className="text-sm font-semibold uppercase tracking-wider">No customization requests found.</p>
+            <p className="text-xs mt-1">When customers request custom services, they'll appear here.</p>
           </div>
         ) : (
           <div className="space-y-4">
             {requests.map((request) => (
               <div
                 key={request.id}
-                className={`p-6 rounded-lg shadow transition-all duration-200 ${
-                  darkMode ? "bg-gray-800 border border-gray-700" : "bg-white border border-gray-200"
-                } hover:shadow-lg`}
+                className={`p-6 border shadow-sm transition-all duration-300 ${
+                  darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"
+                } hover:border-emerald-500`}
+                style={{ borderRadius: '2px' }}
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className={`text-lg font-semibold ${darkMode ? "text-white" : "text-gray-900"}`}>
+                    <h3 className={`text-base font-bold uppercase tracking-tight ${darkMode ? "text-white" : "text-gray-900"}`}>
                       Custom Service Request
                     </h3>
-                    <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+                    <p className={`text-xs ${darkMode ? "text-gray-450" : "text-gray-500"} mt-0.5`}>
                       Requested on {formatDate(request.created_at)}
                     </p>
                   </div>
                   {getStatusBadge(request.status)}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
                   <div>
-                    <h4 className={`font-medium mb-2 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+                    <h4 className={`text-[10px] font-bold uppercase tracking-wider mb-2 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
                       Customization Details
                     </h4>
-                    <ul className={`space-y-1 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+                    <ul className={`space-y-1.5 ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
                       {request.customizations.map((customization, index) => (
-                        <li key={index} className="text-sm">
+                        <li key={index} className="text-xs">
                           • {customization}
                         </li>
                       ))}
@@ -183,15 +181,15 @@ export default function ProviderCustomizationRequests() {
                   </div>
 
                   <div>
-                    <h4 className={`font-medium mb-2 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+                    <h4 className={`text-[10px] font-bold uppercase tracking-wider mb-2 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
                       Pricing
                     </h4>
                     {request.custom_price ? (
-                      <p className={`text-lg font-bold ${darkMode ? "text-green-400" : "text-green-600"}`}>
+                      <p className="text-lg font-bold text-emerald-500">
                         ${Number(request.custom_price).toFixed(2)}
                       </p>
                     ) : (
-                      <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+                      <p className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
                         No price quoted yet
                       </p>
                     )}
@@ -199,8 +197,8 @@ export default function ProviderCustomizationRequests() {
                 </div>
 
                 {request.status === 'pending' && (
-                  <div className="border-t pt-4 mt-4">
-                    <h4 className={`font-medium mb-3 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+                    <h4 className={`text-[10px] font-bold uppercase tracking-wider mb-3 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
                       Quote a Price
                     </h4>
                     <div className="flex gap-3 items-center">
@@ -210,11 +208,12 @@ export default function ProviderCustomizationRequests() {
                           placeholder="Enter custom price ($)"
                           value={customPrice}
                           onChange={(e) => setCustomPrice(e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-md ${
+                          className={`w-full p-2.5 border text-sm ${
                             darkMode 
-                              ? "bg-gray-700 border-gray-600 text-white" 
-                              : "bg-white border-gray-300"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                              ? "bg-gray-900 border-gray-750 text-white" 
+                              : "bg-white border-gray-250"
+                          } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                          style={{ borderRadius: '2px' }}
                           min="0"
                           step="0.01"
                         />
@@ -222,11 +221,12 @@ export default function ProviderCustomizationRequests() {
                       <button
                         onClick={() => handleQuotePrice(request.id)}
                         disabled={!customPrice || isNaN(parseFloat(customPrice))}
-                        className={`px-4 py-2 rounded-md font-medium ${
+                        className={`px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-colors ${
                           !customPrice || isNaN(parseFloat(customPrice))
-                            ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                            : "bg-blue-600 text-white hover:bg-blue-700"
+                            ? "bg-gray-450 text-gray-200 cursor-not-allowed"
+                            : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm"
                         }`}
+                        style={{ borderRadius: '2px' }}
                       >
                         Quote Price
                       </button>
@@ -236,8 +236,8 @@ export default function ProviderCustomizationRequests() {
 
                 {request.status === 'quoted' && (
                   <div className={`border-t pt-4 mt-4 ${darkMode ? "border-gray-700" : "border-gray-200"}`}>
-                    <p className={`text-sm ${darkMode ? "text-green-400" : "text-green-600"} mb-2`}>
-                      ✅ Price quoted - Waiting for customer acceptance
+                    <p className={`text-xs font-bold uppercase tracking-wider text-emerald-500 mb-3`}>
+                      ✓ Price quoted - Waiting for customer acceptance
                     </p>
                     <div className="flex gap-2">
                       <button
@@ -245,7 +245,10 @@ export default function ProviderCustomizationRequests() {
                           setCustomPrice(request.custom_price?.toString() || "");
                           setEditingRequestId(request.id);
                         }}
-                        className="px-3 py-1 text-sm bg-yellow-600 text-white rounded hover:bg-yellow-700"
+                        className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider border transition-colors ${
+                          darkMode ? "bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700" : "bg-white border-gray-250 text-gray-705 hover:bg-gray-50"
+                        }`}
+                        style={{ borderRadius: '2px' }}
                       >
                         Edit Quote
                       </button>
@@ -255,20 +258,35 @@ export default function ProviderCustomizationRequests() {
 
                 {request.status === 'accepted' && (
                   <div className={`border-t pt-4 mt-4 ${darkMode ? "border-gray-700" : "border-gray-200"}`}>
-                    <p className={`text-sm ${darkMode ? "text-green-400" : "text-green-600"} mb-2`}>
-                      ✅ Customer accepted the quote - Ready to proceed!
+                    <p className={`text-xs font-bold uppercase tracking-wider text-emerald-500 mb-3`}>
+                      ✓ Customer accepted the quote - Ready to proceed!
                     </p>
-                    <button className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700">
+                    <button 
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(`${API_BASE}/api/custom/${request.id}/complete`, {
+                            method: "PUT",
+                            headers: { Authorization: `Bearer ${token}` }
+                          });
+                          if (res.ok) {
+                            setRequests(prev => prev.map(r => r.id === request.id ? { ...r, status: 'completed' } : r));
+                            alert("Request marked as completed!");
+                          }
+                        } catch (err) {
+                          console.error(err);
+                        }
+                      }}
+                      className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-white transition-colors"
+                      style={{ borderRadius: '2px' }}
+                    >
                       Mark as Completed
                     </button>
                   </div>
                 )}
 
                 {editingRequestId === request.id && (
-                  <div className={`mt-4 p-4 rounded-md ${darkMode ? "bg-gray-700" : "bg-yellow-50"} border ${
-                    darkMode ? "border-gray-600" : "border-yellow-200"
-                  }`}>
-                    <h4 className={`font-medium mb-2 ${darkMode ? "text-white" : "text-yellow-800"}`}>
+                  <div className={`mt-4 p-4 ${darkMode ? "bg-gray-900 border-gray-750" : "bg-yellow-50/50 border-gray-200"} border`} style={{ borderRadius: '2px' }}>
+                    <h4 className={`text-[10px] font-bold uppercase tracking-wider mb-2.5 ${darkMode ? "text-white" : "text-gray-750"}`}>
                       Edit Quote
                     </h4>
                     <div className="flex gap-2">
@@ -276,22 +294,27 @@ export default function ProviderCustomizationRequests() {
                         type="number"
                         value={customPrice}
                         onChange={(e) => setCustomPrice(e.target.value)}
-                        className={`flex-1 px-3 py-1 border rounded-md ${
+                        className={`flex-1 px-3 py-1.5 border text-sm ${
                           darkMode 
-                            ? "bg-gray-600 border-gray-500 text-white" 
-                            : "bg-white border-gray-300"
-                        }`}
+                            ? "bg-gray-800 border-gray-700 text-white" 
+                            : "bg-white border-gray-250 text-gray-900"
+                        } focus:ring-1 focus:ring-emerald-500 focus:outline-none`}
+                        style={{ borderRadius: '2px' }}
                         placeholder="New price"
                       />
                       <button
                         onClick={() => handleQuotePrice(request.id)}
-                        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-white transition-colors"
+                        style={{ borderRadius: '2px' }}
                       >
                         Update
                       </button>
                       <button
                         onClick={() => setEditingRequestId(null)}
-                        className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+                        className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider border transition-colors ${
+                          darkMode ? "bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700" : "bg-white border-gray-250 text-gray-705 hover:bg-gray-50"
+                        }`}
+                        style={{ borderRadius: '2px' }}
                       >
                         Cancel
                       </button>
@@ -305,36 +328,36 @@ export default function ProviderCustomizationRequests() {
 
         {/* Statistics Card */}
         {requests.length > 0 && (
-          <div className={`mt-8 p-6 rounded-lg shadow ${
-            darkMode ? "bg-gray-800 border border-gray-700" : "bg-white border border-gray-200"
-          }`}>
-            <h3 className={`text-lg font-semibold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>
+          <div className={`mt-8 p-6 border shadow-sm ${
+            darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+          }`} style={{ borderRadius: '2px' }}>
+            <h3 className={`text-base font-bold uppercase tracking-tight mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>
               Request Statistics
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className={`text-2xl font-bold ${darkMode ? "text-blue-400" : "text-blue-600"}`}>
+              <div className="text-center p-3 border border-gray-150 dark:border-gray-750 bg-gray-50/30 dark:bg-gray-900/30" style={{ borderRadius: '2px' }}>
+                <div className={`text-2xl font-bold ${darkMode ? "text-emerald-450" : "text-emerald-600"}`}>
                   {requests.length}
                 </div>
-                <div className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Total Requests</div>
+                <div className={`text-[10px] font-bold uppercase tracking-wider mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Total Requests</div>
               </div>
-              <div className="text-center">
-                <div className={`text-2xl font-bold ${darkMode ? "text-yellow-400" : "text-yellow-600"}`}>
+              <div className="text-center p-3 border border-gray-150 dark:border-gray-750 bg-gray-50/30 dark:bg-gray-900/30" style={{ borderRadius: '2px' }}>
+                <div className="text-2xl font-bold text-amber-500">
                   {requests.filter(r => r.status === 'pending').length}
                 </div>
-                <div className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Pending</div>
+                <div className={`text-[10px] font-bold uppercase tracking-wider mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Pending</div>
               </div>
-              <div className="text-center">
-                <div className={`text-2xl font-bold ${darkMode ? "text-blue-400" : "text-blue-600"}`}>
+              <div className="text-center p-3 border border-gray-150 dark:border-gray-750 bg-gray-50/30 dark:bg-gray-900/30" style={{ borderRadius: '2px' }}>
+                <div className="text-2xl font-bold text-blue-500">
                   {requests.filter(r => r.status === 'quoted').length}
                 </div>
-                <div className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Quoted</div>
+                <div className={`text-[10px] font-bold uppercase tracking-wider mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Quoted</div>
               </div>
-              <div className="text-center">
-                <div className={`text-2xl font-bold ${darkMode ? "text-green-400" : "text-green-600"}`}>
+              <div className="text-center p-3 border border-gray-150 dark:border-gray-750 bg-gray-50/30 dark:bg-gray-900/30" style={{ borderRadius: '2px' }}>
+                <div className="text-2xl font-bold text-emerald-500">
                   {requests.filter(r => r.status === 'accepted').length}
                 </div>
-                <div className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Accepted</div>
+                <div className={`text-[10px] font-bold uppercase tracking-wider mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Accepted</div>
               </div>
             </div>
           </div>

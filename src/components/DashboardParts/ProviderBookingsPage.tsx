@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useDarkMode } from '@/context/DarkMode';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
@@ -29,6 +31,7 @@ type BookingItem = {
 };
 
 export default function ProviderBookingsPage() {
+  const { darkMode } = useDarkMode();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filter, setFilter] = useState<'all' | 'completed' | 'pending' | 'refunded'>('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -74,17 +77,9 @@ export default function ProviderBookingsPage() {
   });
 
   // Calculate total revenue
-const completedBookings = bookings.filter(b => b.status === 'completed');
-console.log('Completed bookings:', completedBookings);
-console.log('Total values:', completedBookings.map(b => ({total: b.total, type: typeof b.total})));
-
-const totalRevenue = completedBookings.reduce((sum, booking) => {
-  const numericTotal = Number(booking.total);
-  console.log(`Adding: ${sum} + ${booking.total} (as number: ${numericTotal})`);
-  return sum + numericTotal;
-}, 0);
-
-console.log('Final total revenue:', totalRevenue);
+  const totalRevenue = bookings
+    .filter(b => b.status === 'completed')
+    .reduce((sum, b) => sum + Number(b.total), 0);
 
   // Format date
   const formatDate = (dateString: string) => {
@@ -100,10 +95,8 @@ console.log('Final total revenue:', totalRevenue);
 
   if (isLoading) {
     return (
-      <div className="p-6 max-w-6xl mx-auto">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
+      <div className={`min-h-[50vh] flex items-center justify-center ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+        <LoadingSpinner variant="dots" size="lg" message="Loading bookings..." />
       </div>
     );
   }
@@ -111,12 +104,13 @@ console.log('Final total revenue:', totalRevenue);
   if (error) {
     return (
       <div className="p-6 max-w-6xl mx-auto">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-          <h2 className="text-red-800 font-semibold mb-2">Error Loading Bookings</h2>
-          <p className="text-red-600">{error}</p>
+        <div className={`border p-6 text-center ${darkMode ? "bg-red-500/10 border-red-500/20 text-red-400" : "bg-red-50 border-red-200 text-red-800"}`} style={{ borderRadius: '2px' }}>
+          <h2 className="font-bold text-base uppercase tracking-tight mb-2">Error Loading Bookings</h2>
+          <p className="text-xs">{error}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+            className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-750 text-white font-semibold text-xs uppercase tracking-wider transition-colors duration-200"
+            style={{ borderRadius: '2px' }}
           >
             Try Again
           </button>
@@ -126,120 +120,118 @@ console.log('Final total revenue:', totalRevenue);
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold text-center mb-6">Bookings & Payments History</h1>
+    <div className={`p-6 max-w-6xl mx-auto ${darkMode ? "text-gray-200" : "text-gray-800"}`}>
+      <h1 className={`text-2xl font-bold tracking-tighter uppercase text-center mb-6 ${darkMode ? "text-white" : "text-gray-900"}`}>
+        Bookings & Payments History
+      </h1>
       
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <h3 className="text-gray-500 text-sm">Total Bookings</h3>
-          <p className="text-2xl font-bold">{bookings.length}</p>
+        <div className={`p-4 border shadow-sm ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`} style={{ borderRadius: '2px' }}>
+          <h3 className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Total Bookings</h3>
+          <p className="text-2xl font-extrabold mt-1">{bookings.length}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <h3 className="text-gray-500 text-sm">Completed</h3>
-          <p className="text-2xl font-bold text-green-600">
+        <div className={`p-4 border shadow-sm ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`} style={{ borderRadius: '2px' }}>
+          <h3 className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Completed</h3>
+          <p className="text-2xl font-extrabold mt-1 text-emerald-500">
             {bookings.filter(b => b.status === 'completed').length}
           </p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <h3 className="text-gray-500 text-sm">Pending</h3>
-          <p className="text-2xl font-bold text-yellow-600">
+        <div className={`p-4 border shadow-sm ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`} style={{ borderRadius: '2px' }}>
+          <h3 className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Pending</h3>
+          <p className="text-2xl font-extrabold mt-1 text-amber-500">
             {bookings.filter(b => b.status === 'pending').length}
           </p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow border">
-          <h3 className="text-gray-500 text-sm">Total Revenue</h3>
-          <p className="text-2xl font-bold">{totalRevenue.toLocaleString()} RWF</p>
+        <div className={`p-4 border shadow-sm ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`} style={{ borderRadius: '2px' }}>
+          <h3 className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Total Revenue</h3>
+          <p className="text-2xl font-extrabold mt-1 text-emerald-500">{totalRevenue.toLocaleString()} RWF</p>
         </div>
       </div>
 
       {/* Filter Controls */}
-      <div className="bg-white p-4 rounded-lg shadow border mb-6">
-        <div className="flex flex-wrap gap-4 items-center">
-          <span className="font-medium">Filter by status:</span>
-          <button
-            onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setFilter('completed')}
-            className={`px-4 py-2 rounded ${filter === 'completed' ? 'bg-green-500 text-white' : 'bg-gray-100'}`}
-          >
-            Completed
-          </button>
-          <button
-            onClick={() => setFilter('pending')}
-            className={`px-4 py-2 rounded ${filter === 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-100'}`}
-          >
-            Pending
-          </button>
-          <button
-            onClick={() => setFilter('refunded')}
-            className={`px-4 py-2 rounded ${filter === 'refunded' ? 'bg-red-500 text-white' : 'bg-gray-100'}`}
-          >
-            Refunded
-          </button>
+      <div className={`p-4 border shadow-sm mb-6 ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`} style={{ borderRadius: '2px' }}>
+        <div className="flex flex-wrap gap-3 items-center">
+          <span className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Filter status:</span>
+          {(['all', 'completed', 'pending', 'refunded'] as const).map((status) => {
+            const active = filter === status;
+            return (
+              <button
+                key={status}
+                onClick={() => setFilter(status)}
+                className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider border transition-colors ${
+                  active 
+                    ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm' 
+                    : darkMode 
+                      ? 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700' 
+                      : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                }`}
+                style={{ borderRadius: '2px' }}
+              >
+                {status}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Bookings List */}
       <div className="space-y-4">
         {filteredBookings.length === 0 ? (
-          <div className="bg-white p-8 rounded-lg shadow border text-center">
-            <p className="text-gray-500">No bookings found</p>
+          <div className={`p-8 border text-center ${darkMode ? "bg-gray-850 border-gray-750 text-gray-400" : "bg-white border-gray-200 text-gray-500"}`} style={{ borderRadius: '2px' }}>
+            <p className="text-sm font-semibold uppercase tracking-wider">No bookings found</p>
           </div>
         ) : (
           filteredBookings.map((booking) => (
-            <div key={booking.id} className="bg-white rounded-lg shadow border overflow-hidden">
+            <div key={booking.id} className={`border shadow-sm overflow-hidden ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`} style={{ borderRadius: '2px' }}>
               {/* Booking Header */}
-              <div className="p-4 border-b bg-gray-50 flex justify-between items-center flex-wrap gap-2">
+              <div className={`p-4 border-b flex justify-between items-center flex-wrap gap-2 ${darkMode ? "border-gray-750 bg-gray-900/40" : "border-gray-150 bg-gray-50/50"}`}>
                 <div>
-      <h3 className="font-semibold">Booking #{String(booking.id).slice(-6)}</h3>
-      <p className="text-sm text-gray-500">{formatDate(booking.created_at)}</p>
-      {booking.customer_name && (
-        <p className="text-sm text-gray-600">Customer: {booking.customer_name}</p>
+                  <h3 className={`font-bold text-sm uppercase tracking-tight ${darkMode ? "text-white" : "text-gray-900"}`}>Booking #{String(booking.id).slice(-6)}</h3>
+                  <p className={`text-xs ${darkMode ? "text-gray-450" : "text-gray-500"} mt-0.5`}>{formatDate(booking.created_at)}</p>
+                  {booking.customer_name && (
+                    <p className={`text-xs font-semibold ${darkMode ? "text-gray-400" : "text-gray-600"} mt-1`}>Customer: {booking.customer_name}</p>
                   )}
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium
-                    ${booking.status === 'completed' ? 'bg-green-100 text-green-800' : ''}
-                    ${booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}
-                    ${booking.status === 'refunded' ? 'bg-red-100 text-red-800' : ''}
-                  `}>
-                    {booking.status.toUpperCase()}
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-0.5 border text-[9px] font-bold uppercase tracking-wider
+                    ${booking.status === 'completed' ? (darkMode ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-emerald-50 text-emerald-700 border-emerald-200') : ''}
+                    ${booking.status === 'pending' ? (darkMode ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-amber-50 text-amber-700 border-amber-200') : ''}
+                    ${booking.status === 'refunded' ? (darkMode ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-red-50 text-red-700 border-red-200') : ''}
+                  `} style={{ borderRadius: '2px' }}>
+                    {booking.status}
                   </span>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium
-                    ${booking.type === 'direct' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}
-                  `}>
-                    {booking.type.toUpperCase()}
+                  <span className={`px-2 py-0.5 border text-[9px] font-bold uppercase tracking-wider
+                    ${booking.type === 'direct' ? (darkMode ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-blue-50 text-blue-700 border-blue-200') : (darkMode ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' : 'bg-purple-50 text-purple-700 border-purple-200')}
+                  `} style={{ borderRadius: '2px' }}>
+                    {booking.type}
                   </span>
                 </div>
               </div>
 
               {/* Booking Items */}
               <div className="p-4">
-                <h4 className="font-medium mb-3">Items</h4>
+                <h4 className={`text-[10px] font-bold uppercase tracking-wider mb-3 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Items</h4>
                 <div className="space-y-3">
                   {booking.items.map((item) => (
-                    <div key={item.id} className="flex items-center gap-4 p-3 border rounded-lg">
+                    <div key={item.id} className={`flex items-center gap-4 p-3 border ${darkMode ? "border-gray-750 bg-gray-900/10" : "border-gray-150 bg-white"}`} style={{ borderRadius: '2px' }}>
                       <img 
                         src={item.image || '/api/placeholder/80/80'} 
                         alt={item.name}
-                        className="w-16 h-16 object-cover rounded"
+                        className="w-16 h-16 object-cover border dark:border-gray-700"
+                        style={{ borderRadius: '2px' }}
                         onError={(e) => {
                           e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik00MCA0MEM0My4zMTM3IDQwIDQ2IDM3LjMxMzcgNDYgMzRDNDYgMzAuNjg2MyA0My4zMTM3IDI4IDQwIDI4QzM2LjY4NjMgMjggMzQgMzAuNjg2MyAzNCAzNEMzNCAzNy4zMTM3IDM2LjY4NjMgNDAgNDAgNDBaTTQwIDUyQzQ2LjYgNTIgNTIuOCA0OC40IDU2IDQyLjRDNjAgMzYuNCA1Ni44IDMyIDQwIDMyQzIzLjIgMzIgMjAgMzYuNCAyNCA0Mi40QzI3LjIgNDguNCAzMy40IDUyIDQwIDUyWiIgZmlsbD0iIzlDQTBCRiIvPgo8L3N2Zz4K';
                         }}
                       />
-                      <div className="flex-1">
-                        <h5 className="font-medium">{item.name}</h5>
-                        <p className="text-sm text-gray-500 capitalize">{item.type}</p>
-                        <p className="text-sm">Quantity: {item.quantity}</p>
+                      <div className="flex-1 min-w-0">
+                        <h5 className={`font-bold text-sm truncate ${darkMode ? "text-white" : "text-gray-900"}`}>{item.name}</h5>
+                        <p className={`text-[10px] font-bold uppercase tracking-wider text-gray-500 mt-0.5`}>{item.type}</p>
+                        <p className="text-xs text-gray-400 mt-1">Qty: {item.quantity}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold">{(item.price * item.quantity).toLocaleString()} RWF</p>
-                        <p className="text-sm text-gray-500">{item.price.toLocaleString()} RWF each</p>
+                        <p className="font-bold text-sm text-emerald-500">{(item.price * item.quantity).toLocaleString()} RWF</p>
+                        <p className={`text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-0.5`}>{item.price.toLocaleString()} each</p>
                       </div>
                     </div>
                   ))}
@@ -247,17 +239,17 @@ console.log('Final total revenue:', totalRevenue);
               </div>
 
               {/* Booking Footer */}
-              <div className="p-4 border-t bg-gray-50 flex justify-between items-center flex-wrap gap-2">
+              <div className={`p-4 border-t flex justify-between items-center flex-wrap gap-2 ${darkMode ? "border-gray-750 bg-gray-900/40" : "border-gray-150 bg-gray-50/50"}`}>
                 <div>
                   {booking.expected_arrival && (
-                    <p className="text-sm text-gray-600">
+                    <p className={`text-xs font-semibold ${darkMode ? "text-gray-400" : "text-gray-600"}`}>
                       Expected arrival: {formatDate(booking.expected_arrival)}
                     </p>
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold">{booking.total.toLocaleString()} RWF</p>
-                  <p className="text-sm text-gray-500">Total amount</p>
+                  <p className="text-base font-extrabold text-emerald-500">{booking.total.toLocaleString()} RWF</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-0.5">Total amount</p>
                 </div>
               </div>
             </div>

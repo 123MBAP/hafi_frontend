@@ -11,6 +11,7 @@ type Props = {
   service?: { specific_features?: boolean; features?: ServiceFeature[] } | null;
   productImages: File[];
   productVideos: File[];
+  productViews: File[][];
   productTitle: string;
   productDesc: string;
   productPrice: string;
@@ -52,84 +53,72 @@ export default function ProductUploadCard({
 }: Props) {
   return (
     <div
-      className={`rounded-xl overflow-hidden transition-all duration-300 ${darkMode ? 'bg-gray-800' : 'bg-white'
-        } shadow-lg`}
+      className={`border transition-all duration-300 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+        } shadow-sm overflow-hidden`}
+      style={{ borderRadius: '2px' }}
     >
       <div
-        className={`p-6 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'
+        className={`px-6 py-4 border-b ${darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'
           } flex justify-between items-center`}
       >
-        <h3
-          className={`text-xl font-semibold ${darkMode ? 'text-teal-300' : 'text-hafi-teal'
-            }`}
-        >
+        <h3 className={`text-base font-bold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
           Upload Product
         </h3>
       </div>
 
       <form
         onSubmit={handleProductUpload}
-        className={`p-6 ${darkMode ? 'bg-gray-700/30' : 'bg-purple-50'
-          } rounded-b-xl`}
+        className={`p-6 ${darkMode ? 'bg-gray-800/40' : 'bg-gray-50/50'}`}
       >
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div>
-              <label
-                className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-              >
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Product Title
               </label>
               <input
                 type="text"
                 value={productTitle}
                 onChange={(e) => setProductTitle(e.target.value)}
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode
-                  ? 'bg-gray-700 border-gray-600 focus:border-teal-500 text-white'
-                  : 'bg-white border-gray-300 focus:border-purple-400'
-                  } focus:ring-2 ${darkMode ? 'focus:ring-teal-500/30' : 'focus:ring-purple-200'
-                  } transition`}
-                placeholder="Product name"
+                className={`w-full p-2.5 border text-sm ${darkMode
+                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                  : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                  } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                style={{ borderRadius: '2px' }}
+                placeholder="PRODUCT NAME"
               />
             </div>
 
             <div>
-              <label
-                className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-              >
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Description
               </label>
               <textarea
                 value={productDesc}
                 onChange={(e) => setProductDesc(e.target.value)}
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode
-                  ? 'bg-gray-700 border-gray-600 focus:border-teal-500 text-white'
-                  : 'bg-white border-gray-300 focus:border-purple-400'
-                  } focus:ring-2 ${darkMode ? 'focus:ring-teal-500/30' : 'focus:ring-purple-200'
-                  } transition`}
+                className={`w-full p-2.5 border text-sm ${darkMode
+                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                  : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                  } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                style={{ borderRadius: '2px' }}
                 rows={3}
-                placeholder="Write about the product..."
+                placeholder="WRITE ABOUT THE PRODUCT..."
               />
             </div>
 
             <div>
-              <label
-                className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-              >
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Price (RWF)
               </label>
               <input
                 type="number"
                 value={productPrice}
                 onChange={(e) => setProductPrice(e.target.value)}
-                className={`w-full px-4 py-2 rounded-lg border ${darkMode
-                  ? 'bg-gray-700 border-gray-600 focus:border-teal-500 text-white'
-                  : 'bg-white border-gray-300 focus:border-purple-400'
-                  } focus:ring-2 ${darkMode ? 'focus:ring-teal-500/30' : 'focus:ring-purple-200'
-                  } transition`}
+                className={`w-full p-2.5 border text-sm ${darkMode
+                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                  : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                  } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                style={{ borderRadius: '2px' }}
                 placeholder="1000"
                 min={0}
               />
@@ -141,13 +130,14 @@ export default function ProductUploadCard({
                 type="checkbox"
                 checked={productMadeInRwanda}
                 onChange={(e) => setProductMadeInRwanda(e.target.checked)}
-                className="mr-2"
+                className="mr-2 text-emerald-600 focus:ring-emerald-500"
+                style={{ borderRadius: '2px' }}
               />
               <label
                 htmlFor="made-in-rwanda"
-                className={darkMode ? 'text-gray-300' : 'text-gray-700'}
+                className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}
               >
-                Made in Rwanda
+                Made in Rwanda 🇷🇼
               </label>
             </div>
 
@@ -173,17 +163,15 @@ export default function ProductUploadCard({
 
           <div className="space-y-4">
             <div>
-              <label
-                className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-              >
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Main Product Images
               </label>
               <div
                 className={`border-2 border-dashed ${darkMode
-                  ? 'border-gray-600 hover:border-teal-400'
-                  : 'border-gray-300 hover:border-purple-400'
-                  } rounded-lg p-4 flex flex-col items-center justify-center transition`}
+                  ? 'border-gray-700 bg-gray-900/30'
+                  : 'border-gray-300 bg-white'
+                  } p-4 flex flex-col items-center justify-center transition hover:border-emerald-500`}
+                style={{ borderRadius: '2px' }}
               >
                 <input
                   type="file"
@@ -216,10 +204,7 @@ export default function ProductUploadCard({
                         className={`mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'
                           }`}
                       />
-                      <p
-                        className={`text-center ${darkMode ? 'text-gray-400' : 'text-gray-500'
-                          }`}
-                      >
+                      <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-450' : 'text-gray-500'}`}>
                         Click to upload main images
                       </p>
                     </>
@@ -230,17 +215,15 @@ export default function ProductUploadCard({
 
             {productImages.map((img, idx) => (
               <div key={idx} className="mb-4">
-                <label
-                  className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                    }`}
-                >
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                   Views for {img.name}
                 </label>
                 <div
                   className={`border-2 border-dashed ${darkMode
-                    ? 'border-gray-600 hover:border-teal-400'
-                    : 'border-gray-300 hover:border-purple-400'
-                    } rounded-lg p-4 transition`}
+                    ? 'border-gray-700 bg-gray-900/30'
+                    : 'border-gray-300 bg-white'
+                    } p-4 transition hover:border-emerald-500`}
+                  style={{ borderRadius: '2px' }}
                 >
                   <input
                     type="file"
@@ -260,8 +243,8 @@ export default function ProductUploadCard({
                           <img
                             key={i}
                             src={src}
-                            className="w-16 h-16 object-cover rounded border"
-                            style={{ borderColor: darkMode ? '#4B5563' : '#E5E7EB' }}
+                            className="w-16 h-16 object-cover border"
+                            style={{ borderColor: darkMode ? '#374151' : '#E5E7EB', borderRadius: '2px' }}
                           />
                         ))}
                       </div>
@@ -272,10 +255,7 @@ export default function ProductUploadCard({
                           className={`mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'
                             }`}
                         />
-                        <p
-                          className={`text-center ${darkMode ? 'text-gray-400' : 'text-gray-500'
-                            }`}
-                        >
+                        <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-455' : 'text-gray-500'}`}>
                           Click to upload images for {img.name}
                         </p>
                       </>
@@ -286,17 +266,15 @@ export default function ProductUploadCard({
             ))}
 
             <div>
-              <label
-                className={`block mb-1 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}
-              >
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Product Videos
               </label>
               <div
                 className={`border-2 border-dashed ${darkMode
-                  ? 'border-gray-600 hover:border-teal-400'
-                  : 'border-gray-300 hover:border-purple-400'
-                  } rounded-lg p-4 flex flex-col items-center justify-center transition`}
+                  ? 'border-gray-700 bg-gray-900/30'
+                  : 'border-gray-300 bg-white'
+                  } p-4 flex flex-col items-center justify-center transition hover:border-emerald-500`}
+                style={{ borderRadius: '2px' }}
               >
                 <input
                   type="file"
@@ -315,8 +293,9 @@ export default function ProductUploadCard({
                       {productVideos.map((video, i) => (
                         <div
                           key={i}
-                          className={`text-xs truncate ${darkMode ? 'text-gray-400' : 'text-gray-500'
-                            } bg-red-100 dark:bg-red-900/20 px-2 py-1 rounded`}
+                          className={`text-[10px] font-bold uppercase tracking-wider truncate ${darkMode ? 'text-red-400' : 'text-red-650'
+                            } bg-red-500/10 px-2 py-1 border border-red-500/25`}
+                          style={{ borderRadius: '2px' }}
                         >
                           🎥 {video.name}
                         </div>
@@ -329,14 +308,11 @@ export default function ProductUploadCard({
                         className={`mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'
                           }`}
                       />
-                      <p
-                        className={`text-center ${darkMode ? 'text-gray-400' : 'text-gray-500'
-                          }`}
-                      >
+                      <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-450' : 'text-gray-500'}`}>
                         Click to upload product videos
                       </p>
                       <p
-                        className={`text-xs text-center mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-400'
+                        className={`text-[9px] font-bold uppercase tracking-wider text-center mt-1.5 ${darkMode ? 'text-gray-500' : 'text-gray-400'
                           }`}
                       >
                         Supported: MP4, MOV, AVI (Max 50MB per video)
@@ -363,22 +339,24 @@ export default function ProductUploadCard({
               setProductPrice('');
               setProductMadeInRwanda(false);
             }}
-            className={`px-4 py-2 rounded-lg font-medium ${darkMode
-              ? 'bg-gray-700 hover:bg-gray-600 text-white'
-              : 'bg-gray-200 hover:bg-gray-300'
-              } transition`}
+            className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border
+              ${darkMode
+                ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
+              }`}
+            style={{ borderRadius: '2px' }}
           >
             Reset
           </button>
           <button
             type="submit"
             disabled={subscription?.subscription?.status !== 'active' || isUploading}
-            className={`px-6 py-2 rounded-lg font-medium ${subscription?.subscription?.status === 'active'
-              ? darkMode
-                ? 'bg-gradient-to-r from-teal-600 to-teal-800 hover:from-teal-700 hover:to-teal-900'
-                : 'bg-gradient-to-r from-purple-600 to-teal-500 hover:from-purple-700 hover:to-teal-600'
-              : 'bg-gray-400 cursor-not-allowed'
-              } text-white transition shadow-lg`}
+            className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider
+              ${subscription?.subscription?.status === 'active'
+                ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm'
+                : 'bg-gray-450 text-gray-200 cursor-not-allowed'
+              }`}
+            style={{ borderRadius: '2px' }}
           >
             {isUploading ? (
               <span className="inline-flex items-center gap-2">

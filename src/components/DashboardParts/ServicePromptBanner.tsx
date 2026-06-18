@@ -47,35 +47,36 @@ export default function ServicePromptBanner({ darkMode = false }: Props) {
     if (!isServiceProvider || noService === null || !noService) return null;
 
     const card = darkMode
-        ? 'bg-gray-900/90 border-teal-500/50 text-white'
-        : 'bg-white border-teal-500 text-gray-900';
+        ? 'bg-gray-850 border-gray-800 text-white'
+        : 'bg-white border-gray-250 text-gray-900';
 
     return (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 backdrop-blur-md bg-black/40">
-            <div className={`relative max-w-lg w-full rounded-[2.5rem] p-10 shadow-[0_30px_100px_rgba(0,0,0,0.5)] border-4 ${card} transform transition-all animate-in zoom-in-95 duration-300`}>
-                <div className="flex flex-col items-center text-center gap-8">
-                    <div className="shrink-0 bg-gradient-to-br from-teal-400 to-teal-600 text-white rounded-[2rem] p-6 shadow-2xl shadow-teal-500/40">
-                        <Briefcase size={48} />
+            <div className={`relative max-w-md w-full p-8 shadow-[0_20px_60px_rgba(0,0,0,0.3)] border ${card} transform transition-all animate-in zoom-in-95 duration-300`} style={{ borderRadius: '2px' }}>
+                <div className="flex flex-col items-center text-center gap-6">
+                    <div className={`shrink-0 p-4 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-200 text-emerald-600'}`} style={{ borderRadius: '2px' }}>
+                        <Briefcase size={32} />
                     </div>
 
-                    <div className="space-y-4">
-                        <h2 className="font-black text-3xl tracking-tight leading-tight">
+                    <div className="space-y-2">
+                        <h2 className="font-bold text-lg uppercase tracking-tight">
                             Complete Your Profile
                         </h2>
-                        <p className="text-sm font-bold uppercase tracking-[0.2em] text-teal-500">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-500">
                             Action Required
                         </p>
-                        <p className={`text-base leading-relaxed font-medium opacity-80`}>
-                            Please complete your profile information and the service you are providing.
+                        <p className={`text-xs leading-relaxed font-medium opacity-80 mt-2`}>
+                            Please complete your profile information and select the service you are providing.
                         </p>
                     </div>
 
-                    <div className="w-full pt-4">
+                    <div className="w-full pt-2">
                         <Link
                             to="/profile"
-                            className="w-full py-5 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white text-lg font-black rounded-3xl transition-all shadow-2xl shadow-teal-600/30 active:scale-[0.98] flex items-center justify-center gap-3 uppercase tracking-widest group"
+                            className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+                            style={{ borderRadius: '2px' }}
                         >
-                            Complete Profile Now <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
+                            Complete Profile Now <ChevronRight size={16} />
                         </Link>
                     </div>
                 </div>

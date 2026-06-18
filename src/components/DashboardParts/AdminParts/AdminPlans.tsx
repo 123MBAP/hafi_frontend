@@ -281,55 +281,49 @@ export default function AdminPlansPage() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center space-x-4 mb-4">
-          <div className={`p-3 rounded-2xl ${
-            darkMode 
-              ? 'bg-gradient-to-br from-blue-600 to-purple-600' 
-              : 'bg-gradient-to-br from-blue-500 to-purple-500'
-          } shadow-lg`}>
-            <Package className="w-8 h-8 text-white" />
+          <div className="p-3 bg-emerald-500 shadow-md text-white" style={{ borderRadius: '2px' }}>
+            <Package className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className={`text-2xl font-extrabold uppercase tracking-wider ${darkMode ? 'text-white' : 'text-gray-950'}`}>
               Storage Plans Management
             </h1>
-            <p className={`text-lg mt-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               Manage subscription plans and storage pricing
             </p>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className={`flex space-x-1 p-1 rounded-2xl max-w-md ${
-          darkMode ? 'bg-gray-800' : 'bg-white shadow-sm border border-gray-200'
-        }`}>
+        <div className={`flex space-x-1 p-1 max-w-md border ${
+          darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+        }`} style={{ borderRadius: '2px' }}>
           <button
             onClick={() => setActiveTab('plans')}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 flex-1 ${
+            className={`flex items-center justify-center space-x-2 px-6 py-3 font-semibold uppercase text-xs tracking-wider transition-all duration-200 flex-1 ${
               activeTab === 'plans'
-                ? darkMode 
-                  ? 'bg-blue-600 text-white shadow-lg' 
-                  : 'bg-blue-500 text-white shadow-lg'
+                ? 'bg-emerald-500 text-white shadow-sm'
                 : darkMode 
-                  ? 'text-gray-400 hover:text-white hover:bg-gray-700' 
-                  : 'text-gray-600 hover:text-blue-600 hover:bg-gray-100'
+                  ? 'text-gray-400 hover:text-white hover:bg-gray-800' 
+                  : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-100'
             }`}
+            style={{ borderRadius: '2px' }}
           >
-            <Package className="w-5 h-5" />
+            <Package className="w-4 h-4" />
             <span>Storage Plans</span>
           </button>
           <button
             onClick={() => setActiveTab('storage-pricing')}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 flex-1 ${
+            className={`flex items-center justify-center space-x-2 px-6 py-3 font-semibold uppercase text-xs tracking-wider transition-all duration-200 flex-1 ${
               activeTab === 'storage-pricing'
-                ? darkMode 
-                  ? 'bg-green-600 text-white shadow-lg' 
-                  : 'bg-green-500 text-white shadow-lg'
+                ? 'bg-emerald-500 text-white shadow-sm'
                 : darkMode 
-                  ? 'text-gray-400 hover:text-white hover:bg-gray-700' 
-                  : 'text-gray-600 hover:text-green-600 hover:bg-gray-100'
+                  ? 'text-gray-400 hover:text-white hover:bg-gray-800' 
+                  : 'text-gray-600 hover:text-emerald-600 hover:bg-gray-100'
             }`}
+            style={{ borderRadius: '2px' }}
           >
-            <DollarSign className="w-5 h-5" />
+            <DollarSign className="w-4 h-4" />
             <span>Storage Pricing</span>
           </button>
         </div>
@@ -339,30 +333,30 @@ export default function AdminPlansPage() {
       {activeTab === 'plans' && (
         <div className="space-y-8">
           {/* Plan Form Card */}
-          <div id="plan-form" className={`rounded-3xl shadow-2xl border-2 backdrop-blur-sm transition-all duration-300 ${
+          <div id="plan-form" className={`border transition-all duration-300 ${
             darkMode 
-              ? 'bg-gray-800/80 border-gray-700' 
-              : 'bg-white/90 border-gray-200'
-          }`}>
+              ? 'bg-gray-900 border-gray-800' 
+              : 'bg-white border-gray-200 shadow-sm'
+          }`} style={{ borderRadius: '2px' }}>
             <div className={`p-8 border-b ${
-              darkMode ? 'border-gray-700' : 'border-gray-200'
+              darkMode ? 'border-gray-800' : 'border-gray-150'
             }`}>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
-                  <div className={`p-2 rounded-xl ${
-                    darkMode ? 'bg-blue-900/50' : 'bg-blue-100'
-                  }`}>
+                  <div className={`p-2.5 ${
+                    darkMode ? 'bg-emerald-950/40' : 'bg-emerald-50'
+                  }`} style={{ borderRadius: '2px' }}>
                     {editingId ? (
-                      <Edit3 className="w-6 h-6 text-blue-500" />
+                      <Edit3 className="w-5 h-5 text-emerald-600" />
                     ) : (
-                      <Plus className="w-6 h-6 text-blue-500" />
+                      <Plus className="w-5 h-5 text-emerald-600" />
                     )}
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold">
+                    <h2 className="text-lg font-bold uppercase tracking-wider text-gray-805">
                       {editingId ? 'Edit Storage Plan' : 'Create New Storage Plan'}
                     </h2>
-                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p className={`text-xs mt-0.5 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                       {editingId ? 'Update existing plan details' : 'Configure a new subscription plan'}
                     </p>
                   </div>
@@ -370,13 +364,14 @@ export default function AdminPlansPage() {
                 {editingId && (
                   <button
                     onClick={resetForm}
-                    className={`p-2 rounded-xl transition-all duration-300 hover:scale-110 ${
+                    className={`p-2.5 transition-colors duration-200 ${
                       darkMode 
-                        ? 'text-gray-400 hover:bg-gray-700' 
-                        : 'text-gray-500 hover:bg-gray-100'
+                        ? 'text-gray-400 hover:bg-gray-800 hover:text-white' 
+                        : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
                     }`}
+                    style={{ borderRadius: '2px' }}
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
@@ -385,49 +380,51 @@ export default function AdminPlansPage() {
                 {/* Basic Information */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
-                    <label className={`block text-sm font-medium mb-2 ${
+                    <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
                       darkMode ? 'text-gray-300' : 'text-gray-700'
                     }`}>
                       Plan Name (Internal)
                     </label>
                     <div className="relative">
                       <Shield className={`absolute left-3 top-3 w-5 h-5 ${
-                        darkMode ? 'text-gray-400' : 'text-gray-500'
+                        darkMode ? 'text-emerald-500' : 'text-emerald-600'
                       }`} />
                       <input
                         type="text"
                         placeholder="e.g., BASIC, PREMIUM"
                         value={form.name}
                         onChange={e => setForm({ ...form, name: e.target.value.toUpperCase() })}
-                        className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        className={`w-full pl-11 pr-4 py-2.5 border transition-all duration-250 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 ${
                           darkMode 
-                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                            ? 'bg-gray-800 border-gray-750 text-white placeholder-gray-500' 
+                            : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                         }`}
+                        style={{ borderRadius: '2px' }}
                         required
                       />
                     </div>
                   </div>
                   <div>
-                    <label className={`block text-sm font-medium mb-2 ${
+                    <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
                       darkMode ? 'text-gray-300' : 'text-gray-700'
                     }`}>
                       Display Name
                     </label>
                     <div className="relative">
                       <FileText className={`absolute left-3 top-3 w-5 h-5 ${
-                        darkMode ? 'text-gray-400' : 'text-gray-500'
+                        darkMode ? 'text-emerald-500' : 'text-emerald-600'
                       }`} />
                       <input
                         type="text"
                         placeholder="e.g., Basic Plan, Premium Plan"
                         value={form.display_name}
                         onChange={e => setForm({ ...form, display_name: e.target.value })}
-                        className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        className={`w-full pl-11 pr-4 py-2.5 border transition-all duration-250 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 ${
                           darkMode 
-                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                            ? 'bg-gray-800 border-gray-750 text-white placeholder-gray-500' 
+                            : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                         }`}
+                        style={{ borderRadius: '2px' }}
                         required
                       />
                     </div>
@@ -435,25 +432,25 @@ export default function AdminPlansPage() {
                 </div>
 
                 {/* Pricing Section */}
-                <div className={`p-6 rounded-2xl ${
-                  darkMode ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'
-                }`}>
-                  <h3 className={`text-lg font-semibold mb-4 flex items-center ${
-                    darkMode ? 'text-blue-400' : 'text-blue-700'
+                <div className={`p-6 border ${
+                  darkMode ? 'bg-gray-850/40 border-gray-850' : 'bg-gray-50 border-gray-150'
+                }`} style={{ borderRadius: '2px' }}>
+                  <h3 className={`text-xs font-bold uppercase tracking-wider mb-4 flex items-center ${
+                    darkMode ? 'text-emerald-400' : 'text-emerald-700'
                   }`}>
-                    <DollarSign className="w-5 h-5 mr-2" />
+                    <DollarSign className="w-4 h-4 mr-2" />
                     Pricing Configuration
                   </h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-blue-300' : 'text-blue-700'
+                      <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
+                        darkMode ? 'text-gray-300' : 'text-gray-700'
                       }`}>
                         Monthly Price ($)
                       </label>
                       <div className="relative">
                         <DollarSign className={`absolute left-3 top-3 w-5 h-5 ${
-                          darkMode ? 'text-blue-400' : 'text-blue-500'
+                          darkMode ? 'text-emerald-500' : 'text-emerald-600'
                         }`} />
                         <input
                           type="number"
@@ -461,24 +458,25 @@ export default function AdminPlansPage() {
                           placeholder="0.00"
                           value={form.price_monthly}
                           onChange={e => setForm({ ...form, price_monthly: e.target.value })}
-                          className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          className={`w-full pl-11 pr-4 py-2.5 border transition-all duration-250 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 ${
                             darkMode 
-                              ? 'bg-gray-700 border-blue-600 text-white' 
-                              : 'bg-white border-blue-300 text-gray-900'
+                              ? 'bg-gray-800 border-gray-750 text-white placeholder-gray-500' 
+                              : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                           }`}
+                          style={{ borderRadius: '2px' }}
                           required
                         />
                       </div>
                     </div>
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-blue-300' : 'text-blue-700'
+                      <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
+                        darkMode ? 'text-gray-300' : 'text-gray-700'
                       }`}>
                         Yearly Price ($)
                       </label>
                       <div className="relative">
                         <Calendar className={`absolute left-3 top-3 w-5 h-5 ${
-                          darkMode ? 'text-blue-400' : 'text-blue-500'
+                          darkMode ? 'text-emerald-500' : 'text-emerald-600'
                         }`} />
                         <input
                           type="number"
@@ -486,11 +484,12 @@ export default function AdminPlansPage() {
                           placeholder="0.00"
                           value={form.price_yearly}
                           onChange={e => setForm({ ...form, price_yearly: e.target.value })}
-                          className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          className={`w-full pl-11 pr-4 py-2.5 border transition-all duration-250 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 ${
                             darkMode 
-                              ? 'bg-gray-700 border-blue-600 text-white' 
-                              : 'bg-white border-blue-300 text-gray-900'
+                              ? 'bg-gray-800 border-gray-750 text-white placeholder-gray-500' 
+                              : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                           }`}
+                          style={{ borderRadius: '2px' }}
                           required
                         />
                       </div>
@@ -499,67 +498,69 @@ export default function AdminPlansPage() {
                 </div>
 
                 {/* Storage Configuration */}
-                <div className={`p-6 rounded-2xl ${
-                  darkMode ? 'bg-purple-900/20 border border-purple-800' : 'bg-purple-50 border border-purple-200'
-                }`}>
-                  <h3 className={`text-lg font-semibold mb-4 flex items-center ${
-                    darkMode ? 'text-purple-400' : 'text-purple-700'
+                <div className={`p-6 border ${
+                  darkMode ? 'bg-gray-850/40 border-gray-855' : 'bg-gray-50 border-gray-150'
+                }`} style={{ borderRadius: '2px' }}>
+                  <h3 className={`text-xs font-bold uppercase tracking-wider mb-4 flex items-center ${
+                    darkMode ? 'text-emerald-400' : 'text-emerald-700'
                   }`}>
-                    <HardDrive className="w-5 h-5 mr-2" />
+                    <HardDrive className="w-4 h-4 mr-2" />
                     Storage Configuration
                   </h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-purple-300' : 'text-purple-700'
+                      <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
+                        darkMode ? 'text-gray-300' : 'text-gray-700'
                       }`}>
                         Base Storage (MB)
                       </label>
                       <div className="relative">
                         <Database className={`absolute left-3 top-3 w-5 h-5 ${
-                          darkMode ? 'text-purple-400' : 'text-purple-500'
+                          darkMode ? 'text-emerald-500' : 'text-emerald-600'
                         }`} />
                         <input
                           type="number"
                           placeholder="100"
                           value={form.base_storage_mb}
                           onChange={e => setForm({ ...form, base_storage_mb: e.target.value })}
-                          className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                          className={`w-full pl-11 pr-4 py-2.5 border transition-all duration-250 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 ${
                             darkMode 
-                              ? 'bg-gray-700 border-purple-600 text-white' 
-                              : 'bg-white border-purple-300 text-gray-900'
+                              ? 'bg-gray-800 border-gray-750 text-white placeholder-gray-500' 
+                              : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                           }`}
+                          style={{ borderRadius: '2px' }}
                           required
                         />
                       </div>
                       {form.base_storage_mb && (
-                        <p className={`text-xs mt-2 ${
-                          darkMode ? 'text-purple-300' : 'text-purple-600'
+                        <p className={`text-xs font-semibold mt-2 ${
+                          darkMode ? 'text-emerald-400' : 'text-emerald-600'
                         }`}>
                           {(Number(form.base_storage_mb) / 1024).toFixed(2)} GB total storage
                         </p>
                       )}
                     </div>
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-purple-300' : 'text-purple-700'
+                      <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
+                        darkMode ? 'text-gray-300' : 'text-gray-700'
                       }`}>
                         Max File Size (MB)
                       </label>
                       <div className="relative">
                         <Upload className={`absolute left-3 top-3 w-5 h-5 ${
-                          darkMode ? 'text-purple-400' : 'text-purple-500'
+                          darkMode ? 'text-emerald-500' : 'text-emerald-600'
                         }`} />
                         <input
                           type="number"
                           placeholder="50"
                           value={form.max_file_size_mb}
                           onChange={e => setForm({ ...form, max_file_size_mb: e.target.value })}
-                          className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                          className={`w-full pl-11 pr-4 py-2.5 border transition-all duration-250 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 ${
                             darkMode 
-                              ? 'bg-gray-700 border-purple-600 text-white' 
-                              : 'bg-white border-purple-300 text-gray-900'
+                              ? 'bg-gray-800 border-gray-750 text-white placeholder-gray-500' 
+                              : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                           }`}
+                          style={{ borderRadius: '2px' }}
                           required
                         />
                       </div>
@@ -568,59 +569,61 @@ export default function AdminPlansPage() {
                 </div>
 
                 {/* Upload Limits */}
-                <div className={`p-6 rounded-2xl ${
-                  darkMode ? 'bg-green-900/20 border border-green-800' : 'bg-green-50 border border-green-200'
-                }`}>
-                  <h3 className={`text-lg font-semibold mb-4 flex items-center ${
-                    darkMode ? 'text-green-400' : 'text-green-700'
+                <div className={`p-6 border ${
+                  darkMode ? 'bg-gray-855/40 border-gray-855' : 'bg-gray-50 border-gray-150'
+                }`} style={{ borderRadius: '2px' }}>
+                  <h3 className={`text-xs font-bold uppercase tracking-wider mb-4 flex items-center ${
+                    darkMode ? 'text-emerald-400' : 'text-emerald-700'
                   }`}>
-                    <Settings className="w-5 h-5 mr-2" />
+                    <Settings className="w-4 h-4 mr-2" />
                     Upload Limits
                   </h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-green-300' : 'text-green-700'
+                      <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
+                        darkMode ? 'text-gray-300' : 'text-gray-700'
                       }`}>
                         Max Products
                       </label>
                       <div className="relative">
                         <ShoppingBag className={`absolute left-3 top-3 w-5 h-5 ${
-                          darkMode ? 'text-green-400' : 'text-green-500'
+                          darkMode ? 'text-emerald-500' : 'text-emerald-600'
                         }`} />
                         <input
                           type="number"
                           placeholder="Unlimited (leave empty)"
                           value={form.max_products}
                           onChange={e => setForm({ ...form, max_products: e.target.value })}
-                          className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                          className={`w-full pl-11 pr-4 py-2.5 border transition-all duration-250 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 ${
                             darkMode 
-                              ? 'bg-gray-700 border-green-600 text-white placeholder-green-400' 
-                              : 'bg-white border-green-300 text-gray-900 placeholder-green-500'
+                              ? 'bg-gray-800 border-gray-750 text-white placeholder-gray-550' 
+                              : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                           }`}
+                          style={{ borderRadius: '2px' }}
                         />
                       </div>
                     </div>
                     <div>
-                      <label className={`block text-sm font-medium mb-2 ${
-                        darkMode ? 'text-green-300' : 'text-green-700'
+                      <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
+                        darkMode ? 'text-gray-300' : 'text-gray-700'
                       }`}>
                         Max Services
                       </label>
                       <div className="relative">
                         <Wrench className={`absolute left-3 top-3 w-5 h-5 ${
-                          darkMode ? 'text-green-400' : 'text-green-500'
+                          darkMode ? 'text-emerald-500' : 'text-emerald-600'
                         }`} />
                         <input
                           type="number"
                           placeholder="Unlimited (leave empty)"
                           value={form.max_services}
                           onChange={e => setForm({ ...form, max_services: e.target.value })}
-                          className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                          className={`w-full pl-11 pr-4 py-2.5 border transition-all duration-250 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 ${
                             darkMode 
-                              ? 'bg-gray-700 border-green-600 text-white placeholder-green-400' 
-                              : 'bg-white border-green-300 text-gray-900 placeholder-green-500'
+                              ? 'bg-gray-800 border-gray-750 text-white placeholder-gray-550' 
+                              : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                           }`}
+                          style={{ borderRadius: '2px' }}
                         />
                       </div>
                     </div>
@@ -628,43 +631,45 @@ export default function AdminPlansPage() {
                 </div>
 
                 {/* Feature Toggles */}
-                <div className={`p-6 rounded-2xl ${
-                  darkMode ? 'bg-orange-900/20 border border-orange-800' : 'bg-orange-50 border border-orange-200'
-                }`}>
-                  <h3 className={`text-lg font-semibold mb-4 flex items-center ${
-                    darkMode ? 'text-orange-400' : 'text-orange-700'
+                <div className={`p-6 border ${
+                  darkMode ? 'bg-gray-855/40 border-gray-855' : 'bg-gray-50 border-gray-150'
+                }`} style={{ borderRadius: '2px' }}>
+                  <h3 className={`text-xs font-bold uppercase tracking-wider mb-4 flex items-center ${
+                    darkMode ? 'text-emerald-400' : 'text-emerald-700'
                   }`}>
-                    <Zap className="w-5 h-5 mr-2" />
+                    <Zap className="w-4 h-4 mr-2" />
                     Feature Access
                   </h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="flex items-center space-x-3 p-3 rounded-xl bg-white/50 dark:bg-gray-700/50">
+                    <div className="flex items-center space-x-3 p-3 border border-gray-200 dark:border-gray-750 bg-white/50 dark:bg-gray-800/50" style={{ borderRadius: '2px' }}>
                       <input
                         type="checkbox"
                         id="can_upload_videos"
                         checked={form.can_upload_videos}
                         onChange={e => setForm({ ...form, can_upload_videos: e.target.checked })}
-                        className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-all duration-200"
+                        className="h-5 w-5 text-emerald-600 focus:ring-emerald-500 border-gray-300 transition-all duration-200"
+                        style={{ borderRadius: '2px' }}
                       />
-                      <label htmlFor="can_upload_videos" className={`flex items-center space-x-2 font-medium ${
-                        darkMode ? 'text-orange-300' : 'text-orange-700'
+                      <label htmlFor="can_upload_videos" className={`flex items-center space-x-2 text-sm font-semibold cursor-pointer ${
+                        darkMode ? 'text-gray-300' : 'text-gray-700'
                       }`}>
-                        <Upload className="w-4 h-4" />
+                        <Upload className="w-4 h-4 text-emerald-500" />
                         <span>Allow Video Uploads</span>
                       </label>
                     </div>
-                    <div className="flex items-center space-x-3 p-3 rounded-xl bg-white/50 dark:bg-gray-700/50">
+                    <div className="flex items-center space-x-3 p-3 border border-gray-200 dark:border-gray-750 bg-white/50 dark:bg-gray-800/50" style={{ borderRadius: '2px' }}>
                       <input
                         type="checkbox"
                         id="can_use_analytics"
                         checked={form.can_use_analytics}
                         onChange={e => setForm({ ...form, can_use_analytics: e.target.checked })}
-                        className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-all duration-200"
+                        className="h-5 w-5 text-emerald-600 focus:ring-emerald-500 border-gray-300 transition-all duration-200"
+                        style={{ borderRadius: '2px' }}
                       />
-                      <label htmlFor="can_use_analytics" className={`flex items-center space-x-2 font-medium ${
-                        darkMode ? 'text-orange-300' : 'text-orange-700'
+                      <label htmlFor="can_use_analytics" className={`flex items-center space-x-2 text-sm font-semibold cursor-pointer ${
+                        darkMode ? 'text-gray-300' : 'text-gray-700'
                       }`}>
-                        <BarChart3 className="w-4 h-4" />
+                        <BarChart3 className="w-4 h-4 text-emerald-500" />
                         <span>Analytics Access</span>
                       </label>
                     </div>
@@ -674,7 +679,7 @@ export default function AdminPlansPage() {
                 {/* Additional Settings */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
-                    <label className={`block text-sm font-medium mb-2 ${
+                    <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
                       darkMode ? 'text-gray-300' : 'text-gray-700'
                     }`}>
                       Sort Order
@@ -684,25 +689,27 @@ export default function AdminPlansPage() {
                       placeholder="0"
                       value={form.sort_order}
                       onChange={e => setForm({ ...form, sort_order: e.target.value })}
-                      className={`w-full p-3 rounded-xl border-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      className={`w-full p-2.5 border transition-all duration-250 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 ${
                         darkMode 
-                          ? 'bg-gray-700 border-gray-600 text-white' 
-                          : 'bg-white border-gray-300 text-gray-900'
+                          ? 'bg-gray-800 border-gray-750 text-white placeholder-gray-500' 
+                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                       }`}
+                      style={{ borderRadius: '2px' }}
                     />
                   </div>
-                  <div className="flex items-center space-x-3 p-3 rounded-xl bg-white/50 dark:bg-gray-700/50">
+                  <div className="flex items-center space-x-3 p-3 border border-gray-200 dark:border-gray-750 bg-white/50 dark:bg-gray-800/50 self-end" style={{ borderRadius: '2px', height: '46px' }}>
                     <input
                       type="checkbox"
                       id="is_active"
                       checked={form.is_active}
                       onChange={e => setForm({ ...form, is_active: e.target.checked })}
-                      className="h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded transition-all duration-200"
+                      className="h-5 w-5 text-emerald-600 focus:ring-emerald-500 border-gray-300 transition-all duration-200"
+                      style={{ borderRadius: '2px' }}
                     />
-                    <label htmlFor="is_active" className={`flex items-center space-x-2 font-medium ${
-                      darkMode ? 'text-green-300' : 'text-green-700'
+                    <label htmlFor="is_active" className={`flex items-center space-x-2 text-sm font-semibold cursor-pointer ${
+                      darkMode ? 'text-gray-300' : 'text-gray-700'
                     }`}>
-                      <Check className="w-4 h-4" />
+                      <Check className="w-4 h-4 text-emerald-500" />
                       <span>Plan Active</span>
                     </label>
                   </div>
@@ -710,24 +717,25 @@ export default function AdminPlansPage() {
 
                 {/* Features */}
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${
+                  <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
                     darkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>
                     Plan Features (comma separated)
                   </label>
                   <div className="relative">
                     <Star className={`absolute left-3 top-3 w-5 h-5 ${
-                      darkMode ? 'text-gray-400' : 'text-gray-500'
+                      darkMode ? 'text-emerald-500' : 'text-emerald-600'
                     }`} />
                     <textarea
                       placeholder="e.g., Unlimited products, Video uploads, Analytics, Priority support"
                       value={form.features}
                       onChange={e => setForm({ ...form, features: e.target.value })}
-                      className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      className={`w-full pl-11 pr-4 py-2.5 border transition-all duration-250 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 ${
                         darkMode 
-                          ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                          ? 'bg-gray-800 border-gray-750 text-white placeholder-gray-500' 
+                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                       } h-20`}
+                      style={{ borderRadius: '2px' }}
                       required
                     />
                   </div>
@@ -738,25 +746,26 @@ export default function AdminPlansPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`flex items-center space-x-2 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
+                    className={`flex items-center space-x-2 px-8 py-3.5 font-bold uppercase text-xs tracking-wider transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
                       darkMode 
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white' 
-                        : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white'
-                    } shadow-lg hover:shadow-blue-500/25`}
+                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                        : 'bg-emerald-50 hover:bg-emerald-600 text-white'
+                    }`}
+                    style={{ borderRadius: '2px' }}
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
                         <span>Saving...</span>
                       </>
                     ) : editingId ? (
                       <>
-                        <Save className="w-5 h-5" />
+                        <Save className="w-4 h-4" />
                         <span>Update Plan</span>
                       </>
                     ) : (
                       <>
-                        <Plus className="w-5 h-5" />
+                        <Plus className="w-4 h-4" />
                         <span>Create Plan</span>
                       </>
                     )}
@@ -768,12 +777,12 @@ export default function AdminPlansPage() {
 
           {/* Plans List */}
           <div>
-            <h3 className="text-2xl font-bold mb-6 flex items-center">
-              <Package className="w-6 h-6 mr-3" />
+            <h3 className="text-xl font-bold uppercase tracking-wider mb-6 flex items-center">
+              <Package className="w-5 h-5 mr-3 text-emerald-500" />
               Current Storage Plans
-              <span className={`ml-3 px-3 py-1 rounded-full text-sm font-medium ${
-                darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
-              }`}>
+              <span className={`ml-3 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider ${
+                darkMode ? 'bg-gray-800 text-gray-300 border border-gray-700' : 'bg-gray-100 text-gray-750 border border-gray-200'
+              }`} style={{ borderRadius: '2px' }}>
                 {plans.length} plans
               </span>
             </h3>
@@ -782,121 +791,121 @@ export default function AdminPlansPage() {
               {plans.map((plan, index) => (
                 <div
                   key={plan.id}
-                  className={`rounded-3xl border-2 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:scale-105 ${
+                  className={`border transition-all duration-300 ${
                     darkMode 
-                      ? 'bg-gray-800/80 border-gray-700' 
-                      : 'bg-white/90 border-gray-200'
+                      ? 'bg-gray-900 border-gray-800 hover:border-emerald-600/40' 
+                      : 'bg-white border-gray-200 hover:border-emerald-500/40 shadow-sm'
                   }`}
-                  style={{ animationDelay: `${index * 100}ms` }}
+                  style={{ animationDelay: `${index * 100}ms`, borderRadius: '2px' }}
                 >
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-3">
-                          <h3 className="font-bold text-2xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                          <h3 className={`font-bold text-lg uppercase tracking-wider ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                             {plan.display_name || plan.name}
                           </h3>
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            darkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-700'
-                          }`}>
+                          <span className={`px-2 py-0.5 text-xs font-bold uppercase tracking-wider border ${
+                            darkMode ? 'bg-emerald-950/40 border-emerald-800/50 text-emerald-450' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                          }`} style={{ borderRadius: '2px' }}>
                             {plan.name}
                           </span>
                           {!plan.is_active && (
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              darkMode ? 'bg-red-900/50 text-red-300' : 'bg-red-100 text-red-700'
-                            }`}>
+                            <span className={`px-2 py-0.5 text-xs font-bold uppercase tracking-wider border ${
+                              darkMode ? 'bg-red-950/40 border-red-800/50 text-red-400' : 'bg-red-50 border-red-200 text-red-700'
+                            }`} style={{ borderRadius: '2px' }}>
                               INACTIVE
                             </span>
                           )}
                         </div>
 
                         {/* Pricing Card */}
-                        <div className={`p-4 rounded-2xl mb-4 ${
-                          darkMode ? 'bg-gradient-to-r from-blue-900/50 to-purple-900/50' : 'bg-gradient-to-r from-blue-50 to-purple-50'
-                        }`}>
+                        <div className={`p-4 border mb-4 ${
+                          darkMode ? 'bg-gray-800/40 border-gray-800' : 'bg-gray-50 border-gray-150'
+                        }`} style={{ borderRadius: '2px' }}>
                           <div className="flex items-center justify-between">
                             <div>
-                              <div className={`text-2xl font-bold ${
-                                darkMode ? 'text-white' : 'text-gray-900'
+                              <div className={`text-2xl font-black tracking-tight ${
+                                darkMode ? 'text-white' : 'text-gray-950'
                               }`}>
                                 ${plan.price_monthly}
-                                <span className={`text-sm font-normal ${
-                                  darkMode ? 'text-gray-400' : 'text-gray-600'
+                                <span className={`text-xs font-bold uppercase tracking-wider ml-1 ${
+                                  darkMode ? 'text-gray-400' : 'text-gray-500'
                                 }`}>/month</span>
                               </div>
-                              <div className={`text-lg ${
-                                darkMode ? 'text-gray-400' : 'text-gray-600'
+                              <div className={`text-sm font-semibold ${
+                                darkMode ? 'text-gray-400' : 'text-gray-500'
                               }`}>
                                 ${plan.price_yearly}/year
                               </div>
                             </div>
-                            <div className={`p-3 rounded-xl ${
-                              darkMode ? 'bg-blue-900/30' : 'bg-blue-100'
-                            }`}>
-                              <HardDrive className="w-6 h-6 text-blue-500" />
+                            <div className={`p-2.5 ${
+                              darkMode ? 'bg-emerald-950/40 text-emerald-400' : 'bg-emerald-50 text-emerald-600'
+                            }`} style={{ borderRadius: '2px' }}>
+                              <HardDrive className="w-5 h-5" />
                             </div>
                           </div>
                         </div>
 
                         {/* Features Grid */}
                         <div className="grid grid-cols-2 gap-4 mb-4">
-                          <div className={`p-3 rounded-xl ${
-                            darkMode ? 'bg-gray-700/50' : 'bg-gray-100'
-                          }`}>
-                            <div className={`text-sm ${
-                              darkMode ? 'text-gray-400' : 'text-gray-600'
+                          <div className={`p-3 border ${
+                            darkMode ? 'bg-gray-850/30 border-gray-800' : 'bg-gray-50 border-gray-150'
+                          }`} style={{ borderRadius: '2px' }}>
+                            <div className={`text-xs font-bold uppercase tracking-wider mb-0.5 ${
+                              darkMode ? 'text-gray-500' : 'text-gray-400'
                             }`}>Storage</div>
-                            <div className="font-bold">{(plan.base_storage_mb / 1024).toFixed(2)} GB</div>
+                            <div className="font-bold text-sm">{(plan.base_storage_mb / 1024).toFixed(2)} GB</div>
                           </div>
-                          <div className={`p-3 rounded-xl ${
-                            darkMode ? 'bg-gray-700/50' : 'bg-gray-100'
-                          }`}>
-                            <div className={`text-sm ${
-                              darkMode ? 'text-gray-400' : 'text-gray-600'
+                          <div className={`p-3 border ${
+                            darkMode ? 'bg-gray-855/30 border-gray-800' : 'bg-gray-50 border-gray-150'
+                          }`} style={{ borderRadius: '2px' }}>
+                            <div className={`text-xs font-bold uppercase tracking-wider mb-0.5 ${
+                              darkMode ? 'text-gray-500' : 'text-gray-400'
                             }`}>Max File</div>
-                            <div className="font-bold">{plan.max_file_size_mb} MB</div>
+                            <div className="font-bold text-sm">{plan.max_file_size_mb} MB</div>
                           </div>
                         </div>
 
                         {/* Feature Badges */}
                         <div className="flex flex-wrap gap-2 mb-4">
                           {plan.can_upload_videos && (
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center space-x-1 ${
-                              darkMode ? 'bg-red-900/30 text-red-300' : 'bg-red-100 text-red-700'
-                            }`}>
-                              <Upload className="w-3 h-3" />
+                            <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider border flex items-center space-x-1 ${
+                              darkMode ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-gray-100 border-gray-200 text-gray-700'
+                            }`} style={{ borderRadius: '2px' }}>
+                              <Upload className="w-3 h-3 text-emerald-555" />
                               <span>Videos</span>
                             </span>
                           )}
                           {plan.can_use_analytics && (
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center space-x-1 ${
-                              darkMode ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-700'
-                            }`}>
-                              <BarChart3 className="w-3 h-3" />
+                            <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider border flex items-center space-x-1 ${
+                              darkMode ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-gray-100 border-gray-200 text-gray-700'
+                            }`} style={{ borderRadius: '2px' }}>
+                              <BarChart3 className="w-3 h-3 text-emerald-555" />
                               <span>Analytics</span>
                             </span>
                           )}
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            darkMode ? 'bg-purple-900/30 text-purple-300' : 'bg-purple-100 text-purple-700'
-                          }`}>
+                          <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider border ${
+                            darkMode ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-gray-100 border-gray-200 text-gray-750'
+                          }`} style={{ borderRadius: '2px' }}>
                             {plan.max_products || '∞'} Products
                           </span>
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            darkMode ? 'bg-orange-900/30 text-orange-300' : 'bg-orange-100 text-orange-700'
-                          }`}>
+                          <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider border ${
+                            darkMode ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-gray-100 border-gray-200 text-gray-755'
+                          }`} style={{ borderRadius: '2px' }}>
                             {plan.max_services || '∞'} Services
                           </span>
                         </div>
 
                         {/* Features List */}
-                        <div className={`p-3 rounded-xl ${
-                          darkMode ? 'bg-gray-700/30' : 'bg-gray-50'
-                        }`}>
-                          <div className={`text-sm font-medium mb-2 ${
+                        <div className={`p-3 border ${
+                          darkMode ? 'bg-gray-900/50 border-gray-800' : 'bg-gray-50 border-gray-150'
+                        }`} style={{ borderRadius: '2px' }}>
+                          <div className={`text-xs font-bold uppercase tracking-wider mb-2 ${
                             darkMode ? 'text-gray-400' : 'text-gray-600'
                           }`}>Features:</div>
-                          <p className={`text-sm ${
-                            darkMode ? 'text-gray-300' : 'text-gray-700'
+                          <p className={`text-sm font-semibold ${
+                            darkMode ? 'text-gray-300' : 'text-gray-750'
                           }`}>
                             {Array.isArray(plan.features) ? plan.features.join(", ") : plan.features}
                           </p>
@@ -905,27 +914,29 @@ export default function AdminPlansPage() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-3 pt-4 border-t" style={{ borderColor: darkMode ? '#374151' : '#E5E7EB' }}>
+                    <div className="flex gap-3 pt-4 border-t" style={{ borderColor: darkMode ? '#1F2937' : '#E5E7EB' }}>
                       <button
                         onClick={() => startEditing(plan)}
-                        className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 hover:scale-105 ${
+                        className={`flex items-center space-x-1.5 px-4 py-2 font-bold uppercase text-xs tracking-wider transition-colors duration-200 ${
                           darkMode 
-                            ? 'bg-yellow-900/30 text-yellow-300 hover:bg-yellow-800/50' 
-                            : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                            ? 'bg-gray-800 text-yellow-500 hover:bg-gray-750' 
+                            : 'bg-gray-100 text-yellow-600 hover:bg-gray-200'
                         }`}
+                        style={{ borderRadius: '2px' }}
                       >
-                        <Edit3 className="w-4 h-4" />
+                        <Edit3 className="w-3.5 h-3.5" />
                         <span>Edit</span>
                       </button>
                       <button
                         onClick={() => deletePlan(plan.id)}
-                        className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 hover:scale-105 ${
+                        className={`flex items-center space-x-1.5 px-4 py-2 font-bold uppercase text-xs tracking-wider transition-colors duration-200 ${
                           darkMode 
-                            ? 'bg-red-900/30 text-red-300 hover:bg-red-800/50' 
-                            : 'bg-red-100 text-red-700 hover:bg-red-200'
+                            ? 'bg-gray-800 text-red-400 hover:bg-gray-750' 
+                            : 'bg-gray-100 text-red-500 hover:bg-gray-200'
                         }`}
+                        style={{ borderRadius: '2px' }}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                         <span>Delete</span>
                       </button>
                     </div>
@@ -939,21 +950,21 @@ export default function AdminPlansPage() {
 
       {/* Storage Pricing Tab */}
       {activeTab === 'storage-pricing' && (
-        <div className={`rounded-3xl shadow-2xl border-2 backdrop-blur-sm transition-all duration-300 ${
+        <div className={`border transition-all duration-300 ${
           darkMode 
-            ? 'bg-gray-800/80 border-gray-700' 
-            : 'bg-white/90 border-gray-200'
-        }`}>
+            ? 'bg-gray-900 border-gray-800' 
+            : 'bg-white border-gray-200 shadow-sm'
+        }`} style={{ borderRadius: '2px' }}>
           <div className="p-8">
             <div className="flex items-center space-x-3 mb-6">
-              <div className={`p-2 rounded-xl ${
-                darkMode ? 'bg-green-900/50' : 'bg-green-100'
-              }`}>
-                <DollarSign className="w-6 h-6 text-green-500" />
+              <div className={`p-2.5 ${
+                darkMode ? 'bg-emerald-950/40' : 'bg-emerald-50'
+              }`} style={{ borderRadius: '2px' }}>
+                <DollarSign className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold">Extra Storage Pricing</h2>
-                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <h2 className="text-lg font-bold uppercase tracking-wider text-gray-805">Extra Storage Pricing</h2>
+                <p className={`text-xs mt-0.5 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                   Configure pricing for additional storage beyond plan limits
                 </p>
               </div>
@@ -961,23 +972,23 @@ export default function AdminPlansPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
               {/* Monthly Pricing */}
-              <div className={`p-6 rounded-2xl border-2 ${
-                darkMode ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-200'
-              }`}>
+              <div className={`p-6 border ${
+                darkMode ? 'bg-gray-850/40 border-gray-800' : 'bg-gray-50 border-gray-150'
+              }`} style={{ borderRadius: '2px' }}>
                 <div className="flex items-center space-x-3 mb-4">
-                  <Calendar className={`w-6 h-6 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
-                  <h3 className={`text-lg font-semibold ${darkMode ? 'text-blue-400' : 'text-blue-700'}`}>
+                  <Calendar className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                  <h3 className={`text-sm font-bold uppercase tracking-wider ${darkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
                     Monthly Pricing
                   </h3>
                 </div>
-                <label className={`block text-sm font-medium mb-3 ${
-                  darkMode ? 'text-blue-300' : 'text-blue-700'
+                <label className={`block text-xs font-bold uppercase tracking-wider mb-3 ${
+                  darkMode ? 'text-gray-300' : 'text-gray-700'
                 }`}>
                   Price per GB ($)
                 </label>
                 <div className="relative">
                   <DollarSign className={`absolute left-3 top-3 w-5 h-5 ${
-                    darkMode ? 'text-blue-400' : 'text-blue-500'
+                    darkMode ? 'text-emerald-555' : 'text-emerald-600'
                   }`} />
                   <input
                     type="number"
@@ -987,38 +998,39 @@ export default function AdminPlansPage() {
                       ...storagePricing, 
                       price_per_gb_monthly: Number(e.target.value)
                     })}
-                    className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    className={`w-full pl-11 pr-4 py-2.5 border transition-all duration-250 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 ${
                       darkMode 
-                        ? 'bg-gray-700 border-blue-600 text-white' 
-                        : 'bg-white border-blue-300 text-gray-900'
+                        ? 'bg-gray-800 border-gray-750 text-white' 
+                        : 'bg-white border-gray-250 text-gray-900'
                     }`}
+                    style={{ borderRadius: '2px' }}
                   />
                 </div>
-                <p className={`text-xs mt-2 ${
-                  darkMode ? 'text-blue-300' : 'text-blue-600'
+                <p className={`text-xs font-semibold mt-2 ${
+                  darkMode ? 'text-gray-500' : 'text-gray-400'
                 }`}>
                   Users pay this amount per GB of extra storage monthly
                 </p>
               </div>
 
               {/* Yearly Pricing */}
-              <div className={`p-6 rounded-2xl border-2 ${
-                darkMode ? 'bg-green-900/20 border-green-800' : 'bg-green-50 border-green-200'
-              }`}>
+              <div className={`p-6 border ${
+                darkMode ? 'bg-gray-850/40 border-gray-850' : 'bg-gray-50 border-gray-150'
+              }`} style={{ borderRadius: '2px' }}>
                 <div className="flex items-center space-x-3 mb-4">
-                  <Calendar className={`w-6 h-6 ${darkMode ? 'text-green-400' : 'text-green-600'}`} />
-                  <h3 className={`text-lg font-semibold ${darkMode ? 'text-green-400' : 'text-green-700'}`}>
+                  <Calendar className={`w-5 h-5 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                  <h3 className={`text-sm font-bold uppercase tracking-wider ${darkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
                     Yearly Pricing
                   </h3>
                 </div>
-                <label className={`block text-sm font-medium mb-3 ${
-                  darkMode ? 'text-green-300' : 'text-green-700'
+                <label className={`block text-xs font-bold uppercase tracking-wider mb-3 ${
+                  darkMode ? 'text-gray-300' : 'text-gray-700'
                 }`}>
                   Price per GB ($)
                 </label>
                 <div className="relative">
                   <DollarSign className={`absolute left-3 top-3 w-5 h-5 ${
-                    darkMode ? 'text-green-400' : 'text-green-500'
+                    darkMode ? 'text-emerald-555' : 'text-emerald-600'
                   }`} />
                   <input
                     type="number"
@@ -1028,15 +1040,16 @@ export default function AdminPlansPage() {
                       ...storagePricing, 
                       price_per_gb_yearly: Number(e.target.value)
                     })}
-                    className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                    className={`w-full pl-11 pr-4 py-2.5 border transition-all duration-250 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 ${
                       darkMode 
-                        ? 'bg-gray-700 border-green-600 text-white' 
-                        : 'bg-white border-green-300 text-gray-900'
+                        ? 'bg-gray-800 border-gray-750 text-white' 
+                        : 'bg-white border-gray-250 text-gray-900'
                     }`}
+                    style={{ borderRadius: '2px' }}
                   />
                 </div>
-                <p className={`text-xs mt-2 ${
-                  darkMode ? 'text-green-300' : 'text-green-600'
+                <p className={`text-xs font-semibold mt-2 ${
+                  darkMode ? 'text-gray-500' : 'text-gray-400'
                 }`}>
                   Yearly pricing typically offers savings
                 </p>
@@ -1044,34 +1057,34 @@ export default function AdminPlansPage() {
             </div>
 
             {/* Pricing Preview */}
-            <div className={`p-6 rounded-2xl mb-8 ${
-              darkMode ? 'bg-purple-900/20 border border-purple-800' : 'bg-purple-50 border border-purple-200'
-            }`}>
-              <h3 className={`text-lg font-semibold mb-4 flex items-center ${
-                darkMode ? 'text-purple-400' : 'text-purple-700'
+            <div className={`p-6 border mb-8 ${
+              darkMode ? 'bg-gray-900/50 border-gray-800' : 'bg-gray-50 border-gray-150'
+            }`} style={{ borderRadius: '2px' }}>
+              <h3 className={`text-xs font-bold uppercase tracking-wider mb-4 flex items-center ${
+                darkMode ? 'text-emerald-400' : 'text-emerald-700'
               }`}>
-                <Zap className="w-5 h-5 mr-2" />
+                <Zap className="w-4 h-4 mr-2" />
                 Pricing Preview
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className={`p-4 rounded-xl text-center ${
-                  darkMode ? 'bg-gray-700/50' : 'bg-white'
-                }`}>
-                  <div className="font-bold text-lg mb-2">1 GB Extra</div>
+                <div className={`p-4 border text-center ${
+                  darkMode ? 'bg-gray-800/40 border-gray-800' : 'bg-white border-gray-200 shadow-sm'
+                }`} style={{ borderRadius: '2px' }}>
+                  <div className="font-bold text-sm uppercase tracking-wider mb-2 text-gray-755">1 GB Extra</div>
                   <div className="text-sm">Monthly: <span className="font-bold">${storagePricing.price_per_gb_monthly}</span></div>
                   <div className="text-sm">Yearly: <span className="font-bold">${storagePricing.price_per_gb_yearly}</span></div>
                 </div>
-                <div className={`p-4 rounded-xl text-center ${
-                  darkMode ? 'bg-gray-700/50' : 'bg-white'
-                }`}>
-                  <div className="font-bold text-lg mb-2">5 GB Extra</div>
+                <div className={`p-4 border text-center ${
+                  darkMode ? 'bg-gray-800/40 border-gray-800' : 'bg-white border-gray-200 shadow-sm'
+                }`} style={{ borderRadius: '2px' }}>
+                  <div className="font-bold text-sm uppercase tracking-wider mb-2 text-gray-755">5 GB Extra</div>
                   <div className="text-sm">Monthly: <span className="font-bold">${(storagePricing.price_per_gb_monthly * 5).toFixed(2)}</span></div>
                   <div className="text-sm">Yearly: <span className="font-bold">${(storagePricing.price_per_gb_yearly * 5).toFixed(2)}</span></div>
                 </div>
-                <div className={`p-4 rounded-xl text-center ${
-                  darkMode ? 'bg-gray-700/50' : 'bg-white'
-                }`}>
-                  <div className="font-bold text-lg mb-2">10 GB Extra</div>
+                <div className={`p-4 border text-center ${
+                  darkMode ? 'bg-gray-800/40 border-gray-800' : 'bg-white border-gray-200 shadow-sm'
+                }`} style={{ borderRadius: '2px' }}>
+                  <div className="font-bold text-sm uppercase tracking-wider mb-2 text-gray-755">10 GB Extra</div>
                   <div className="text-sm">Monthly: <span className="font-bold">${(storagePricing.price_per_gb_monthly * 10).toFixed(2)}</span></div>
                   <div className="text-sm">Yearly: <span className="font-bold">${(storagePricing.price_per_gb_yearly * 10).toFixed(2)}</span></div>
                 </div>
@@ -1082,20 +1095,21 @@ export default function AdminPlansPage() {
               id="save-pricing-btn"
               onClick={updateStoragePricing}
               disabled={isSubmitting}
-              className={`flex items-center space-x-2 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`flex items-center space-x-2 px-8 py-3.5 font-bold uppercase text-xs tracking-wider transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
                 darkMode 
-                  ? 'bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white' 
-                  : 'bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white'
-              } shadow-lg hover:shadow-green-500/25`}
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                  : 'bg-emerald-50 hover:bg-emerald-600 text-white'
+              }`}
+              style={{ borderRadius: '2px' }}
             >
               {isSubmitting ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
                   <span>Saving...</span>
                 </>
               ) : (
                 <>
-                  <Save className="w-5 h-5" />
+                  <Save className="w-4 h-4" />
                   <span>Save Storage Pricing</span>
                 </>
               )}

@@ -6,6 +6,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { DynamicFieldRenderer } from './DynamicFieldRenderer';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface Service {
     id: number;
@@ -306,28 +307,30 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
     if (loading) {
         return (
             <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <LoadingSpinner variant="dots" size="md" message="Loading schema..." />
             </div>
         );
     }
 
     return (
-        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto bg-white border border-gray-250 p-8 shadow-sm" style={{ borderRadius: '2px' }}>
+            <h2 className="text-xl font-bold uppercase tracking-tight text-gray-900 mb-6">
                 {listingId ? 'Edit Listing' : 'Create New Listing'}
             </h2>
 
             {/* Service Selection */}
             {!initialServiceId && (
                 <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-gray-650">
                         Service Category <span className="text-red-500">*</span>
                     </label>
                     <select
                         value={selectedServiceId || ''}
                         onChange={(e) => setSelectedServiceId(parseInt(e.target.value))}
-                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.service_id ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                        className={`w-full px-4 py-2.5 border text-sm focus:border-emerald-500 focus:outline-none transition-all ${
+                            errors.service_id ? 'border-red-500 text-red-700' : 'border-gray-250 text-gray-900'
+                        }`}
+                        style={{ borderRadius: '2px' }}
                     >
                         <option value="">Select a service</option>
                         {services.map(service => (
@@ -336,14 +339,14 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                             </option>
                         ))}
                     </select>
-                    {errors.service_id && <p className="mt-1 text-sm text-red-500">{errors.service_id}</p>}
+                    {errors.service_id && <p className="mt-1 text-xs text-red-500 font-semibold">{errors.service_id}</p>}
                 </div>
             )}
 
             {/* Listing Type */}
             {serviceSchema && (
                 <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-gray-650">
                         Listing Type <span className="text-red-500">*</span>
                     </label>
                     <div className="flex space-x-4">
@@ -355,9 +358,9 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                                     value="product"
                                     checked={coreFields.listing_type === 'product'}
                                     onChange={(e) => handleCoreFieldChange('listing_type', e.target.value)}
-                                    className="w-4 h-4 text-blue-600"
+                                    className="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500"
                                 />
-                                <span className="text-gray-700">Product</span>
+                                <span className="text-gray-705 text-sm font-medium">Product</span>
                             </label>
                         )}
                         {serviceSchema.service.supports_services && (
@@ -368,9 +371,9 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                                     value="service"
                                     checked={coreFields.listing_type === 'service'}
                                     onChange={(e) => handleCoreFieldChange('listing_type', e.target.value)}
-                                    className="w-4 h-4 text-blue-600"
+                                    className="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500"
                                 />
-                                <span className="text-gray-700">Service</span>
+                                <span className="text-gray-705 text-sm font-medium">Service</span>
                             </label>
                         )}
                     </div>
@@ -379,7 +382,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
 
             {/* Core Fields */}
             <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-gray-650">
                     Title <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -387,14 +390,16 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                     value={coreFields.title}
                     onChange={(e) => handleCoreFieldChange('title', e.target.value)}
                     placeholder="Enter listing title"
-                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.title ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                    className={`w-full px-4 py-2.5 border text-sm focus:border-emerald-500 focus:outline-none transition-all ${
+                        errors.title ? 'border-red-500 text-red-700 placeholder-red-300' : 'border-gray-250 text-gray-900 placeholder-gray-400'
+                    }`}
+                    style={{ borderRadius: '2px' }}
                 />
-                {errors.title && <p className="mt-1 text-sm text-red-500">{errors.title}</p>}
+                {errors.title && <p className="mt-1 text-xs text-red-500 font-semibold">{errors.title}</p>}
             </div>
 
             <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-gray-650">
                     Description
                 </label>
                 <textarea
@@ -402,29 +407,32 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                     onChange={(e) => handleCoreFieldChange('description', e.target.value)}
                     placeholder="Describe your listing"
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-250 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
+                    style={{ borderRadius: '2px' }}
                 />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Price</label>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-gray-650">Price</label>
                     <input
                         type="number"
                         value={coreFields.price}
                         onChange={(e) => handleCoreFieldChange('price', e.target.value)}
                         placeholder="0"
                         step="0.01"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2.5 border border-gray-250 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
+                        style={{ borderRadius: '2px' }}
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-gray-650">Currency</label>
                     <select
                         value={coreFields.currency}
                         onChange={(e) => handleCoreFieldChange('currency', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2.5 border border-gray-250 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none transition-all"
+                        style={{ borderRadius: '2px' }}
                     >
                         <option value="RWF">RWF</option>
                         <option value="USD">USD</option>
@@ -433,11 +441,12 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Price Type</label>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-gray-650">Price Type</label>
                     <select
                         value={coreFields.price_type}
                         onChange={(e) => handleCoreFieldChange('price_type', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2.5 border border-gray-250 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none transition-all"
+                        style={{ borderRadius: '2px' }}
                     >
                         <option value="fixed">Fixed</option>
                         <option value="negotiable">Negotiable</option>
@@ -449,50 +458,54 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
             </div>
 
             {/* Location Fields */}
-            <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Location</h3>
+            <div className="mb-6 border-t border-gray-150 pt-4">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-850 mb-3">Location</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Province</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-wider mb-1 text-gray-505">Province</label>
                         <input
                             type="text"
                             value={coreFields.location_province}
                             onChange={(e) => handleCoreFieldChange('location_province', e.target.value)}
                             placeholder="e.g., Kigali City"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-2 border border-gray-250 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
+                            style={{ borderRadius: '2px' }}
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">District</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-wider mb-1 text-gray-505">District</label>
                         <input
                             type="text"
                             value={coreFields.location_district}
                             onChange={(e) => handleCoreFieldChange('location_district', e.target.value)}
                             placeholder="e.g., Gasabo"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-2 border border-gray-250 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
+                            style={{ borderRadius: '2px' }}
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Sector</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-wider mb-1 text-gray-505">Sector</label>
                         <input
                             type="text"
                             value={coreFields.location_sector}
                             onChange={(e) => handleCoreFieldChange('location_sector', e.target.value)}
                             placeholder="e.g., Remera"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-2 border border-gray-250 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
+                            style={{ borderRadius: '2px' }}
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Cell</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-wider mb-1 text-gray-505">Cell</label>
                         <input
                             type="text"
                             value={coreFields.location_cell}
                             onChange={(e) => handleCoreFieldChange('location_cell', e.target.value)}
                             placeholder="e.g., Rukiri I"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-2 border border-gray-250 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
+                            style={{ borderRadius: '2px' }}
                         />
                     </div>
                 </div>
@@ -500,8 +513,8 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
 
             {/* Dynamic Fields */}
             {serviceSchema?.service.has_specific_features && serviceSchema.fields.length > 0 && (
-                <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                <div className="mb-6 border-t border-gray-150 pt-4">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-850 mb-3">
                         {serviceSchema.service.name} Specific Fields
                     </h3>
                     <div className="space-y-4">
@@ -519,14 +532,15 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
             )}
 
             {/* Image Upload */}
-            <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Images</label>
+            <div className="mb-6 border-t border-gray-150 pt-4">
+                <label className="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-gray-650">Images</label>
                 <input
                     type="file"
                     accept="image/*"
                     multiple
                     onChange={handleImageChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-250 text-sm focus:border-emerald-500 focus:outline-none transition-all"
+                    style={{ borderRadius: '2px' }}
                 />
 
                 {imagePreviewUrls.length > 0 && (
@@ -536,12 +550,14 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                                 <img
                                     src={url}
                                     alt={`Preview ${index + 1}`}
-                                    className="w-full h-32 object-cover rounded-lg"
+                                    className="w-full h-32 object-cover border border-gray-200"
+                                    style={{ borderRadius: '2px' }}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => removeImage(index)}
-                                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                                    className="absolute top-2 right-2 bg-red-500 text-white p-1.5 hover:bg-red-600 transition-colors shadow-sm"
+                                    style={{ borderRadius: '2px' }}
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -554,12 +570,13 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
             </div>
 
             {/* Submit Buttons */}
-            <div className="flex justify-end space-x-4">
+            <div className="flex justify-end space-x-4 border-t border-gray-150 pt-6">
                 {onCancel && (
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+                        className="px-6 py-2.5 border border-gray-250 text-gray-755 font-bold uppercase text-xs tracking-wider hover:bg-gray-50 transition-colors"
+                        style={{ borderRadius: '2px' }}
                     >
                         Cancel
                     </button>
@@ -567,7 +584,8 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                 <button
                     type="submit"
                     disabled={submitting}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-2.5 bg-emerald-500 text-white font-bold uppercase text-xs tracking-wider hover:bg-emerald-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ borderRadius: '2px' }}
                 >
                     {submitting ? 'Submitting...' : (listingId ? 'Update Listing' : 'Create Listing')}
                 </button>

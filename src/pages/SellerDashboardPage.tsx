@@ -2,11 +2,12 @@ import { useAuth } from '@/context/AuthContext';
 import { useDarkMode } from "@/context/DarkMode";
 import { useEffect, useState } from "react";
 import { FiEdit2, FiSave, FiSearch, FiTrash2, FiUpload, FiVideo, FiX } from "react-icons/fi";
-import DashboardOverviewCards from '../components/DashboardParts/DashboardOverviewCards';
+
 import SubscriptionBanner from '../components/DashboardParts/PlansScrollingBanner';
 import RestrictionCard from '../components/PlansParts/RestrictionCards';
 import { cachedFetch } from '../utils/cachedFetch';
 import WhatsAppPromptBanner from '../components/DashboardParts/WhatsAppPromptBanner';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 // Types (unchanged)
 interface Category { id: string; name: string; description: string; }
@@ -225,7 +226,7 @@ export default function SellerDashboardPage() {
   if (loading) {
     return (
       <div className={`min-h-screen -mx-4 sm:mx-0 flex items-center justify-center ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+        <LoadingSpinner variant="dots" size="lg" message="Loading dashboard..." />
       </div>
     );
   }
@@ -240,47 +241,45 @@ export default function SellerDashboardPage() {
         <SubscriptionBanner />
       </div>
       {/* Header */}
-      <div className={`max-w-6xl mx-auto  py-2 ${darkMode
-        ? "bg-gray-900" : "bg-white"}`}>
-        <h1 className="text-3xl font-semibold text-center mb-4">Seller's Dashboard</h1>
+      <div className={`max-w-6xl mx-auto py-0 ${darkMode ? "bg-gray-900" : "bg-white"}`}>
+        <h1 className="text-2xl font-bold tracking-tighter uppercase text-center mb-4">Seller's Dashboard</h1>
       </div>
 
-      {/* Overview Cards (Bookings, Upgrade Plan, etc.) */}
-      <section className="py-4 px-0 md:p-8 ">
-        <WhatsAppPromptBanner
-          providerId={localStorage.getItem('userId')}
-          darkMode={darkMode}
-        />
-        <DashboardOverviewCards />
-      </section>
-      {/* Conditional Modals/Sections for Cards */}
-      {/* Removed modals/sections for messages, bookings, and upgrade plans as they are now separate pages */}
-
-      <main className="max-w-full mx-auto py-8 px-0 sm:px-4">
+      <main className="max-w-full mx-auto py-4 px-0 sm:px-4">
         {/* Category Selector */}
         <section className="mb-12">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 px-3 py-1 rounded-full">
+          <h2 className="text-2xl font-bold tracking-tighter uppercase mb-4 flex items-center gap-2">
+            <span 
+              className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border border-emerald-500/20 px-3 py-1 text-sm font-bold"
+              style={{ borderRadius: '2px' }}
+            >
               {categories.length}
             </span>
             Product Categories
           </h2>
+          <p className='text-gray-600 dark:text-gray-400 mb-6'>
+            Select from the product category list to start uploading your products
+          </p>
           <div className="flex flex-wrap gap-3">
             {categories.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => toggleCategory(cat.id)}
-                className={`px-4 py-2 rounded-full font-medium transition-all duration-300 flex items-center gap-2
+                className={`px-4 py-2 font-semibold text-xs uppercase tracking-wider transition-all duration-300 flex items-center gap-2 border
                   ${selectedCategoryIds.includes(cat.id)
-                    ? "bg-gradient-to-r from-purple-600 to-teal-500 text-white shadow-lg"
+                    ? "bg-emerald-500 border-emerald-500 text-white shadow-sm"
                     : darkMode
-                      ? "bg-gray-700 hover:bg-gray-600"
-                      : "bg-white hover:bg-gray-100 border border-gray-200"}
+                      ? "bg-gray-800 border-gray-750 hover:bg-gray-700 text-gray-300"
+                      : "bg-white hover:bg-gray-100 border-gray-200 text-gray-750"}
                   ${productUploads[cat.id]?.length ? "pr-3" : "pr-4"}`}
+                style={{ borderRadius: '2px' }}
               >
                 {cat.name}
                 {productUploads[cat.id]?.length > 0 && (
-                  <span className="bg-white text-purple-600 dark:bg-gray-800 dark:text-teal-300 text-xs font-bold px-2 py-0.5 rounded-full">
+                  <span 
+                    className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5"
+                    style={{ borderRadius: '2px' }}
+                  >
                     {productUploads[cat.id]?.length}
                   </span>
                 )}
@@ -300,37 +299,47 @@ export default function SellerDashboardPage() {
                 return (
                   <div
                     key={cid}
-                    className={`rounded-xl overflow-hidden transition-all duration-300 ${darkMode ? "bg-gray-800" : "bg-white"} shadow-lg`}
+                    className={`border ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} shadow-sm overflow-hidden`}
+                    style={{ borderRadius: '2px' }}
                   >
-                    <div className={`p-6 border-b ${darkMode ? "border-gray-700" : "border-gray-200"} flex justify-between items-center`}>
-                      <h3 className="text-xl font-semibold flex items-center gap-3">
+                    <div className={`p-6 border-b ${darkMode ? "border-gray-700 bg-gray-900/50" : "border-gray-200 bg-gray-50"} flex justify-between items-center`}>
+                      <h3 className="text-base font-bold uppercase tracking-tight flex items-center gap-3">
                         {cat.name}
-                        <span className={`text-sm px-2 py-1 rounded-full ${darkMode ? "bg-gray-700 text-teal-300" : "bg-purple-100 text-purple-800"}`}>
+                        <span 
+                          className={`text-xs px-2 py-0.5 border font-bold uppercase ${darkMode ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-emerald-50 text-emerald-600 border-emerald-500/10"}`}
+                          style={{ borderRadius: '2px' }}
+                        >
                           {productUploads[cid]?.length || 0} products
                         </span>
                       </h3>
                       <div className="flex gap-2">
                         <button
                           onClick={() => setShowForm(prev => ({ ...prev, [cid]: !prev[cid] }))}
-                          className={`flex items-center gap-1 px-4 py-2 rounded-full transition-all ${showForm[cid]
-                            ? "bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400"
-                            : "bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300"}`}
+                          className={`flex items-center gap-1 px-4 py-2 font-semibold text-xs uppercase tracking-wider transition-all border
+                            ${showForm[cid]
+                              ? "bg-red-500 hover:bg-red-655 hover:bg-red-600 text-white border-red-500"
+                              : "bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500"}`}
+                          style={{ borderRadius: '2px' }}
                         >
                           {showForm[cid] ? (
                             <>
-                              <FiX size={16} /> Cancel
+                              <FiX size={14} /> Cancel
                             </>
                           ) : (
                             <>
-                              <FiUpload size={16} /> Add Product
+                              <FiUpload size={14} /> Add Product
                             </>
                           )}
                         </button>
                         <button
                           onClick={() => toggleCategory(cid)}
-                          className="flex items-center gap-1 px-3 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                          className={`flex items-center gap-1 px-3 py-2 font-semibold text-xs border uppercase tracking-wider transition-colors
+                            ${darkMode
+                              ? "bg-gray-850 border-gray-750 text-gray-300 hover:bg-gray-700"
+                              : "bg-white border-gray-250 text-gray-700 hover:bg-gray-50"}`}
+                          style={{ borderRadius: '2px' }}
                         >
-                          <FiX size={16} /> Close
+                          <FiX size={14} /> Close
                         </button>
                       </div>
                     </div>
@@ -339,37 +348,40 @@ export default function SellerDashboardPage() {
                     {showForm[cid] && (
                       <form
                         onSubmit={(e) => handleSubmit(e, cid)}
-                        className={`p-6 ${darkMode ? "bg-gray-700/30" : "bg-purple-50"} rounded-b-xl`}
+                        className={`p-6 ${darkMode ? "bg-gray-800/40" : "bg-gray-50/50"}`}
                       >
                         <div className="grid md:grid-cols-2 gap-6">
                           <div className="space-y-4">
                             <div>
-                              <label className={`block mb-1 font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Product Title</label>
+                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Product Title</label>
                               <input
                                 type="text"
                                 value={productForms[cid]?.title || ""}
                                 onChange={(e) => handleInput(cid, "title", e.target.value)}
-                                className={`w-full px-4 py-2 rounded-lg border ${darkMode ? "bg-gray-700 border-gray-600 focus:border-purple-500" : "bg-white border-gray-300 focus:border-purple-400"} focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-500/30 transition`}
-                                placeholder="Amazing Product..."
+                                className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-900 border-gray-700 text-white placeholder-gray-550" : "bg-white border-gray-250 text-gray-900 placeholder-gray-400"} focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                                style={{ borderRadius: '2px' }}
+                                placeholder="AMAZING PRODUCT..."
                               />
                             </div>
                             <div>
-                              <label className={`block mb-1 font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Description</label>
+                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Description</label>
                               <textarea
                                 value={productForms[cid]?.description || ""}
                                 onChange={(e) => handleInput(cid, "description", e.target.value)}
-                                className={`w-full px-4 py-2 rounded-lg border ${darkMode ? "bg-gray-700 border-gray-600 focus:border-purple-500" : "bg-white border-gray-300 focus:border-purple-400"} focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-500/30 transition`}
+                                className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-900 border-gray-700 text-white placeholder-gray-550" : "bg-white border-gray-250 text-gray-900 placeholder-gray-400"} focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                                style={{ borderRadius: '2px' }}
                                 rows={3}
-                                placeholder="Describe your product..."
+                                placeholder="DESCRIBE YOUR PRODUCT..."
                               />
                             </div>
                             <div>
-                              <label className={`block mb-1 font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Price ($)</label>
+                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Price ($)</label>
                               <input
                                 type="number"
                                 value={productForms[cid]?.price || ""}
                                 onChange={(e) => handleInput(cid, "price", e.target.value)}
-                                className={`w-full px-4 py-2 rounded-lg border ${darkMode ? "bg-gray-700 border-gray-600 focus:border-purple-500" : "bg-white border-gray-300 focus:border-purple-400"} focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-500/30 transition`}
+                                className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-900 border-gray-700 text-white placeholder-gray-550" : "bg-white border-gray-250 text-gray-900 placeholder-gray-400"} focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                                style={{ borderRadius: '2px' }}
                                 placeholder="29.99"
                               />
                             </div>
@@ -379,17 +391,21 @@ export default function SellerDashboardPage() {
                                   type="checkbox"
                                   checked={madeInRwanda[cid] || false}
                                   onChange={(e) => setMadeInRwanda(prev => ({ ...prev, [cid]: e.target.checked }))}
-                                  className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                                  className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:outline-none border-gray-300"
+                                  style={{ borderRadius: '2px' }}
                                 />
-                                <span className={`font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Made in Rwanda 🇷🇼</span>
+                                <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? "text-gray-300" : "text-gray-650"}`}>Made in Rwanda 🇷🇼</span>
                               </label>
                             </div>
                           </div>
 
                           <div className="space-y-4">
                             <div>
-                              <label className={`block mb-1 font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Main Image</label>
-                              <div className={`border-2 border-dashed ${darkMode ? "border-gray-600" : "border-gray-300"} rounded-lg p-4 flex flex-col items-center justify-center transition hover:border-purple-400`}>
+                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Main Image</label>
+                              <div 
+                                className={`border-2 border-dashed ${darkMode ? "border-gray-700 bg-gray-900/30" : "border-gray-300 bg-white"} p-4 flex flex-col items-center justify-center transition hover:border-emerald-500`}
+                                style={{ borderRadius: '2px' }}
+                              >
                                 <input
                                   type="file"
                                   accept="image/*"
@@ -405,12 +421,13 @@ export default function SellerDashboardPage() {
                                     <img
                                       src={previewMain[cid]}
                                       alt="Preview"
-                                      className="w-full h-40 object-contain rounded-lg mb-2"
+                                      className="w-full h-40 object-contain mb-2"
+                                      style={{ borderRadius: '2px' }}
                                     />
                                   ) : (
                                     <>
                                       <FiUpload size={24} className="mb-2 text-gray-400" />
-                                      <p className={`text-center ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Click to upload main image</p>
+                                      <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-450" : "text-gray-500"}`}>Click to upload main image</p>
                                     </>
                                   )}
                                 </label>
@@ -418,8 +435,11 @@ export default function SellerDashboardPage() {
                             </div>
 
                             <div>
-                              <label className={`block mb-1 font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Additional Images (Optional)</label>
-                              <div className={`border-2 border-dashed ${darkMode ? "border-gray-600" : "border-gray-300"} rounded-lg p-4 transition hover:border-purple-400`}>
+                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Additional Images (Optional)</label>
+                              <div 
+                                className={`border-2 border-dashed ${darkMode ? "border-gray-700 bg-gray-900/30" : "border-gray-300 bg-white"} p-4 transition hover:border-emerald-500`}
+                                style={{ borderRadius: '2px' }}
+                              >
                                 <input
                                   type="file"
                                   accept="image/*"
@@ -438,14 +458,15 @@ export default function SellerDashboardPage() {
                                         <img
                                           key={i}
                                           src={src}
-                                          className="w-16 h-16 object-cover rounded border dark:border-gray-600"
+                                          className="w-16 h-16 object-cover border dark:border-gray-700"
+                                          style={{ borderRadius: '2px' }}
                                         />
                                       ))}
                                     </div>
                                   ) : (
                                     <>
                                       <FiUpload size={24} className="mb-2 text-gray-400" />
-                                      <p className={`text-center ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Click to upload additional images</p>
+                                      <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-450" : "text-gray-500"}`}>Click to upload additional images</p>
                                     </>
                                   )}
                                 </label>
@@ -453,8 +474,11 @@ export default function SellerDashboardPage() {
                             </div>
 
                             <div>
-                              <label className={`block mb-1 font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Video (Optional)</label>
-                              <div className={`border-2 border-dashed ${darkMode ? "border-gray-600" : "border-gray-300"} rounded-lg p-4 transition hover:border-purple-400`}>
+                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Video (Optional)</label>
+                              <div 
+                                className={`border-2 border-dashed ${darkMode ? "border-gray-700 bg-gray-900/30" : "border-gray-300 bg-white"} p-4 transition hover:border-emerald-500`}
+                                style={{ borderRadius: '2px' }}
+                              >
                                 <input
                                   type="file"
                                   accept="video/*"
@@ -469,13 +493,14 @@ export default function SellerDashboardPage() {
                                   {previewVideo[cid] ? (
                                     <video
                                       src={previewVideo[cid]}
-                                      className="w-full h-40 object-contain rounded-lg mb-2"
+                                      className="w-full h-40 object-contain mb-2"
+                                      style={{ borderRadius: '2px' }}
                                       controls
                                     />
                                   ) : (
                                     <>
                                       <FiUpload size={24} className="mb-2 text-gray-400" />
-                                      <p className={`text-center ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Click to upload video</p>
+                                      <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-450" : "text-gray-500"}`}>Click to upload video</p>
                                     </>
                                   )}
                                 </label>
@@ -493,17 +518,23 @@ export default function SellerDashboardPage() {
                           <button
                             type="button"
                             onClick={() => resetForm(cid)}
-                            className={`px-4 py-2 rounded-lg font-medium ${darkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"} transition`}
+                            className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border
+                              ${darkMode 
+                                ? "bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700" 
+                                : "bg-white border-gray-250 text-gray-700 hover:bg-gray-50"}`}
+                            style={{ borderRadius: '2px' }}
                           >
                             Reset
                           </button>
                           <button
                             type="submit"
                             disabled={subscription?.subscription?.status !== 'active'}
-                            className={`px-6 py-2 rounded-lg font-medium ${subscription?.subscription?.status === 'active'
-                              ? "bg-gradient-to-r from-purple-600 to-teal-500 text-white hover:from-purple-700 hover:to-teal-600"
-                              : "bg-gray-400 cursor-not-allowed text-gray-200"
-                              } transition shadow-lg`}
+                            className={`px-6 py-2 font-semibold text-xs uppercase tracking-wider transition-all
+                              ${subscription?.subscription?.status === 'active'
+                                ? "bg-emerald-50 text-white hover:bg-emerald-600 shadow-sm"
+                                : "bg-gray-450 cursor-not-allowed text-gray-200"
+                              }`}
+                            style={{ borderRadius: '2px' }}
                           >
                             Upload Product
                           </button>
@@ -520,26 +551,35 @@ export default function SellerDashboardPage() {
         {/* Product Gallery */}
         <section>
           <div className="mb-6">
-            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
+            <h2 className="text-2xl font-bold tracking-tighter uppercase mb-4 flex items-center gap-2">
               Your Product Collection
-              <span className={`text-sm px-2 py-1 rounded-full ${darkMode ? "bg-gray-700 text-teal-300" : "bg-purple-100 text-purple-800"}`}>
+              <span 
+                className={`text-xs px-2 py-0.5 border font-bold uppercase ${darkMode ? "bg-emerald-500/10 text-emerald-455 border-emerald-500/20" : "bg-emerald-50 text-emerald-600 border-emerald-500/10"}`}
+                style={{ borderRadius: '2px' }}
+              >
                 {Object.values(productUploads).flat().length} total
               </span>
             </h2>
-            <div className={`relative ${darkMode ? "bg-gray-700" : "bg-white"} rounded-lg shadow-inner max-w-md`}>
+            <div 
+              className={`relative border max-w-md ${darkMode ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-gray-250 text-gray-900"} focus-within:ring-1 focus-within:ring-emerald-500`}
+              style={{ borderRadius: '2px' }}
+            >
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder="SEARCH PRODUCTS..."
                 onChange={(e) => handleSearch(e.target.value)}
-                className={`pl-10 pr-4 py-2 w-full rounded-lg focus:outline-none ${darkMode ? "bg-gray-700 text-white placeholder-gray-400" : "bg-white text-gray-900 placeholder-gray-500"}`}
+                className={`pl-10 pr-4 py-2.5 w-full bg-transparent focus:outline-none text-sm`}
               />
             </div>
           </div>
 
           {Object.keys(productUploads).length === 0 ? (
-            <div className={`text-center py-12 rounded-xl ${darkMode ? "bg-gray-800/50" : "bg-purple-50"} border ${darkMode ? "border-gray-700" : "border-purple-100"}`}>
-              <p className={`text-lg ${darkMode ? "text-gray-400" : "text-gray-500"}`}>No products found. Start by adding some!</p>
+            <div 
+              className={`text-center py-12 border ${darkMode ? "bg-gray-800/40 border-gray-700" : "bg-gray-50/50 border-gray-200"}`}
+              style={{ borderRadius: '2px' }}
+            >
+              <p className={`text-sm font-semibold uppercase tracking-wider ${darkMode ? "text-gray-450" : "text-gray-500"}`}>No products found. Start by adding some!</p>
             </div>
           ) : (
             <div className="space-y-10">
@@ -548,9 +588,12 @@ export default function SellerDashboardPage() {
                 const cat = categories.find(c => c.id === cid);
                 return (
                   <div key={cid}>
-                    <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
+                    <h3 className="text-base font-bold uppercase tracking-tight mb-4 flex items-center gap-2">
                       {cat?.name}
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${darkMode ? "bg-gray-700 text-teal-300" : "bg-purple-100 text-purple-800"}`}>
+                      <span 
+                        className={`text-xs px-2 py-0.5 border font-bold uppercase ${darkMode ? "bg-emerald-500/10 text-emerald-455 border-emerald-500/20" : "bg-emerald-50 text-emerald-600 border-emerald-500/10"}`}
+                        style={{ borderRadius: '2px' }}
+                      >
                         {products.length} items
                       </span>
                     </h3>
@@ -705,7 +748,8 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
                 setShowImageModal(false);
                 setShowVideoModal(false);
               }}
-              className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 transition"
+              className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white p-2 border border-white/20 transition"
+              style={{ borderRadius: '2px' }}
             >
               <FiX size={24} />
             </button>
@@ -717,7 +761,8 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
                   e.stopPropagation();
                   setModalImageIndex((prev) => (prev - 1 + mediaItems.length) % mediaItems.length);
                 }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-3 transition z-10"
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 border border-white/20 transition z-10"
+                style={{ borderRadius: '2px' }}
                 aria-label="Previous"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -732,7 +777,8 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
                 src={mediaItems[modalImageIndex]}
                 controls
                 autoPlay
-                className="max-w-full max-h-[90vh] rounded-lg"
+                className="max-w-full max-h-[90vh] border border-gray-700/50"
+                style={{ borderRadius: '2px' }}
                 key={mediaItems[modalImageIndex]} // Force re-render when changing videos
                 onError={(e) => console.error('Video load error:', e, 'URL:', mediaItems[modalImageIndex])}
               >
@@ -743,7 +789,8 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
               <img
                 src={mediaItems[modalImageIndex]}
                 alt={product.title}
-                className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                className="max-w-full max-h-[90vh] object-contain border border-gray-700/50"
+                style={{ borderRadius: '2px' }}
               />
             )}
 
@@ -754,7 +801,8 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
                   e.stopPropagation();
                   setModalImageIndex((prev) => (prev + 1) % mediaItems.length);
                 }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-3 transition z-10"
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 border border-white/20 transition z-10"
+                style={{ borderRadius: '2px' }}
                 aria-label="Next"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -764,7 +812,10 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
             )}
 
             {/* Media Counter & Type Indicator */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm flex items-center gap-2">
+            <div 
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider flex items-center gap-2 border border-white/10"
+              style={{ borderRadius: '2px' }}
+            >
               <span>{modalImageIndex + 1} / {mediaItems.length}</span>
               {isVideo(mediaItems[modalImageIndex]) && (
                 <span className="flex items-center gap-1">
@@ -776,17 +827,26 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
         </div>
       )}
 
-      <div className={`relative group rounded-xl overflow-hidden shadow-lg transition-all duration-300 ${darkMode ? "bg-gray-800" : "bg-white"} hover:shadow-xl`}>
+      <div 
+        className={`relative group border overflow-hidden shadow-sm transition-all duration-300 ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} hover:border-emerald-500 hover:shadow-md`}
+        style={{ borderRadius: '2px' }}
+      >
         {/* Made in Rwanda Badge */}
         {product.madeInRwanda && (
-          <div className="absolute top-2 left-2 z-10 bg-gradient-to-r from-blue-500 to-yellow-400 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+          <div 
+            className="absolute top-2 left-2 z-10 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-3 py-1 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm border border-emerald-500/20"
+            style={{ borderRadius: '2px' }}
+          >
             🇷🇼 Made in Rwanda
           </div>
         )}
 
         {/* Video Badge */}
         {product.video_url && (
-          <div className="absolute top-2 right-2 z-10 bg-black/60 text-white px-2 py-1 rounded-full text-xs font-medium shadow-lg flex items-center gap-1">
+          <div 
+            className="absolute top-2 right-2 z-10 bg-black/70 text-white px-2 py-1 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm border border-white/10"
+            style={{ borderRadius: '2px' }}
+          >
             <FiVideo size={12} /> Video
           </div>
         )}
@@ -816,7 +876,8 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
                       e.stopPropagation();
                       setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
                     }}
-                    className={`absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200`}
+                    className={`absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 border border-white/10`}
+                    style={{ borderRadius: '2px' }}
                     aria-label="Previous image"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -830,7 +891,8 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
                       e.stopPropagation();
                       setCurrentImageIndex((prev) => (prev + 1) % images.length);
                     }}
-                    className={`absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200`}
+                    className={`absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 border border-white/10`}
+                    style={{ borderRadius: '2px' }}
                     aria-label="Next image"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -839,7 +901,7 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
                   </button>
 
                   {/* Dot Indicators */}
-                  <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+                  <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
                     {images.map((_, idx) => (
                       <button
                         key={idx}
@@ -847,7 +909,8 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
                           e.stopPropagation();
                           setCurrentImageIndex(idx);
                         }}
-                        className={`w-2 h-2 rounded-full transition ${idx === currentImageIndex ? (darkMode ? "bg-teal-400" : "bg-purple-600") : (darkMode ? "bg-gray-600" : "bg-gray-300")}`}
+                        className={`w-4 h-1 transition ${idx === currentImageIndex ? "bg-emerald-500" : "bg-white/40"}`}
+                        style={{ borderRadius: '2px' }}
                       />
                     ))}
                   </div>
@@ -855,8 +918,8 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
               )}
             </>
           ) : (
-            <div className={`w-full h-full flex items-center justify-center ${darkMode ? "bg-gray-700" : "bg-gray-100"}`}>
-              <span className={`text-sm ${darkMode ? "text-gray-500" : "text-gray-400"}`}>No Image</span>
+            <div className={`w-full h-full flex items-center justify-center ${darkMode ? "bg-gray-750" : "bg-gray-100"}`}>
+              <span className={`text-xs uppercase font-bold tracking-wider ${darkMode ? "text-gray-500" : "text-gray-400"}`}>No Image</span>
             </div>
           )}
         </div>
@@ -869,28 +932,31 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
                 type="text"
                 value={editData.title}
                 onChange={(e) => setEditData({ ...editData, title: e.target.value })}
-                className={`w-full px-3 py-2 rounded border ${darkMode ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}`}
+                className={`w-full p-2 border text-sm ${darkMode ? "bg-gray-900 border-gray-750 text-white" : "bg-white border-gray-250 text-gray-900"} focus:ring-1 focus:ring-emerald-500 focus:outline-none`}
+                style={{ borderRadius: '2px' }}
               />
               <textarea
                 value={editData.description}
                 onChange={(e) => setEditData({ ...editData, description: e.target.value })}
-                className={`w-full px-3 py-2 rounded border ${darkMode ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}`}
+                className={`w-full p-2 border text-sm ${darkMode ? "bg-gray-900 border-gray-750 text-white" : "bg-white border-gray-250 text-gray-900"} focus:ring-1 focus:ring-emerald-500 focus:outline-none`}
+                style={{ borderRadius: '2px' }}
                 rows={2}
               />
               <input
                 type="number"
                 value={editData.price}
                 onChange={(e) => setEditData({ ...editData, price: e.target.value })}
-                className={`w-full px-3 py-2 rounded border ${darkMode ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}`}
+                className={`w-full p-2 border text-sm ${darkMode ? "bg-gray-900 border-gray-750 text-white" : "bg-white border-gray-250 text-gray-900"} focus:ring-1 focus:ring-emerald-500 focus:outline-none`}
+                style={{ borderRadius: '2px' }}
               />
             </div>
           ) : (
             <>
-              <h3 className="font-semibold text-lg mb-1 line-clamp-1">{product.title}</h3>
-              <p className={`text-sm mb-2 line-clamp-2 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
+              <h3 className="font-bold text-sm uppercase tracking-tight mb-1 line-clamp-1">{product.title}</h3>
+              <p className={`text-xs mb-2 line-clamp-2 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
                 {product.description}
               </p>
-              <p className={`font-bold ${darkMode ? "text-teal-400" : "text-purple-600"}`}>
+              <p className="font-bold text-sm text-emerald-500">
                 ${product.price}
               </p>
             </>
@@ -907,9 +973,10 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
                 setModalImageIndex(mediaItems.length - 1);
                 setShowVideoModal(true);
               }}
-              className="w-full py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 flex items-center justify-center gap-2 font-medium transition shadow-md"
+              className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center gap-2 font-semibold text-xs transition-colors uppercase tracking-wider"
+              style={{ borderRadius: '2px' }}
             >
-              <FiVideo size={18} /> View Video
+              <FiVideo size={14} /> View Video
             </button>
           )}
 
@@ -918,35 +985,44 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
               <>
                 <button
                   onClick={() => setIsEditing(false)}
-                  className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1 ${darkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"}`}
+                  className={`flex-1 py-2 border flex items-center justify-center gap-1 font-semibold text-xs transition-colors uppercase tracking-wider
+                    ${darkMode ? "bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700" : "bg-white border-gray-250 text-gray-750 hover:bg-gray-50"}`}
+                  style={{ borderRadius: '2px' }}
                 >
-                  <FiX size={16} /> Cancel
+                  <FiX size={14} /> Cancel
                 </button>
                 <button
                   onClick={handleUpdate}
-                  className="flex-1 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-teal-500 text-white hover:from-purple-700 hover:to-teal-600 flex items-center justify-center gap-1"
+                  className="flex-1 py-2 bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center gap-1 font-semibold text-xs transition-all uppercase tracking-wider"
+                  style={{ borderRadius: '2px' }}
                 >
-                  <FiSave size={16} /> Save
+                  <FiSave size={14} /> Save
                 </button>
               </>
             ) : (
               <>
                 <button
                   onClick={() => setIsEditing(true)}
-                  className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1 ${darkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"}`}
+                  className={`flex-1 py-2 border flex items-center justify-center gap-1 font-semibold text-xs transition-colors uppercase tracking-wider
+                    ${darkMode ? "bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700" : "bg-white border-gray-250 text-gray-750 hover:bg-gray-50"}`}
+                  style={{ borderRadius: '2px' }}
                 >
-                  <FiEdit2 size={16} /> Edit
+                  <FiEdit2 size={14} /> Edit
                 </button>
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1 ${darkMode ? "bg-red-900/30 hover:bg-red-900/40 text-red-400" : "bg-red-100 hover:bg-red-200 text-red-600"}`}
+                  className={`flex-1 py-2 border flex items-center justify-center gap-1 font-semibold text-xs transition-colors uppercase tracking-wider
+                    ${darkMode 
+                      ? "bg-red-950/20 border-red-900/30 text-red-400 hover:bg-red-950/40" 
+                      : "bg-red-50 border-red-200 text-red-650 hover:bg-red-100"}`}
+                  style={{ borderRadius: '2px' }}
                 >
                   {isDeleting ? (
                     <span className="animate-spin">↻</span>
                   ) : (
                     <>
-                      <FiTrash2 size={16} /> Delete
+                      <FiTrash2 size={14} /> Delete
                     </>
                   )}
                 </button>
