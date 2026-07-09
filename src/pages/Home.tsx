@@ -349,7 +349,7 @@ const HomePage = () => {
 
   // Render service card with random height
   const renderServiceCard = (service: Service, isLarge: boolean = false, isWide: boolean = false) => {
-    const cardHeight = isLarge ? 'h-80' : isWide ? 'h-56' : getRandomHeight();
+    const cardHeight = isLarge ? 'h-64 sm:h-72' : isWide ? 'h-44 sm:h-52 md:h-60' : 'h-36 sm:h-44 md:h-52';
     
     return (
       <Link to={`/services/${service.id}`} className="block h-full group">
@@ -361,15 +361,15 @@ const HomePage = () => {
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
-          <div className="p-4 flex-1 flex flex-col">
-            <h3 className="font-bold text-gray-900 dark:text-white text-lg leading-tight line-clamp-2">
+          <div className="p-3 flex-1 flex flex-col">
+            <h3 className="font-bold text-gray-900 dark:text-white text-sm sm:text-base leading-tight line-clamp-2">
               {service.title}
             </h3>
-            <p className="mt-2 text-gray-500 dark:text-gray-400 text-sm line-clamp-2 flex-1">
+            <p className="mt-1.5 text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 line-clamp-2 flex-1">
               {service.description}
             </p>
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-xs text-gray-400">
+            <div className="mt-2 flex items-center justify-between">
+              <span className="text-[10px] text-gray-400">
                 {formatUpdatedTime(service.created_at) || 'New'}
               </span>
             </div>
@@ -399,7 +399,7 @@ const HomePage = () => {
     const price = getPrice();
     const imageUrl = getImage();
     const title = getTitle();
-    const cardHeight = isLarge ? 'h-96' : isWide ? 'h-64' : getRandomHeight();
+    const cardHeight = isLarge ? 'h-64 sm:h-80' : isWide ? 'h-44 sm:h-56 md:h-64' : 'h-36 sm:h-44 md:h-52';
     
     const handleClick = () => {
       if (item.category === 'product') navigate(`/product/${item.id}`);
@@ -428,20 +428,20 @@ const HomePage = () => {
             </div>
           )}
         </div>
-        <div className="p-4 flex-1 flex flex-col">
-          <h3 className="font-bold text-gray-900 dark:text-white text-base leading-tight line-clamp-2">
+        <div className="p-3 flex-1 flex flex-col">
+          <h3 className="font-bold text-gray-900 dark:text-white text-sm sm:text-base leading-tight line-clamp-2">
             {title}
           </h3>
           {isLarge && item.description && (
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+            <p className="mt-1.5 text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
               {item.description}
             </p>
           )}
-          <div className="mt-3 flex items-center justify-between">
-            <span className="text-xs text-gray-400">
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-[10px] text-gray-400">
               {formatUpdatedTime(item.createdAt || item.updatedAt) || 'Just added'}
             </span>
-            <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-emerald-500 transition-colors" />
+            <ArrowRight className="w-3.5 h-3.5 text-gray-400 group-hover:text-emerald-500 transition-colors" />
           </div>
         </div>
       </button>
@@ -455,7 +455,7 @@ const HomePage = () => {
     if (layout === 'full' && items[0]) {
       return (
         <div key={Math.random()} className="mb-6">
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-4">
             {type === 'service' 
               ? renderServiceCard(items[0], true, false)
               : renderUpdateCard(items[0], true, false)
@@ -468,7 +468,7 @@ const HomePage = () => {
     if (layout === 'half-half' && items.length >= 2) {
       return (
         <div key={Math.random()} className="mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {items.slice(0, 2).map((item, idx) => (
               <div key={item.id || idx}>
                 {type === 'service' 
@@ -485,7 +485,7 @@ const HomePage = () => {
     if (layout === 'third-third-third' && items.length >= 3) {
       return (
         <div key={Math.random()} className="mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {items.slice(0, 3).map((item, idx) => (
               <div key={item.id || idx}>
                 {type === 'service' 
@@ -502,7 +502,7 @@ const HomePage = () => {
     if (layout === 'two-thirds-third' && items.length >= 2) {
       return (
         <div key={Math.random()} className="mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
               {type === 'service' 
                 ? renderServiceCard(items[0], true, true)
@@ -523,7 +523,7 @@ const HomePage = () => {
     if (layout === 'third-two-thirds' && items.length >= 2) {
       return (
         <div key={Math.random()} className="mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-1">
               {type === 'service' 
                 ? renderServiceCard(items[0], false, false)
@@ -544,7 +544,7 @@ const HomePage = () => {
     if (layout === 'large-small' && items.length >= 2) {
       return (
         <div key={Math.random()} className="mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="md:col-span-3">
               {type === 'service' 
                 ? renderServiceCard(items[0], true, true)
@@ -565,7 +565,7 @@ const HomePage = () => {
     if (layout === 'small-large' && items.length >= 2) {
       return (
         <div key={Math.random()} className="mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="md:col-span-1">
               {type === 'service' 
                 ? renderServiceCard(items[0], false, false)
@@ -586,9 +586,9 @@ const HomePage = () => {
     if (layout === 'scrolling') {
       return (
         <div key={Math.random()} className="mb-6 overflow-x-auto pb-4 -mx-4 px-4">
-          <div className="flex gap-6" style={{ minWidth: 'min-content' }}>
+          <div className="flex gap-4" style={{ minWidth: 'min-content' }}>
             {items.slice(0, 8).map((item, idx) => (
-              <div key={item.id || idx} className="w-72 flex-shrink-0">
+              <div key={item.id || idx} className="w-64 sm:w-72 flex-shrink-0">
                 {type === 'service' 
                   ? renderServiceCard(item, false, false)
                   : renderUpdateCard(item, false, false)
@@ -608,7 +608,7 @@ const HomePage = () => {
       
       {/* Hero Section */}
       <section
-        className="relative text-center py-48 px-6 text-white bg-cover bg-center transition-all duration-700"
+        className="relative text-center py-24 sm:py-32 lg:py-48 px-4 sm:px-6 text-white bg-cover bg-center transition-all duration-700"
         style={{ backgroundImage: `url(${images[currentIndex]})` }}
       >
         <div className="absolute inset-0 bg-black/60 z-0"></div>
@@ -630,17 +630,17 @@ const HomePage = () => {
         </button>
 
         <div className="relative z-10 max-w-4xl mx-auto">
-          <h2 className="text-5xl sm:text-7xl font-bold mb-4 uppercase tracking-tighter text-white drop-shadow-md">
+          <h2 className="text-3xl sm:text-5xl lg:text-7xl font-bold mb-4 uppercase tracking-tighter text-white drop-shadow-md">
             Find Trusted Local Services
           </h2>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto mb-10 drop-shadow-sm">
+          <p className="text-sm sm:text-lg lg:text-xl text-white/90 max-w-2xl mx-auto mb-8 sm:mb-10 drop-shadow-sm">
             Discover cameramen, tailors, salons, and more – compare prices and connect instantly.
           </p>
           <div className="flex justify-center gap-3 flex-wrap">
             <input
               type="text"
               placeholder="What do you need?"
-              className="px-5 py-3 text-gray-800 bg-white font-sans focus:outline-none focus:ring-1 focus:ring-emerald-500 w-64"
+              className="px-4 py-3 text-gray-800 bg-white font-sans focus:outline-none focus:ring-1 focus:ring-emerald-500 w-full sm:w-64"
               style={{ borderRadius: '2px' }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -648,13 +648,13 @@ const HomePage = () => {
             <input
               type="text"
               placeholder="Location"
-              className="px-5 py-3 text-gray-800 bg-white font-sans focus:outline-none focus:ring-1 focus:ring-emerald-500 w-48"
+              className="px-4 py-3 text-gray-800 bg-white font-sans focus:outline-none focus:ring-1 focus:ring-emerald-500 w-full sm:w-48"
               style={{ borderRadius: '2px' }}
               value={locationTerm}
               onChange={(e) => setLocationTerm(e.target.value)}
             />
             <button
-              className="px-8 py-3 bg-black text-white font-semibold hover:bg-gray-800 transition-all tracking-tight"
+              className="px-8 py-3 bg-black text-white font-semibold hover:bg-gray-800 transition-all tracking-tight w-full sm:w-auto"
               style={{ borderRadius: '2px' }}
               onClick={handleSearch}
             >
@@ -665,22 +665,22 @@ const HomePage = () => {
       </section>
 
       {/* Why HafiConnect */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase">
+      <section className="container mx-auto px-4 py-12 sm:py-16">
+        <div className="text-center mb-8 sm:mb-10">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase">
             Why HafiConnect?
           </h2>
           <div className="w-12 h-0.5 bg-emerald-500 mx-auto mt-4"></div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
             { title: 'Browse & Compare', desc: 'Easily browse local providers. Compare prices and profiles.' },
             { title: 'Contact Instantly', desc: 'Message or call providers directly. Get quick answers without leaving.' },
             { title: 'Review & Trust', desc: 'Read authentic reviews and make informed decisions.' }
           ].map((item, i) => (
-            <div key={i} className="bg-white dark:bg-gray-800 p-8 shadow-sm hover:shadow-md transition-all" style={{ borderRadius: '2px' }}>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">{item.title}</h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+            <div key={i} className="bg-white dark:bg-gray-800 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all" style={{ borderRadius: '2px' }}>
+              <h3 className="text-base sm:text-lg font-bold mb-2 text-gray-900 dark:text-white">{item.title}</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -715,8 +715,8 @@ const HomePage = () => {
       </section>
 
       {/* Fresh Picks - Completely unpredictable */}
-      <section className="container mx-auto px-4 py-16 bg-white dark:bg-gray-800/50">
-        <div className="mb-10">
+      <section className="container mx-auto px-4 py-8 bg-white dark:bg-gray-800/50">
+        <div className="mb-4">
           <h2 className="text-3xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase">
             Fresh Picks
           </h2>
@@ -732,9 +732,9 @@ const HomePage = () => {
       </section>
 
       {/* How it Works */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase">
+      <section className="container mx-auto px-4 py-2 sm:py-4">
+        <div className="text-center mb-2 sm:mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase">
             How It Works
           </h2>
           <p className="mt-4 max-w-3xl mx-auto text-gray-500 dark:text-gray-400 text-sm sm:text-base leading-relaxed">
@@ -742,7 +742,7 @@ const HomePage = () => {
           </p>
           <div className="w-12 h-0.5 bg-emerald-500 mx-auto mt-4"></div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
             {
               step: '01',
@@ -775,14 +775,14 @@ const HomePage = () => {
               desc: 'Track the order or service outcome and complete delivery through the same platform.',
             },
           ].map((item) => (
-            <div key={item.step} className="bg-white dark:bg-gray-800 p-6 shadow-sm hover:shadow-md transition-all h-full" style={{ borderRadius: '2px' }}>
-              <div className="inline-flex items-center justify-center w-11 h-11 mb-4 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold text-sm" style={{ borderRadius: '2px' }}>
+            <div key={item.step} className="bg-white dark:bg-gray-800 p-4 shadow-sm hover:shadow-md transition-all h-full" style={{ borderRadius: '2px' }}>
+              <div className="inline-flex items-center justify-center w-9 h-9 mb-3 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold text-xs" style={{ borderRadius: '2px' }}>
                 {item.step}
               </div>
-              <h3 className="text-lg font-bold mb-3 text-gray-900 dark:text-white leading-tight">
+              <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                 {item.title}
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+              <p className={`text-sm leading-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 {item.desc}
               </p>
             </div>

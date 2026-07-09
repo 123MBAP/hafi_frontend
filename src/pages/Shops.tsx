@@ -91,8 +91,8 @@ function ShopProductCard({
         {/* Shop Category Label badge */}
         {product.shopping_type_name && (
           <div className="absolute bottom-2 left-2 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-emerald-600/90 text-white shadow-sm flex items-center gap-1" style={{ borderRadius: '2px' }}>
-            <Store className="w-2.5 h-2.5" />
-            <span>{product.shopping_type_name}</span>
+            {/* <Store className="w-2.5 h-2.5" />
+            <span>{product.shopping_type_name}</span> */}
           </div>
         )}
       </div>
@@ -135,13 +135,15 @@ function ShopProductCard({
 export default function ShopsPage() {
   const { darkMode } = useDarkMode();
   const [categories, setCategories] = useState<ShopCategory[]>([]);
+  const [productCategories, setProductCategories] = useState<any[]>([]);
   const [loadingCats, setLoadingCats] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<ShopCategory | null>(null);
+  const [selectedProductCategory, setSelectedProductCategory] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high' | 'newest'>('popular');
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
 
   // Auto-scroll refs
   const categoryStripRef = useRef<HTMLDivElement | null>(null);
@@ -161,6 +163,13 @@ export default function ShopsPage() {
         // Check if seller's shopping_type_id matches
         return String(product.shopping_type_id) === String(selectedCategory.id);
       })
+      .filter(product => {
+        if (!selectedProductCategory) return true;
+        if (selectedProductCategory === "uncategorized") {
+          return !product.category_id || product.category_id === "uncategorized" || product.category_id === "null";
+        }
+        return String(product.category_id) === String(selectedProductCategory);
+      })
       .filter(product =>
         product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -178,7 +187,7 @@ export default function ShopsPage() {
             return (b.views?.length || 0) - (a.views?.length || 0);
         }
       });
-  }, [products, selectedCategory, searchQuery, sortBy]);
+  }, [products, selectedCategory, selectedProductCategory, searchQuery, sortBy]);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -194,19 +203,22 @@ export default function ShopsPage() {
     setLoadingCats(true);
     setLoadingProducts(true);
     try {
-      const [catsRes, productsRes] = await Promise.all([
+      const [catsRes, productsRes, prodCatsRes] = await Promise.all([
         fetch(`${API_BASE}/api/shopping-types`),
         fetch(`${API_BASE}/api/shops/products`),
+        fetch(`${API_BASE}/api/upload/categories?type=product`),
       ]);
 
       const catsData = catsRes.ok ? await catsRes.json() : { shopping_types: [] };
       const productsData = productsRes.ok ? await productsRes.json() : { products: [] };
+      const prodCatsData = prodCatsRes.ok ? await prodCatsRes.json() : { uploadCategories: [] };
 
       // Exclude 'other' products shop category from filters
       const rawCats = Array.isArray(catsData.shopping_types) ? catsData.shopping_types : [];
       const filteredCats = rawCats.filter((cat: any) => cat.key !== 'other' && !cat.name.toLowerCase().includes('other'));
 
       setCategories(filteredCats);
+      setProductCategories(prodCatsData.uploadCategories || []);
 
       const normalizedProducts = Array.isArray(productsData.products)
         ? productsData.products.map((p: any) => ({
@@ -230,6 +242,7 @@ export default function ShopsPage() {
     } catch (err) {
       console.error("Failed to load Shops data:", err);
       setCategories([]);
+      setProductCategories([]);
       setProducts([]);
     } finally {
       setLoadingCats(false);
@@ -267,8 +280,16 @@ export default function ShopsPage() {
     setShowFilters(false);
   };
 
+  const handleFilterToggle = () => {
+    if (showFilters) {
+      clearFilters();
+    }
+    setShowFilters((prev) => !prev);
+  };
+
   const clearFilters = () => {
     setSelectedCategory(null);
+    setSelectedProductCategory(null);
     setSearchQuery("");
     setSortBy('popular');
   };
@@ -341,7 +362,7 @@ export default function ShopsPage() {
 
           <div className="flex gap-2">
             <button
-              onClick={() => setShowFilters(!showFilters)}
+              onClick={handleFilterToggle}
               className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border border-transparent shadow-sm`}
               style={{ borderRadius: '2px' }}
             >
@@ -398,7 +419,24 @@ export default function ShopsPage() {
                   ))}
                 </select>
 
-                {(selectedCategory || searchQuery || sortBy !== 'popular') && (
+                <select
+                  value={selectedProductCategory || ''}
+                  onChange={(e) => {
+                    setSelectedProductCategory(e.target.value || null);
+                  }}
+                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-250 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  <option value="">All Product Categories</option>
+                  <option value="uncategorized">Uncategorised</option>
+                  {productCategories.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+
+                {(selectedCategory || selectedProductCategory || searchQuery || sortBy !== 'popular') && (
                   <button
                     onClick={clearFilters}
                     className="text-xs font-bold uppercase tracking-wider text-emerald-500 hover:text-emerald-600 whitespace-nowrap"

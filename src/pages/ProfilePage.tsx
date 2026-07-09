@@ -3,6 +3,25 @@ import { useDarkMode } from "@/context/DarkMode";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { cachedFetch } from "../utils/cachedFetch";
+import { 
+  User, 
+  Mail, 
+  Phone, 
+  MessageSquare, 
+  MapPin, 
+  Shield, 
+  Lock, 
+  Briefcase, 
+  Upload, 
+  Compass, 
+  X, 
+  Check, 
+  Edit2, 
+  ChevronRight, 
+  Store,
+  FileText
+} from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
@@ -36,7 +55,6 @@ type Profile = {
 const allowedRoles = ["customer", "seller", "service_provider"];
 
 export default function ProfilePage() {
-  // State management
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editField, setEditField] = useState<string | null>(null);
@@ -56,7 +74,6 @@ export default function ProfilePage() {
   const [loadingServices, setLoadingServices] = useState(false);
   const [showServiceField, setShowServiceField] = useState(false);
   const [isUpdatingService, setIsUpdatingService] = useState(false);
-  const [isUpdatingRole, setIsUpdatingRole] = useState(false);
 
   const [addressFields, setAddressFields] = useState<Address>({
     district: "",
@@ -69,13 +86,13 @@ export default function ProfilePage() {
   const { darkMode } = useDarkMode();
   const { updateToken } = useAuth();
 
-  // Dark mode classes
-  const bgColor = darkMode ? "bg-gray-900" : "bg-white";
-  const textColor = darkMode ? "text-gray-100" : "text-gray-900";
-  const secondaryTextColor = darkMode ? "text-gray-300" : "text-gray-600";
-  const cardBg = darkMode ? "bg-gray-800" : "bg-white";
-  const borderColor = darkMode ? "border-gray-700" : "border-gray-200";
-  const inputBg = darkMode ? "bg-gray-700 text-white" : "bg-white";
+  // Unified theme tokens
+  const bgColor = darkMode ? "bg-gray-950 text-gray-100" : "bg-gray-50 text-gray-900";
+  const cardBg = darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
+  const borderColor = darkMode ? "border-gray-800" : "border-gray-200";
+  const inputBg = darkMode ? "bg-gray-950 border-gray-800 text-white focus:border-emerald-500" : "bg-white border-gray-250 text-gray-900 focus:border-emerald-500";
+  const labelColor = darkMode ? "text-gray-400" : "text-gray-600";
+  const containerClass = `max-w-6xl mx-auto px-4 py-8 min-h-screen ${bgColor}`;
 
   // Fetch profile data
   useEffect(() => {
@@ -90,7 +107,7 @@ export default function ProfilePage() {
 
         const data = await res.json();
 
-        // Parse address if it's a string
+        // Parse address if string
         if (data.address && typeof data.address === 'string') {
           try {
             data.address = JSON.parse(data.address);
@@ -111,7 +128,6 @@ export default function ProfilePage() {
           known_place: data.address?.known_place || ""
         });
 
-        // If user is a service provider, fetch services
         if (data.roles?.includes("service_provider")) {
           fetchServices();
         }
@@ -126,7 +142,6 @@ export default function ProfilePage() {
     fetchProfile();
   }, []);
 
-  // Fetch services
   const fetchServices = async () => {
     setLoadingServices(true);
     try {
@@ -134,21 +149,17 @@ export default function ProfilePage() {
       setServices(data.services || []);
     } catch (error) {
       console.error("Error fetching services:", error);
-      alert("Error loading services");
     } finally {
       setLoadingServices(false);
     }
   };
 
-  // Handle service selection
   const handleServiceSelect = async (serviceId: string) => {
     if (!profile?.roles?.includes('service_provider')) {
       alert('Only service providers can set their service');
       return;
     }
-
     setIsUpdatingService(true);
-
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE}/api/profile`, {
@@ -165,54 +176,39 @@ export default function ProfilePage() {
         throw new Error(errData.error || "Failed to update service");
       }
 
-      const updatedProfile = await res.json();
       const selectedService = services.find(s => s.id === serviceId);
-
-      // Show success message with details (console.log removed because reload clears it)
       alert(
         `✅ Service Updated!\n\n` +
         `Old Service: ${profile.service_title || 'None'}\n` +
-        `New Service: ${selectedService?.title}\n\n` +
-        `The page will reload. After reload, go to Dashboard to see the new service features!`
+        `New Service: ${selectedService?.title || 'None'}\n\n` +
+        `The page will reload to configure your dashboard.`
       );
-
-      // Reload the page to fetch fresh data
       window.location.reload();
     } catch (error) {
-      console.error('❌ Service update failed:', error);
       alert(`Failed to update service: ${error instanceof Error ? error.message : ""}`);
     } finally {
       setIsUpdatingService(false);
     }
   };
 
-  // Handle image preview
   useEffect(() => {
     if (!selectedImage) {
       setPreviewUrl(null);
       return;
     }
-
     const objectUrl = URL.createObjectURL(selectedImage);
     setPreviewUrl(objectUrl);
-
     return () => URL.revokeObjectURL(objectUrl);
   }, [selectedImage]);
 
-  // Check if user can edit
   const canEdit = () => profile?.roles?.some(role => allowedRoles.includes(role));
 
-  // Handlers
   const handleImageUpload = async () => {
     if (!selectedImage || !canEdit()) {
-      alert(!canEdit()
-        ? "You don't have permission to upload images"
-        : "No image selected");
+      alert(!canEdit() ? "You don't have permission to upload images" : "No image selected");
       return;
     }
-
     setIsUploadingImage(true);
-
     try {
       const token = localStorage.getItem("token");
       const formData = new FormData();
@@ -246,7 +242,6 @@ export default function ProfilePage() {
     setSelectedImage(null);
     setEditAddressMode(false);
     setShowServiceField(false);
-
     if (profile?.address) {
       setAddressFields({
         district: profile.address.district || "",
@@ -263,9 +258,7 @@ export default function ProfilePage() {
       alert("You don't have permission to edit");
       return;
     }
-
     setIsSavingProfile(true);
-
     try {
       const token = localStorage.getItem("token");
       const payload = field === "address"
@@ -328,49 +321,11 @@ export default function ProfilePage() {
     }
   };
 
-  const handleUpdateRole = async (role: string, action: "add" | "remove") => {
-    if (!role || !canEdit()) return;
-
-    setIsUpdatingRole(true);
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API_BASE}/api/profile/roles`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ role, action }),
-      });
-
-      if (!res.ok) throw new Error("Failed to update roles");
-      const data = await res.json();
-
-      if (data.token) {
-        updateToken(data.token);
-      }
-
-      alert(data.message || "Role updated");
-      window.location.reload();
-
-    } catch {
-      alert("Error updating roles");
-    } finally {
-      setIsUpdatingRole(false);
-    }
-  };
-
-
-
-
-
   const captureCurrentLocation = async () => {
     if (!canEdit()) {
       alert("You don't have permission to edit location");
       return;
     }
-
     setIsGettingLocation(true);
     try {
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
@@ -402,6 +357,7 @@ export default function ProfilePage() {
       }
 
       setProfile(prev => prev ? { ...prev, location: newLocation } : prev);
+      alert("📍 Location coordinates saved successfully!");
     } catch (error) {
       alert(`Failed to get location: ${error instanceof Error ? error.message : ""}`);
     } finally {
@@ -409,270 +365,59 @@ export default function ProfilePage() {
     }
   };
 
-  // Render helpers
-  const renderEditField = (field: string, label: string, type = "text") => (
-    <div className="flex items-center gap-2 mt-1">
-      <input
-        type={type}
-        value={editValue}
-        onChange={e => setEditValue(e.target.value)}
-        placeholder={label}
-        className={`border ${borderColor} rounded px-2 py-1 w-full ${inputBg}`}
-      />
-      <button
-        onClick={() => handleSave(field)}
-        disabled={isSavingProfile}
-        className="bg-hafi-green text-white px-3 py-1 rounded text-sm"
-      >
-        {isSavingProfile ? (
-          <span className="flex items-center gap-2">
-            <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Saving...
-          </span>
-        ) : (
-          'Save'
-        )}
-      </button>
-      <button
-        onClick={handleCancel}
-        disabled={isSavingProfile}
-        className={`${darkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-700'} px-3 py-1 rounded text-sm`}
-      >
-        Cancel
-      </button>
-    </div>
-  );
-
-  const renderField = (field: string, label: string, value = "", type = "text") => (
-    <div className={`flex justify-between items-center border-b ${borderColor} pb-3`}>
-      <div>
-        <p className={`text-sm ${secondaryTextColor}`}>{label}</p>
-        {editField === field ? (
-          renderEditField(field, label, type)
-        ) : (
-          <p className={`font-medium ${textColor}`}>{value || "-"}</p>
-        )}
-      </div>
-      {editField !== field && field !== "email" && (
-        <button
-          onClick={() => handleEdit(field, value)}
-          className="text-hafi-teal hover:text-hafi-green"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-          </svg>
-        </button>
-      )}
-    </div>
-  );
-
-  const renderAddressFields = () => {
-    const displayAddress = editAddressMode ? addressFields : (profile?.address || addressFields);
-
-    if (editAddressMode) {
-      return (
-        <div className="space-y-4">
-          {Object.entries(addressFields).map(([field, value]) => (
-            <div key={field}>
-              <label className={`text-sm ${secondaryTextColor} capitalize`}>
-                {field.replace('_', ' ')}
-              </label>
-              <input
-                type="text"
-                value={value}
-                onChange={(e) =>
-                  setAddressFields(prev => ({
-                    ...prev,
-                    [field]: e.target.value
-                  }))
-                }
-                className={`border ${borderColor} rounded px-2 py-1 w-full mt-1 ${inputBg}`}
-                placeholder={`Enter ${field.replace('_', ' ')}`}
-              />
-            </div>
-          ))}
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={() => handleSave("address")}
-              disabled={isSavingProfile}
-              className="bg-hafi-green text-white px-3 py-1 rounded text-sm"
-            >
-              {isSavingProfile ? (
-                <span className="flex items-center gap-2">
-                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Saving...
-                </span>
-              ) : (
-                'Save Address'
-              )}
-            </button>
-            <button
-              onClick={handleCancel}
-              disabled={isSavingProfile}
-              className={`${darkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-700'} px-3 py-1 rounded text-sm`}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      );
-    }
-
+  if (loading) {
     return (
-      <div className="space-y-3">
-        <div className={`border-b ${borderColor} pb-3`}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className={`text-sm ${secondaryTextColor}`}>District</p>
-              <p className={`font-medium ${textColor}`}>
-                {displayAddress.district || "Not specified"}
-              </p>
-            </div>
-            <div>
-              <p className={`text-sm ${secondaryTextColor}`}>Sector</p>
-              <p className={`font-medium ${textColor}`}>
-                {displayAddress.sector || "Not specified"}
-              </p>
-            </div>
-            <div>
-              <p className={`text-sm ${secondaryTextColor}`}>Cell</p>
-              <p className={`font-medium ${textColor}`}>
-                {displayAddress.cell || "Not specified"}
-              </p>
-            </div>
-            <div>
-              <p className={`text-sm ${secondaryTextColor}`}>Village</p>
-              <p className={`font-medium ${textColor}`}>
-                {displayAddress.village || "Not specified"}
-              </p>
-            </div>
-            <div>
-              <p className={`text-sm ${secondaryTextColor}`}>Known Place</p>
-              <p className={`font-medium ${textColor}`}>
-                {displayAddress.known_place || "Not specified"}
-              </p>
-            </div>
-          </div>
-          <div className="flex justify-end mt-3">
-            <button
-              onClick={() => setEditAddressMode(true)}
-              className="text-hafi-teal hover:text-hafi-green flex items-center gap-1"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-              </svg>
-              Edit Address
-            </button>
-          </div>
+      <div className={`flex justify-center items-center min-h-[70vh] ${bgColor}`}>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-xs uppercase tracking-widest font-semibold text-emerald-500">Loading Profile...</span>
         </div>
       </div>
     );
-  };
+  }
 
-  const renderServiceField = () => {
-    if (!profile?.roles?.includes('service_provider')) return null;
-
-    if (showServiceField) {
-      return (
-        <div className={`${cardBg} rounded-lg shadow-md p-6 mb-6`}>
-          <h2 className={`text-xl font-bold text-hafi-teal mb-4 ${textColor}`}>Your Service</h2>
-          {loadingServices ? (
-            <div className={textColor}>Loading services...</div>
-          ) : (
-            <div>
-              <select
-                className={`border ${borderColor} rounded px-3 py-2 w-full mb-3 ${inputBg}`}
-                onChange={e => handleServiceSelect(String(e.target.value))}
-                disabled={isUpdatingService}
-                defaultValue=""
-              >
-                <option value="" disabled>Select your service</option>
-                {services.map(service => (
-                  <option key={service.id} value={service.id}>
-                    {service.title}
-                  </option>
-                ))}
-              </select>
-              {isUpdatingService && (
-                <div className={`flex items-center gap-2 text-sm ${secondaryTextColor} mb-3`}>
-                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Updating service...
-                </div>
-              )}
-              <button
-                onClick={() => setShowServiceField(false)}
-                disabled={isUpdatingService}
-                className={`${darkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-700'} px-4 py-2 rounded`}
-              >
-                Cancel
-              </button>
-            </div>
-          )}
-        </div>
-      );
-    }
-
+  if (!profile) {
     return (
-      <div className={`${cardBg} rounded-lg shadow-md p-6 mb-6`}>
-        <h2 className={`text-xl font-bold text-hafi-teal mb-4 ${textColor}`}>Your Service</h2>
-        <div className="flex justify-between items-center">
-          <p className={`font-medium ${textColor}`}>
-            {profile?.service_title || "No service selected"}
-          </p>
-          <button
-            onClick={() => setShowServiceField(true)}
-            className="text-hafi-teal hover:text-hafi-green"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-            </svg>
-          </button>
+      <div className={`flex justify-center items-center min-h-[70vh] ${bgColor}`}>
+        <div className="text-center p-6 border border-red-500/20 bg-red-500/5 max-w-sm" style={{ borderRadius: '2px' }}>
+          <p className="text-red-500 font-semibold uppercase tracking-wider text-sm mb-2">Error Loading Profile</p>
+          <p className="text-xs text-gray-500">Please make sure you are logged in and try again.</p>
         </div>
       </div>
     );
+  }
+
+  const absoluteImageUrl = (path: string) => {
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    return `${API_BASE}/${path.replace(/^\/+/, '')}`;
   };
 
-  // Loading states
-  if (loading) return <div className={`flex justify-center items-center h-[60vh] ${bgColor} ${textColor}`}>Loading...</div>;
-  if (!profile) return <div className={`text-center text-red-500 ${bgColor} p-4`}>Failed to load profile.</div>;
-
-  // Derived values
   const imagePath = previewUrl ||
     (profile.profile_image
-      ? (profile.profile_image.startsWith('http://') || profile.profile_image.startsWith('https://')
-        ? profile.profile_image
-        : `http://localhost:5000${profile.profile_image}`)
-      : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&size=240`);
+      ? absoluteImageUrl(profile.profile_image)
+      : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&size=240&background=10b981&color=fff`);
 
   return (
-    <div className={`max-w-6xl mx-auto px-4 py-8 min-h-screen ${bgColor}`}>
-      {/* Profile Header */}
-      <div className={`${cardBg} rounded-lg shadow-md p-6 mb-6`}>
-        <div className="flex flex-col md:flex-row items-center gap-6">
-          <div className="relative">
+    <div className={containerClass}>
+      {/* Profile Header Banner */}
+      <div className={`border ${cardBg} overflow-hidden mb-6 shadow-sm`} style={{ borderRadius: '2px' }}>
+        {/* <div className="h-12  bg-gray-100 dark:bg-gray-900 border-4 border-white dark:border-gray-900 "></div> */}
+        <div className="p-6 relative flex flex-col md:flex-row items-center md:items-end gap-6 -mt-16">
+          {/* Avatar container */}
+          <div className="relative group shrink-0 mt-12">
             <img
               src={imagePath}
               alt="Profile"
-              className="w-32 h-32 object-cover rounded-full border-4 border-hafi-teal"
+              className="w-32 h-32 object-cover bg-gray-100 dark:bg-gray-800 border-4 border-white dark:border-gray-900 shadow-md"
+              style={{ borderRadius: '2px' }}
               onError={e => {
                 (e.target as HTMLImageElement).src =
-                  `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&size=240`;
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&size=240&background=10b981&color=fff`;
               }}
             />
             {canEdit() && (
-              <label className="absolute bottom-0 right-0 bg-hafi-green text-white p-2 rounded-full cursor-pointer shadow-md hover:bg-green-600">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                </svg>
+              <label className="absolute bottom-2 right-2 bg-emerald-500 hover:bg-emerald-600 text-white p-2 cursor-pointer shadow-md transition-all hover:scale-105" style={{ borderRadius: '2px' }}>
+                <Upload className="w-4 h-4" />
                 <input
                   type="file"
                   accept="image/*"
@@ -683,165 +428,478 @@ export default function ProfilePage() {
               </label>
             )}
           </div>
-          <div className="text-center md:text-left">
-            <h1 className={`text-3xl font-bold text-hafi-teal ${textColor}`}>{profile.name}</h1>
-            <p className={`${secondaryTextColor} mb-4`}>
-              {profile.service_title ? `${profile.service_title} at HafiConnect` : "Service Provider at HafiConnect"}
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-              <div className={`${darkMode ? 'bg-hafi-green/20' : 'bg-hafi-green/10'} px-4 py-2 rounded-lg`}>
-                <p className={`text-sm ${secondaryTextColor}`}>Opportunities applied</p>
-                <p className="font-bold text-hafi-green">32</p>
+
+          <div className="text-center md:text-left flex-1 pb-2">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-bold uppercase tracking-tight flex items-center justify-center md:justify-start gap-2">
+                  {profile.name}
+                </h1>
+                <p className="text-xs uppercase tracking-wider font-semibold text-emerald-500 mt-1">
+                  {profile.service_title ? `${profile.service_title} Provider` : "Uploader Account"}
+                </p>
               </div>
-              <div className={`${darkMode ? 'bg-hafi-teal/20' : 'bg-hafi-teal/10'} px-4 py-2 rounded-lg`}>
-                <p className={`text-sm ${secondaryTextColor}`}>Opportunities won</p>
-                <p className="font-bold text-hafi-teal">26</p>
-              </div>
-              <div className={`${darkMode ? 'bg-blue-900/20' : 'bg-blue-100'} px-4 py-2 rounded-lg`}>
-                <p className={`text-sm ${secondaryTextColor}`}>Current opportunities</p>
-                <p className="font-bold text-blue-600">6</p>
+
+              {/* Stat badges */}
+              <div className="flex flex-wrap gap-2 justify-center md:justify-end">
+                <div className={`px-3 py-1.5 border ${borderColor} ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+                  <div className="text-[9px] uppercase tracking-wider font-bold text-gray-500">Service Category</div>
+                  <div className="text-xs font-semibold text-emerald-500">{profile.service_title || 'None'}</div>
+                </div>
+                <div className={`px-3 py-1.5 border ${borderColor} ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+                  <div className="text-[9px] uppercase tracking-wider font-bold text-gray-500">Active Roles</div>
+                  <div className="text-xs font-semibold text-teal-500">{profile.roles?.length || 0} assigned</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Service Field */}
-      {renderServiceField()}
-
-      {/* Main Content */}
+      {/* Main Grid Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column */}
+        
+        {/* Left Column: Account Details */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Account Settings */}
-          <div className={`${cardBg} rounded-lg shadow-md p-6`}>
-            <h2 className={`text-xl font-bold text-hafi-teal mb-4 ${textColor}`}>Account Settings</h2>
-            <div className="space-y-4">
-              {renderField("name", "Full Name", profile.name)}
-              {renderField("contact", "Phone Number", profile.contact)}
+          
+          {/* Service Provider Select Block */}
+          {profile.roles?.includes('service_provider') && (
+            <div className={`border p-6 shadow-sm ${cardBg}`} style={{ borderRadius: '2px' }}>
+              <div className="flex items-center gap-2 mb-4 border-b pb-3 border-gray-200 dark:border-gray-800">
+                <Briefcase className="w-5 h-5 text-emerald-500" />
+                <h2 className="text-sm font-bold uppercase tracking-wider">Service Configuration</h2>
+              </div>
+              
+              {showServiceField ? (
+                <div className="space-y-4">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Select your Service Offering</label>
+                  {loadingServices ? (
+                    <div className="text-xs text-gray-400">Loading service list...</div>
+                  ) : (
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <select
+                        className={`px-3 py-2 text-sm border focus:outline-none focus:ring-1 focus:ring-emerald-500 ${inputBg}`}
+                        onChange={e => handleServiceSelect(String(e.target.value))}
+                        disabled={isUpdatingService}
+                        defaultValue=""
+                        style={{ borderRadius: '2px' }}
+                      >
+                        <option value="" disabled>Choose service...</option>
+                        {services.map(service => (
+                          <option key={service.id} value={service.id}>
+                            {service.title}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        onClick={handleCancel}
+                        disabled={isUpdatingService}
+                        className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border ${darkMode ? 'border-gray-700 hover:bg-gray-800 text-gray-300' : 'border-gray-250 hover:bg-gray-50 text-gray-700'}`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex justify-between items-center bg-emerald-500/5 p-4 border border-emerald-500/10" style={{ borderRadius: '2px' }}>
+                  <div>
+                    <div className="text-[9px] uppercase tracking-wider font-bold text-gray-500 mb-1">Assigned Service</div>
+                    <div className="text-sm font-semibold">{profile.service_title || "No service selected"}</div>
+                  </div>
+                  <button
+                    onClick={() => { setShowServiceField(true); fetchServices(); }}
+                    className="text-xs font-bold uppercase tracking-wider border border-emerald-500/20 text-emerald-500 px-3 py-1.5 hover:bg-emerald-500 hover:text-white transition-colors"
+                    style={{ borderRadius: '2px' }}
+                  >
+                    Change Service
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
-          {/* Contact Information */}
-          <div className={`${cardBg} rounded-lg shadow-md p-6`}>
-            <h2 className={`text-xl font-bold text-hafi-teal mb-4 ${textColor}`}>Contact Information</h2>
-            <div className="space-y-4">
-              {renderField("email", "Email Address", profile.email, "email")}
-              {renderField("whatsapp_number", "WhatsApp", profile.whatsapp_number)}
+          {/* Account Profile Fields */}
+          <div className={`border p-6 shadow-sm ${cardBg}`} style={{ borderRadius: '2px' }}>
+            <div className="flex items-center gap-2 mb-6 border-b pb-3 border-gray-200 dark:border-gray-800">
+              <User className="w-5 h-5 text-emerald-500" />
+              <h2 className="text-sm font-bold uppercase tracking-wider">Account Information</h2>
+            </div>
+            
+            <div className="space-y-5">
+              {/* Full Name */}
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Full Name</label>
+                  {editField === "name" ? (
+                    <div className="flex gap-2 max-w-md">
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={e => setEditValue(e.target.value)}
+                        className={`px-3 py-2 text-sm border focus:outline-none w-full ${inputBg}`}
+                        style={{ borderRadius: '2px' }}
+                      />
+                      <button
+                        onClick={() => handleSave("name")}
+                        disabled={isSavingProfile}
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 text-xs font-bold uppercase tracking-wider"
+                        style={{ borderRadius: '2px' }}
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className={`px-3 py-2 text-xs font-bold uppercase border ${darkMode ? 'border-gray-700 text-gray-300' : 'border-gray-200 text-gray-600'}`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-sm font-medium">{profile.name}</div>
+                  )}
+                </div>
+                {editField !== "name" && (
+                  <button
+                    onClick={() => handleEdit("name", profile.name)}
+                    className="text-emerald-500 hover:text-emerald-600 p-1"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Phone Number */}
+              <div className="flex justify-between items-start gap-4 border-t pt-4 dark:border-gray-800">
+                <div className="flex-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Phone Number</label>
+                  {editField === "contact" ? (
+                    <div className="flex gap-2 max-w-md">
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={e => setEditValue(e.target.value)}
+                        className={`px-3 py-2 text-sm border focus:outline-none w-full ${inputBg}`}
+                        style={{ borderRadius: '2px' }}
+                      />
+                      <button
+                        onClick={() => handleSave("contact")}
+                        disabled={isSavingProfile}
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 text-xs font-bold uppercase tracking-wider"
+                        style={{ borderRadius: '2px' }}
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className={`px-3 py-2 text-xs font-bold uppercase border ${darkMode ? 'border-gray-700 text-gray-300' : 'border-gray-250 text-gray-600'}`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-sm font-medium">{profile.contact || "None"}</div>
+                  )}
+                </div>
+                {editField !== "contact" && (
+                  <button
+                    onClick={() => handleEdit("contact", profile.contact || "")}
+                    className="text-emerald-500 hover:text-emerald-600 p-1"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* WhatsApp Number */}
+              <div className="flex justify-between items-start gap-4 border-t pt-4 dark:border-gray-800">
+                <div className="flex-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">WhatsApp Number</label>
+                  {editField === "whatsapp_number" ? (
+                    <div className="flex gap-2 max-w-md">
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={e => setEditValue(e.target.value)}
+                        className={`px-3 py-2 text-sm border focus:outline-none w-full ${inputBg}`}
+                        style={{ borderRadius: '2px' }}
+                      />
+                      <button
+                        onClick={() => handleSave("whatsapp_number")}
+                        disabled={isSavingProfile}
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 text-xs font-bold uppercase tracking-wider"
+                        style={{ borderRadius: '2px' }}
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className={`px-3 py-2 text-xs font-bold uppercase border ${darkMode ? 'border-gray-700 text-gray-300' : 'border-gray-250 text-gray-600'}`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-sm font-medium">{profile.whatsapp_number || "None"}</div>
+                  )}
+                </div>
+                {editField !== "whatsapp_number" && (
+                  <button
+                    onClick={() => handleEdit("whatsapp_number", profile.whatsapp_number || "")}
+                    className="text-emerald-500 hover:text-emerald-600 p-1"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Email Address */}
+              <div className="flex justify-between items-start gap-4 border-t pt-4 dark:border-gray-800">
+                <div className="flex-1">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Email Address</label>
+                  <div className="text-sm font-medium text-gray-400 select-all">{profile.email}</div>
+                </div>
+                <div className="text-[10px] uppercase font-bold text-gray-400 bg-gray-500/10 px-2 py-1" style={{ borderRadius: '2px' }}>Locked</div>
+              </div>
+
             </div>
           </div>
 
           {/* Address Details */}
-          <div className={`${cardBg} rounded-lg shadow-md p-6`}>
-            <h2 className={`text-xl font-bold text-hafi-teal mb-4 ${textColor}`}>Address Details</h2>
-            {renderAddressFields()}
+          <div className={`border p-6 shadow-sm ${cardBg}`} style={{ borderRadius: '2px' }}>
+            <div className="flex items-center gap-2 mb-6 border-b pb-3 border-gray-200 dark:border-gray-800">
+              <MapPin className="w-5 h-5 text-emerald-500" />
+              <h2 className="text-sm font-bold uppercase tracking-wider">Address Details</h2>
+            </div>
+            
+            {editAddressMode ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(addressFields).map(([field, value]) => (
+                  <div key={field}>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1 capitalize">
+                      {field.replace('_', ' ')}
+                    </label>
+                    <input
+                      type="text"
+                      value={value}
+                      onChange={(e) =>
+                        setAddressFields(prev => ({
+                          ...prev,
+                          [field]: e.target.value
+                        }))
+                      }
+                      className={`px-3 py-2 text-sm border focus:outline-none w-full ${inputBg}`}
+                      style={{ borderRadius: '2px' }}
+                      placeholder={`Enter ${field.replace('_', ' ')}`}
+                    />
+                  </div>
+                ))}
+                
+                <div className="md:col-span-2 flex gap-2 pt-2 border-t dark:border-gray-800">
+                  <button
+                    onClick={() => handleSave("address")}
+                    disabled={isSavingProfile}
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider"
+                    style={{ borderRadius: '2px' }}
+                  >
+                    Save Address
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    className={`px-4 py-2 text-xs font-bold uppercase border ${darkMode ? 'border-gray-700 text-gray-300' : 'border-gray-250 text-gray-650'}`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <label className="block text-[9px] uppercase tracking-wider text-gray-500 font-bold mb-0.5">District</label>
+                    <div className="font-semibold">{profile.address?.district || "Not set"}</div>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] uppercase tracking-wider text-gray-500 font-bold mb-0.5">Sector</label>
+                    <div className="font-semibold">{profile.address?.sector || "Not set"}</div>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] uppercase tracking-wider text-gray-500 font-bold mb-0.5">Cell</label>
+                    <div className="font-semibold">{profile.address?.cell || "Not set"}</div>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] uppercase tracking-wider text-gray-500 font-bold mb-0.5">Village</label>
+                    <div className="font-semibold">{profile.address?.village || "Not set"}</div>
+                  </div>
+                  <div className="col-span-2 md:col-span-2">
+                    <label className="block text-[9px] uppercase tracking-wider text-gray-500 font-bold mb-0.5">Known Place</label>
+                    <div className="font-semibold">{profile.address?.known_place || "Not set"}</div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-3 border-t dark:border-gray-800">
+                  <button
+                    onClick={() => setEditAddressMode(true)}
+                    className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider border border-emerald-500/20 text-emerald-500 px-3 py-1.5 hover:bg-emerald-500 hover:text-white transition-all"
+                    style={{ borderRadius: '2px' }}
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    Edit Address
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Location */}
-          <div className={`${cardBg} rounded-lg shadow-md p-6`}>
-            <h2 className={`text-xl font-bold text-hafi-teal mb-4 ${textColor}`}>Location</h2>
-            <div className={`flex justify-between items-center border-b ${borderColor} pb-3`}>
+          {/* Location & GPS */}
+          <div className={`border p-6 shadow-sm ${cardBg}`} style={{ borderRadius: '2px' }}>
+            <div className="flex items-center gap-2 mb-6 border-b pb-3 border-gray-200 dark:border-gray-800">
+              <Compass className="w-5 h-5 text-emerald-500" />
+              <h2 className="text-sm font-bold uppercase tracking-wider">Geolocation Settings</h2>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-emerald-500/5 border border-emerald-500/10 p-4" style={{ borderRadius: '2px' }}>
               <div>
-                <p className={`text-sm ${secondaryTextColor}`}>Coordinates</p>
-                <p className={`font-medium ${textColor}`}>
+                <label className="block text-[9px] uppercase tracking-wider text-gray-500 font-bold mb-1">GPS Coordinates</label>
+                <div className="text-sm font-semibold select-all font-mono">
                   {profile.location?.lat && profile.location?.lng
                     ? `${profile.location.lat.toFixed(6)}, ${profile.location.lng.toFixed(6)}`
-                    : "Not set"}
-                </p>
+                    : "Coordinates not calibrated"}
+                </div>
               </div>
+              
               {canEdit() && (
                 <button
                   onClick={captureCurrentLocation}
                   disabled={isGettingLocation}
-                  className={`flex items-center gap-1 ${isGettingLocation ? 'text-gray-400' : 'text-hafi-teal hover:text-hafi-green'}`}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider px-4 py-2 hover:scale-102 transition-all flex items-center gap-1.5 shrink-0"
+                  style={{ borderRadius: '2px' }}
                 >
                   {isGettingLocation ? (
-                    <>
-                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Updating...
-                    </>
+                    <div className="w-3.5 h-3.5 border border-white border-t-transparent animate-spin rounded-full"></div>
                   ) : (
-                    <>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
-                      Update Location
-                    </>
+                    <Compass className="w-3.5 h-3.5" />
                   )}
+                  {isGettingLocation ? "Syncing GPS..." : "Record Location"}
                 </button>
               )}
             </div>
+
             {profile.location?.lat && profile.location?.lng && (
               <div className="mt-4">
                 <a
                   href={`https://www.google.com/maps?q=${profile.location.lat},${profile.location.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-hafi-teal hover:underline flex items-center"
+                  className="text-xs uppercase tracking-wider font-bold text-emerald-500 hover:underline flex items-center gap-1"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
-                  View on Google Maps
+                  <MapPin className="w-4 h-4" />
+                  Open in Google Maps
                 </a>
               </div>
             )}
           </div>
+
         </div>
 
-        {/* Right Column */}
+        {/* Right Column: Sidebar (Roles, Password) */}
         <div className="space-y-6">
-          {/* Password Update */}
-          <div className={`${cardBg} rounded-lg shadow-md p-6`}>
-            <h2 className={`text-xl font-bold text-hafi-teal mb-4 ${textColor}`}>Update Password</h2>
+          
+          {/* User Roles Card */}
+          <div className={`border p-6 shadow-sm ${cardBg}`} style={{ borderRadius: '2px' }}>
+            <div className="flex items-center justify-between mb-4 border-b pb-3 dark:border-gray-800">
+              <div className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-emerald-500" />
+                <h2 className="text-sm font-bold uppercase tracking-wider">My Roles</h2>
+              </div>
+              <Link to="/account-dashboard" className="text-xs font-bold uppercase text-emerald-500 hover:underline">
+                Manage
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap gap-2 mb-4">
+              {(profile.roles || []).map(role => (
+                <div
+                  key={role}
+                  className={`flex items-center gap-1 px-2.5 py-1 border text-xs font-bold uppercase tracking-wide
+                    ${darkMode ? 'bg-gray-950 border-gray-800 text-gray-300' : 'bg-gray-100 border-gray-200 text-gray-700'}`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  {role === 'seller' && <Store className="w-3.5 h-3.5 text-emerald-500" />}
+                  {role === 'service_provider' && <Briefcase className="w-3.5 h-3.5 text-teal-500" />}
+                  {role === 'customer' && <User className="w-3.5 h-3.5 text-emerald-450" />}
+                  <span>{role.replace('_', ' ')}</span>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-[11px] leading-relaxed text-gray-500 dark:text-gray-400">
+              To swap or enable seller/service features, manage subscriptions, or expand capabilities, click Manage to visit the <Link to="/account-dashboard" className="text-emerald-500 hover:underline font-semibold">Account Dashboard</Link>.
+            </p>
+          </div>
+
+          {/* Update Password Card */}
+          <div className={`border p-6 shadow-sm ${cardBg}`} style={{ borderRadius: '2px' }}>
+            <div className="flex items-center gap-2 mb-4 border-b pb-3 dark:border-gray-800">
+              <Lock className="w-5 h-5 text-emerald-500" />
+              <h2 className="text-sm font-bold uppercase tracking-wider">Security Setting</h2>
+            </div>
+
             {showPasswordForm ? (
               <div className="space-y-3">
-                <input
-                  type="password"
-                  placeholder="Current Password"
-                  value={oldPassword}
-                  onChange={e => setOldPassword(e.target.value)}
-                  className={`border ${borderColor} rounded px-3 py-2 w-full ${inputBg}`}
-                />
-                <input
-                  type="password"
-                  placeholder="New Password"
-                  value={newPassword}
-                  onChange={e => setNewPassword(e.target.value)}
-                  className={`border ${borderColor} rounded px-3 py-2 w-full ${inputBg}`}
-                />
-                <input
-                  type="password"
-                  placeholder="Confirm New Password"
-                  value={confirmNewPassword}
-                  onChange={e => setConfirmNewPassword(e.target.value)}
-                  className={`border ${borderColor} rounded px-3 py-2 w-full ${inputBg}`}
-                />
-                <div className="flex gap-2">
+                <div>
+                  <input
+                    type="password"
+                    placeholder="CURRENT PASSWORD"
+                    value={oldPassword}
+                    onChange={e => setOldPassword(e.target.value)}
+                    className={`px-3 py-2 text-sm border focus:outline-none w-full ${inputBg}`}
+                    style={{ borderRadius: '2px' }}
+                  />
+                </div>
+                <div>
+                  <input
+                    type="password"
+                    placeholder="NEW PASSWORD"
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                    className={`px-3 py-2 text-sm border focus:outline-none w-full ${inputBg}`}
+                    style={{ borderRadius: '2px' }}
+                  />
+                </div>
+                <div>
+                  <input
+                    type="password"
+                    placeholder="CONFIRM NEW PASSWORD"
+                    value={confirmNewPassword}
+                    onChange={e => setConfirmNewPassword(e.target.value)}
+                    className={`px-3 py-2 text-sm border focus:outline-none w-full ${inputBg}`}
+                    style={{ borderRadius: '2px' }}
+                  />
+                </div>
+
+                <div className="flex gap-2 pt-2">
                   <button
                     onClick={handlePasswordUpdate}
                     disabled={isUpdatingPassword}
-                    className="bg-hafi-green text-white px-4 py-2 rounded flex-1 hover:bg-green-600"
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider py-2 px-3 flex-1 flex items-center justify-center"
+                    style={{ borderRadius: '2px' }}
                   >
                     {isUpdatingPassword ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Updating...
-                      </span>
+                      <div className="w-3.5 h-3.5 border border-white border-t-transparent animate-spin rounded-full"></div>
                     ) : (
-                      'Update'
+                      "Save Password"
                     )}
                   </button>
                   <button
                     onClick={() => setShowPasswordForm(false)}
-                    disabled={isUpdatingPassword}
-                    className={`${darkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-700'} px-4 py-2 rounded flex-1 hover:bg-gray-300`}
+                    className={`text-xs font-bold uppercase tracking-wider py-2 px-3 flex-1 border ${darkMode ? 'border-gray-700 text-gray-300' : 'border-gray-250 text-gray-700'}`}
+                    style={{ borderRadius: '2px' }}
                   >
                     Cancel
                   </button>
@@ -850,78 +908,57 @@ export default function ProfilePage() {
             ) : (
               <button
                 onClick={() => setShowPasswordForm(true)}
-                className="w-full bg-hafi-teal text-white py-2 rounded hover:bg-teal-600 transition-colors"
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider py-2.5 transition-colors"
+                style={{ borderRadius: '2px' }}
               >
                 Change Password
               </button>
             )}
           </div>
 
-          {/* Roles Display */}
-          <div className={`${cardBg} rounded-lg shadow-md p-6`}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className={`text-xl font-bold text-hafi-teal ${textColor}`}>My Roles</h2>
-              <Link to="/account-dashboard" className="text-sm text-hafi-teal hover:underline flex items-center">
-                Manage Roles <span className="ml-1">→</span>
-              </Link>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {(profile.roles || []).map(role => (
-                <div key={role} className={`${darkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800'} px-3 py-1 rounded-full text-sm font-medium capitalize flex items-center`}>
-                  {role === 'seller' && (
-                    <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                  )}
-                  {role === 'service_provider' && (
-                    <svg className="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                  )}
-                  {role.replace('_', ' ')}
-                </div>
-              ))}
-            </div>
-
-            <p className={`text-xs mt-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              Go to the <Link to="/account-dashboard" className="text-hafi-teal hover:underline">Account Dashboard</Link> to add or remove roles, which may include additional verification or data cleanup steps.
-            </p>
-          </div>
-
         </div>
+
       </div>
 
       {/* Image Upload Modal */}
       {selectedImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`${cardBg} rounded-lg p-6 max-w-md w-full`}>
-            <h3 className={`text-lg font-bold mb-4 ${textColor}`}>Confirm Profile Image</h3>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm animate-fade-in">
+          <div className={`border p-6 shadow-2xl w-full max-w-md ${cardBg}`} style={{ borderRadius: '4px' }}>
+            <div className="flex justify-between items-center border-b pb-3 mb-4 dark:border-gray-800">
+              <h3 className="font-bold text-sm uppercase tracking-wider">Preview Profile Image</h3>
+              <button onClick={handleCancel} className="p-1 hover:bg-gray-500/10 transition-colors" style={{ borderRadius: '2px' }}>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
             <img
               src={previewUrl || ""}
               alt="Preview"
-              className="w-full h-64 object-contain mb-4"
+              className="w-full h-64 object-cover bg-gray-950 border border-gray-800 mb-4"
+              style={{ borderRadius: '2px' }}
             />
+            
             <div className="flex justify-end gap-2">
               <button
                 onClick={handleCancel}
                 disabled={isUploadingImage}
-                className={`${darkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-700'} px-4 py-2 rounded`}
+                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border ${darkMode ? 'border-gray-700 hover:bg-gray-800 text-gray-300' : 'border-gray-200 hover:bg-gray-50 text-gray-700'}`}
+                style={{ borderRadius: '2px' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleImageUpload}
                 disabled={isUploadingImage}
-                className="bg-hafi-green text-white px-4 py-2 rounded hover:bg-green-600"
+                className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5"
+                style={{ borderRadius: '2px' }}
               >
                 {isUploadingImage ? (
-                  <span className="flex items-center gap-2">
-                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Uploading...
-                  </span>
+                  <div className="w-3.5 h-3.5 border border-white border-t-transparent animate-spin rounded-full"></div>
                 ) : (
-                  'Save Image'
+                  <Check className="w-3.5 h-3.5" />
                 )}
+                Save Image
               </button>
             </div>
           </div>

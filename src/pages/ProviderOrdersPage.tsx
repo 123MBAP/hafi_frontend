@@ -3,6 +3,24 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useDarkMode } from '@/context/DarkMode';
 import ChatBox from './ChatBox';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { 
+  FileText, 
+  RefreshCw, 
+  ArrowLeft, 
+  Package, 
+  DollarSign, 
+  Truck, 
+  CheckCircle,
+  MessageSquare,
+  AlertCircle,
+  Clock,
+  Calendar,
+  X,
+  Send,
+  Info
+} from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
@@ -64,13 +82,13 @@ type OrderSummary = {
 
 // ===== Constants =====
 const STATUS_CONFIG: Record<OrderStatus, { label: string; tone: string; nextActions?: OrderStatus[] }> = {
-  placed: { label: 'Placed', tone: 'default', nextActions: ['order_received'] },
-  order_received: { label: 'Order received by provider', tone: 'info', nextActions: ['payment_received'] },
-  quoted: { label: 'Quoted new price', tone: 'warning', nextActions: [] },
-  quote_accepted: { label: 'Quote accepted', tone: 'success', nextActions: ['payment_received'] },
-  payment_done: { label: 'Payment pending provider confirmation', tone: 'info', nextActions: ['payment_received'] },
-  payment_received: { label: 'Payment confirmed', tone: 'warning', nextActions: ['delivery_pending'] },
-  delivery_pending: { label: 'Delivery pending customer confirmation', tone: 'info', nextActions: ['delivered'] },
+  placed: { label: 'Awaiting Payment', tone: 'default', nextActions: ['order_received'] },
+  order_received: { label: 'Order Received', tone: 'info', nextActions: ['payment_received'] },
+  quoted: { label: 'Quoted Price', tone: 'warning', nextActions: [] },
+  quote_accepted: { label: 'Quote Accepted', tone: 'success', nextActions: ['payment_received'] },
+  payment_done: { label: 'Payment Sent', tone: 'info', nextActions: ['payment_received'] },
+  payment_received: { label: 'Payment Confirmed', tone: 'warning', nextActions: ['delivery_pending'] },
+  delivery_pending: { label: 'Delivery Pending', tone: 'info', nextActions: ['delivered'] },
   delivered: { label: 'Delivered', tone: 'success', nextActions: [] },
 };
 
@@ -94,12 +112,44 @@ const normalizeProviderOrder = (order: any): ProviderOrder => ({
 
 const getStatusTone = (status: OrderStatus, darkMode: boolean): string => {
   const tones = {
-    default: darkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-700',
-    info: darkMode ? 'bg-cyan-600/20 text-cyan-100' : 'bg-cyan-100 text-cyan-700',
-    warning: darkMode ? 'bg-amber-600/20 text-amber-100' : 'bg-amber-100 text-amber-700',
-    success: darkMode ? 'bg-green-600/20 text-green-100' : 'bg-green-100 text-green-700',
+    default: darkMode ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+    info: darkMode ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' : 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20',
+    warning: darkMode ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20',
+    success: darkMode ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
   };
   return tones[STATUS_CONFIG[status]?.tone as keyof typeof tones] || tones.default;
+};
+
+const formatAddress = (addressStr?: string | null) => {
+  if (!addressStr) return 'Not Available';
+  const trimmed = addressStr.trim();
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (parsed && typeof parsed === 'object') {
+        const { lat, lng, name, address } = parsed;
+        if (lat != null && lng != null) {
+          return (
+            <div className="flex flex-col items-end gap-0.5">
+              {address && <span className="font-semibold text-right">{address}</span>}
+              {name && <span className="text-[10px] text-gray-500 text-right">{name}</span>}
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-emerald-500 hover:underline font-bold text-[10px] inline-flex items-center gap-0.5 mt-0.5"
+              >
+                Google Maps ({Number(lat).toFixed(5)}, {Number(lng).toFixed(5)})
+              </a>
+            </div>
+          );
+        }
+      }
+    } catch {
+      // fallback
+    }
+  }
+  return <span className="font-semibold">{addressStr}</span>;
 };
 
 // ===== Custom Hooks =====
@@ -227,24 +277,26 @@ const useCustomerChatCounts = (token: string | null) => {
 // ===== Components =====
 const OrderSummaryCards = ({ summary, darkMode }: { summary: OrderSummary; darkMode: boolean }) => {
   const cards = [
-    { label: 'Total Orders', value: summary.total },
-    { label: 'Payment Pending', value: summary.paymentPending },
-    { label: 'Payment Received', value: summary.paymentReceived },
-    { label: 'Delivery Pending', value: summary.deliveryPending },
-    { label: 'Delivered', value: summary.delivered },
+    { label: 'Total Orders', value: summary.total, icon: <Package className="w-5 h-5 text-gray-500" /> },
+    { label: 'Payment Pending', value: summary.paymentPending, icon: <Clock className="w-5 h-5 text-amber-500" /> },
+    { label: 'Payment Confirmed', value: summary.paymentReceived, icon: <DollarSign className="w-5 h-5 text-emerald-500" /> },
+    { label: 'Delivery Pending', value: summary.deliveryPending, icon: <Truck className="w-5 h-5 text-cyan-500" /> },
+    { label: 'Completed', value: summary.delivered, icon: <CheckCircle className="w-5 h-5 text-green-500" /> },
   ];
 
-  const bgColor = darkMode ? 'bg-gray-800' : 'bg-white';
-  const borderColor = darkMode ? 'border-gray-700' : 'border-gray-200';
-  const textColor = darkMode ? 'text-gray-100' : 'text-gray-800';
-  const secondaryTextColor = darkMode ? 'text-gray-300' : 'text-gray-600';
+  const bgColor = darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200';
+  const textColor = darkMode ? 'text-gray-100' : 'text-gray-900';
+  const secondaryTextColor = darkMode ? 'text-gray-400' : 'text-gray-650';
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
       {cards.map((card, idx) => (
-        <div key={idx} className={`rounded-2xl border p-4 ${borderColor} ${bgColor}`}>
-          <p className={`text-sm ${secondaryTextColor}`}>{card.label}</p>
-          <p className={`mt-1 text-2xl font-bold ${textColor}`}>{card.value}</p>
+        <div key={idx} className={`border p-4 shadow-sm flex flex-col justify-between`} style={{ borderRadius: '2px', ...{ backgroundColor: darkMode ? '#111827' : '#ffffff' } }}>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">{card.label}</span>
+            {card.icon}
+          </div>
+          <p className="text-2xl font-bold font-mono tracking-tight text-emerald-500">{card.value}</p>
         </div>
       ))}
     </div>
@@ -252,7 +304,7 @@ const OrderSummaryCards = ({ summary, darkMode }: { summary: OrderSummary; darkM
 };
 
 const StatusBadge = ({ status, darkMode }: { status: OrderStatus; darkMode: boolean }) => (
-  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusTone(status, darkMode)}`}>
+  <span className={`border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${getStatusTone(status, darkMode)}`} style={{ borderRadius: '2px' }}>
     {STATUS_CONFIG[status]?.label || status}
   </span>
 );
@@ -269,9 +321,9 @@ const ActionButton = ({
   variant?: 'primary' | 'secondary' | 'danger';
 }) => {
   const variants = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700',
-    secondary: 'bg-amber-600 text-white hover:bg-amber-700',
-    danger: 'bg-red-600 text-white hover:bg-red-700',
+    primary: 'bg-emerald-500 hover:bg-emerald-600 text-white',
+    secondary: 'bg-indigo-600 hover:bg-indigo-700 text-white',
+    danger: 'bg-red-600 hover:bg-red-700 text-white',
   };
 
   return (
@@ -279,9 +331,10 @@ const ActionButton = ({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`w-full rounded-lg px-4 py-3 text-sm font-semibold transition-colors ${
-        disabled ? 'cursor-not-allowed bg-gray-300 text-gray-500' : variants[variant]
+      className={`w-full py-2.5 text-xs font-bold uppercase tracking-wider transition-colors duration-200 ${
+        disabled ? 'cursor-not-allowed bg-gray-700 text-gray-500' : variants[variant]
       }`}
+      style={{ borderRadius: '2px' }}
     >
       {children}
     </button>
@@ -305,15 +358,18 @@ const QuoteSection = ({
 }) => {
   const [quoteDraft, setQuoteDraft] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const itemKey = `${orderUuid}-${item.id}`;
   const customization = item.serviceCustomization;
+
+  const borderColor = darkMode ? 'border-gray-800' : 'border-gray-250';
+  const inputBg = darkMode ? 'bg-gray-950 border-gray-850 text-white' : 'bg-white border-gray-250 text-gray-900';
 
   if (!customization || customization.noCustomizationNeeded) return null;
   if (customization.quoteStatus === 'accepted') {
     return (
-      <div className={`mt-3 rounded-xl border px-4 py-3 text-sm ${darkMode ? 'bg-emerald-900/20 border-emerald-700' : 'bg-emerald-50 border-emerald-200'}`}>
-        <p className={`font-semibold ${darkMode ? 'text-emerald-300' : 'text-emerald-700'}`}>
-          ✓ Customer accepted the quote of RWF {Number(customization.quotedPrice).toLocaleString()}
+      <div className="mt-3 border border-emerald-500/20 bg-emerald-500/5 p-3 text-xs" style={{ borderRadius: '2px' }}>
+        <p className="font-semibold text-emerald-500 flex items-center gap-1">
+          <CheckCircle className="w-4 h-4" />
+          Customer accepted offered quote: RWF {Number(customization.quotedPrice).toLocaleString()}
         </p>
       </div>
     );
@@ -331,28 +387,28 @@ const QuoteSection = ({
 
   if (!isEditing && customization.quotedPrice) {
     return (
-      <div className={`mt-3 rounded-xl border px-4 py-3 ${darkMode ? 'border-gray-700 bg-gray-900/20' : 'border-gray-200 bg-gray-50'}`}>
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-semibold">Quoted Price: RWF {Number(customization.quotedPrice).toLocaleString()}</span>
+      <div className={`mt-3 border p-3 ${borderColor} ${darkMode ? 'bg-gray-950/20' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+        <div className="flex justify-between items-center gap-2">
+          <span className="text-xs font-semibold">Active Offered Quote: RWF {Number(customization.quotedPrice).toLocaleString()}</span>
           <button
             onClick={() => setIsEditing(true)}
-            className="text-sm text-blue-600 hover:text-blue-700"
+            className="text-xs uppercase font-bold text-emerald-500 hover:underline"
           >
-            Edit Quote
+            Adjust Quote
           </button>
         </div>
         {customization.customizationRequest && (
-          <p className="text-xs text-gray-500">Request: {customization.customizationRequest}</p>
+          <p className="text-[11px] text-gray-500 mt-1">Request notes: {customization.customizationRequest}</p>
         )}
       </div>
     );
   }
 
   return (
-    <div className={`mt-3 rounded-xl border p-4 ${darkMode ? 'border-gray-700 bg-gray-900/20' : 'border-gray-200 bg-gray-50'}`}>
-      <p className="text-sm font-semibold mb-2">Provide Service Quote</p>
+    <div className={`mt-3 border p-4 ${borderColor} ${darkMode ? 'bg-gray-950/20' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+      <p className="text-xs font-bold uppercase tracking-wider text-emerald-500 mb-1.5">Submit custom service quote</p>
       {customization.customizationRequest && (
-        <p className="text-xs text-gray-500 mb-2">Request: {customization.customizationRequest}</p>
+        <p className="text-[11px] text-gray-400 mb-2 leading-relaxed">Request: {customization.customizationRequest}</p>
       )}
       <div className="flex gap-2">
         <input
@@ -361,15 +417,17 @@ const QuoteSection = ({
           step="0.01"
           value={quoteDraft}
           onChange={(e) => setQuoteDraft(e.target.value)}
-          placeholder={`Original: RWF ${Number(item.price).toLocaleString()}`}
-          className={`flex-1 rounded-lg border px-3 py-2 text-sm ${darkMode ? 'border-gray-600 bg-gray-800 text-gray-100' : 'border-gray-300 bg-white text-gray-800'}`}
+          placeholder={`Reg Price: RWF ${Number(item.price).toLocaleString()}`}
+          className={`px-3 py-2 text-xs border focus:outline-none flex-grow ${inputBg}`}
+          style={{ borderRadius: '2px' }}
         />
         <button
           onClick={handleQuote}
           disabled={saving || !quoteDraft}
-          className="rounded-lg px-4 py-2 text-sm font-semibold bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
+          className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider px-3.5 py-2 disabled:opacity-50"
+          style={{ borderRadius: '2px' }}
         >
-          {customization.quotedPrice ? 'Update Quote' : 'Submit Quote'}
+          {customization.quotedPrice ? 'Adjust Quote' : 'Send Quote'}
         </button>
       </div>
     </div>
@@ -386,6 +444,7 @@ const OrderCard = ({
   onToggleChat,
   customerChatCounts,
   onClearUnreadCount,
+  customer,
   darkMode 
 }: {
   order: ProviderOrder;
@@ -397,13 +456,14 @@ const OrderCard = ({
   onToggleChat: (orderUuid: string) => void;
   customerChatCounts: Record<string, { unread_count: number; name?: string }>;
   onClearUnreadCount: (customerId: string) => void;
+  customer?: any;
   darkMode: boolean;
 }) => {
-  const bgColor = darkMode ? 'bg-gray-800' : 'bg-white';
-  const borderColor = darkMode ? 'border-gray-700' : 'border-gray-200';
-  const textColor = darkMode ? 'text-gray-100' : 'text-gray-800';
-  const secondaryTextColor = darkMode ? 'text-gray-300' : 'text-gray-600';
-  
+  const cardBg = darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200';
+  const borderColor = darkMode ? 'border-gray-800' : 'border-gray-250';
+  const textColor = darkMode ? 'text-gray-100' : 'text-gray-900';
+  const secondaryTextColor = darkMode ? 'text-gray-400' : 'text-gray-650';
+
   const isSaving = savingOrderUuid === order.orderUuid;
   const isChatOpen = activeChatOrderUuid === order.orderUuid;
   const customerId = String(order.customerId);
@@ -421,9 +481,9 @@ const OrderCard = ({
   const renderActionButtons = () => {
     const nextActions = STATUS_CONFIG[order.status]?.nextActions || [];
     const actionMap: Record<OrderStatus, { label: string; variant: 'primary' | 'secondary' }> = {
-      order_received: { label: '✓ Confirm Order Received', variant: 'primary' },
-      payment_received: { label: '💰 Confirm Payment Received', variant: 'secondary' },
-      delivery_pending: { label: '📦 Mark as Delivered', variant: 'primary' },
+      order_received: { label: 'Receive Order', variant: 'primary' },
+      payment_received: { label: 'Verify Payment Cleared', variant: 'secondary' },
+      delivery_pending: { label: 'Confirm Transport Completed', variant: 'primary' },
     };
 
     return nextActions.map(action => {
@@ -444,98 +504,128 @@ const OrderCard = ({
 
   const getStatusMessage = () => {
     const messages: Record<OrderStatus, string> = {
-      placed: 'Order placed; confirm receipt to proceed.',
-      order_received: 'You confirmed receipt; the customer can now proceed with payment.',
-      quoted: 'A new price has been quoted for the customer to review.',
-      quote_accepted: 'The customer accepted the quote. You can now continue with payment and delivery steps.',
-      payment_done: 'Customer marked payment done; confirm receipt to continue.',
-      payment_received: 'Payment confirmed; now mark the order as delivered to the customer.',
-      delivery_pending: 'Delivery marked completed; waiting for customer confirmation.',
-      delivered: 'This order has been successfully delivered.',
+      placed: 'New order requested. Please acknowledge to proceed.',
+      order_received: 'Order acknowledged. The customer will process the transaction transfer.',
+      quoted: 'Pending customer review of the newly updated service price.',
+      quote_accepted: 'Quote accepted. Customer was notified to complete the payment.',
+      payment_done: 'Customer marked transaction completed. Verify your account and confirm.',
+      payment_received: 'Payment confirmed. Please dispatch delivery and mark transport complete.',
+      delivery_pending: 'Transport dispatched. Waiting for client to confirm delivery receipt.',
+      delivered: 'Order fully closed and delivered successfully.',
     };
     return messages[order.status] || 'Processing...';
   };
 
   return (
-    <div className={`rounded-2xl border p-5 shadow-sm ${borderColor} ${bgColor}`}>
+    <div className={`border shadow-sm p-6 ${cardBg}`} style={{ borderRadius: '2px' }}>
+      
       {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between border-b pb-4 dark:border-gray-800">
         <div className="flex-1">
-          <div className="flex flex-wrap items-center gap-2 mb-1">
-            <h2 className={`text-lg font-semibold ${textColor}`}>Order {order.orderUuid}</h2>
+          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+            <h2 className="text-base font-bold uppercase tracking-tight">Order #{order.orderUuid.slice(0, 12).toUpperCase()}</h2>
             <StatusBadge status={order.status} darkMode={darkMode} />
           </div>
-          <p className={`text-sm ${secondaryTextColor}`}>Customer: {order.customerName}</p>
+          <p className="text-sm font-semibold">{order.customerName}</p>
           {order.customerEmail && (
-            <p className={`text-sm ${secondaryTextColor}`}>Email: {order.customerEmail}</p>
+            <p className={`text-xs ${secondaryTextColor} mt-0.5`}>{order.customerEmail}</p>
           )}
-          <button
-            onClick={handleChatToggle}
-            className="mt-3 inline-flex items-center gap-2 rounded-lg bg-hafi-teal px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-hafi-green"
-          >
-            💬 Chat with customer{unreadCount > 0 && ` (${unreadCount} new)`}
-          </button>
-          <div className="mt-3 text-xs space-y-0.5">
-            <p className={secondaryTextColor}>Placed: {new Date(order.createdAt).toLocaleString()}</p>
-            {order.updatedAt && <p>Updated: {new Date(order.updatedAt).toLocaleString()}</p>}
-            {order.customerPaymentDoneAt && <p>Payment marked: {new Date(order.customerPaymentDoneAt).toLocaleString()}</p>}
-            {order.customerAcknowledgedAt && <p>Delivery confirmed: {new Date(order.customerAcknowledgedAt).toLocaleString()}</p>}
+
+          <div className="mt-3 w-full max-w-xs">
+            <style>{`
+              @keyframes chat-shake {
+                0%, 100% { transform: scale(1); }
+                10%, 30%, 50%, 70%, 90% { transform: scale(1.02) rotate(-0.5deg); }
+                20%, 40%, 60%, 80% { transform: scale(1.02) rotate(0.5deg); }
+              }
+              @keyframes chat-pulse {
+                0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+                70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+              }
+              .chat-wave-shake {
+                animation: chat-shake 4s infinite ease-in-out, chat-pulse 2s infinite;
+              }
+            `}</style>
+            <button
+              onClick={handleChatToggle}
+              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[11px] font-black uppercase tracking-widest shadow-md chat-wave-shake hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2"
+              style={{ borderRadius: '2px' }}
+            >
+              <MessageSquare className="w-4 h-4 animate-bounce" />
+              <span>Chat with client {unreadCount > 0 ? `(${unreadCount} New)` : ''}</span>
+            </button>
+          </div>
+
+          <div className={`mt-3 text-[10px] font-bold uppercase tracking-wide space-y-1 ${secondaryTextColor}`}>
+            <div className="flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5 text-gray-500" />
+              <span>Placed: {new Date(order.createdAt).toLocaleString()}</span>
+            </div>
+            {order.customerPaymentDoneAt && <p className="text-amber-500">Payment notified: {new Date(order.customerPaymentDoneAt).toLocaleString()}</p>}
+            {order.customerAcknowledgedAt && <p className="text-emerald-500">Delivery acknowledged: {new Date(order.customerAcknowledgedAt).toLocaleString()}</p>}
           </div>
         </div>
-        <div className={`text-right ${textColor}`}>
-          <div className="text-sm">Subtotal: RWF {Number(order.subtotal).toLocaleString()}</div>
-          <div className="text-lg font-bold">Total: RWF {Number(order.total).toLocaleString()}</div>
+
+        <div className="text-left sm:text-right">
+          <div className={`text-xs ${secondaryTextColor} uppercase tracking-wider font-bold`}>Quote Sum</div>
+          <div className="text-xl font-bold text-emerald-500">RWF {Number(order.total).toLocaleString()}</div>
+          <div className={`text-[10px] ${secondaryTextColor} uppercase tracking-wider font-bold mt-0.5`}>Subtotal: RWF {Number(order.subtotal).toLocaleString()}</div>
         </div>
       </div>
 
-      {/* Main Content Grid */}
-      <div className={`mt-4 grid gap-4 ${isChatOpen ? 'md:grid-cols-[1fr_360px_280px]' : 'md:grid-cols-[1fr_280px]'}`}>
-        {/* Left Column - Items */}
+      {/* Grid contents */}
+      <div className={`mt-4 grid gap-6 ${isChatOpen ? 'lg:grid-cols-[1fr_360px_320px]' : 'lg:grid-cols-[1fr_320px]'}`}>
+        
+        {/* Column 1 - Items */}
         <div className="space-y-4">
-          <div className={`rounded-xl border px-4 py-3 text-sm ${borderColor} ${darkMode ? 'bg-gray-900/20 text-gray-200' : 'bg-gray-50 text-gray-700'}`}>
-            ℹ️ Transport and delivery are negotiated directly between the customer and the service provider.
+          <div className={`p-3 text-[11px] leading-relaxed border border-emerald-500/15 bg-emerald-500/5 text-gray-500`} style={{ borderRadius: '2px' }}>
+            <div className="flex items-center gap-1 font-bold uppercase tracking-wider text-emerald-500 mb-1">
+              <Truck className="w-3.5 h-3.5" />
+              <span>Transport & Delivery</span>
+            </div>
+            Negotiate delivery coordinates and transport terms directly with the customer.
           </div>
 
-          <div className={`rounded-xl border ${borderColor} ${darkMode ? 'bg-gray-900/40' : 'bg-gray-50'}`}>
+          <div className={`border divide-y ${borderColor}`} style={{ borderRadius: '2px' }}>
             {order.items.map((item, idx) => (
-              <div key={idx} className={`border-b last:border-b-0 p-4 ${idx > 0 ? 'border-t' : ''}`}>
-                <div className="flex gap-3">
-                  <img src={item.image} alt={item.name} className="h-14 w-14 rounded-lg object-cover flex-shrink-0" />
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className={`font-semibold ${textColor}`}>{item.name}</p>
-                        {item.description && (
-                          <p className={`text-sm ${secondaryTextColor} mt-0.5`}>{item.description}</p>
-                        )}
-                        <p className={`text-sm ${secondaryTextColor} mt-1`}>
-                          Qty {item.quantity} {item.size && `· Size ${item.size}`}
-                        </p>
-                      </div>
-                      <div className={`text-sm font-semibold ${textColor}`}>
-                        RWF {(item.price * item.quantity).toLocaleString()}
-                      </div>
+              <div key={idx} className="p-4 flex gap-4">
+                <img src={item.image} alt={item.name} className="h-14 w-14 border dark:border-gray-800 object-cover shrink-0" style={{ borderRadius: '2px' }} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm font-bold uppercase tracking-tight truncate">{item.name}</p>
+                      {item.description && (
+                        <p className={`text-xs ${secondaryTextColor} mt-0.5`}>{item.description}</p>
+                      )}
+                      <p className={`text-xs ${secondaryTextColor} mt-1`}>
+                        Qty: <strong className="text-emerald-500 font-bold">{item.quantity}</strong> {item.size && ` · Size: ${item.size}`}
+                      </p>
                     </div>
-                    {item.type === 'service' && (
-                      <QuoteSection
-                        item={item}
-                        orderUuid={order.orderUuid}
-                        orderStatus={order.status}
-                        onQuote={(itemId, price) => onQuoteItem(order.orderUuid, itemId, price)}
-                        saving={isSaving}
-                        darkMode={darkMode}
-                      />
-                    )}
+                    <div className="text-sm font-semibold shrink-0">
+                      RWF {(item.price * item.quantity).toLocaleString()}
+                    </div>
                   </div>
+
+                  {item.type === 'service' && (
+                    <QuoteSection
+                      item={item}
+                      orderUuid={order.orderUuid}
+                      orderStatus={order.status}
+                      onQuote={(itemId, price) => onQuoteItem(order.orderUuid, itemId, price)}
+                      saving={isSaving}
+                      darkMode={darkMode}
+                    />
+                  )}
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Middle Column - Chat (conditional) */}
+        {/* Column 2 - Chat Box */}
         {isChatOpen && (
-          <div className={`rounded-xl border p-3 ${borderColor} ${darkMode ? 'bg-gray-900/20' : 'bg-gray-50'}`}>
+          <div className={`border p-3 ${borderColor} ${darkMode ? 'bg-gray-955' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
             <ChatBox
               providerId={providerId}
               customerId={customerId}
@@ -547,23 +637,77 @@ const OrderCard = ({
           </div>
         )}
 
-        {/* Right Column - Actions */}
+        {/* Column 3 - Actions */}
         <div className="space-y-4">
-          <div className={`rounded-xl border p-4 ${borderColor} ${darkMode ? 'bg-gray-900/20' : 'bg-gray-50'}`}>
-            <div className="text-sm text-gray-500 mb-1">Order total</div>
-            <div className={`text-2xl font-bold ${textColor}`}>RWF {Number(order.total).toLocaleString()}</div>
-            <div className={`mt-1 text-sm ${secondaryTextColor}`}>Subtotal: RWF {Number(order.subtotal).toLocaleString()}</div>
+          <div className={`border p-4 ${borderColor} ${darkMode ? 'bg-gray-950/20' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Receipt Summary</div>
+            <div className="text-xl font-bold text-emerald-500">RWF {Number(order.total).toLocaleString()}</div>
+            <div className={`text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-0.5`}>Subtotal: RWF {Number(order.subtotal).toLocaleString()}</div>
           </div>
 
-          <div className={`rounded-xl border p-4 ${borderColor} ${darkMode ? 'bg-gray-900/20' : 'bg-gray-50'}`}>
+          <div className={`border p-4 ${borderColor} ${darkMode ? 'bg-gray-950/20' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
             <div className="space-y-3">
               {renderActionButtons()}
             </div>
-            <div className={`mt-4 rounded-xl border px-4 py-3 text-sm ${borderColor} ${darkMode ? 'bg-gray-900/20 text-gray-200' : 'bg-gray-50 text-gray-700'}`}>
+            
+            <div className={`mt-4 p-3 border text-[11px] leading-relaxed ${borderColor} ${darkMode ? 'bg-gray-955 text-gray-400' : 'bg-gray-50 text-gray-650'}`} style={{ borderRadius: '2px' }}>
+              <div className="flex items-center gap-1 font-bold uppercase tracking-wider text-emerald-500 mb-1">
+                <Info className="w-3.5 h-3.5" />
+                <span>Next Action Notes</span>
+              </div>
               {getStatusMessage()}
             </div>
           </div>
+
+          {/* Client Information Card */}
+          <div className={`border p-4 text-xs space-y-2 ${borderColor} ${darkMode ? 'bg-gray-955 text-gray-300' : 'bg-gray-50 text-gray-800'}`} style={{ borderRadius: '2px' }}>
+            <div className="font-bold text-[10px] uppercase tracking-widest text-emerald-500 border-b pb-1.5 dark:border-gray-800">Client Information</div>
+            <div className="space-y-1.5 mt-2">
+              <div className="flex justify-between items-center">
+                <span className={secondaryTextColor}>Name:</span>
+                <span className="font-bold text-emerald-500">{order.customerName}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className={secondaryTextColor}>Phone:</span>
+                {customer?.phone_number ? (
+                  <a href={`tel:${customer.phone_number}`} className="font-semibold text-emerald-500 hover:underline">
+                    {customer.phone_number}
+                  </a>
+                ) : (
+                  <span className="font-semibold text-gray-500">Not Available</span>
+                )}
+              </div>
+              <div className="flex justify-between items-center">
+                <span className={secondaryTextColor}>WhatsApp:</span>
+                {customer?.whatsapp_number ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const phone = customer.whatsapp_number.replace(/\D/g, '');
+                      if (phone) window.open(`https://wa.me/${phone}`, '_blank', 'noopener,noreferrer');
+                    }}
+                    className="font-semibold text-emerald-500 hover:underline"
+                  >
+                    {customer.whatsapp_number}
+                  </button>
+                ) : (
+                  <span className="font-semibold text-gray-500">Not Available</span>
+                )}
+              </div>
+              <div className="flex justify-between items-center">
+                <span className={secondaryTextColor}>Email:</span>
+                <span className="font-semibold select-all">{order.customerEmail || customer?.email || 'Not Available'}</span>
+              </div>
+              <div className="flex justify-between items-start gap-2">
+                <span className={secondaryTextColor}>Address:</span>
+                <div className="max-w-[180px] break-words">
+                  {formatAddress(customer?.address || customer?.location)}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
   );
@@ -578,6 +722,60 @@ export default function ProviderOrdersPage() {
   
   const [savingOrderUuid, setSavingOrderUuid] = useState<string | null>(null);
   const [activeChatOrderUuid, setActiveChatOrderUuid] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'all' | 'new' | 'unpaid' | 'payment_sent' | 'processing' | 'completed'>('all');
+  const [customerContacts, setCustomerContacts] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    let mounted = true;
+    const ids = Array.from(new Set(orders.map(order => String(order.customerId)).filter(Boolean)));
+    if (!ids.length) return;
+
+    const fetchFor = async (id: string) => {
+      try {
+        const res = await fetch(`${API_BASE}/api/providers/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (mounted) {
+            setCustomerContacts(prev => ({ ...prev, [id]: data }));
+          }
+        }
+      } catch {
+        // ignore errors
+      }
+    };
+
+    ids.forEach(id => {
+      if (!customerContacts[id]) {
+        fetchFor(id);
+      }
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, [orders, customerContacts]);
+
+  const sortedOrders = useMemo(() => {
+    return [...orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [orders]);
+
+  const filteredOrders = useMemo(() => {
+    return sortedOrders.filter(order => {
+      if (activeTab === 'all') return true;
+      if (activeTab === 'new') return order.status === 'placed';
+      if (activeTab === 'unpaid') return ['order_received', 'quoted', 'quote_accepted'].includes(order.status);
+      if (activeTab === 'payment_sent') return order.status === 'payment_done';
+      if (activeTab === 'processing') return ['payment_received', 'delivery_pending'].includes(order.status);
+      if (activeTab === 'completed') return order.status === 'delivered';
+      return true;
+    });
+  }, [sortedOrders, activeTab]);
+
+  useEffect(() => {
+    if (token) {
+      fetchOrders();
+    }
+  }, [token]);
 
   const summary = useMemo(() => ({
     total: orders.length,
@@ -620,44 +818,44 @@ export default function ProviderOrdersPage() {
     }));
   };
 
-  const bgColor = darkMode ? 'bg-gray-900' : 'bg-white';
-  const textColor = darkMode ? 'text-gray-100' : 'text-gray-800';
-  const secondaryTextColor = darkMode ? 'text-gray-300' : 'text-gray-600';
-  const borderColor = darkMode ? 'border-gray-700' : 'border-gray-200';
-  const cardBg = darkMode ? 'bg-gray-800' : 'bg-white';
+  const bgColor = darkMode ? 'bg-gray-955 text-gray-100' : 'bg-gray-50 text-gray-900';
+  const secondaryTextColor = darkMode ? 'text-gray-400' : 'text-gray-650';
 
   return (
     <div className={`p-6 max-w-7xl mx-auto min-h-screen ${bgColor}`}>
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
-          <h1 className={`text-3xl font-bold ${darkMode ? 'text-hafi-teal-light' : 'text-hafi-teal'}`}>
-            Provider Orders
+          <h1 className="text-2xl font-bold uppercase tracking-tight flex items-center gap-2">
+            <FileText className="w-6 h-6 text-emerald-500" />
+            <span>Provider Dashboard Orders</span>
           </h1>
-          <p className={`mt-1 ${secondaryTextColor}`}>
-            Manage client orders, confirm receipt, confirm payment, and mark deliveries completed.
+          <p className={`text-xs uppercase tracking-wider font-semibold ${secondaryTextColor} mt-1`}>
+            Manage incoming client orders, review service quotes, and confirm transactions
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
             to="/dashboard"
-            className={`inline-flex items-center justify-center rounded-lg px-4 py-2 font-semibold transition-colors ${
-              darkMode
-                ? 'bg-hafi-teal/20 text-white hover:bg-hafi-teal/35'
-                : 'bg-hafi-teal text-white hover:bg-hafi-green'
-            }`}
+            className={`inline-flex items-center justify-center border text-xs font-bold uppercase tracking-wider px-4 py-2 transition-all hover:scale-102
+              ${darkMode 
+                ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-850' 
+                : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50 shadow-sm'}`}
+            style={{ borderRadius: '2px' }}
           >
-            ← Back to Dashboard
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
           </Link>
           <button
             onClick={fetchOrders}
-            className={`inline-flex items-center justify-center rounded-lg px-4 py-2 font-semibold transition-colors ${
-              darkMode
-                ? 'border border-gray-600 text-gray-100 hover:bg-gray-800'
-                : 'border border-gray-300 text-gray-800 hover:bg-gray-100'
-            }`}
+            className={`inline-flex items-center justify-center border text-xs font-bold uppercase tracking-wider px-4 py-2 transition-all hover:scale-102
+              ${darkMode 
+                ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-850' 
+                : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50 shadow-sm'}`}
+            style={{ borderRadius: '2px' }}
           >
-            🔄 Refresh
+            <RefreshCw className="w-3.5 h-3.5 mr-2" />
+            Refresh
           </button>
         </div>
       </div>
@@ -667,31 +865,81 @@ export default function ProviderOrdersPage() {
 
       {/* Orders List */}
       {loading ? (
-        <div className={`rounded-2xl border p-10 text-center ${borderColor} ${cardBg}`}>
-          <p className={secondaryTextColor}>Loading provider orders...</p>
+        <div className="py-16">
+          <LoadingSpinner size="lg" message="Loading received orders..." variant="dots" />
         </div>
       ) : error ? (
-        <div className={`rounded-2xl border p-8 text-center ${borderColor} ${cardBg}`}>
-          <p className={`text-lg font-semibold ${textColor}`}>Could not load provider orders</p>
-          <p className={`mt-2 ${secondaryTextColor}`}>{error}</p>
+        <div className={`border p-8 text-center bg-gray-900/10`} style={{ borderRadius: '2px' }}>
+          <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-3" />
+          <p className="font-bold uppercase tracking-wider text-sm text-red-500">Could not load provider orders</p>
+          <p className={`text-xs mt-1 ${secondaryTextColor}`}>{error}</p>
           <button
             onClick={fetchOrders}
-            className="mt-4 rounded-lg bg-hafi-teal px-4 py-2 text-white hover:bg-hafi-green"
+            className="mt-4 rounded bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider px-4 py-2"
+            style={{ borderRadius: '2px' }}
           >
             Try Again
           </button>
         </div>
       ) : orders.length === 0 ? (
-        <div className={`rounded-2xl border p-10 text-center ${borderColor} ${cardBg}`}>
-          <p className={`text-lg font-semibold ${textColor}`}>No provider orders yet</p>
-          <p className={`mt-2 ${secondaryTextColor}`}>
-            Orders from customers will appear here once they place them.
+        <div className={`border p-12 text-center flex flex-col items-center justify-center`} style={{ borderRadius: '2px' }}>
+          <Package className="w-12 h-12 text-gray-500 mb-3 opacity-30" />
+          <p className="font-bold uppercase tracking-wider text-sm text-gray-500">No orders yet</p>
+          <p className={`text-xs mt-1 ${secondaryTextColor}`}>
+            Customer order requests will populate here automatically.
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {orders.map(order => (
-            <OrderCard
+        <div className="space-y-6">
+          {/* Tabs Filter */}
+          <div className="flex flex-wrap gap-2 border-b dark:border-gray-800 pb-4">
+            {[
+              { id: 'all', label: 'All Orders', count: orders.length },
+              { id: 'new', label: 'New Orders', count: orders.filter(o => o.status === 'placed').length },
+              { id: 'unpaid', label: 'Awaiting Payment', count: orders.filter(o => ['order_received', 'quoted', 'quote_accepted'].includes(o.status)).length },
+              { id: 'payment_sent', label: 'Payment Sent', count: orders.filter(o => o.status === 'payment_done').length },
+              { id: 'processing', label: 'Processing', count: orders.filter(o => ['payment_received', 'delivery_pending'].includes(o.status)).length },
+              { id: 'completed', label: 'Completed', count: orders.filter(o => o.status === 'delivered').length },
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200 border flex items-center gap-2
+                  ${activeTab === tab.id
+                    ? 'bg-emerald-500 border-emerald-500 text-white'
+                    : darkMode
+                      ? 'bg-gray-900 border-gray-800 text-gray-400 hover:text-white hover:bg-gray-850'
+                      : 'bg-white border-gray-250 text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                style={{ borderRadius: '2px' }}
+              >
+                <span>{tab.label}</span>
+                <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold
+                  ${activeTab === tab.id
+                    ? 'bg-emerald-600 text-white'
+                    : darkMode
+                      ? 'bg-gray-850 text-gray-500'
+                      : 'bg-gray-100 text-gray-500'
+                  }`}
+                >
+                  {tab.count}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {filteredOrders.length === 0 ? (
+            <div className={`border p-12 text-center flex flex-col items-center justify-center`} style={{ borderRadius: '2px' }}>
+              <Package className="w-12 h-12 text-gray-500 mb-3 opacity-30" />
+              <p className="font-bold uppercase tracking-wider text-sm text-gray-500">No orders found</p>
+              <p className={`text-xs mt-1 ${secondaryTextColor}`}>
+                There are no orders matching this filter tab.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {filteredOrders.map(order => (
+                <OrderCard
               key={order.orderUuid}
               order={order}
               providerId={String(user?.id ?? '')}
@@ -702,9 +950,12 @@ export default function ProviderOrdersPage() {
               onToggleChat={handleToggleChat}
               customerChatCounts={customerChatCounts}
               onClearUnreadCount={handleClearUnreadCount}
+              customer={customerContacts[String(order.customerId)]}
               darkMode={darkMode}
             />
-          ))}
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

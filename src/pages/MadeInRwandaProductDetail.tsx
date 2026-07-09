@@ -1,18 +1,67 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { useCart } from '../context/CartContext';
 import ProductOrServiceDetail from "./ProductOrServiceDetail";
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
+const toAbsoluteMediaUrl = (rawUrl?: string | null) => {
+    if (!rawUrl) return '';
+
+    let trimmed = String(rawUrl).trim().replace(/\\/g, '/');
+    if (!trimmed) return '';
+
+    // Extract nested URL if it's double-prefixed (e.g. http://localhost:5000/https://res.cloudinary.com/...)
+    const nestedHttpIndex = trimmed.indexOf('http', 4);
+    if (nestedHttpIndex !== -1) {
+        trimmed = trimmed.substring(nestedHttpIndex);
+    }
+
+    const uploadsIndex = trimmed.toLowerCase().indexOf('uploads/');
+    if (uploadsIndex !== -1 && /^https?:\/\//i.test(trimmed)) {
+        trimmed = API_BASE + '/' + trimmed.substring(uploadsIndex);
+    }
+
+    if (/^(https?:|blob:|data:)/i.test(trimmed)) {
+        return trimmed;
+    }
+
+    if (trimmed.startsWith('/')) {
+        return `${API_BASE}${trimmed}`;
+    }
+
+    return `${API_BASE}/${trimmed.replace(/^\/+/, '')}`;
+};
+
 export default function MadeInRwandaProductDetail() {
     const { productId } = useParams();
     const [product, setProduct] = useState<any>(null);
+    const [provider, setProvider] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState<string | undefined>(undefined);
 
     const { addToCart } = useCart();
     const [quantity, setQuantity] = useState(1);
+
+    useEffect(() => {
+        if (!product) return;
+        const provId = product.providerId || product.provider_id || product.seller_id;
+        if (!provId) return;
+
+        const fetchProvider = async () => {
+            try {
+                const res = await fetch(`${API_BASE}/api/providers/${provId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setProvider(data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch provider profile info:", err);
+            }
+        };
+        fetchProvider();
+    }, [product]);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -97,25 +146,39 @@ export default function MadeInRwandaProductDetail() {
         setMessage('Product added to cart successfully');
     };
 
-    if (loading) return <div className="p-10 text-center">Loading...</div>;
+    if (loading) {
+        return (
+            <div className="py-16">
+                <LoadingSpinner size="lg" message="Loading product details..." variant="dots" />
+            </div>
+        );
+    }
     if (!product) return <div className="p-10 text-center text-red-600">Product not found</div>;
 
     // Extract all media (views + videos from mediaFiles)
     const allMedia: string[] = [];
 
+    // Always include main image URL first
+    const mainImage = toAbsoluteMediaUrl(product.image_url);
+    if (mainImage) {
+        allMedia.push(mainImage);
+    }
+
     // Add views
-    if (product.views) {
-        allMedia.push(...product.views);
+    if (product.views && Array.isArray(product.views)) {
+        const viewUrls = product.views
+            .map((v: any) => toAbsoluteMediaUrl(v))
+            .filter((url: string) => url && url !== mainImage);
+        allMedia.push(...viewUrls);
     }
 
     // Add videos from mediaFiles
-    if (product.mediaFiles) {
-        product.mediaFiles.forEach((media: any) => {
-            if (media.type === 'video') {
-                const videoUrl = media.url.startsWith('http') ? media.url : `${API_BASE}${media.url}`;
-                allMedia.push(videoUrl);
-            }
-        });
+    if (product.mediaFiles && Array.isArray(product.mediaFiles)) {
+        const videoUrls = product.mediaFiles
+            .filter((media: any) => media.type === 'video' || media.type === 'video')
+            .map((media: any) => toAbsoluteMediaUrl(media.url))
+            .filter((url: string) => url && url !== mainImage);
+        allMedia.push(...videoUrls);
     }
 
     return (
@@ -125,13 +188,20 @@ export default function MadeInRwandaProductDetail() {
                 title={product.title}
                 description={product.description}
                 price={product.price}
-                imageUrl={product.image_url}
+                imageUrl={toAbsoluteMediaUrl(product.image_url)}
                 imageViews={allMedia}
                 quantity={quantity}
                 setQuantity={setQuantity}
                 onAddToCart={handleAddToCart}
                 message={message}
                 type={product.type}
+                providerId={product.providerId || product.provider_id || product.seller_id}
+                providerName={provider?.name}
+                providerEmail={provider?.email}
+                providerPhone={provider?.phone_number}
+                providerWhatsapp={provider?.whatsapp_number}
+                providerProfileImage={toAbsoluteMediaUrl(provider?.profile_image || provider?.profile_image_url)}
+                madeInRwanda={product.madeInRwanda || product.made_in_rwanda || true}
             />
             {/* Made in Rwanda Badge in sidebar */}
             {product.madeInRwanda && (

@@ -3,7 +3,36 @@ import { FaEnvelope, FaPhone, FaWhatsapp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
+
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+
+const toAbsoluteMediaUrl = (rawUrl?: string | null) => {
+  if (!rawUrl) return '';
+
+  let trimmed = String(rawUrl).trim().replace(/\\/g, '/');
+  if (!trimmed) return '';
+
+  // Extract nested URL if it's double-prefixed (e.g. http://localhost:5000/https://res.cloudinary.com/...)
+  const nestedHttpIndex = trimmed.indexOf('http', 4);
+  if (nestedHttpIndex !== -1) {
+    trimmed = trimmed.substring(nestedHttpIndex);
+  }
+
+  const uploadsIndex = trimmed.toLowerCase().indexOf('uploads/');
+  if (uploadsIndex !== -1 && /^https?:\/\//i.test(trimmed)) {
+    trimmed = API_BASE + '/' + trimmed.substring(uploadsIndex);
+  }
+
+  if (/^(https?:|blob:|data:)/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith('/')) {
+    return `${API_BASE}${trimmed}`;
+  }
+
+  return `${API_BASE}/${trimmed.replace(/^\/+/, '')}`;
+};
 interface ProductOrServiceDetailProps {
   productId: string;
   title: string;
@@ -39,6 +68,8 @@ interface ProductOrServiceDetailProps {
   providerPhone?: string;
   providerWhatsapp?: string;
   providerProfileImage?: string;
+  madeInRwanda?: boolean;
+  viewMorePath?: string;
 }
 
 
@@ -62,6 +93,8 @@ export default function ProductOrServiceDetail({
   providerPhone,
   providerWhatsapp,
   providerProfileImage,
+  madeInRwanda,
+  viewMorePath,
 }: ProductOrServiceDetailProps) {
   const [quantity, setQuantity] = useState(minQuantity);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -154,7 +187,16 @@ export default function ProductOrServiceDetail({
                 </h3>
                 <button
                   type="button"
-                  onClick={() => providerId && navigate(`/provider/${providerId}/uploads`)}
+                  onClick={() => {
+                    if (!providerId) return;
+                    if (viewMorePath) {
+                      navigate(viewMorePath);
+                    } else if (madeInRwanda) {
+                      navigate(`/made-in-rwanda?providerId=${providerId}`);
+                    } else {
+                      navigate(`/provider/${providerId}/uploads`);
+                    }
+                  }}
                   className={`mt-2 inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold transition-colors md:w-auto w-full
                       ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
                         : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
@@ -216,7 +258,7 @@ export default function ProductOrServiceDetail({
               {isVideo(img) ? (
                 <div className="relative w-full h-full max-h-80">
                   <video
-                    src={img.startsWith("http") ? img : `${API_BASE}${img}`}
+                    src={toAbsoluteMediaUrl(img)}
                     className="object-cover w-full h-full max-h-80"
                     preload="metadata"
                     muted
@@ -231,7 +273,7 @@ export default function ProductOrServiceDetail({
                 </div>
               ) : (
                 <img
-                  src={img.startsWith("http") ? img : `${API_BASE}${img}`}
+                  src={toAbsoluteMediaUrl(img)}
                   alt={`${title} view ${index + 1}`}
                   className="object-cover w-full h-full max-h-80 transition duration-300"
                 />
@@ -259,7 +301,7 @@ export default function ProductOrServiceDetail({
                 {isVideo(img) ? (
                   <div className="relative w-full h-full max-h-32">
                     <video
-                      src={img.startsWith("http") ? img : `${API_BASE}${img}`}
+                      src={toAbsoluteMediaUrl(img)}
                       className="object-cover w-full h-full max-h-32"
                       preload="metadata"
                       muted
@@ -274,7 +316,7 @@ export default function ProductOrServiceDetail({
                   </div>
                 ) : (
                   <img
-                    src={img.startsWith("http") ? img : `${API_BASE}${img}`}
+                    src={toAbsoluteMediaUrl(img)}
                     alt={`${title} view ${index + 3}`}
                     className="object-cover w-full h-full max-h-32 transition duration-300"
                   />
@@ -426,18 +468,14 @@ export default function ProductOrServiceDetail({
           <div className="relative max-w-full max-h-full">
             {isVideo(allImages[currentImageIndex]) ? (
               <video
-                src={allImages[currentImageIndex].startsWith("http")
-                  ? allImages[currentImageIndex]
-                  : `${API_BASE}${allImages[currentImageIndex]}`}
+                src={toAbsoluteMediaUrl(allImages[currentImageIndex])}
                 controls
                 autoPlay={false}
                 className="max-w-full max-h-[90vh] object-contain"
               />
             ) : (
               <img
-                src={allImages[currentImageIndex].startsWith("http")
-                  ? allImages[currentImageIndex]
-                  : `${API_BASE}${allImages[currentImageIndex]}`}
+                src={toAbsoluteMediaUrl(allImages[currentImageIndex])}
                 alt={`${title} full view`}
                 className="max-w-full max-h-[90vh] object-contain"
               />

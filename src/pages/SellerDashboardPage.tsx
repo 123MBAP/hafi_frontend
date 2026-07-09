@@ -24,6 +24,19 @@ interface Product {
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
+const getUrl = (path: string | undefined | null) => {
+  if (!path) return '';
+  const trimmed = String(path).trim();
+  if (/^(https?:|blob:|data:)/i.test(trimmed)) {
+    return trimmed;
+  }
+  const normalized = trimmed.replace(/\\/g, '/');
+  if (normalized.startsWith('/')) {
+    return `${API_BASE}${normalized}`;
+  }
+  return `${API_BASE}/${normalized}`;
+};
+
 function uploadWithProgress(
   method: string,
   url: string,
@@ -70,6 +83,7 @@ export default function SellerDashboardPage() {
   const { darkMode } = useDarkMode();
   // const [darkMode, setDarkMode] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [selectedCategoryIds, setSelected] = useState<string[]>([]);
   const [showForm, setShowForm] = useState<Record<string, boolean>>({});
   const [productForms, setProductForms] = useState<Record<string, Product>>({});
@@ -105,11 +119,11 @@ export default function SellerDashboardPage() {
     if (editingProduct) {
       setEditForm(editingProduct);
       setEditMainFile(null);
-      setEditPreviewMain(editingProduct.image_url || "");
+      setEditPreviewMain(getUrl(editingProduct.image_url));
       setEditViewFiles([]);
-      setEditPreviewViews(editingProduct.views || []);
+      setEditPreviewViews(editingProduct.views?.map(v => getUrl(v)) || []);
       setEditVideoFile(null);
-      setEditPreviewVideo(editingProduct.video_url || "");
+      setEditPreviewVideo(getUrl(editingProduct.video_url));
       setEditMadeInRwanda(editingProduct.madeInRwanda || false);
     } else {
       setEditForm(null);
@@ -134,6 +148,7 @@ export default function SellerDashboardPage() {
     form.append("description", editForm.description);
     form.append("price", editForm.price);
     form.append("madeInRwanda", String(editMadeInRwanda));
+    form.append("categoryId", editForm.category_id || "uncategorized");
 
     if (editMainFile) {
       form.append("image", editMainFile);
@@ -155,14 +170,8 @@ export default function SellerDashboardPage() {
         }
       );
 
-      // Update local product state
-      setProductUploads(prev => {
-        const next = { ...prev };
-        for (const cid in next) {
-          next[cid] = next[cid].map(p => p.id === editingProduct.id ? data.product : p);
-        }
-        return next;
-      });
+      // Re-fetch products to ensure correct grouping
+      await loadProducts();
 
       setEditingProduct(null);
     } catch (err) {
@@ -189,6 +198,19 @@ export default function SellerDashboardPage() {
         console.log("DEBUG: Fetched profileData:", profileData);
         if (!active) return;
         setSellerProfile(profileData);
+
+        // Always fetch all product upload categories for selection dropdowns
+        try {
+          const allCatRes = await fetch(`${API_BASE}/api/upload/categories?type=product`);
+          if (allCatRes.ok) {
+            const allCatData = await allCatRes.json();
+            if (allCatData.uploadCategories) {
+              setAllCategories(allCatData.uploadCategories);
+            }
+          }
+        } catch (e) {
+          console.error("Error fetching all categories:", e);
+        }
 
         // 2. Determine categories
         if (profileData.shopping_type_id && profileData.shopping_type_key !== 'other') {
@@ -230,30 +252,40 @@ export default function SellerDashboardPage() {
     return () => { active = false; };
   }, [fetchWithAutoLogout]);
 
-  // Get products (unchanged logic)
-  useEffect(() => {
-    if (categories.length === 0) return;
-    (async () => {
-      try {
-        const res = await fetch(`${API_BASE}/api/seller/products/images`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        if (res.ok && Array.isArray(data.products)) {
-          const grouped: Record<string, Product[]> = {};
+  const loadProducts = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/seller/products/images`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.products)) {
+        const isPremium = sellerProfile?.shopping_type_id && sellerProfile.shopping_type_key !== 'other';
+        const grouped: Record<string, Product[]> = {};
+
+        if (isPremium) {
+          const mainCid = String(sellerProfile.shopping_type_id);
+          grouped[mainCid] = data.products;
+        } else {
           data.products.forEach((p: Product) => {
-            const catId = String(p.category_id);
+            const catId = String(p.category_id || 'uncategorized');
             if (!grouped[catId]) grouped[catId] = [];
             grouped[catId].push(p);
           });
-          setProductUploads(grouped);
-          setOriginalUploads(grouped);
         }
-      } catch (err) {
-        console.error("❌ Failed to load products:", err);
+        setProductUploads(grouped);
+        setOriginalUploads(grouped);
       }
-    })();
-  }, [categories, token]);
+    } catch (err) {
+      console.error("❌ Failed to load products:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      loadProducts();
+    }
+  }, [categories, token, sellerProfile]);
 
   // Load current subscription/plan restrictions for this seller
   useEffect(() => {
@@ -330,7 +362,10 @@ export default function SellerDashboardPage() {
     form.append("title", product.title);
     form.append("description", product.description);
     form.append("price", product.price);
-    form.append("categoryId", cid);
+    
+    const isPremium = sellerProfile?.shopping_type_id && sellerProfile.shopping_type_key !== 'other';
+    const targetCategoryId = product.category_id || (isPremium ? "uncategorized" : cid);
+    form.append("categoryId", targetCategoryId);
     form.append("image", main);
     (viewFiles[cid] || []).forEach(f => form.append("views", f));
     if (videoFiles[cid]) form.append("video", videoFiles[cid]!);
@@ -349,11 +384,8 @@ export default function SellerDashboardPage() {
         }
       );
 
-      // Update UI
-      setProductUploads(prev => ({
-        ...prev,
-        [cid]: [...(prev[cid] || []), data.product]
-      }));
+      // Re-fetch products to ensure correct grouping
+      await loadProducts();
       resetForm(cid);
     } catch (err) {
       alert(err instanceof Error ? err.message : "Upload failed. Please try again.");
@@ -364,7 +396,8 @@ export default function SellerDashboardPage() {
   };
 
   const resetForm = (cid: string) => {
-    setProductForms(prev => ({ ...prev, [cid]: { title: "", description: "", price: "", image_url: "", category_id: cid } }));
+    const isPremium = sellerProfile?.shopping_type_id && sellerProfile.shopping_type_key !== 'other';
+    setProductForms(prev => ({ ...prev, [cid]: { title: "", description: "", price: "", image_url: "", category_id: isPremium ? "uncategorized" : cid } }));
     setPreviewMain(prev => { const { [cid]: _, ...rest } = prev; return rest; });
     setPreviewViews(prev => { const { [cid]: _, ...rest } = prev; return rest; });
     setMainFiles(prev => { const { [cid]: _, ...rest } = prev; return rest; });
@@ -556,6 +589,22 @@ export default function SellerDashboardPage() {
                                 style={{ borderRadius: '2px' }}
                                 placeholder="29.99"
                               />
+                            </div>
+                            <div>
+                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Category</label>
+                              <select
+                                value={productForms[cid]?.category_id || (sellerProfile?.shopping_type_id && sellerProfile.shopping_type_key !== 'other' ? "uncategorized" : cid)}
+                                onChange={(e) => handleInput(cid, "category_id", e.target.value)}
+                                className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-gray-250 text-gray-900"} focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                                style={{ borderRadius: '2px' }}
+                              >
+                                <option value="uncategorized">Uncategorised</option>
+                                {allCategories.map((c) => (
+                                  <option key={c.id} value={c.id}>
+                                    {c.name}
+                                  </option>
+                                ))}
+                              </select>
                             </div>
                             <div>
                               <label className="flex items-center gap-2 cursor-pointer">
@@ -802,25 +851,7 @@ export default function SellerDashboardPage() {
                           product={product}
                           darkMode={darkMode}
                           onEdit={(p) => setEditingProduct(p)}
-                          onUpdate={() => {
-                            // Refresh products after update
-                            const token = localStorage.getItem("token");
-                            fetch(`${API_BASE}/api/seller/products/images`, {
-                              headers: { Authorization: `Bearer ${token}` },
-                            })
-                              .then(res => res.json())
-                              .then(data => {
-                                if (data.products) {
-                                  const grouped: Record<string, Product[]> = {};
-                                  data.products.forEach((p: Product) => {
-                                    const catId = String(p.category_id);
-                                    if (!grouped[catId]) grouped[catId] = [];
-                                    grouped[catId].push(p);
-                                  });
-                                  setProductUploads(grouped);
-                                }
-                              });
-                          }}
+                          onUpdate={loadProducts}
                         />
                       ))}
                     </div>
@@ -877,6 +908,24 @@ export default function SellerDashboardPage() {
                     className={`w-full p-3 border text-sm focus:ring-1 focus:ring-emerald-500 focus:outline-none ${darkMode ? "bg-gray-950 border-gray-850" : "bg-gray-50 border-gray-250"}`}
                     style={{ borderRadius: '2px' }}
                   />
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label className="block text-xs uppercase font-bold tracking-wider mb-1">Category</label>
+                  <select
+                    value={editForm.category_id || "uncategorized"}
+                    onChange={(e) => setEditForm({ ...editForm, category_id: e.target.value })}
+                    className={`w-full p-3 border text-sm focus:ring-1 focus:ring-emerald-500 focus:outline-none ${darkMode ? "bg-gray-950 border-gray-850 text-white" : "bg-gray-50 border-gray-250 text-gray-900"}`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    <option value="uncategorized">Uncategorised</option>
+                    {allCategories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Description */}
@@ -1051,12 +1100,7 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalImageIndex, setModalImageIndex] = useState(0);
 
-  // Helper to format URLs
-  const getUrl = (path: string | undefined) => {
-    if (!path) return '';
-    if (path.startsWith('http')) return path;
-    return `${API_BASE}/${path}`;
-  };
+
 
   // Prepare images array
   const images = [

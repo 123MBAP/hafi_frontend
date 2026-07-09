@@ -1,11 +1,39 @@
 import { useDarkMode } from "@/context/DarkMode";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import MapComponent from "@/components/MapComponent";
-import { Search, Filter, ChevronRight, X, Eye, Star, MapPin } from "lucide-react";
+import { Search, Filter, MapPin } from "lucide-react";
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+
+const toAbsoluteMediaUrl = (rawUrl?: string | null) => {
+  if (!rawUrl) return '';
+
+  let trimmed = String(rawUrl).trim().replace(/\\/g, '/');
+  if (!trimmed) return '';
+
+  // Extract nested URL if it's double-prefixed (e.g. http://localhost:5000/https://res.cloudinary.com/...)
+  const nestedHttpIndex = trimmed.indexOf('http', 4);
+  if (nestedHttpIndex !== -1) {
+    trimmed = trimmed.substring(nestedHttpIndex);
+  }
+
+  const uploadsIndex = trimmed.toLowerCase().indexOf('uploads/');
+  if (uploadsIndex !== -1 && /^https?:\/\//i.test(trimmed)) {
+    trimmed = API_BASE + '/' + trimmed.substring(uploadsIndex);
+  }
+
+  if (/^(https?:|blob:|data:)/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith('/')) {
+    return `${API_BASE}${trimmed}`;
+  }
+
+  return `${API_BASE}/${trimmed.replace(/^\/+/, '')}`;
+};
 
 interface MadeInRwandaProduct {
   id: string;
@@ -42,16 +70,19 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
 }
 
 // Small width product card component
-function ProductCard({ product, darkMode, onOpen, onView }: {
+function ProductCard({ product, darkMode, onView }: {
   product: MadeInRwandaProduct;
   darkMode: boolean;
-  onOpen: (product: MadeInRwandaProduct, startAtVideo?: boolean) => void;
   onView: (id: string) => void;
 }) {
   return (
     <div
       className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-md flex flex-col h-full ${darkMode ? 'bg-gray-800' : 'bg-white'} border-0 shadow-sm`}
       style={{ borderRadius: '2px' }}
+      onClick={(e) => {
+        e.stopPropagation();
+        onView(product.id);
+      }}
     >
       <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-700">
         <img
@@ -59,7 +90,7 @@ function ProductCard({ product, darkMode, onOpen, onView }: {
           alt={product.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
-          onClick={() => onOpen(product)}
+          // onClick={() => onOpen(product)}
         />
         <div className="absolute top-2 left-2 px-1.5 py-0.5 text-[10px] font-medium bg-emerald-600 text-white" style={{ borderRadius: '2px' }}>
           Made in Rwanda
@@ -84,23 +115,7 @@ function ProductCard({ product, darkMode, onOpen, onView }: {
           <div className={`text-lg font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
             RWF {product.price.toLocaleString()}
           </div>
-          
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-            <div className="flex items-center gap-2 text-xs text-gray-400">
-              <Eye className="w-3 h-3" />
-              <span>{product.views?.length || 0}</span>
-            </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onView(product.id);
-              }}
-              className={`text-xs font-medium px-2.5 py-1 transition-colors ${darkMode ? 'bg-gray-700 text-white hover:bg-emerald-600' : 'bg-gray-100 text-gray-700 hover:bg-emerald-500 hover:text-white'}`}
-              style={{ borderRadius: '2px' }}
-            >
-              View
-            </button>
-          </div>
+   
         </div>
       </div>
     </div>
@@ -110,6 +125,9 @@ function ProductCard({ product, darkMode, onOpen, onView }: {
 export default function MadeInRwanda() {
   const { darkMode } = useDarkMode();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const filterProviderId = searchParams.get("providerId");
+  const [filterProviderName, setFilterProviderName] = useState<string | null>(null);
 
   const [products, setProducts] = useState<MadeInRwandaProduct[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -127,11 +145,21 @@ export default function MadeInRwanda() {
   // Auto-scroll ref
   const categoryStripRef = useRef<HTMLDivElement | null>(null);
 
-  // Modal state
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalViews, setModalViews] = useState<string[]>([]);
-  const [modalViewIndex, setModalViewIndex] = useState(0);
-  const [selectedProduct, setSelectedProduct] = useState<MadeInRwandaProduct | null>(null);
+  // Fetch provider info if filtered
+  useEffect(() => {
+    if (filterProviderId) {
+      fetch(`${API_BASE}/api/providers/${filterProviderId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data) {
+            setFilterProviderName(data.name || data.email?.split('@')[0] || 'Provider');
+          }
+        })
+        .catch((err) => console.error("Error fetching provider info:", err));
+    } else {
+      setFilterProviderName(null);
+    }
+  }, [filterProviderId]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -149,33 +177,42 @@ export default function MadeInRwanda() {
             const title = row.title || row.image_title || "";
             const description = row.description || row.image_description || "";
             const rawImagePath = row.image_url || row.image_path || "";
-            const baseUrl = `${window.location.protocol}//${window.location.host}`;
 
             const latitude = row.latitude ?? row.lat ?? row.location_lat ?? (row.location ? row.location.lat : undefined) ?? null;
             const longitude = row.longitude ?? row.lng ?? row.location_lng ?? (row.location ? row.location.lng : undefined) ?? null;
 
             let views: string[] = [];
             if (Array.isArray(row.views)) {
-              views = row.views.map((v: string) =>
-                v && (v.startsWith("http://") || v.startsWith("https://")) ? v : `${baseUrl}/${v}`
-              );
+              views = row.views
+                .filter((v: string) => v && String(v).trim())
+                .map((v: string) => toAbsoluteMediaUrl(v));
             } else if (typeof row.views === "string" && row.views.length > 0) {
               try {
                 const parsed = JSON.parse(row.views);
                 if (Array.isArray(parsed))
-                  views = parsed.map((v) => (v && (v.startsWith("http://") || v.startsWith("https://")) ? v : `${baseUrl}/${v}`));
+                  views = parsed
+                    .filter((v: any) => v && String(v).trim())
+                    .map((v) => toAbsoluteMediaUrl(v));
               } catch { }
             }
 
-            let image_url = "";
-            if (rawImagePath) {
-              if (rawImagePath.startsWith("http://") || rawImagePath.startsWith("https://")) {
-                image_url = rawImagePath;
-              } else if (rawImagePath.startsWith("/")) {
-                image_url = `${baseUrl}${rawImagePath}`;
-              } else {
-                image_url = `${baseUrl}/${rawImagePath}`;
-              }
+            const mediaFiles = Array.isArray(row.mediaFiles)
+              ? row.mediaFiles
+                  .filter((m: any) => m && m.url)
+                  .map((m: any) => ({
+                    ...m,
+                    url: toAbsoluteMediaUrl(m.url),
+                  }))
+              : [];
+
+            const image_url = toAbsoluteMediaUrl(rawImagePath);
+
+            // Determine fileType based on available media
+            let fileType = row.fileType || 'image';
+            if (mediaFiles.some((m: any) => m.type === 'video') && (views.length > 0 || image_url)) {
+              fileType = 'mixed';
+            } else if (mediaFiles.some((m: any) => m.type === 'video')) {
+              fileType = 'video';
             }
 
             return {
@@ -185,10 +222,10 @@ export default function MadeInRwanda() {
               price: Number(row.price ?? 0),
               image_url,
               views,
-              mediaFiles: row.mediaFiles || [],
-              fileType: row.fileType || 'image',
+              mediaFiles,
+              fileType,
               madeInRwanda: true,
-              providerId: row.provider_id || row.seller_id || null,
+              providerId: row.providerId || row.provider_id || row.seller_id || null,
               latitude: latitude !== undefined ? Number(latitude) : null,
               longitude: longitude !== undefined ? Number(longitude) : null,
             } as MadeInRwandaProduct;
@@ -247,6 +284,12 @@ export default function MadeInRwanda() {
     return products
       .filter((p) => {
         if (!p) return false;
+
+        // Apply providerId query filter if present
+        if (filterProviderId && String(p.providerId) !== String(filterProviderId)) {
+          return false;
+        }
+
         const title = (p.title || "").toLowerCase();
         const desc = (p.description || "").toLowerCase();
         const q = searchQuery.toLowerCase();
@@ -261,7 +304,7 @@ export default function MadeInRwanda() {
         const bViews = b.views?.length ?? 0;
         return bViews - aViews;
       });
-  }, [products, searchQuery, sortBy, selectedCategory]);
+  }, [products, searchQuery, sortBy, selectedCategory, filterProviderId]);
 
   const visibleProducts = useMemo(() => {
     if (!nearbyOnly || !userLocation) return filteredAndSorted;
@@ -290,7 +333,7 @@ export default function MadeInRwanda() {
           productId: p.id,
         };
       })
-      .filter(Boolean);
+      .filter((m): m is Exclude<typeof m, null> => m !== null);
   }, [visibleProducts]);
 
   const handleUseMyLocation = () => {
@@ -307,57 +350,6 @@ export default function MadeInRwanda() {
         alert("Unable to get location: " + err.message);
       }
     );
-  };
-
-  const isVideo = (url: string) => {
-    const lowerUrl = url.toLowerCase();
-    return lowerUrl.includes('.mp4') || lowerUrl.includes('.mov') ||
-      lowerUrl.includes('.avi') || lowerUrl.includes('.webm');
-  };
-
-  const openModal = (product: MadeInRwandaProduct, startAtVideo: boolean = false) => {
-    const videoUrls: string[] = [];
-    if ((product.fileType === 'mixed' || product.fileType === 'video') && Array.isArray(product.mediaFiles)) {
-      product.mediaFiles.forEach((media) => {
-        if (media.type === 'video') {
-          videoUrls.push(media.url);
-        }
-      });
-    }
-
-    const views = Array.isArray(product.views) ? product.views : [];
-    const allMedia = [product.image_url, ...views, ...videoUrls];
-    const images = allMedia.filter(url => !isVideo(url));
-    const videos = allMedia.filter(url => isVideo(url));
-    const orderedMedia = [...images, ...videos];
-
-    setModalViews(orderedMedia);
-    let startIndex = 0;
-    if (startAtVideo && videos.length > 0) {
-      startIndex = orderedMedia.indexOf(videos[0]);
-    }
-    setModalViewIndex(startIndex);
-    setSelectedProduct(product);
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-    setModalViews([]);
-    setModalViewIndex(0);
-    setSelectedProduct(null);
-  };
-
-  const nextView = () => {
-    if (modalViews.length > 0) {
-      setModalViewIndex((prev) => (prev + 1) % modalViews.length);
-    }
-  };
-
-  const prevView = () => {
-    if (modalViews.length > 0) {
-      setModalViewIndex((prev) => (prev - 1 + modalViews.length) % modalViews.length);
-    }
   };
 
   const clearFilters = () => {
@@ -491,6 +483,33 @@ export default function MadeInRwanda() {
           </p>
         </div>
 
+        {/* Provider Filter Banner */}
+        {filterProviderId && (
+          <div className={`mb-6 p-4 border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+            darkMode 
+              ? 'bg-emerald-950/20 border-emerald-800/60 text-emerald-200' 
+              : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+          }`} style={{ borderRadius: '2px' }}>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="font-semibold">Showing products by:</span>
+              <span className="font-bold underline text-emerald-600 dark:text-emerald-400">
+                {filterProviderName || 'Loading...'}
+              </span>
+            </div>
+            <button
+              onClick={() => setSearchParams({})}
+              className={`text-xs px-3 py-1.5 font-bold transition-all border ${
+                darkMode
+                  ? 'border-emerald-700 bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-200'
+                  : 'border-emerald-300 bg-emerald-100 hover:bg-emerald-200/80 text-emerald-800'
+              }`}
+              style={{ borderRadius: '2px' }}
+            >
+              Clear Filter / Show All
+            </button>
+          </div>
+        )}
+
         {/* Mobile filter toggle */}
         <div className="flex items-center gap-3 mb-4 lg:hidden">
           <button
@@ -564,7 +583,6 @@ export default function MadeInRwanda() {
                 key={product.id}
                 product={product}
                 darkMode={darkMode}
-                onOpen={openModal}
                 onView={(id) => navigate(`/made-in-rwanda/product/${id}`)}
               />
             ))}
@@ -572,77 +590,7 @@ export default function MadeInRwanda() {
         )}
       </div>
 
-      {/* Modal */}
-      {modalOpen && selectedProduct && modalViews.length > 0 && (
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
-          onClick={closeModal}
-        >
-          <div className="relative max-w-5xl max-h-[95vh] w-full h-full flex items-center justify-center" onClick={e => e.stopPropagation()}>
-            <button
-              onClick={closeModal}
-              className="absolute top-4 right-4 z-10 p-2 transition-all bg-white hover:bg-gray-100 shadow-lg"
-              style={{ borderRadius: '2px' }}
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {modalViews.length > 1 && (
-              <>
-                <button
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 transition-all"
-                  style={{ borderRadius: '2px' }}
-                  onClick={(e) => { e.stopPropagation(); prevView(); }}
-                >
-                  <ChevronRight className="w-5 h-5 rotate-180" />
-                </button>
-                <button
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 transition-all"
-                  style={{ borderRadius: '2px' }}
-                  onClick={(e) => { e.stopPropagation(); nextView(); }}
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </>
-            )}
-
-            <div className="bg-black overflow-hidden shadow-2xl max-w-full max-h-full">
-              {(() => {
-                const currentUrl = modalViews[modalViewIndex];
-                const isVideoUrl = selectedProduct.fileType === 'video' ||
-                  currentUrl.toLowerCase().includes('.mp4') ||
-                  currentUrl.toLowerCase().includes('.mov');
-
-                return isVideoUrl ? (
-                  <video
-                    className="max-w-[90vw] max-h-[80vh] w-auto h-auto"
-                    src={currentUrl}
-                    controls
-                    autoPlay={false}
-                    preload="metadata"
-                    style={{ maxWidth: '90vw', maxHeight: '80vh', objectFit: 'contain' }}
-                  />
-                ) : (
-                  <img
-                    src={currentUrl}
-                    alt={selectedProduct.title}
-                    className="max-w-[90vw] max-h-[80vh] w-auto h-auto object-contain"
-                  />
-                );
-              })()}
-            </div>
-
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-3 py-1.5 backdrop-blur-sm" style={{ borderRadius: '2px' }}>
-              <div className="flex items-center gap-3 text-xs">
-                <span className="font-medium">{selectedProduct.title}</span>
-                {modalViews.length > 1 && (
-                  <span className="text-gray-300">{modalViewIndex + 1} / {modalViews.length}</span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal - removed, now navigating to detail page instead */}
     </div>
   );
 }

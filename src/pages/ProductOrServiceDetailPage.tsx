@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { CartItem, useCart } from '../context/CartContext';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { cachedFetch } from '../utils/cachedFetch';
 import ProductOrServiceDetail from './ProductOrServiceDetail';
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
@@ -8,20 +9,29 @@ const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").repla
 const toAbsoluteMediaUrl = (rawUrl?: string | null) => {
   if (!rawUrl) return '';
 
-  const trimmed = String(rawUrl).trim();
+  let trimmed = String(rawUrl).trim().replace(/\\/g, '/');
   if (!trimmed) return '';
+
+  // Extract nested URL if it's double-prefixed (e.g. http://localhost:5000/https://res.cloudinary.com/...)
+  const nestedHttpIndex = trimmed.indexOf('http', 4);
+  if (nestedHttpIndex !== -1) {
+    trimmed = trimmed.substring(nestedHttpIndex);
+  }
+
+  const uploadsIndex = trimmed.toLowerCase().indexOf('uploads/');
+  if (uploadsIndex !== -1 && /^https?:\/\//i.test(trimmed)) {
+    trimmed = API_BASE + '/' + trimmed.substring(uploadsIndex);
+  }
 
   if (/^(https?:|blob:|data:)/i.test(trimmed)) {
     return trimmed;
   }
 
-  const normalized = trimmed.replace(/\\/g, '/');
-
-  if (normalized.startsWith('/')) {
-    return `${API_BASE}${normalized}`;
+  if (trimmed.startsWith('/')) {
+    return `${API_BASE}${trimmed}`;
   }
 
-  return `${API_BASE}/${normalized.replace(/^\/+/, '')}`;
+  return `${API_BASE}/${trimmed.replace(/^\/+/, '')}`;
 };
 
 interface ProviderProfile {
@@ -47,6 +57,7 @@ interface ProviderImage {
   views?: string[];
   mediaFiles?: Array<{ url: string; type: 'image' | 'video' }>;
   fileType?: 'image' | 'video' | 'mixed';
+  madeInRwanda?: boolean;
 }
 
 export default function ProductOrServicesDetailPage() {
@@ -86,6 +97,7 @@ export default function ProductOrServicesDetailPage() {
             views: Array.isArray(img.views) ? img.views : [],
             mediaFiles: Array.isArray(img.mediaFiles) ? img.mediaFiles : [],
             fileType: img.fileType || 'image',
+            madeInRwanda: img.madeInRwanda || false,
           })));
         }
 
@@ -102,6 +114,7 @@ export default function ProductOrServicesDetailPage() {
             views: Array.isArray(img.views) ? img.views : [],
             mediaFiles: Array.isArray(img.mediaFiles) ? img.mediaFiles : [],
             fileType: img.fileType || 'image',
+            madeInRwanda: img.madeInRwanda || false,
           })));
         }
 
@@ -165,8 +178,14 @@ export default function ProductOrServicesDetailPage() {
     addToCart(cartItem);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <LoadingSpinner size="lg" message="Loading products..." variant="dots" />
+      </div>
+    );
+  }
 
-  if (loading) return <div className="text-center mt-10">Loading...</div>;
   if (error) return <div className="text-center text-red-500 mt-10">{error}</div>;
   if (!imageData) return <div className="text-center mt-10">Item not found.</div>;
 
@@ -204,6 +223,8 @@ export default function ProductOrServicesDetailPage() {
       providerPhone={provider?.phone_number}
       providerWhatsapp={provider?.whatsapp_number}
       providerProfileImage={toAbsoluteMediaUrl(provider?.profile_image || provider?.profile_image_url)}
+      madeInRwanda={imageData.madeInRwanda}
+      viewMorePath={`/provider/${providerId}/uploads`}
     />
   );
 }

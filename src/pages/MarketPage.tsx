@@ -14,7 +14,7 @@ import {
   ChevronDown
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
@@ -37,6 +37,7 @@ interface Product {
   fileType?: 'image' | 'video' | 'mixed';
   rating?: number;
   createdAt?: string;
+  providerId?: string;
 }
 
 const getUrl = (path: string | undefined) => {
@@ -124,6 +125,10 @@ function MarketProductCard({
 
 export default function MarketWithCategoryProducts() {
   const { darkMode } = useDarkMode();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const filterProviderId = searchParams.get("providerId");
+  const [filterProviderName, setFilterProviderName] = useState<string | null>(null);
+
   const [categories, setCategories] = useState<MarketProductCat[]>([]);
   const [loadingCats, setLoadingCats] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<MarketProductCat | null>(null);
@@ -136,6 +141,22 @@ export default function MarketWithCategoryProducts() {
 
   // Auto-scroll refs
   const categoryStripRef = useRef<HTMLDivElement | null>(null);
+
+  // Fetch provider name if filtered
+  useEffect(() => {
+    if (filterProviderId) {
+      fetch(`${API_BASE}/api/providers/${filterProviderId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data) {
+            setFilterProviderName(data.name || data.email?.split('@')[0] || 'Provider');
+          }
+        })
+        .catch((err) => console.error("Error fetching provider info:", err));
+    } else {
+      setFilterProviderName(null);
+    }
+  }, [filterProviderId]);
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -159,6 +180,12 @@ export default function MarketWithCategoryProducts() {
 
     return products
       .filter(product => !categoryId || String(product.category_id) === categoryId)
+      .filter(product => {
+        if (filterProviderId && String(product.providerId) !== String(filterProviderId)) {
+          return false;
+        }
+        return true;
+      })
       .filter(product =>
         product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -176,7 +203,7 @@ export default function MarketWithCategoryProducts() {
             return (b.views?.length || 0) - (a.views?.length || 0);
         }
       });
-  }, [products, selectedCategory, searchQuery, sortBy]);
+  }, [products, selectedCategory, searchQuery, sortBy, filterProviderId]);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -227,6 +254,7 @@ export default function MarketWithCategoryProducts() {
             fileType: product.fileType || 'image',
             rating: product.rating,
             createdAt: product.createdAt || product.created_at || undefined,
+            providerId: product.providerId || product.provider_id || product.seller_id || undefined,
           }))
         : [];
 
@@ -464,6 +492,33 @@ export default function MarketWithCategoryProducts() {
             {filteredAndSortedProducts.length} products available
           </p>
         </div>
+
+        {/* Provider Filter Banner */}
+        {filterProviderId && (
+          <div className={`mb-6 p-4 border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+            darkMode 
+              ? 'bg-emerald-950/20 border-emerald-800/60 text-emerald-200' 
+              : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+          }`} style={{ borderRadius: '2px' }}>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="font-semibold">Showing products by:</span>
+              <span className="font-bold underline text-emerald-600 dark:text-emerald-400">
+                {filterProviderName || 'Loading...'}
+              </span>
+            </div>
+            <button
+              onClick={() => setSearchParams({})}
+              className={`text-xs px-3 py-1.5 font-bold transition-all border ${
+                darkMode
+                  ? 'border-emerald-700 bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-200'
+                  : 'border-emerald-300 bg-emerald-100 hover:bg-emerald-200/80 text-emerald-800'
+              }`}
+              style={{ borderRadius: '2px' }}
+            >
+              Clear Filter / Show All
+            </button>
+          </div>
+        )}
 
         {/* Mobile action buttons */}
         <div className="flex items-center gap-3 mb-4 lg:hidden">

@@ -5,6 +5,21 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { Link, useSearchParams } from 'react-router-dom';
 import ChatBox from './ChatBox';
 import { loadOrders, type OrderRecord } from '../utils/orderStorage';
+import { 
+  FileText, 
+  MessageSquare, 
+  Trash2, 
+  CheckCircle, 
+  Clock, 
+  Info, 
+  Phone, 
+  ArrowLeft, 
+  CreditCard,
+  Package,
+  Calendar,
+  AlertCircle
+} from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
@@ -19,6 +34,38 @@ const getMethodDisplayName = (method: string) => {
     default:
       return method;
   }
+};
+
+const formatAddress = (addressStr?: string | null) => {
+  if (!addressStr) return 'Not Available';
+  const trimmed = addressStr.trim();
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (parsed && typeof parsed === 'object') {
+        const { lat, lng, name, address } = parsed;
+        if (lat != null && lng != null) {
+          return (
+            <div className="flex flex-col items-end gap-0.5">
+              {address && <span className="font-semibold text-right">{address}</span>}
+              {name && <span className="text-[10px] text-gray-500 text-right">{name}</span>}
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-emerald-500 hover:underline font-bold text-[10px] inline-flex items-center gap-0.5 mt-0.5"
+              >
+                Google Maps ({Number(lat).toFixed(5)}, {Number(lng).toFixed(5)})
+              </a>
+            </div>
+          );
+        }
+      }
+    } catch {
+      // fallback
+    }
+  }
+  return <span className="font-semibold">{addressStr}</span>;
 };
 
 type ProviderContact = {
@@ -42,6 +89,23 @@ const OrdersPage = () => {
   const [error, setError] = useState('');
   const [deletingOrderUuid, setDeletingOrderUuid] = useState<string | null>(null);
   const customerId = user?.id ?? '';
+  const [activeTab, setActiveTab] = useState<'all' | 'unpaid' | 'quoted' | 'payment_sent' | 'processing' | 'completed'>('all');
+
+  const sortedOrders = useMemo(() => {
+    return [...orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [orders]);
+
+  const filteredOrders = useMemo(() => {
+    return sortedOrders.filter(order => {
+      if (activeTab === 'all') return true;
+      if (activeTab === 'unpaid') return ['placed', 'order_received', 'quote_accepted'].includes(order.status);
+      if (activeTab === 'quoted') return order.status === 'quoted';
+      if (activeTab === 'payment_sent') return order.status === 'payment_done';
+      if (activeTab === 'processing') return ['payment_received', 'delivery_pending'].includes(order.status);
+      if (activeTab === 'completed') return order.status === 'delivered';
+      return true;
+    });
+  }, [sortedOrders, activeTab]);
 
   const placedOrderId = searchParams.get('placed');
 
@@ -164,12 +228,11 @@ const OrdersPage = () => {
     setOrderLastSeenAt(prev => ({ ...prev, [order.orderUuid]: new Date().toISOString() }));
   };
 
-  const bgColor = darkMode ? 'bg-gray-900' : 'bg-gray-50';
-  const textColor = darkMode ? 'text-gray-100' : 'text-gray-800';
-  const secondaryTextColor = darkMode ? 'text-gray-300' : 'text-gray-600';
-  const borderColor = darkMode ? 'border-gray-700' : 'border-gray-200';
-  const cardBg = darkMode ? 'bg-gray-800' : 'bg-white';
-  const cardBorder = darkMode ? 'border-gray-700' : 'border-gray-100';
+  const bgColor = darkMode ? 'bg-gray-955 text-gray-100' : 'bg-gray-50 text-gray-900';
+  const textColor = darkMode ? 'text-gray-100' : 'text-gray-900';
+  const secondaryTextColor = darkMode ? 'text-gray-400' : 'text-gray-600';
+  const borderColor = darkMode ? 'border-gray-800' : 'border-gray-250';
+  const cardBg = darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200';
 
   const openWhatsApp = (rawNumber?: string | null) => {
     if (!rawNumber) return;
@@ -285,97 +348,149 @@ const OrdersPage = () => {
     }
   };
 
-  // Status color and icon mapping
   const getStatusConfig = (status: string) => {
     switch (status) {
       case 'placed':
-        return { color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300', icon: '🕒', label: 'Awaiting Payment' };
+        return { color: 'bg-amber-500/10 text-amber-500 border-amber-500/20', label: 'Awaiting Payment' };
       case 'order_received':
-        return { color: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300', icon: '✅', label: 'Order Received by Provider' };
+        return { color: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20', label: 'Order Received' };
       case 'quoted':
-        return { color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300', icon: '💬', label: 'Quoted Price' };
+        return { color: 'bg-violet-500/10 text-violet-500 border-violet-500/20', label: 'Quoted Price' };
       case 'quote_accepted':
-        return { color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300', icon: '✅', label: 'Quote Accepted' };
+        return { color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20', label: 'Quote Accepted' };
       case 'payment_done':
-        return { color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300', icon: '💰', label: 'Payment Sent' };
+        return { color: 'bg-blue-500/10 text-blue-500 border-blue-500/20', label: 'Payment Sent' };
       case 'payment_received':
-        return { color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300', icon: '✅', label: 'Payment Confirmed' };
+        return { color: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20', label: 'Payment Confirmed' };
       case 'delivery_pending':
-        return { color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300', icon: '📦', label: 'Delivery Pending' };
+        return { color: 'bg-purple-500/10 text-purple-500 border-purple-500/20', label: 'Delivery Pending' };
       case 'delivered':
-        return { color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300', icon: '🎉', label: 'Delivered' };
+        return { color: 'bg-green-500/10 text-green-500 border-green-500/20', label: 'Delivered' };
       default:
-        return { color: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300', icon: '📋', label: status };
+        return { color: 'bg-gray-500/10 text-gray-400 border-gray-500/20', label: status };
     }
   };
 
   return (
-    <div className={`p-4 md:p-6 max-w-7xl mx-auto min-h-screen ${bgColor}`}>
-      {/* Header - More Compact */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-5">
+    <div className={`p-6 max-w-7xl mx-auto min-h-screen ${bgColor}`}>
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
-          <h1 className={`text-2xl font-bold tracking-tight ${darkMode ? 'text-hafi-teal-light' : 'text-hafi-teal'}`}>
-            Orders
+          <h1 className="text-2xl font-bold uppercase tracking-tight flex items-center gap-2">
+            <FileText className="w-6 h-6 text-emerald-500" />
+            <span>My Orders</span>
           </h1>
-          <p className={`text-sm ${secondaryTextColor}`}>
-            Track and manage your orders
+          <p className={`text-xs uppercase tracking-wider font-semibold ${secondaryTextColor} mt-1`}>
+            Track and manage your requested products and services
           </p>
         </div>
         <Link
           to="/cart"
-          className={`inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200 ${darkMode
-            ? 'bg-hafi-teal/20 text-white hover:bg-hafi-teal/35'
-            : 'bg-hafi-teal text-white hover:bg-hafi-green shadow-sm'
-            }`}
+          className={`inline-flex items-center justify-center border text-xs font-bold uppercase tracking-wider px-4 py-2 transition-all hover:scale-102
+            ${darkMode 
+              ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-850' 
+              : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50 shadow-sm'}`}
+          style={{ borderRadius: '2px' }}
         >
-          ← Back to Cart
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Cart
         </Link>
       </div>
 
-      {/* Success Message */}
+      {/* Success Message Banner */}
       {placedOrder && (
-        <div className={`mb-5 rounded-xl border-l-4 border-l-green-500 px-4 py-3 text-sm ${darkMode ? 'bg-green-600/10 border-green-600/40 text-green-100' : 'bg-green-50 border-green-200 text-green-800'}`}>
-          Order {placedOrder.orderUuid.slice(0, 8)}… placed successfully.
+        <div className="mb-6 border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm font-semibold text-emerald-500 flex items-center gap-2" style={{ borderRadius: '2px' }}>
+          <CheckCircle className="w-5 h-5" />
+          <span>Order #{placedOrder.orderUuid.slice(0, 8)} has been placed successfully.</span>
         </div>
       )}
 
-      {/* Loading / Error / Empty States */}
+      {/* States */}
       {loading ? (
-        <div className="py-8">
+        <div className="py-16">
           <LoadingSpinner size="lg" message="Loading your orders..." variant="dots" />
         </div>
       ) : error ? (
-        <div className={`rounded-xl border p-8 text-center ${cardBorder} ${cardBg}`}>
-          <p className={`font-semibold ${textColor}`}>Unable to load orders</p>
-          <p className={`text-sm mt-1 ${secondaryTextColor}`}>{error}</p>
+        <div className={`border p-8 text-center ${cardBg}`} style={{ borderRadius: '2px' }}>
+          <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-3" />
+          <p className="font-bold uppercase tracking-wider text-sm text-red-500">Unable to load orders</p>
+          <p className={`text-xs mt-1 ${secondaryTextColor}`}>{error}</p>
         </div>
       ) : orders.length === 0 ? (
-        <div className={`rounded-xl border p-8 text-center ${cardBorder} ${cardBg}`}>
-          <p className={`font-semibold ${textColor}`}>No orders yet</p>
-          <p className={`text-sm mt-1 ${secondaryTextColor}`}>
-            Orders you place from your cart will appear here.
+        <div className={`border p-12 text-center flex flex-col items-center justify-center ${cardBg}`} style={{ borderRadius: '2px' }}>
+          <Package className="w-12 h-12 text-gray-500 mb-3 opacity-30" />
+          <p className="font-bold uppercase tracking-wider text-sm text-gray-500">No orders yet</p>
+          <p className={`text-xs mt-1 ${secondaryTextColor} mb-4`}>
+            Orders or requests you place from your cart will appear here.
           </p>
           <Link
             to="/cart"
-            className={`mt-4 inline-flex items-center justify-center rounded-lg px-5 py-2 text-sm font-semibold transition-all ${darkMode
-              ? 'bg-hafi-teal/20 text-white hover:bg-hafi-teal/35'
-              : 'bg-hafi-teal text-white hover:bg-hafi-green'
-              }`}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 transition-colors"
+            style={{ borderRadius: '2px' }}
           >
             Browse Cart
           </Link>
         </div>
       ) : (
-        <div className="space-y-4">
-          {orders.map(order => {
-            const providerId = order.providerId ? String(order.providerId) : '';
+        <div className="space-y-6">
+          {/* Tabs Filter */}
+          <div className="flex flex-wrap gap-2 border-b dark:border-gray-800 pb-4">
+            {[
+              { id: 'all', label: 'All Orders', count: orders.length },
+              { id: 'unpaid', label: 'Awaiting Payment', count: orders.filter(o => ['placed', 'order_received', 'quote_accepted'].includes(o.status)).length },
+              { id: 'quoted', label: 'Quoted Price', count: orders.filter(o => o.status === 'quoted').length },
+              { id: 'payment_sent', label: 'Payment Sent', count: orders.filter(o => o.status === 'payment_done').length },
+              { id: 'processing', label: 'Processing', count: orders.filter(o => ['payment_received', 'delivery_pending'].includes(o.status)).length },
+              { id: 'completed', label: 'Delivered', count: orders.filter(o => o.status === 'delivered').length },
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200 border flex items-center gap-2
+                  ${activeTab === tab.id
+                    ? 'bg-emerald-500 border-emerald-500 text-white'
+                    : darkMode
+                      ? 'bg-gray-900 border-gray-800 text-gray-400 hover:text-white hover:bg-gray-850'
+                      : 'bg-white border-gray-250 text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                style={{ borderRadius: '2px' }}
+              >
+                <span>{tab.label}</span>
+                <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold
+                  ${activeTab === tab.id
+                    ? 'bg-emerald-600 text-white'
+                    : darkMode
+                      ? 'bg-gray-850 text-gray-500'
+                      : 'bg-gray-100 text-gray-500'
+                  }`}
+                >
+                  {tab.count}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {filteredOrders.length === 0 ? (
+            <div className={`border p-12 text-center flex flex-col items-center justify-center ${cardBg}`} style={{ borderRadius: '2px' }}>
+              <Package className="w-12 h-12 text-gray-500 mb-3 opacity-30" />
+              <p className="font-bold uppercase tracking-wider text-sm text-gray-500">No orders found</p>
+              <p className={`text-xs mt-1 ${secondaryTextColor}`}>
+                There are no orders matching this filter tab.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {filteredOrders.map(order => {
+                const providerId = order.providerId ? String(order.providerId) : '';
             const provider = providerId ? providerContacts[providerId] : undefined;
             const methods = providerId ? providerMethods[providerId] : undefined;
             const hasMethods = !!methods && Object.keys(methods).length > 0;
             const statusConfig = getStatusConfig(order.status);
+            
             const serviceItems = order.items.filter(item => item.type === 'service');
             const needsServiceQuote = serviceItems.some(item => item.serviceCustomization && !item.serviceCustomization.noCustomizationNeeded && item.serviceCustomization.quotedPrice == null);
             const hasQuotedServicePrice = serviceItems.some(item => item.serviceCustomization?.quotedPrice != null);
+            
             const originalTotal = order.items.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
             const quotedTotal = order.items.reduce((sum, item) => {
               const unitPrice = item.type === 'service' && item.serviceCustomization?.quotedPrice != null
@@ -383,100 +498,99 @@ const OrdersPage = () => {
                 : Number(item.price);
               return sum + (unitPrice * Number(item.quantity));
             }, 0);
+            
             const canShowPaymentButton = (order.status === 'order_received' && !needsServiceQuote) || order.status === 'quote_accepted';
             const canShowConfirmDeliveryButton = ['payment_done', 'payment_received', 'delivery_pending'].includes(order.status);
-            const isPaymentDoneOrLater = ['order_received', 'payment_done', 'payment_received', 'delivery_pending', 'delivered'].includes(order.status);
             const showCancelButton = order.status === 'placed';
             const chatOpen = activeChatOrderUuid === order.orderUuid;
 
             return (
-              <div key={order.orderUuid} className={`rounded-xl border shadow-sm transition-all hover:shadow-md ${cardBorder} ${cardBg}`}>
-                {/* Order Header - Compact with Status */}
-                <div className={`flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3 ${borderColor}`}>
+              <div key={order.orderUuid} className={`border shadow-sm transition-all duration-300 hover:shadow-md ${cardBg}`} style={{ borderRadius: '2px' }}>
+                
+                {/* Header */}
+                <div className={`flex flex-wrap items-center justify-between gap-4 border-b px-5 py-4 ${borderColor}`}>
                   <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs font-mono ${secondaryTextColor}`}>
-                        #{order.orderUuid.slice(0, 12)}…
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`text-xs font-mono font-bold select-all ${textColor}`}>
+                        #{order.orderUuid.slice(0, 12).toUpperCase()}…
                       </span>
-                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${statusConfig.color}`}>
-                        <span>{statusConfig.icon}</span>
-                        <span>{statusConfig.label}</span>
+                      <span className={`inline-flex items-center border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${statusConfig.color}`} style={{ borderRadius: '2px' }}>
+                        {statusConfig.label}
                       </span>
                       {order.notifyWhatsApp && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-                          📱 WA
+                        <span className="inline-flex items-center bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+                          WhatsApp Confirmed
                         </span>
                       )}
                     </div>
-                    <div className={`text-xs ${secondaryTextColor}`}>
+                    <div className={`text-xs font-medium ${secondaryTextColor} flex items-center gap-1`}>
+                      <Calendar className="w-3.5 h-3.5" />
                       {new Date(order.createdAt).toLocaleDateString()}
                     </div>
                   </div>
+
                   <div className="text-right">
-                    <div className={`text-base font-bold ${textColor}`}>
+                    <div className="text-lg font-bold text-emerald-500">
                       RWF {quotedTotal.toLocaleString()}
                     </div>
                     {hasQuotedServicePrice && (
-                      <div className={`text-xs ${secondaryTextColor}`}>
+                      <div className={`text-[11px] line-through ${secondaryTextColor}`}>
                         Original: RWF {originalTotal.toLocaleString()}
                       </div>
                     )}
-                    <div className={`text-xs ${secondaryTextColor}`}>
+                    <div className={`text-[10px] uppercase font-bold tracking-wider ${secondaryTextColor}`}>
                       {order.items.length} item{order.items.length !== 1 ? 's' : ''}
                     </div>
                   </div>
                 </div>
 
-                {/* Main Content - Two Column Layout */}
-                <div className="p-4">
-                  <div className={`grid grid-cols-1 gap-4 ${chatOpen ? 'md:grid-cols-[1fr_360px_280px]' : 'md:grid-cols-[1fr_280px]'}`}>
-                    {/* Left Column: Items and Customer Info */}
-                    <div className="space-y-3">
-                      {/* Items List - Compact */}
-                      <div className="space-y-2">
+                {/* Content Area */}
+                <div className="p-5">
+                  <div className={`grid grid-cols-1 gap-6 ${chatOpen ? 'lg:grid-cols-[1fr_360px_320px]' : 'lg:grid-cols-[1fr_320px]'}`}>
+                    
+                    {/* Column 1: Items list */}
+                    <div className="space-y-4">
+                      <div className="space-y-3">
                         {order.items.map(item => (
-                          <div key={`${order.orderUuid}-${item.id}-${item.size || 'default'}`} className="space-y-1">
-                            <div className="flex items-center gap-3">
-                              <img src={item.image} alt={item.name} className="h-10 w-10 rounded-md object-cover" />
+                          <div key={`${order.orderUuid}-${item.id}-${item.size || 'default'}`} className="flex flex-col gap-2">
+                            <div className="flex gap-4 items-center">
+                              <img src={item.image} alt={item.name} className="h-14 w-14 border dark:border-gray-800 object-cover shrink-0" style={{ borderRadius: '2px' }} />
                               <div className="flex-1 min-w-0">
-                                <p className={`text-sm font-medium truncate ${textColor}`}>{item.name}</p>
+                                <p className="text-sm font-bold uppercase tracking-tight truncate">{item.name}</p>
                                 {item.description && (
-                                  <p className={`text-xs ${secondaryTextColor} mt-1 line-clamp-2`}>
+                                  <p className={`text-xs ${secondaryTextColor} line-clamp-1 mt-0.5`}>
                                     {item.description}
                                   </p>
                                 )}
-                                <div className="flex items-center gap-2 text-xs mt-1">
-                                  <span className={secondaryTextColor}>Qty {item.quantity}</span>
-                                  {item.size && <span className={secondaryTextColor}>Size {item.size}</span>}
+                                <div className={`flex items-center gap-3 text-xs mt-1 ${secondaryTextColor}`}>
+                                  <span>Quantity: <strong className="text-emerald-500 font-bold">{item.quantity}</strong></span>
+                                  {item.size && <span>Size: <strong className={textColor}>{item.size}</strong></span>}
                                 </div>
                               </div>
-                              <div className={`text-sm font-medium ${textColor}`}>
+                              <div className="text-sm font-semibold shrink-0">
                                 RWF {(item.price * item.quantity).toLocaleString()}
                               </div>
                             </div>
 
-                            {/* Service Customization Display */}
+                            {/* Service Details */}
                             {item.type === 'service' && item.serviceCustomization && (
-                              <div className={`ml-13 text-xs p-2 rounded-md border-l-2 ${
-                                darkMode
-                                  ? 'border-l-hafi-teal bg-blue-900/20 text-blue-100'
-                                  : 'border-l-hafi-teal bg-blue-50 text-blue-900'
-                              }`}>
-                                <span className="font-semibold">Services Requested: </span>
+                              <div className={`ml-18 p-3 text-xs border-l-2 bg-emerald-500/5 ${darkMode ? 'border-l-emerald-500 text-gray-300' : 'border-l-emerald-600 text-gray-800'}`} style={{ borderRadius: '2px' }}>
+                                <div className="font-bold uppercase text-[9px] tracking-wider text-emerald-500 mb-1">Service Specifications:</div>
                                 {item.serviceCustomization.noCustomizationNeeded ? (
-                                  <span>✓ No customization needed</span>
+                                  <span>No custom requirements requested.</span>
                                 ) : item.serviceCustomization.customizationRequest ? (
-                                  <div className="mt-1 whitespace-pre-wrap">{item.serviceCustomization.customizationRequest}</div>
+                                  <div className="whitespace-pre-wrap">{item.serviceCustomization.customizationRequest}</div>
                                 ) : null}
-                                <div className="mt-2 rounded-md border border-current/20 bg-white/40 p-2 dark:bg-black/10">
-                                  <div className="flex items-center justify-between gap-2">
-                                    <span className="font-semibold">Previous price</span>
-                                    <span>RWF {Number(item.price).toLocaleString()}</span>
+                                
+                                <div className="mt-3 p-2 bg-gray-950/20 border border-gray-800 flex justify-between gap-4 text-[10px]" style={{ borderRadius: '2px' }}>
+                                  <div>
+                                    <span className="text-gray-400">Regular Quote:</span>{' '}
+                                    <strong>RWF {Number(item.price).toLocaleString()}</strong>
                                   </div>
                                   {item.serviceCustomization.quotedPrice != null && (
-                                    <div className="mt-1 flex items-center justify-between gap-2">
-                                      <span className="font-semibold">New price</span>
-                                      <span>RWF {Number(item.serviceCustomization.quotedPrice).toLocaleString()}</span>
+                                    <div>
+                                      <span className="text-emerald-500">Provider Offer:</span>{' '}
+                                      <strong className="text-emerald-500">RWF {Number(item.serviceCustomization.quotedPrice).toLocaleString()}</strong>
                                     </div>
                                   )}
                                 </div>
@@ -485,30 +599,31 @@ const OrdersPage = () => {
                           </div>
                         ))}
                       </div>
-                      
-                      {/* Customer Details */}
-                      <div className={`mt-3 rounded-lg border px-3 py-2 ${borderColor} ${darkMode ? 'bg-gray-900/30' : 'bg-gray-50'}`}>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className={secondaryTextColor}>Customer:</span>
-                          <span className={`font-medium ${textColor}`}>{order.customerName}</span>
+
+                      {/* Contact metadata */}
+                      <div className={`rounded p-4 border text-xs space-y-1.5 ${borderColor} ${darkMode ? 'bg-gray-950/30' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+                        <div className="flex justify-between items-center">
+                          <span className={secondaryTextColor}>Client Name:</span>
+                          <span className="font-semibold">{order.customerName}</span>
                         </div>
                         {provider?.name && (
-                          <div className="flex items-center justify-between text-xs mt-1">
-                            <span className={secondaryTextColor}>Provider:</span>
-                            <span className={`font-medium ${textColor}`}>{provider.name}</span>
+                          <div className="flex justify-between items-center">
+                            <span className={secondaryTextColor}>Seller Name:</span>
+                            <span className="font-semibold">{provider.name}</span>
                           </div>
                         )}
                         {order.updatedAt && (
-                          <div className="flex items-center justify-between text-xs mt-1">
-                            <span className={secondaryTextColor}>Updated:</span>
-                            <span className={secondaryTextColor}>{new Date(order.updatedAt).toLocaleDateString()}</span>
+                          <div className="flex justify-between items-center">
+                            <span className={secondaryTextColor}>Last Updated:</span>
+                            <span className="font-medium">{new Date(order.updatedAt).toLocaleString()}</span>
                           </div>
                         )}
                       </div>
                     </div>
 
+                    {/* Column 2: Chat dialog inline */}
                     {chatOpen && (
-                      <div className="space-y-3">
+                      <div className={`border p-3 ${borderColor} ${darkMode ? 'bg-gray-950/20' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
                         <ChatBox
                           providerId={providerId}
                           customerId={customerId}
@@ -524,189 +639,218 @@ const OrdersPage = () => {
                       </div>
                     )}
 
-                    {/* Right Column: Payment & Actions - Compact */}
-                    <div className="space-y-3">
-                      {/* Payment Methods - Prominently Displayed */}
-                      <div className={`rounded-lg border ${borderColor} ${darkMode ? 'bg-gray-900/30' : 'bg-gray-50'} overflow-hidden`}>
-                        <div className={`border-b px-3 py-2 ${borderColor}`}>
-                          <div className="flex items-center justify-between">
-                            <h4 className={`text-xs font-semibold uppercase tracking-wide ${secondaryTextColor}`}>
-                              Payment Methods
-                            </h4>
-                            {hasMethods && (
-                              <span className="text-[10px] font-medium text-green-600 dark:text-green-400">✓ Available</span>
-                            )}
-                          </div>
+                    {/* Column 3: Actions & Pay credentials */}
+                    <div className="space-y-4">
+                      {/* Payment credentials */}
+                      <div className={`border overflow-hidden ${borderColor}`} style={{ borderRadius: '2px' }}>
+                        <div className={`border-b px-3 py-2 bg-emerald-500/5 ${borderColor}`}>
+                          <h4 className="text-[10px] font-bold uppercase tracking-wider text-emerald-500">
+                            Pay Account Details
+                          </h4>
                         </div>
-                        <div className="p-2 space-y-2">
+                        <div className="p-3 space-y-2">
                           {hasMethods ? (
                             Object.entries(methods as Record<string, any>)
-                              .filter(([, value]) => value && Object.keys(value).length > 0)
-                              .map(([method, value]) => (
-                                <div key={method} className={`rounded-md border px-2 py-1.5 ${borderColor} ${darkMode ? 'bg-gray-800/40' : 'bg-white'}`}>
-                                  <div className="flex items-center justify-between">
-                                    <span className={`text-xs font-medium ${textColor}`}>{getMethodDisplayName(method)}</span>
-                                    <span className="text-[10px] text-gray-500 dark:text-gray-400">
-                                      {method === 'momoPay' ? 'Code' : 'Phone'}
-                                    </span>
+                              .filter(([, val]) => val && Object.keys(val).length > 0)
+                              .map(([method, val]) => (
+                                <div key={method} className={`p-2 border text-xs ${borderColor} ${darkMode ? 'bg-gray-950/20' : 'bg-white'}`} style={{ borderRadius: '2px' }}>
+                                  <div className="flex justify-between font-bold">
+                                    <span className="uppercase text-[9px] tracking-wide text-emerald-500">{getMethodDisplayName(method)}</span>
+                                    <span className="text-[9px] text-gray-500">{method === 'momoPay' ? 'CODE' : 'PHONE'}</span>
                                   </div>
-                                  <div className={`text-xs truncate ${secondaryTextColor}`}>
-                                    {method === 'momoPay' ? value?.code || '—' : value?.phone || '—'}
+                                  <div className="font-mono font-semibold mt-1 text-sm select-all">
+                                    {method === 'momoPay' ? val?.code : val?.phone}
                                   </div>
-                                  <div className={`text-[10px] truncate ${secondaryTextColor}`}>
-                                    {value?.registeredName || ''}
-                                  </div>
+                                  {val?.registeredName && (
+                                    <div className="text-[10px] text-gray-500 mt-0.5">{val.registeredName}</div>
+                                  )}
                                 </div>
                               ))
                           ) : (
-                            <div className={`text-center text-xs py-2 ${secondaryTextColor}`}>
-                              No payment methods available
+                            <div className={`text-center text-xs py-3 text-gray-500`}>
+                              No payment accounts available
                             </div>
                           )}
                         </div>
                       </div>
 
-                      {/* Actions and Support */}
+                      {/* Action buttons */}
                       <div className="space-y-2">
                         {canShowPaymentButton && (
                           <button
-                            type="button"
                             onClick={() => markPaymentDone(order.orderUuid)}
-                            className="w-full rounded-lg bg-amber-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-700"
+                            className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold uppercase tracking-wider"
+                            style={{ borderRadius: '2px' }}
                           >
-                            💰 Mark Payment Done
+                             Confirm Payment Sent
                           </button>
                         )}
 
                         {order.status === 'quoted' && (
                           <button
-                            type="button"
                             onClick={() => acceptQuote(order.orderUuid)}
-                            className="w-full rounded-lg bg-violet-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-violet-700"
+                            className="w-full py-2.5 bg-violet-600 hover:bg-violet-750 text-white text-xs font-bold uppercase tracking-wider"
+                            style={{ borderRadius: '2px' }}
                           >
-                            ✅ Accept Quote
+                            Accept Offered Quote
                           </button>
                         )}
                         
                         {canShowConfirmDeliveryButton && (
                           <button
-                            type="button"
                             onClick={() => confirmReceipt(order.orderUuid)}
-                            className="w-full rounded-lg bg-hafi-teal px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-hafi-green"
+                            className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider"
+                            style={{ borderRadius: '2px' }}
                           >
-                            📦 I have received the delivery
+                            Confirm Delivery Received
                           </button>
                         )}
 
                         {showCancelButton && (
                           <button
-                            type="button"
                             onClick={() => deleteOrder(order.orderUuid)}
                             disabled={deletingOrderUuid === order.orderUuid}
-                            className="w-full rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400"
+                            className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wider disabled:opacity-50"
+                            style={{ borderRadius: '2px' }}
                           >
-                            {deletingOrderUuid === order.orderUuid ? 'Cancelling…' : 'Cancel Order'}
+                            {deletingOrderUuid === order.orderUuid ? 'Cancelling…' : 'Cancel Request'}
                           </button>
                         )}
 
                         {providerId && customerId && (
-                          <button
-                            type="button"
-                            onClick={() => openChatForOrder(order)}
-                            className="w-full rounded-lg bg-hafi-teal px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-hafi-green"
-                          >
-                            💬 Chat with provider{orderMessageCounts[order.orderUuid] ? ` (${orderMessageCounts[order.orderUuid]})` : ''}
-                          </button>
+                          <div className="w-full">
+                            <style>{`
+                              @keyframes chat-shake {
+                                0%, 100% { transform: scale(1); }
+                                10%, 30%, 50%, 70%, 90% { transform: scale(1.02) rotate(-0.5deg); }
+                                20%, 40%, 60%, 80% { transform: scale(1.02) rotate(0.5deg); }
+                              }
+                              @keyframes chat-pulse {
+                                0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+                                70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+                                100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+                              }
+                              .chat-wave-shake {
+                                animation: chat-shake 4s infinite ease-in-out, chat-pulse 2s infinite;
+                              }
+                            `}</style>
+                            <button
+                              onClick={() => openChatForOrder(order)}
+                              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[11px] font-black uppercase tracking-widest shadow-md chat-wave-shake hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2"
+                              style={{ borderRadius: '2px' }}
+                            >
+                              <MessageSquare className="w-4 h-4 animate-bounce" />
+                              <span>Chat with  seller or service provider {orderMessageCounts[order.orderUuid] ? `(${orderMessageCounts[order.orderUuid]} New)` : ''}</span>
+                            </button>
+                          </div>
                         )}
 
-                        {/* Status Info */}
-                        {['order_received', 'quoted', 'quote_accepted', 'payment_done', 'payment_received'].includes(order.status) && order.status !== 'delivered' && order.status !== 'delivery_pending' && (
-                          <div className={`rounded-lg border px-3 py-2 text-xs ${borderColor} ${darkMode ? 'bg-gray-800/40 text-gray-300' : 'bg-gray-50 text-gray-600'}`}>
-                            {order.status === 'order_received' && '✅ The service provider has received your order. You can now mark payment as done.'}
-                            {order.status === 'quoted' && '💬 A new price has been quoted. Please review and accept it to continue.'}
-                            {order.status === 'quote_accepted' && '✅ Quote accepted. You can now proceed with payment.'}
-                            {order.status === 'payment_done' && '📦 Your delivery confirmation button is now active. You can finish the order whenever you have received it.'}
-                            {order.status === 'payment_received' && '✅ Payment confirmed. You can now confirm delivery when it arrives.'}
+                        {/* Informational Alerts */}
+                        {['order_received', 'quoted', 'quote_accepted', 'payment_done', 'payment_received'].includes(order.status) && (
+                          <div className={`p-3 border text-[11px] leading-relaxed ${borderColor} ${darkMode ? 'bg-gray-950/20 text-gray-400' : 'bg-gray-50 text-gray-600'}`} style={{ borderRadius: '2px' }}>
+                            {order.status === 'order_received' && 'The provider has acknowledged this order. You may now complete the payment via coordinates above and confirm.'}
+                            {order.status === 'quoted' && 'The provider has updated the request quote. Please accept the quote to proceed.'}
+                            {order.status === 'quote_accepted' && 'Quote accepted. Please perform the transaction transfer.'}
+                            {order.status === 'payment_done' && 'Payment marked as completed. Awaiting delivery receipt.'}
+                            {order.status === 'payment_received' && 'Payment verified by seller. Awaiting transport dispatch.'}
                           </div>
                         )}
-                        {order.status === 'delivery_pending' && (
-                          <div className={`rounded-lg border px-3 py-2 text-xs ${borderColor} ${darkMode ? 'bg-gray-800/40 text-gray-300' : 'bg-gray-50 text-gray-600'}`}>
-                            📦 The order is ready for delivery. You can now close the order by confirming receipt.
-                          </div>
-                        )}
+
                         {order.status === 'delivered' && (
-                          <div className={`rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-700 dark:border-green-800/40 dark:bg-green-950/20 dark:text-green-400`}>
-                            🎉 Order completed. Thank you for shopping with us!
+                          <div className="p-3 border border-emerald-500/20 bg-emerald-500/5 text-[11px] text-emerald-500 font-medium" style={{ borderRadius: '2px' }}>
+                            Order fully completed! Thank you for choosing HafiConnect.
                           </div>
                         )}
 
-                        {/* Provider Contact */}
-                        <div className={`rounded-lg border px-3 py-2 text-sm ${borderColor} ${darkMode ? 'bg-gray-900/30 text-gray-200' : 'bg-gray-50 text-gray-700'}`}>
-                          <div className="font-semibold text-xs uppercase tracking-wide text-gray-400">Provider contact</div>
-                          <div className="mt-2 space-y-1">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className={secondaryTextColor}>Phone</span>
-                              <a href={provider?.phone_number ? `tel:${provider.phone_number}` : '#'} className={`text-xs font-medium ${provider?.phone_number ? 'text-hafi-teal hover:underline' : secondaryTextColor}`}>
-                                {provider?.phone_number || 'Not available'}
-                              </a>
+                        {/* Seller Information Card */}
+                        <div className={`border p-4 text-xs space-y-2 ${borderColor} ${darkMode ? 'bg-gray-955 text-gray-300' : 'bg-gray-50 text-gray-850'}`} style={{ borderRadius: '2px' }}>
+                          <div className="font-bold text-[10px] uppercase tracking-widest text-emerald-500 border-b pb-1.5 dark:border-gray-850">Seller Information</div>
+                          <div className="space-y-1.5 mt-2">
+                            <div className="flex justify-between items-center">
+                              <span className={secondaryTextColor}>Name:</span>
+                              <span className="font-bold text-emerald-500">{provider?.name || 'Loading...'}</span>
                             </div>
-                            <div className="flex items-center justify-between gap-2">
-                              <span className={secondaryTextColor}>WhatsApp</span>
+                            <div className="flex justify-between items-center">
+                              <span className={secondaryTextColor}>Phone:</span>
+                              {provider?.phone_number ? (
+                                <a href={`tel:${provider.phone_number}`} className="font-semibold text-emerald-500 hover:underline">
+                                  {provider.phone_number}
+                                </a>
+                              ) : (
+                                <span className="font-semibold text-gray-500">Not Available</span>
+                              )}
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className={secondaryTextColor}>WhatsApp:</span>
                               {provider?.whatsapp_number ? (
                                 <button
                                   type="button"
                                   onClick={() => openWhatsApp(provider.whatsapp_number)}
-                                  className="text-xs font-medium text-emerald-600 hover:underline"
+                                  className="font-semibold text-emerald-500 hover:underline"
                                 >
                                   {provider.whatsapp_number}
                                 </button>
                               ) : (
-                                <span className={secondaryTextColor}>Not available</span>
+                                <span className="font-semibold text-gray-500">Not Available</span>
                               )}
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className={secondaryTextColor}>Email:</span>
+                              <span className="font-semibold select-all">{provider?.email || 'Not Available'}</span>
+                            </div>
+                            <div className="flex justify-between items-start gap-2">
+                              <span className={secondaryTextColor}>Address:</span>
+                              <div className="max-w-[180px] break-words">
+                                {formatAddress(provider?.address || provider?.location)}
+                              </div>
                             </div>
                           </div>
                         </div>
 
-                        {/* Support Buttons */}
+                        {/* Call / WA buttons */}
                         <div className="grid grid-cols-2 gap-2 pt-1">
                           {provider?.phone_number ? (
                             <a
                               href={`tel:${provider.phone_number}`}
-                              className={`flex items-center justify-center gap-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors ${darkMode ? 'border-gray-600 text-gray-100 hover:bg-gray-800' : 'border-gray-300 text-gray-800 hover:bg-gray-100'}`}
+                              className={`flex items-center justify-center border text-xs font-bold uppercase tracking-wider py-2 transition-all
+                                ${darkMode ? 'border-gray-800 text-gray-300 hover:bg-gray-850' : 'border-gray-250 text-gray-700 hover:bg-gray-50'}`}
+                              style={{ borderRadius: '2px' }}
                             >
-                              📞 Call
+                              Call
                             </a>
                           ) : (
-                            <div className={`rounded-lg border px-2 py-1.5 text-center text-xs ${borderColor} ${secondaryTextColor}`}>
-                              No call
-                            </div>
+                            <div className={`p-2 border text-center text-xs text-gray-500 ${borderColor}`} style={{ borderRadius: '2px' }}>Locked</div>
                           )}
+
                           {provider?.whatsapp_number ? (
                             <button
-                              type="button"
                               onClick={() => openWhatsApp(provider.whatsapp_number)}
-                              className="flex items-center justify-center gap-1 rounded-lg bg-emerald-600 px-2 py-1.5 text-xs font-medium text-white transition-colors hover:bg-emerald-700"
+                              className="flex items-center justify-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider py-2"
+                              style={{ borderRadius: '2px' }}
                             >
-                              💬 WhatsApp
+                              <FaWhatsapp className="w-3.5 h-3.5" />
+                              WhatsApp
                             </button>
                           ) : (
-                            <div className={`rounded-lg border px-2 py-1.5 text-center text-xs ${borderColor} ${secondaryTextColor}`}>
-                              No WhatsApp
-                            </div>
+                            <div className={`p-2 border text-center text-xs text-gray-500 ${borderColor}`} style={{ borderRadius: '2px' }}>Locked</div>
                           )}
                         </div>
+
                       </div>
                     </div>
+
                   </div>
-                  
-                  {/* Delivery Note */}
-                  <div className={`mt-3 rounded-lg border px-3 py-1.5 text-[11px] ${borderColor} ${darkMode ? 'bg-gray-900/30 text-gray-400' : 'bg-gray-50 text-gray-500'}`}>
-                    🚚 Transport and delivery are negotiated directly with the service provider.
-                  </div>
+                </div>
+
+                {/* Delivery footer info */}
+                <div className={`px-5 py-2.5 border-t text-[10px] uppercase font-bold tracking-wider ${borderColor} ${darkMode ? 'bg-gray-950/20 text-gray-500' : 'bg-gray-50 text-gray-400'}`} style={{ borderRadius: '2px' }}>
+                   Negotiate dispatch and shipping specifics directly with the seller
                 </div>
               </div>
             );
           })}
+            </div>
+          )}
         </div>
       )}
     </div>

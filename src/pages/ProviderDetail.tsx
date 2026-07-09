@@ -20,20 +20,29 @@ const isVideoUrl = (url: string) => {
 const toAbsoluteMediaUrl = (rawUrl?: string | null) => {
   if (!rawUrl) return '';
 
-  const trimmed = String(rawUrl).trim();
+  let trimmed = String(rawUrl).trim().replace(/\\/g, '/');
   if (!trimmed) return '';
+
+  // Extract nested URL if it's double-prefixed (e.g. http://localhost:5000/https://res.cloudinary.com/...)
+  const nestedHttpIndex = trimmed.indexOf('http', 4);
+  if (nestedHttpIndex !== -1) {
+    trimmed = trimmed.substring(nestedHttpIndex);
+  }
+
+  const uploadsIndex = trimmed.toLowerCase().indexOf('uploads/');
+  if (uploadsIndex !== -1 && /^https?:\/\//i.test(trimmed)) {
+    trimmed = API_BASE + '/' + trimmed.substring(uploadsIndex);
+  }
 
   if (/^(https?:|blob:|data:)/i.test(trimmed)) {
     return trimmed;
   }
 
-  const normalized = trimmed.replace(/\\/g, '/');
-
-  if (normalized.startsWith('/')) {
-    return `${API_BASE}${normalized}`;
+  if (trimmed.startsWith('/')) {
+    return `${API_BASE}${trimmed}`;
   }
 
-  return `${API_BASE}/${normalized.replace(/^\/+/, '')}`;
+  return `${API_BASE}/${trimmed.replace(/^\/+/, '')}`;
 };
 
 const getCardPreviewUrl = (item: { url?: string; views?: string[]; mediaFiles?: Array<{ url: string; type: 'image' | 'video' }> }) => {
@@ -53,6 +62,8 @@ interface Provider {
   location: { lat: number; lng: number } | null;
   whatsapp_number?: string;
   phone_number?: string;
+  profile_image?: string;
+  profile_image_url?: string;
   address?: {
     district?: string;
     sector?: string;
@@ -177,6 +188,15 @@ export default function ProviderDetail() {
     }
     fetchData();
   }, [providerId]);
+
+  useEffect(() => {
+    if (provider) {
+      const directImg = provider.profile_image || provider.profile_image_url;
+      if (directImg) {
+        setProfileImageUrl(toAbsoluteMediaUrl(directImg));
+      }
+    }
+  }, [provider]);
 
   useEffect(() => {
     async function fetchProfileImages() {
@@ -437,14 +457,31 @@ export default function ProviderDetail() {
                     WhatsApp
                   </a>
                 )}
-                <button
-                  onClick={handleChatClick}
-                  className={`w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-colors ${darkMode ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-emerald-500 hover:bg-emerald-600'} text-white`}
-                  style={{ borderRadius: '2px' }}
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  Message
-                </button>
+                <div className="w-full">
+                  <style>{`
+                    @keyframes chat-shake {
+                      0%, 100% { transform: scale(1); }
+                      10%, 30%, 50%, 70%, 90% { transform: scale(1.02) rotate(-0.5deg); }
+                      20%, 40%, 60%, 80% { transform: scale(1.02) rotate(0.5deg); }
+                    }
+                    @keyframes chat-pulse {
+                      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+                      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+                      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+                    }
+                    .chat-wave-shake {
+                      animation: chat-shake 4s infinite ease-in-out, chat-pulse 2s infinite;
+                    }
+                  `}</style>
+                  <button
+                    onClick={handleChatClick}
+                    className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[11px] font-black uppercase tracking-widest shadow-md chat-wave-shake hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2"
+                    style={{ borderRadius: '2px' }}
+                  >
+                    <MessageCircle className="w-4 h-4 animate-bounce" />
+                    <span>Instant Chat Dialog</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
