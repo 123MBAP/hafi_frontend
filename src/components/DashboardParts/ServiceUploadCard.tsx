@@ -309,7 +309,7 @@ export default function ServiceUploadCard({
                         className={`text-[9px] font-bold uppercase tracking-wider text-center mt-1.5 ${darkMode ? 'text-gray-500' : 'text-gray-400'
                           }`}
                       >
-                        Supported: MP4, MOV, AVI (Max 50MB per video)
+                        Supported: MP4, MOV, AVI (Max 3GB per video)
                       </p>
                     </>
                   )}

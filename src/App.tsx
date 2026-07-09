@@ -30,6 +30,7 @@ import Login from './pages/Login';
 import MadeInRwanda from './pages/MadeInRwanda';
 import MadeInRwandaProductDetail from './pages/MadeInRwandaProductDetail';
 import MarketPage from './pages/MarketPage';
+import ShopsPage from './pages/Shops';
 import MarketProductDetil from './pages/MarketProductDetail';
 import OrdersPage from './pages/OrdersPage';
 import NotFound from './pages/PageNotFound';
@@ -44,6 +45,9 @@ import ProviderOrdersPage from './pages/ProviderOrdersPage';
 import RealEstatePage from './pages/RealEstatePage';
 import Register from './pages/Register';
 import ResetPassword from './pages/ResetPassword';
+import AgentLogin from './pages/AgentLogin';
+import AgentRegister from './pages/AgentRegister';
+import AgentDashboard from './pages/AgentDashboard';
 import RwandaLocationSelector from './pages/RwandaLocationSelector';
 import Search from './pages/Search';
 import SellerDashboardPage from './pages/SellerDashboardPage';
@@ -90,10 +94,13 @@ const App: React.FC = () => {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/agent/login" element={<AgentLogin />} />
+              <Route path="/agent/register" element={<AgentRegister />} />
               <Route path="/services" element={<Services />} />
               <Route path="/search" element={<Search />} />
               <Route path="/book/payment" element={<PaymentPage />} />
               <Route path="/market" element={<MarketPage />} />
+              <Route path="/shops" element={<ShopsPage />} />
               <Route path="/made-in-rwanda" element={<MadeInRwanda />} />
               <Route path="/customer-feedbacks" element={<CommentBox />} />
               <Route path="/cart" element={<CartPage />} />
@@ -112,8 +119,16 @@ const App: React.FC = () => {
               <Route path="/checkout" element={<ProviderPayment />} />
               <Route path="/storage-checkout" element={<StorageCheckout />} />
               <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/upgarede/subscriptions" element={<UpgradePlansPage />} />
+              <Route path="/admin/dashboard" element={
+                <ProtectedRoute allowedRoles={['admin']} fallbackPath="/admin/login">
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/upgrade/subscriptions" element={
+                <ProtectedRoute allowedRoles={['admin']} fallbackPath="/admin/login">
+                  <UpgradePlansPage />
+                </ProtectedRoute>
+              } />
               <Route path="/services/:id" element={<ServiceDetailPage />} />
               <Route path="/verify" element={<VerifyPageWrapper />} />
               <Route path="/provider/:providerId/uploads" element={<ProviderDetail />} />
@@ -160,6 +175,11 @@ const App: React.FC = () => {
                 <Route path="provider" element={
                   <ProtectedRoute allowedRoles={['service_provider']}>
                     <Dashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="agent" element={
+                  <ProtectedRoute allowedRoles={['agent']}>
+                    <AgentDashboard />
                   </ProtectedRoute>
                 } />
                 <Route path="orders" element={
@@ -210,15 +230,18 @@ const App: React.FC = () => {
         </main>
 
 
-        <footer className="bg-navy-dark text-white py-10 mt-auto dark:bg-gray-800 dark:text-white">
+        <footer className={`py-12 mt-auto border-t transition-colors duration-300
+          ${darkMode 
+            ? 'bg-gray-950 text-gray-400 border-gray-800' 
+            : 'bg-white text-gray-600 border-gray-200'}`}>
 
-          <div className="container mx-auto px-4 md:px-20 grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8">
             {/* Company Branding and Description */}
             <div>
-              <a href="/" className="text-2xl font-bold text-hafi-green mb-2 block hover:text-green-300 transition-colors">
+              <a href="/" className="text-2xl font-bold text-emerald-600 mb-2 block hover:opacity-85 transition-opacity">
                 HafiConnect
               </a>
-              <p className="text-white/80 font-sans leading-snug">
+              <p className={`font-sans leading-snug text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 HafiConnect connects you with trusted service providers in your area for everything from home repairs to personal wellness. Fast, reliable, and secure.
               </p>
               {/* Social Media */}
@@ -240,8 +263,8 @@ const App: React.FC = () => {
 
             {/* Quick Links */}
             <div>
-              <h4 className="font-sans leading-snug mb-3 text-white">Quick Links</h4>
-              <ul className="space-y-2 font-sans leading-snug text-white/80">
+              <h4 className={`font-sans font-bold leading-snug mb-3 text-sm uppercase tracking-wider ${darkMode ? 'text-white' : 'text-emerald-700'}`}>Quick Links</h4>
+              <ul className="space-y-2 font-sans leading-snug text-sm">
                 <li><a href="/about" className="hover:text-hafi-green transition-colors font-sans leading-snug">About Us</a></li>
                 <li><a href="/contact" className="hover:text-hafi-green transition-colors font-sans leading-snug">Contact</a></li>
                 <li><a href="/faq" className="hover:text-hafi-green transition-colors font-sans leading-snug">FAQs</a></li>
@@ -253,8 +276,8 @@ const App: React.FC = () => {
 
             {/* Popular Services */}
             <div>
-              <h4 className="font-semibold mb-3 text-white font-sans leading-snug">Popular Services</h4>
-              <ul className="space-y-2 text-white/80 font-sans leading-snug">
+              <h4 className={`font-sans font-bold leading-snug mb-3 text-sm uppercase tracking-wider ${darkMode ? 'text-white' : 'text-emerald-700'}`}>Popular Services</h4>
+              <ul className="space-y-2 font-sans leading-snug text-sm">
                 <li><a href="/services/cleaning" className="hover:text-hafi-green transition-colors font-sans leading-snug">Home Cleaning</a></li>
                 <li><a href="/services/plumbing" className="hover:text-hafi-green transition-colors font-sans leading-snug">Plumbing</a></li>
                 <li><a href="/services/electrical" className="hover:text-hafi-green transition-colors font-sans leading-snug">Electrical</a></li>
@@ -266,11 +289,11 @@ const App: React.FC = () => {
 
             {/* Contact & Apps */}
             <div>
-              <h4 className="font-semibold font-sans leading-snug mb-3 text-white">Contact & Download</h4>
-              <p className="text-white/80 text-sm mb-2">
+              <h4 className={`font-sans font-bold leading-snug mb-3 text-sm uppercase tracking-wider ${darkMode ? 'text-white' : 'text-emerald-700'}`}>Contact & Download</h4>
+              <p className={`text-sm mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 Email: <a href="mailto:support@haficonnect.com" className="hover:text-hafi-green transition-colors">support@haficonnect.com</a>
               </p>
-              <p className="text-white/80 text-sm mb-4">
+              <p className={`text-sm mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 Phone: <a href="tel:+1234567890" className="hover:text-hafi-green transition-colors">+1 (234) 567-890</a>
               </p>
               <div className="flex space-x-2">
@@ -285,7 +308,7 @@ const App: React.FC = () => {
           </div>
 
           {/* Footer Bottom */}
-          <div className="border-t border-white/20 mt-8 pt-4 text-center text-white/60 text-xs">
+          <div className={`border-t mt-8 pt-4 text-center text-xs ${darkMode ? 'border-gray-800 text-gray-550' : 'border-gray-200 text-gray-400'}`}>
             &copy; {new Date().getFullYear()} HafiConnect. All rights reserved. &nbsp;|&nbsp;
             <a href="/terms" className="hover:text-hafi-green transition-colors">Terms of Service</a> &nbsp;|&nbsp;
             <a href="/privacy" className="hover:text-hafi-green transition-colors">Privacy Policy</a>

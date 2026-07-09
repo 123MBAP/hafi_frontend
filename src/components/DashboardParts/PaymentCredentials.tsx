@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import LoadingSpinner from "@/components/LoadingSpinner";
+
 // filepath: src/components/DashboardParts/PaymentCredentials.tsx
 import {
   AlertCircle,
@@ -12,9 +16,7 @@ import {
   Wifi,
   XCircle
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useAuth } from "../../context/AuthContext";
-import LoadingSpinner from "@/components/LoadingSpinner";
+
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 

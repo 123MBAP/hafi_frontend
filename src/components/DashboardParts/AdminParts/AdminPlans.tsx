@@ -21,7 +21,10 @@ import {
   ShoppingBag,
   Wrench,
   Save,
-  ArrowLeft
+  ArrowLeft,
+  AlertCircle,
+  AlertTriangle,
+  Crown
 } from 'lucide-react';
 
 interface Plan {
@@ -378,12 +381,59 @@ export default function AdminPlansPage() {
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Information */}
+                {!editingId && !plans.some(p => p.name === 'PREMIUM_SHOP') && (
+                  <div className="p-4 border border-amber-550/20 bg-amber-550/10 text-amber-550 dark:text-amber-400 text-xs flex items-center justify-between mb-4" style={{ borderRadius: '2px' }}>
+                    <div className="flex items-center space-x-2">
+                      <Crown className="w-5 h-5 text-amber-500 animate-pulse animate-duration-1000" />
+                      <div>
+                        <span className="font-bold">Create Unified VIP Shop Plan?</span> Check this box to configure the single plan automatically assigned to custom shop categories.
+                      </div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={form.name === 'PREMIUM_SHOP'}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setForm({
+                            ...form,
+                            name: 'PREMIUM_SHOP',
+                            display_name: 'VIP Shop Plan',
+                            price_monthly: '15000',
+                            price_yearly: '150000',
+                            base_storage_mb: '1024',
+                            max_file_size_mb: '100',
+                            max_products: '100',
+                            can_upload_videos: true,
+                            can_use_analytics: true,
+                            features: 'Up to 100 products, Video uploads supported, Premium analytics dashboard, VIP Shop category listing badge, 1GB base media storage allowance'
+                          });
+                        } else {
+                          setForm({
+                            ...form,
+                            name: '',
+                            display_name: '',
+                            price_monthly: '',
+                            price_yearly: '',
+                            base_storage_mb: '100',
+                            max_file_size_mb: '50',
+                            max_products: '',
+                            can_upload_videos: false,
+                            can_use_analytics: false,
+                            features: ''
+                          });
+                        }
+                      }}
+                      className="rounded border-gray-300 dark:border-gray-700 text-amber-500 focus:ring-amber-550 w-4 h-4 cursor-pointer"
+                    />
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
                     <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
                       darkMode ? 'text-gray-300' : 'text-gray-700'
                     }`}>
-                      Plan Name (Internal)
+                      Plan Name (Internal Key)
                     </label>
                     <div className="relative">
                       <Shield className={`absolute left-3 top-3 w-5 h-5 ${
@@ -394,15 +444,22 @@ export default function AdminPlansPage() {
                         placeholder="e.g., BASIC, PREMIUM"
                         value={form.name}
                         onChange={e => setForm({ ...form, name: e.target.value.toUpperCase() })}
+                        disabled={editingId ? plans.find(p => p.id === editingId)?.name === 'PREMIUM_SHOP' : false}
                         className={`w-full pl-11 pr-4 py-2.5 border transition-all duration-250 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 ${
                           darkMode 
-                            ? 'bg-gray-800 border-gray-750 text-white placeholder-gray-500' 
-                            : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                            ? 'bg-gray-800 border-gray-750 text-white placeholder-gray-500 disabled:bg-gray-850 disabled:text-gray-500' 
+                            : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400 disabled:bg-gray-100 disabled:text-gray-400'
                         }`}
                         style={{ borderRadius: '2px' }}
                         required
                       />
                     </div>
+                    {editingId && plans.find(p => p.id === editingId)?.name === 'PREMIUM_SHOP' && (
+                      <p className="text-[10px] text-amber-550 dark:text-amber-400 font-bold mt-1.5 flex items-center gap-1">
+                        <Crown className="w-3.5 h-3.5" />
+                        Editing Unified VIP Shop Plan. Internal name key is locked to PREMIUM_SHOP.
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${

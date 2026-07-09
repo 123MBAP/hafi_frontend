@@ -55,8 +55,8 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
   const isActive = (path: string) => {
     const isCurrent = location.pathname === path;
     return isCurrent
-      ? 'text-blue-500 font-semibold border-b-2 border-blue-500 pb-1'
-      : `${darkMode ? 'text-gray-300 hover:text-blue-400' : 'text-gray-700 hover:text-blue-500'} hover:border-b hover:border-gray-300 pb-1`;
+      ? 'text-emerald-500 font-semibold border-b-2 border-emerald-500 pb-1'
+      : `${darkMode ? 'text-gray-300 hover:text-emerald-400' : 'text-gray-700 hover:text-emerald-500'} hover:border-b hover:border-gray-300 pb-1`;
   };
 
   const handleSearch = async (query: string): Promise<void> => {
@@ -168,10 +168,10 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
               />
               <button
                 type="submit"
-                className={`p-1 rounded-md ml-2 transition-colors ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-500 hover:text-blue-600'}`}
+                className={`p-1 rounded-md ml-2 transition-colors ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-500 hover:text-emerald-600'}`}
               >
                 {isSearching ? (
-                  <div className="w-5 h-5 border-2 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-2 border-t-emerald-500 border-gray-300 rounded-full animate-spin"></div>
                 ) : (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103 10.5a7.5 7.5 0 0013.15 6.15z" strokeLinecap="round" strokeLinejoin="round" />
@@ -186,7 +186,7 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
               {isSearching ? (
                 <div className={`rounded-lg border shadow-sm p-4 ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-white border-gray-200 text-gray-600'}`}>
                   <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 border-2 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
+                    <div className="w-5 h-5 border-2 border-t-emerald-500 border-gray-300 rounded-full animate-spin"></div>
                     <span>Searching...</span>
                   </div>
                 </div>
@@ -204,11 +204,12 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
 
         {/* Right-side actions (auth, cart, theme) */}
         <nav className="flex items-center space-x-6">
-          <Link to="/market" className={`text-sm font-medium transition-colors ${darkMode ? 'text-gray-300 hover:text-blue-400' : 'text-gray-700 hover:text-blue-500'}`}>Market</Link>
+          <Link to="/market" className={`text-sm font-medium transition-colors ${darkMode ? 'text-gray-300 hover:text-emerald-400' : 'text-gray-700 hover:text-emerald-500'}`}>Market</Link>
+          <Link to="/shops" className={`text-sm font-medium transition-colors ${darkMode ? 'text-gray-300 hover:text-emerald-400' : 'text-gray-700 hover:text-emerald-500'}`}>Shops</Link>
           {/* Made in Rwanda with gradient text (no background) */}
           <Link
             to="/made-in-rwanda"
-            className={`text-sm font-bold bg-gradient-to-r from-sky-500 via-yellow-400 to-green-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity duration-200 ${location.pathname === '/made-in-rwanda' ? 'border-b-2 border-green-600 pb-1' : ''
+            className={`text-sm font-bold bg-gradient-to-r from-sky-500 via-yellow-400 to-green-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity duration-200 ${location.pathname === '/made-in-rwanda' ? 'border-b-2 border-emerald-500 pb-1' : ''
               }`}
           >
             Made in Rwanda
@@ -225,15 +226,15 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
               className="flex items-center space-x-2 focus:outline-none"
             >
               <img
-                src="https://ui-avatars.com/api/?name=User&background=00838F&color=fff"
+                src="https://ui-avatars.com/api/?name=User&background=10B981&color=fff"
                 alt="Profile"
-                className="w-8 h-8 rounded-full border border-hafi-teal"
+                className="w-8 h-8 rounded-full border border-emerald-500"
               />
             </Link>
           ) : (
             <div className="flex items-center space-x-4">
               <Link to="/register" className={`text-sm font-medium transition-colors ${isActive('/register')}`}>Register</Link>
-              <Link to="/login" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">Login</Link>
+              <Link to="/login" className="bg-emerald-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-emerald-600 transition-colors">Login</Link>
             </div>
           )}
 
@@ -283,6 +284,7 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
             <Link to="/" className={`mt-2 mb-1 font-medium transition-colors ${isActive('/')}`}>Home</Link>
             <Link to="/services" className={`mt-2 mb-1 font-medium transition-colors ${isActive('/services')}`}>Services</Link>
             <Link to="/market" className={`mt-2 mb-1 font-medium transition-colors ${isActive('/market')}`}>Market</Link>
+            <Link to="/shops" className={`mt-2 mb-1 font-medium transition-colors ${isActive('/shops')}`}>Shops</Link>
             {/* Made in Rwanda with gradient text */}
             <Link to="/made-in-rwanda"
               className={`mt-2 mb-1 text-sm font-bold bg-gradient-to-r from-sky-500 via-yellow-400 to-green-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity duration-200 ${location.pathname === '/made-in-rwanda' ? 'border-b-2 border-green-600 pb-1' : ''
@@ -350,10 +352,10 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
               />
               <button
                 type="submit"
-                className={`p-1 rounded-md ml-2 transition-colors ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-500 hover:text-blue-600'}`}
+                className={`p-1 rounded-md ml-2 transition-colors ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-500 hover:text-emerald-600'}`}
               >
                 {isSearching ? (
-                  <div className="w-5 h-5 border-2 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-2 border-t-emerald-500 border-gray-300 rounded-full animate-spin"></div>
                 ) : (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103 10.5a7.5 7.5 0 0013.15 6.15z" strokeLinecap="round" strokeLinejoin="round" />
@@ -367,7 +369,7 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
                 {isSearching ? (
                   <div className={`rounded-lg border shadow-sm p-3 ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-white border-gray-200 text-gray-600'}`}>
                     <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 border-2 border-t-blue-500 border-gray-300 rounded-full animate-spin"></div>
+                      <div className="w-5 h-5 border-2 border-t-emerald-500 border-gray-300 rounded-full animate-spin"></div>
                       <span>Searching...</span>
                     </div>
                   </div>
@@ -415,6 +417,7 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
             <Link to="/" className={`px-4 py-3 rounded-md transition-colors ${isActive('/')} ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} onClick={closeMenu}>Home</Link>
             <Link to="/services" className={`px-4 py-3 rounded-md transition-colors ${isActive('/services')} ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} onClick={closeMenu}>Services</Link>
             <Link to="/market" className={`px-4 py-3 rounded-md transition-colors ${isActive('/market')} ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} onClick={closeMenu}>Market</Link>
+            <Link to="/shops" className={`px-4 py-3 rounded-md transition-colors ${isActive('/shops')} ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} onClick={closeMenu}>Shops</Link>
             <Link to="/real-estate" className={`px-4 py-3 rounded-md transition-colors ${isActive('/real-estate')} ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} onClick={closeMenu}>Real Estate</Link>
             <Link to="/real-estate/commissioners" className={`px-4 py-3 rounded-md transition-colors ${isActive('/real-estate/commissioners')} ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} onClick={closeMenu}>Commissioners</Link>
             <Link to="/updates" className={`px-4 py-3 rounded-md transition-colors ${isActive('/updates')} ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} onClick={closeMenu}>Updates</Link>
@@ -438,7 +441,7 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
             ) : (
               <>
                 <Link to="/register" className={`px-4 py-3 rounded-md transition-colors ${isActive('/register')} ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} onClick={closeMenu}>Register</Link>
-                <Link to="/login" className="px-4 py-3 rounded-md bg-blue-600 text-white text-center hover:bg-blue-700 transition-colors" onClick={closeMenu}>Login</Link>
+                <Link to="/login" className="px-4 py-3 rounded-md bg-emerald-500 text-white text-center hover:bg-emerald-600 transition-colors" onClick={closeMenu}>Login</Link>
               </>
             )}
             <div className="border-t my-2"></div>

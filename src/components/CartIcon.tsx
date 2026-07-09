@@ -16,9 +16,9 @@ export default function CartIconWithCount() {
         style={{ display: "block", margin: "0 auto" }}
         xmlns="http://www.w3.org/2000/svg"
       >
-        <g stroke="#00838F" strokeWidth="2.2">
-          <circle cx="12" cy="31" r="1.9" fill="#00838F" />
-          <circle cx="27" cy="31" r="1.9" fill="#00838F" />
+        <g stroke="#10B981" strokeWidth="2.2">
+          <circle cx="12" cy="31" r="1.9" fill="#10B981" />
+          <circle cx="27" cy="31" r="1.9" fill="#10B981" />
           <path d="M5 9.5H7.7L10.8 25.5H29.2L32 13.5H9" strokeLinejoin="round" />
         </g>
       </svg>

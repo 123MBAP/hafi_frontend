@@ -37,9 +37,9 @@ type PlanInfo = {
   features: {
     can_upload_images: boolean;
     can_upload_videos: boolean;
-    max_image_size_mb: number;
-    max_video_size_mb: number;
-    max_products: number;
+    max_image_size_mb: number | string;
+    max_video_size_mb: number | string;
+    max_products: number | string;
     support_level: string;
   };
 };
@@ -399,14 +399,14 @@ export default function StorageDashboard() {
               <div className="flex items-center justify-between">
                 <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Max Image Size</span>
                 <span className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {plan.features.max_image_size_mb} MB
+                  {plan.features.max_image_size_mb === 'Unlimited' ? 'Unlimited' : `${plan.features.max_image_size_mb} MB`}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
                 <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Max Video Size</span>
                 <span className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {plan.features.max_video_size_mb} MB
+                  {plan.features.max_video_size_mb === 'Unlimited' ? 'Unlimited' : `${plan.features.max_video_size_mb} MB`}
                 </span>
               </div>
 

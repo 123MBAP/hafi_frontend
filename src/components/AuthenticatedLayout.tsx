@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useDarkMode } from '@/context/DarkMode';
-import { LayoutDashboard, User, Store, Briefcase, ShoppingBag, MessageCircle, TrendingUp, LogOut } from 'lucide-react';
+import { LayoutDashboard, User, Store, Briefcase, ShoppingBag, MessageCircle, TrendingUp, LogOut, ShieldCheck } from 'lucide-react';
 
 export default function AuthenticatedLayout() {
   const { user, logout } = useAuth();
@@ -21,6 +21,7 @@ export default function AuthenticatedLayout() {
     if (path === '/dashboard/orders') return <ShoppingBag className="w-4 h-4" />;
     if (path === '/dashboard/messages') return <MessageCircle className="w-4 h-4" />;
     if (path === '/dashboard/upgrade') return <TrendingUp className="w-4 h-4" />;
+    if (path === '/dashboard/agent') return <ShieldCheck className="w-4 h-4" />;
     return null;
   };
 
@@ -40,6 +41,7 @@ export default function AuthenticatedLayout() {
     { path: '/dashboard', label: 'Overview', roles: ['all'] },
     { path: '/dashboard/seller', label: 'Seller Area', roles: ['seller'], icon: <Store className="w-4 h-4" /> },
     { path: '/dashboard/provider', label: 'Service Provider', roles: ['service_provider'], icon: <Briefcase className="w-4 h-4" /> },
+    { path: '/dashboard/agent', label: 'Agent Area', roles: ['agent'], icon: <ShieldCheck className="w-4 h-4" /> },
     { path: '/dashboard/account', label: 'Account', roles: ['all'] },
     { path: '/dashboard/orders', label: 'Clients Orders', roles: ['all'] },
     { path: '/dashboard/messages', label: 'Messages', roles: ['all'] },
@@ -47,9 +49,13 @@ export default function AuthenticatedLayout() {
   ];
 
 
-  const allNavItems = [...navItems.filter(item => 
-    item.roles.some(role => role === 'all' || roles.includes(role))
-  )];
+  const isAgent = roles.includes('agent');
+  const allNavItems = navItems.filter(item => {
+    if (isAgent) {
+      return item.roles.includes('agent');
+    }
+    return item.roles.some(role => role === 'all' || roles.includes(role));
+  });
 
   // Desktop navigation - aligned to right
   const DesktopNav = () => (

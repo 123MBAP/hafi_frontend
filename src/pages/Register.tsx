@@ -14,7 +14,7 @@ import {
   Users
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { getNavigationPath } from '../utils/navigationUtils';
 import { cachedFetch } from '../utils/cachedFetch';
 import VerifyEmailForm from './VerifyEmailForm';
@@ -36,6 +36,7 @@ export default function RegisterPage() {
     name: '',
     role: '',
     service: '',
+    shopping_type_id: '',
     email: '',
     password: '',
     location: '',
@@ -61,6 +62,31 @@ export default function RegisterPage() {
       }
     }
     fetchServices();
+  }, []);
+
+  const [shoppingTypes, setShoppingTypes] = useState<{ id: number; name: string; key?: string }[]>([]);
+  const [shopPlan, setShopPlan] = useState<any>(null);
+  const [loadingShoppingTypes, setLoadingShoppingTypes] = useState(true);
+
+  useEffect(() => {
+    async function fetchShoppingTypes() {
+      try {
+        const res = await fetch(`${API_BASE}/api/shopping-types`);
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : (data.shopping_types || []);
+        setShoppingTypes(list);
+        setShopPlan(data.shop_plan || null);
+        const defaultST = list.find((st: any) => st.name.toLowerCase().includes('other')) || list[0];
+        if (defaultST) {
+          setForm(prev => ({ ...prev, shopping_type_id: String(defaultST.id) }));
+        }
+      } catch (err) {
+        console.error('Failed to fetch shopping types:', err);
+      } finally {
+        setLoadingShoppingTypes(false);
+      }
+    }
+    fetchShoppingTypes();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -104,6 +130,8 @@ export default function RegisterPage() {
       if (form.role === 'service_provider') {
         payload.service_id = form.service;
         payload.location = location;
+      } else if (form.role === 'seller') {
+        payload.shopping_type_id = form.shopping_type_id ? parseInt(form.shopping_type_id) : null;
       }
 
       const res = await fetch(`${API_BASE}/api/register`, {
@@ -149,6 +177,13 @@ export default function RegisterPage() {
           navigate(path);
         } else {
           setGoogleUserData(data.user);
+          setForm(prev => ({
+            ...prev,
+            role: '',
+            service: '',
+            location: '',
+            locationOption: 'skip'
+          }));
           setStep('google-role-select');
         }
       } else {
@@ -196,6 +231,8 @@ export default function RegisterPage() {
       if (form.role === 'service_provider') {
         payload.service_id = form.service;
         payload.location = location;
+      } else if (form.role === 'seller') {
+        payload.shopping_type_id = form.shopping_type_id ? parseInt(form.shopping_type_id) : null;
       }
 
       const res = await fetch(`${API_BASE}/api/auth/google/complete-registration`, {
@@ -226,15 +263,17 @@ export default function RegisterPage() {
 
   const getRoleDescription = (role: string) => {
     switch (role) {
-      case 'service_provider': return 'Offer services to customers';
-      case 'seller': return 'Sell products and manage inventory';
-      case 'customer': return 'Browse and book services';
+      case 'service_provider': return 'Service provider and selling related products';
+      case 'seller': return 'Selling products and goods';
+      case 'customer': return 'Buying products and find services';
       default: return '';
     }
   };
 
   const showServiceField = form.role === 'service_provider';
+  const showShopField = form.role === 'seller';
   const showLocationFields = form.role === 'service_provider';
+  const selectedShopType = shoppingTypes.find(st => String(st.id) === String(form.shopping_type_id));
 
   return (
     <div className={`min-h-screen pt-2 pb-8 transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
@@ -335,85 +374,181 @@ export default function RegisterPage() {
                 {/* Role Selection */}
                 <div>
                   <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
-                    Select your role
+                    Choose how you want to use HafiConnect
                   </label>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-3">
                     {[
-                      { value: 'service_provider', label: 'Service Provider', icon: Building },
-                      { value: 'seller', label: 'Seller', icon: ShoppingCart },
-                      { value: 'customer', label: 'Customer', icon: Users },
-                    ].map((role) => (
-                      <div
-                        key={role.value}
-                        className={`p-3 border cursor-pointer transition-colors ${
-                          form.role === role.value
-                            ? darkMode
-                              ? 'border-emerald-500 bg-emerald-500/10'
-                              : 'border-emerald-500 bg-emerald-50'
-                            : darkMode
-                            ? 'border-gray-700 bg-gray-900 hover:border-gray-600'
-                            : 'border-gray-250 bg-white hover:border-gray-350'
-                        }`}
-                        style={{ borderRadius: '2px' }}
-                        onClick={() => setForm({ ...form, role: role.value })}
-                      >
-                        <div className="flex flex-col items-center text-center gap-2">
-                          <role.icon className={`w-5 h-5 ${
-                            form.role === role.value
-                              ? 'text-emerald-500'
-                              : darkMode ? 'text-gray-400' : 'text-gray-500'
-                          }`} />
-                          <span className={`text-xs font-bold uppercase tracking-wider ${
-                            form.role === role.value
-                              ? darkMode ? 'text-emerald-450' : 'text-emerald-755'
-                              : darkMode ? 'text-gray-300' : 'text-gray-600'
-                          }`}>
-                            {role.label}
-                          </span>
+                      { value: 'service_provider', label: 'Service provider and selling related products', icon: Building },
+                      { value: 'seller', label: 'Selling products and goods', icon: ShoppingCart },
+                      { value: 'customer', label: 'Buying products and find services', icon: Users },
+                    ].map((role) => {
+                      const isSelected = form.role === role.value;
+                      return (
+                        <div
+                          key={role.value}
+                          className={`flex flex-col border cursor-pointer transition-all duration-200 ${
+                            isSelected
+                              ? darkMode
+                                ? 'border-emerald-500 bg-emerald-500/10'
+                                : 'border-emerald-500 bg-emerald-50'
+                              : darkMode
+                              ? 'border-gray-700 bg-gray-900 hover:border-gray-600'
+                              : 'border-gray-255 bg-white hover:border-gray-350'
+                          }`}
+                          style={{ borderRadius: '2px' }}
+                          onClick={() => setForm({ ...form, role: role.value })}
+                        >
+                          <div className="flex items-center gap-4 p-4">
+                            {/* Check selection indicator */}
+                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 transition-colors duration-200 ${
+                              isSelected
+                                ? 'border-emerald-500 bg-emerald-500'
+                                : darkMode ? 'border-gray-600 bg-transparent' : 'border-gray-300 bg-transparent'
+                            }`}>
+                              {isSelected && (
+                                <div className="w-2 h-2 rounded-full bg-white" />
+                              )}
+                            </div>
+
+                            {/* Icon */}
+                            <role.icon className={`w-5 h-5 flex-shrink-0 ${
+                              isSelected
+                                ? 'text-emerald-500'
+                                : darkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`} />
+
+                            {/* Label */}
+                            <span className={`text-xs font-bold uppercase tracking-wider ${
+                              isSelected
+                                ? darkMode ? 'text-emerald-450' : 'text-emerald-755'
+                                : darkMode ? 'text-gray-300' : 'text-gray-600'
+                            }`}>
+                              {role.label}
+                            </span>
+                          </div>
+
+                          {/* Nested dropdown for Service Provider */}
+                          {role.value === 'service_provider' && isSelected && (
+                            <div className="px-4 pb-4 pt-1" onClick={(e) => e.stopPropagation()}>
+                              <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                Select service to provide
+                              </label>
+                              {loadingServices ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-emerald-500 border-t-transparent"></div>
+                              ) : (
+                                <select
+                                  name="service"
+                                  value={form.service}
+                                  onChange={handleChange}
+                                  required
+                                  className={`w-full p-2 border text-xs transition-colors ${
+                                    darkMode
+                                      ? 'bg-gray-950 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
+                                      : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
+                                  }`}
+                                  style={{ borderRadius: '2px' }}
+                                >
+                                  <option value="">-- Select a service --</option>
+                                  {services.map(service => (
+                                    <option key={service.id} value={service.id}>
+                                      {service.title}
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Nested dropdown for Seller */}
+                          {role.value === 'seller' && isSelected && (
+                            <div className="px-4 pb-4 pt-1" onClick={(e) => e.stopPropagation()}>
+                              <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                Select Shop Type
+                              </label>
+                              {loadingShoppingTypes ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-emerald-500 border-t-transparent"></div>
+                              ) : (
+                                <select
+                                  name="shopping_type_id"
+                                  value={form.shopping_type_id}
+                                  onChange={handleChange}
+                                  required
+                                  className={`w-full p-2 border text-xs transition-colors ${
+                                    darkMode
+                                      ? 'bg-gray-950 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
+                                      : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
+                                  }`}
+                                  style={{ borderRadius: '2px' }}
+                                >
+                                  {[...shoppingTypes]
+                                    .sort((a, b) => {
+                                      const aIsOther = a.name.toLowerCase().includes('other');
+                                      const bIsOther = b.name.toLowerCase().includes('other');
+                                      if (aIsOther && !bIsOther) return -1;
+                                      if (!aIsOther && bIsOther) return 1;
+                                      return 0;
+                                    })
+                                    .map(st => (
+                                      <option key={st.id} value={st.id}>
+                                        {st.name}
+                                      </option>
+                                    ))}
+                                </select>
+                              )}
+                              
+                              {/* Selected Premium Shop Type Details */}
+                              {selectedShopType && selectedShopType.key !== 'other' && (
+                                <div className={`mt-3 p-3 border transition-colors ${darkMode ? 'bg-amber-950/20 border-amber-900/50' : 'bg-amber-50/50 border-amber-200'} space-y-2`} style={{ borderRadius: '2px' }}>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-[9px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                      👑 {shopPlan?.display_name || 'VIP Shop Plan'}
+                                    </span>
+                                    <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-450">
+                                      RWF {(shopPlan?.price_monthly || 15000).toLocaleString()} / mo
+                                    </span>
+                                  </div>
+                                  
+                                  <div className="text-[10px] text-gray-400 dark:text-gray-300 space-y-0.5">
+                                    <div>Products: {shopPlan?.max_products || 100} max</div>
+                                    <div>Storage: {shopPlan?.base_storage_mb || 1024} MB</div>
+                                  </div>
+
+                                  {shopPlan?.features && (() => {
+                                    let list: string[] = [];
+                                    if (Array.isArray(shopPlan.features)) {
+                                      list = shopPlan.features;
+                                    } else {
+                                      try {
+                                        const parsed = typeof shopPlan.features === 'string' ? JSON.parse(shopPlan.features) : shopPlan.features;
+                                        if (Array.isArray(parsed)) list = parsed;
+                                      } catch {
+                                        list = [];
+                                      }
+                                    }
+                                    if (list.length === 0) return null;
+                                    return (
+                                      <div className="pt-1.5 border-t border-gray-800/10 dark:border-gray-700/30">
+                                        <div className="text-[9px] font-bold text-gray-550 uppercase tracking-wider mb-1">Features Included:</div>
+                                        <div className="grid grid-cols-1 gap-1">
+                                          {list.map((f, i) => (
+                                            <div key={i} className="text-[10px] flex items-center gap-1 text-gray-600 dark:text-gray-355">
+                                              <span className="text-emerald-500">•</span>
+                                              <span>{f}</span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
-
-                {/* Service Selection */}
-                {showServiceField && (
-                  <div>
-                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
-                      Select service to provide
-                    </label>
-                    {loadingServices ? (
-                      <div
-                        className={`p-3 border text-center ${
-                          darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-55 border-gray-250'
-                        }`}
-                        style={{ borderRadius: '2px' }}
-                      >
-                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-emerald-500 border-t-transparent mx-auto"></div>
-                      </div>
-                    ) : (
-                      <select
-                        name="service"
-                        value={form.service}
-                        onChange={handleChange}
-                        required
-                        className={`w-full p-2.5 border text-sm transition-colors ${
-                          darkMode
-                            ? 'bg-gray-900 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
-                            : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
-                        }`}
-                        style={{ borderRadius: '2px' }}
-                      >
-                        <option value="">-- Select a service --</option>
-                        {services.map(service => (
-                          <option key={service.id} value={service.id}>
-                            {service.title}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
-                )}
 
                 {/* Email Field */}
                 <div>
@@ -608,6 +743,18 @@ export default function RegisterPage() {
                   )}
                 </button>
               </form>
+
+              {/* Agent Registration Link */}
+              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-center">
+                <Link
+                  to="/agent/register"
+                  className={`text-xs font-bold uppercase tracking-wider transition-colors ${
+                    darkMode ? 'text-emerald-450 hover:text-emerald-350' : 'text-emerald-600 hover:text-emerald-700'
+                  }`}
+                >
+                  Register as HafiConnect Agent
+                </Link>
+              </div>
             </>
           ) : step === 'google-role-select' ? (
             /* Google Role Selection Step */
@@ -639,83 +786,179 @@ export default function RegisterPage() {
                   <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
                     Select your role
                   </label>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-3">
                     {[
-                      { value: 'service_provider', label: 'Service Provider', icon: Building },
-                      { value: 'seller', label: 'Seller', icon: ShoppingCart },
-                      { value: 'customer', label: 'Customer', icon: Users },
-                    ].map((role) => (
-                      <div
-                        key={role.value}
-                        className={`p-3 border cursor-pointer transition-colors ${
-                          form.role === role.value
-                            ? darkMode
-                              ? 'border-emerald-500 bg-emerald-500/10'
-                              : 'border-emerald-500 bg-emerald-50'
-                            : darkMode
-                            ? 'border-gray-700 bg-gray-900 hover:border-gray-600'
-                            : 'border-gray-255 bg-white hover:border-gray-350'
-                        }`}
-                        style={{ borderRadius: '2px' }}
-                        onClick={() => setForm({ ...form, role: role.value })}
-                      >
-                        <div className="flex flex-col items-center text-center gap-2">
-                          <role.icon className={`w-5 h-5 ${
-                            form.role === role.value
-                              ? 'text-emerald-500'
-                              : darkMode ? 'text-gray-400' : 'text-gray-500'
-                          }`} />
-                          <span className={`text-xs font-bold uppercase tracking-wider ${
-                            form.role === role.value
-                              ? darkMode ? 'text-emerald-450' : 'text-emerald-755'
-                              : darkMode ? 'text-gray-300' : 'text-gray-600'
-                          }`}>
-                            {role.label}
-                          </span>
+                      { value: 'service_provider', label: 'Service provider and selling related products', icon: Building },
+                      { value: 'seller', label: 'Selling products and goods', icon: ShoppingCart },
+                      { value: 'customer', label: 'Buying products and find services', icon: Users },
+                    ].map((role) => {
+                      const isSelected = form.role === role.value;
+                      return (
+                        <div
+                          key={role.value}
+                          className={`flex flex-col border cursor-pointer transition-all duration-200 ${
+                            isSelected
+                              ? darkMode
+                                ? 'border-emerald-500 bg-emerald-500/10'
+                                : 'border-emerald-500 bg-emerald-50'
+                              : darkMode
+                              ? 'border-gray-700 bg-gray-900 hover:border-gray-600'
+                              : 'border-gray-255 bg-white hover:border-gray-350'
+                          }`}
+                          style={{ borderRadius: '2px' }}
+                          onClick={() => setForm({ ...form, role: role.value })}
+                        >
+                          <div className="flex items-center gap-4 p-4">
+                            {/* Check selection indicator */}
+                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 transition-colors duration-200 ${
+                              isSelected
+                                ? 'border-emerald-500 bg-emerald-500'
+                                : darkMode ? 'border-gray-600 bg-transparent' : 'border-gray-300 bg-transparent'
+                            }`}>
+                              {isSelected && (
+                                <div className="w-2 h-2 rounded-full bg-white" />
+                              )}
+                            </div>
+
+                            {/* Icon */}
+                            <role.icon className={`w-5 h-5 flex-shrink-0 ${
+                              isSelected
+                                ? 'text-emerald-500'
+                                : darkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`} />
+
+                            {/* Label */}
+                            <span className={`text-xs font-bold uppercase tracking-wider ${
+                              isSelected
+                                ? darkMode ? 'text-emerald-450' : 'text-emerald-755'
+                                : darkMode ? 'text-gray-300' : 'text-gray-600'
+                            }`}>
+                              {role.label}
+                            </span>
+                          </div>
+
+                          {/* Nested dropdown for Service Provider */}
+                          {role.value === 'service_provider' && isSelected && (
+                            <div className="px-4 pb-4 pt-1" onClick={(e) => e.stopPropagation()}>
+                              <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                                Select service to provide
+                              </label>
+                              {loadingServices ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-emerald-500 border-t-transparent"></div>
+                              ) : (
+                                <select
+                                  name="service"
+                                  value={form.service}
+                                  onChange={handleChange}
+                                  required
+                                  className={`w-full p-2 border text-xs transition-colors ${
+                                    darkMode
+                                      ? 'bg-gray-955 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
+                                      : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
+                                  }`}
+                                  style={{ borderRadius: '2px' }}
+                                >
+                                  <option value="">-- Select a service --</option>
+                                  {services.map(service => (
+                                    <option key={service.id} value={service.id}>
+                                      {service.title}
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Nested dropdown for Seller */}
+                          {role.value === 'seller' && isSelected && (
+                            <div className="px-4 pb-4 pt-1" onClick={(e) => e.stopPropagation()}>
+                              <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                                Select Shop Type
+                              </label>
+                              {loadingShoppingTypes ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-emerald-500 border-t-transparent"></div>
+                              ) : (
+                                <select
+                                  name="shopping_type_id"
+                                  value={form.shopping_type_id}
+                                  onChange={handleChange}
+                                  required
+                                  className={`w-full p-2 border text-xs transition-colors ${
+                                    darkMode
+                                      ? 'bg-gray-955 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
+                                      : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
+                                  }`}
+                                  style={{ borderRadius: '2px' }}
+                                >
+                                  {[...shoppingTypes]
+                                    .sort((a, b) => {
+                                      const aIsOther = a.name.toLowerCase().includes('other');
+                                      const bIsOther = b.name.toLowerCase().includes('other');
+                                      if (aIsOther && !bIsOther) return -1;
+                                      if (!aIsOther && bIsOther) return 1;
+                                      return 0;
+                                    })
+                                    .map(st => (
+                                      <option key={st.id} value={st.id}>
+                                        {st.name}
+                                      </option>
+                                    ))}
+                                </select>
+                              )}
+                              
+                              {/* Selected Premium Shop Type Details */}
+                              {selectedShopType && selectedShopType.key !== 'other' && (
+                                <div className={`mt-3 p-3 border transition-colors ${darkMode ? 'bg-amber-950/20 border-amber-900/50' : 'bg-amber-50/50 border-amber-200'} space-y-2`} style={{ borderRadius: '2px' }}>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-[9px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                      👑 {shopPlan?.display_name || 'VIP Shop Plan'}
+                                    </span>
+                                    <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-450">
+                                      RWF {(shopPlan?.price_monthly || 15000).toLocaleString()} / mo
+                                    </span>
+                                  </div>
+                                  
+                                  <div className="text-[10px] text-gray-400 dark:text-gray-300 space-y-0.5">
+                                    <div>Products: {shopPlan?.max_products || 100} max</div>
+                                    <div>Storage: {shopPlan?.base_storage_mb || 1024} MB</div>
+                                  </div>
+
+                                  {shopPlan?.features && (() => {
+                                    let list: string[] = [];
+                                    if (Array.isArray(shopPlan.features)) {
+                                      list = shopPlan.features;
+                                    } else {
+                                      try {
+                                        const parsed = typeof shopPlan.features === 'string' ? JSON.parse(shopPlan.features) : shopPlan.features;
+                                        if (Array.isArray(parsed)) list = parsed;
+                                      } catch {
+                                        list = [];
+                                      }
+                                    }
+                                    if (list.length === 0) return null;
+                                    return (
+                                      <div className="pt-1.5 border-t border-gray-800/10 dark:border-gray-700/30">
+                                        <div className="text-[9px] font-bold text-gray-550 uppercase tracking-wider mb-1">Features Included:</div>
+                                        <div className="grid grid-cols-1 gap-1">
+                                          {list.map((f, i) => (
+                                            <div key={i} className="text-[10px] flex items-center gap-1 text-gray-600 dark:text-gray-355">
+                                              <span className="text-emerald-500">•</span>
+                                              <span>{f}</span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
-
-                {/* Service Selection - Only for Service Providers */}
-                {showServiceField && (
-                  <div>
-                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
-                      Select service to provide
-                    </label>
-                    {loadingServices ? (
-                      <div
-                        className={`p-3 border text-center ${
-                          darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-55 border-gray-250'
-                        }`}
-                        style={{ borderRadius: '2px' }}
-                      >
-                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-emerald-500 border-t-transparent mx-auto"></div>
-                      </div>
-                    ) : (
-                      <select
-                        name="service"
-                        value={form.service}
-                        onChange={handleChange}
-                        required
-                        className={`w-full p-2.5 border text-sm transition-colors ${
-                          darkMode
-                            ? 'bg-gray-900 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
-                            : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
-                        }`}
-                        style={{ borderRadius: '2px' }}
-                      >
-                        <option value="">-- Select a service --</option>
-                        {services.map(service => (
-                          <option key={service.id} value={service.id}>
-                            {service.title}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
-                )}
 
                 {/* Location Fields - Only for Service Providers */}
                 {showLocationFields && (

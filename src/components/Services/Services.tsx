@@ -8,8 +8,7 @@ import { useDarkMode } from '@/context/DarkMode';
 import { cachedFetch } from '@/utils/cachedFetch';
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Filter, ChevronRight, X } from 'lucide-react';
-import CategoryFilter from './CategoryFilter';
+import { Filter, X } from 'lucide-react';
 import ServiceCard from './ServiceCard';
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
@@ -114,10 +113,10 @@ export default function Services() {
         {/* Header */}
         <div className="mb-6">
           <h1 className={`text-2xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
-            Our Services
+            Available Services
           </h1>
           <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
-            {filteredServices.length} services available
+            {filteredServices.length} services available.  Compare options, make your choice, and connect with service providers instantly.
           </p>
         </div>
 
@@ -213,7 +212,7 @@ export default function Services() {
           <>
             {paginatedServices.length > 0 ? (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-3">
                   {paginatedServices.map((service) => (
                     <Link
                       to={`/services/${service.id}`}

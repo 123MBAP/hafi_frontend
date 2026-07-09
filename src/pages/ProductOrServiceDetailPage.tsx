@@ -5,6 +5,35 @@ import { cachedFetch } from '../utils/cachedFetch';
 import ProductOrServiceDetail from './ProductOrServiceDetail';
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
+const toAbsoluteMediaUrl = (rawUrl?: string | null) => {
+  if (!rawUrl) return '';
+
+  const trimmed = String(rawUrl).trim();
+  if (!trimmed) return '';
+
+  if (/^(https?:|blob:|data:)/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  const normalized = trimmed.replace(/\\/g, '/');
+
+  if (normalized.startsWith('/')) {
+    return `${API_BASE}${normalized}`;
+  }
+
+  return `${API_BASE}/${normalized.replace(/^\/+/, '')}`;
+};
+
+interface ProviderProfile {
+  id: string;
+  name?: string;
+  email?: string;
+  phone_number?: string;
+  whatsapp_number?: string;
+  profile_image?: string;
+  profile_image_url?: string;
+}
+
 
 interface ProviderImage {
   productId: string;
@@ -23,6 +52,7 @@ interface ProviderImage {
 export default function ProductOrServicesDetailPage() {
   const { providerId, imageIndex } = useParams<{ providerId: string; imageIndex: string }>();
   const [imageData, setImageData] = useState<ProviderImage | null>(null);
+  const [provider, setProvider] = useState<ProviderProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,6 +66,9 @@ export default function ProductOrServicesDetailPage() {
         // Use the same uploads endpoint used elsewhere so data shape matches
         const data = await cachedFetch<any>(`${API_BASE}/api/providers/${providerId}/uploads/images`);
         console.log('dataimagass', data)
+
+        const providerData = await cachedFetch<ProviderProfile>(`${API_BASE}/api/providers/${providerId}`);
+        setProvider(providerData);
 
         const allImages: ProviderImage[] = [];
         console.log('allimages', allImages)
@@ -165,6 +198,12 @@ export default function ProductOrServicesDetailPage() {
       imageViews={allMedia.map(v => v.startsWith("http") ? v : `${API_BASE}${v}`)}
       onAddToCart={handleAddToCart}
       type={imageData.type}
+      providerId={providerId}
+      providerName={provider?.name}
+      providerEmail={provider?.email}
+      providerPhone={provider?.phone_number}
+      providerWhatsapp={provider?.whatsapp_number}
+      providerProfileImage={toAbsoluteMediaUrl(provider?.profile_image || provider?.profile_image_url)}
     />
   );
 }

@@ -18,11 +18,21 @@ export default function SubscriptionBanner() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data.success && data.subscriptions.length > 0) {
-        setSubscriptions(data.subscriptions);
-        setVisible(true); // show banner when content exists
+      if (data.success) {
+        if (data.subscriptions && data.subscriptions.length > 0) {
+          setSubscriptions(data.subscriptions);
+        } else {
+          // If no subscription row exists, add a placeholder with null ends_at
+          setSubscriptions([{
+            plan_name: '',
+            created_at: null,
+            ends_at: null,
+            status: 'inactive'
+          }]);
+        }
+        setVisible(true);
       } else {
-        setVisible(false); // hide if no content
+        setVisible(false);
       }
     }
     fetchSubscriptions();
@@ -44,6 +54,13 @@ export default function SubscriptionBanner() {
         }}
       >
         {subscriptions.concat(subscriptions).map((sub, idx) => {
+          if (!sub.ends_at) {
+            return (
+              <span key={idx} className="mr-10">
+                You need to have an active subscription. Please subscribe.
+              </span>
+            );
+          }
           const start = new Date(sub.created_at).toLocaleString();
           const end = new Date(sub.ends_at).toLocaleString();
           const msg =

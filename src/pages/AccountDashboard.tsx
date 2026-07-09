@@ -1,6 +1,11 @@
 import PaymentSettingsCard from '@/components/DashboardParts/PaymentCredentials';
 import { useDarkMode } from '@/context/DarkMode';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import RoleManagement from '../components/RoleManagement';
+import { useAuth } from '../context/AuthContext';
+
 import {
   ArrowLeft,
   Calendar,
@@ -18,10 +23,6 @@ import {
   TrendingUp,
   Upload
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import RoleManagement from '../components/RoleManagement';
-import { useAuth } from '../context/AuthContext';
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
@@ -56,7 +57,8 @@ type PlanInfo = {
   days_remaining: number;
   hours_remaining: number;
   minutes_remaining: number;
-  status?: 'active' | 'expired' | 'expiring_soon';
+  status?: 'active' | 'expired' | 'expiring_soon' | 'none';
+  recent_plan?: string | null;
   features: {
     can_upload_images: boolean;
     can_upload_videos: boolean;
@@ -70,6 +72,7 @@ type PlanInfo = {
 type AccountDashboardData = {
   storage: StorageUsage;
   plan: PlanInfo;
+  referral_code?: { code: string; expires_at: string } | null;
   recent_uploads: Array<{
     filename: string;
     size_mb: number;
@@ -81,6 +84,9 @@ type AccountDashboardData = {
     name: string;
     email: string;
     roles: string[];
+    shopping_type_id?: number | null;
+    shopping_type_name?: string | null;
+    shopping_type_key?: string | null;
   };
 };
 
@@ -90,6 +96,62 @@ export default function AccountDashboard() {
   const [error, setError] = useState<string | null>(null);
   const { darkMode } = useDarkMode();
   const { token } = useAuth();
+
+  const [timeRemaining, setTimeRemaining] = useState({
+    days: '00',
+    hours: '00',
+    minutes: '00',
+    seconds: '00',
+    isExpired: true
+  });
+
+  useEffect(() => {
+    if (!data?.plan?.subscription_end) {
+      setTimeRemaining({
+        days: '00',
+        hours: '00',
+        minutes: '00',
+        seconds: '00',
+        isExpired: true
+      });
+      return;
+    }
+
+    const calculateCountdown = () => {
+      const endTime = new Date(data.plan.subscription_end).getTime();
+      const now = new Date().getTime();
+      const diff = endTime - now;
+
+      if (diff <= 0) {
+        setTimeRemaining({
+          days: '00',
+          hours: '00',
+          minutes: '00',
+          seconds: '00',
+          isExpired: true
+        });
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 3600 * 24));
+      const hours = Math.floor((diff % (1000 * 3600 * 24)) / (1000 * 3600));
+      const minutes = Math.floor((diff % (1000 * 3600)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setTimeRemaining({
+        days: days.toString().padStart(2, '0'),
+        hours: hours.toString().padStart(2, '0'),
+        minutes: minutes.toString().padStart(2, '0'),
+        seconds: seconds.toString().padStart(2, '0'),
+        isExpired: false
+      });
+    };
+
+    calculateCountdown(); // Run immediately
+    const interval = setInterval(calculateCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, [data?.plan?.subscription_end]);
 
   useEffect(() => {
     async function fetchAccountData() {
@@ -297,9 +359,23 @@ export default function AccountDashboard() {
               <ArrowLeft className="w-4 h-4 mr-1.5" />
               Back to Profile
             </Link>
-            <h1 className={`text-2xl font-bold tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Account Dashboard
-            </h1>
+            <div>
+              <h1 className={`text-2xl font-bold tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                Account Dashboard
+              </h1>
+              {user_profile?.shopping_type_name && (
+                <div className="flex mt-1.5 animate-fadeIn">
+                  <span 
+                    className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 border ${
+                      darkMode ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' : 'bg-indigo-50 border-indigo-200 text-indigo-805'
+                    }`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    Premium Shop Category: {user_profile.shopping_type_name}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
           {!isPureCustomer && (
             <div className="flex gap-2">
@@ -325,6 +401,44 @@ export default function AccountDashboard() {
             </div>
           )}
         </div>
+
+        {/* Agent Referral Code Card */}
+        {data?.referral_code && (
+          <div 
+            className={`p-6 border border-emerald-500 shadow-md mb-6 ${darkMode ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-300'}`}
+            style={{ borderRadius: '2px' }}
+          >
+            <div className="flex items-center mb-4">
+              <div className="p-2 bg-emerald-500 text-white rounded" style={{ borderRadius: '2px' }}>
+                <Shield className="w-5 h-5" />
+              </div>
+              <div className="ml-3">
+                <h4 className={`text-sm font-bold uppercase tracking-wider ${darkMode ? 'text-emerald-400' : 'text-emerald-805'}`}>
+                  Agent Referral Code
+                </h4>
+                <p className={`text-[10px] uppercase font-bold tracking-widest ${darkMode ? 'text-emerald-500' : 'text-emerald-600'}`}>
+                  Valid for 24 hours after first payment
+                </p>
+              </div>
+            </div>
+            
+            <div className="bg-white dark:bg-gray-900 border border-emerald-500/20 py-3 px-4 text-center select-all cursor-pointer hover:border-emerald-500 transition-colors" style={{ borderRadius: '2px' }} onClick={() => {
+              navigator.clipboard.writeText(data.referral_code?.code || '');
+              alert('Referral code copied to clipboard!');
+            }}>
+              <span className={`text-xl font-mono font-extrabold tracking-widest ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                {data.referral_code.code}
+              </span>
+            </div>
+
+            <p className={`text-[10px] font-semibold text-center mt-3 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              Give this code to the agent who registered you. They will claim a registration reward!
+            </p>
+            <p className={`text-[9px] font-bold text-center mt-1 text-red-500 dark:text-red-400`}>
+              Expires: {new Date(data.referral_code.expires_at).toLocaleString()}
+            </p>
+          </div>
+        )}
 
         {/* Payment Settings Card */}
         {!isPureCustomer && (user_profile?.roles?.includes('service_provider') || user_profile?.roles?.includes('seller')) && (
@@ -364,6 +478,112 @@ export default function AccountDashboard() {
             <h2 className={`text-lg font-bold tracking-tighter uppercase mt-8 mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
               Storage Usage & Plan Analytics
             </h2>
+
+            {/* Horizontal Subscription Status Header */}
+            <div 
+              className={`p-6 mb-6 border shadow-sm ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              style={{ borderRadius: '2px' }}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 items-center">
+                
+                {/* Col 1: Plan Icon & Name */}
+                <div className="flex items-center lg:col-span-2">
+                  <div 
+                    className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-205 text-emerald-650'}`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    <Crown className="w-6 h-6 text-emerald-500" />
+                  </div>
+                  <div className="ml-4">
+                    <h3 className={`text-lg font-extrabold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {plan.status === 'none' || plan.status === 'expired' ? 'No Active Plan' : plan.plan_display_name}
+                    </h3>
+                    <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-50'}`}>
+                      Current Plan
+                    </p>
+                  </div>
+                </div>
+
+                {/* Col 2: Shop Category / Recent Subscribed */}
+                <div>
+                  {user_profile?.shopping_type_name ? (
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-450 dark:text-gray-400 block">
+                        Shop Category
+                      </span>
+                      <span className={`text-sm font-bold block mt-0.5 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {user_profile.shopping_type_name}
+                      </span>
+                    </div>
+                  ) : (
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-455 dark:text-gray-400 block">
+                        Recent Subscribed
+                      </span>
+                      <span className={`text-sm font-bold block mt-0.5 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {plan.status === 'expired' && plan.recent_plan ? plan.recent_plan : (plan.status === 'none' ? 'None' : 'N/A')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Col 3: Pricing Plan Fee */}
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-455 dark:text-gray-400 block">
+                    Pricing
+                  </span>
+                  <span className={`text-sm font-extrabold block mt-0.5 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {plan.status !== 'none' && plan.status !== 'expired' ? `${plan.monthly_fee?.toLocaleString()} RWF` : '0 RWF'}
+                  </span>
+                  <span className="text-[9px] font-bold text-gray-450 dark:text-gray-450 uppercase tracking-widest block leading-none mt-0.5">
+                    {plan.status !== 'none' && plan.status !== 'expired' ? 'per month' : 'Free Tier'}
+                  </span>
+                </div>
+
+                {/* Col 4: Countdown Time Remaining (Takes 2 cols on lg) */}
+                <div className="lg:col-span-2 p-3 bg-gray-50 dark:bg-gray-905 border border-dashed border-gray-250 dark:border-gray-700 text-center" style={{ borderRadius: '2px' }}>
+                  <span className="text-[9px] font-extrabold uppercase tracking-wider text-gray-450 dark:text-gray-450 block mb-1">
+                    Subscription Time Remaining
+                  </span>
+                  <div className={`text-2xl font-mono font-extrabold tracking-widest leading-none ${timeRemaining.isExpired ? 'text-red-505' : 'text-emerald-505 animate-pulse'}`}>
+                    {timeRemaining.days}:{timeRemaining.hours}:{timeRemaining.minutes}:{timeRemaining.seconds}
+                  </div>
+                  <div className="flex justify-center gap-6 mt-1 text-[8px] font-bold uppercase tracking-widest text-gray-450 dark:text-gray-550">
+                    <span>Days</span>
+                    <span>Hours</span>
+                    <span>Mins</span>
+                    <span>Secs</span>
+                  </div>
+                </div>
+
+                {/* Col 5: Subscription Details & Status */}
+                <div className="flex flex-col gap-1 text-xs">
+                  {plan.subscription_start && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-455 dark:text-gray-400 font-medium">Subscribed:</span>
+                      <span className={`font-bold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        {new Date(plan.subscription_start).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                  {plan.subscription_end && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-455 dark:text-gray-400 font-medium">Expires:</span>
+                      <span className={`font-bold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        {new Date(plan.subscription_end).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center mt-1 pt-1 border-t border-gray-200 dark:border-gray-700">
+                    <span className="text-gray-455 dark:text-gray-400 font-medium">Status:</span>
+                    <span className={`font-bold uppercase text-[9px] ${getStatusColor(plan.status || 'none')}`}>
+                      {plan.status === 'none' ? 'no active plan' : (plan.status === 'expired' ? 'expired' : 'active')}
+                    </span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
 
             {/* Main Grid Layout */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -636,7 +856,7 @@ export default function AccountDashboard() {
                           <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Max Image Size</span>
                         </div>
                         <span className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                          {plan.features.max_image_size_mb} MB
+                          {plan.features.max_image_size_mb === 'Unlimited' ? 'Unlimited' : `${plan.features.max_image_size_mb} MB`}
                         </span>
                       </div>
 
@@ -649,7 +869,7 @@ export default function AccountDashboard() {
                           <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Max Video Size</span>
                         </div>
                         <span className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                          {plan.features.max_video_size_mb} MB
+                          {plan.features.max_video_size_mb === 'Unlimited' ? 'Unlimited' : `${plan.features.max_video_size_mb} MB`}
                         </span>
                       </div>
 
@@ -751,78 +971,7 @@ export default function AccountDashboard() {
 
               {/* Right Column - Stats & Payment */}
               <div className="space-y-6">
-                
-                {/* Subscription Status Card */}
-                <div 
-                  className={`p-6 border shadow-sm ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-                  style={{ borderRadius: '2px' }}
-                >
-                  <div className="flex items-center mb-6">
-                    <div 
-                      className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-200 text-emerald-650'}`}
-                      style={{ borderRadius: '2px' }}
-                    >
-                      <Crown className="w-5 h-5 text-emerald-500" />
-                    </div>
-                    <div className="ml-4">
-                      <h3 className={`text-base font-bold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {plan.plan_display_name}
-                      </h3>
-                      <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                        Current Plan
-                      </p>
-                    </div>
-                  </div>
 
-                  <div 
-                    className={`mb-5 p-4 border ${darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-500/5 border-emerald-500/20 text-emerald-700'}`}
-                    style={{ borderRadius: '2px' }}
-                  >
-                    <div className="text-2xl font-bold">{plan.monthly_fee?.toLocaleString()} RWF</div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider opacity-85 mt-0.5">per month</div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div 
-                      className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/20 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                      style={{ borderRadius: '2px' }}
-                    >
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 text-emerald-500 mr-3" />
-                        <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>Days Remaining</span>
-                      </div>
-                      <span className={`font-bold text-sm ${getStatusColor(status)}`}>
-                        {plan.days_remaining}
-                      </span>
-                    </div>
-
-                    <div 
-                      className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/20 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                      style={{ borderRadius: '2px' }}
-                    >
-                      <div className="flex items-center">
-                        <Clock className="w-4 h-4 text-emerald-500 mr-3" />
-                        <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>Hours Remaining</span>
-                      </div>
-                      <span className={`font-bold text-sm ${getStatusColor(status)}`}>
-                        {plan.hours_remaining}
-                      </span>
-                    </div>
-
-                    <div 
-                      className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/20 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                      style={{ borderRadius: '2px' }}
-                    >
-                      <div className="flex items-center">
-                        <Shield className="w-4 h-4 text-emerald-500 mr-3" />
-                        <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>Status</span>
-                      </div>
-                      <span className={`font-bold text-xs capitalize ${getStatusColor(status)}`}>
-                        {displayStatus}
-                      </span>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Storage Subscription Status Card (Right Column) */}
                 {storage.breakdown.purchasedStorageMB > 0 && (

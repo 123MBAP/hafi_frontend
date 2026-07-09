@@ -25,6 +25,7 @@ import {
   Settings,
   Shield,
   ShoppingBag,
+  Store,
   Tag,
   ToggleLeft,
   ToggleRight,
@@ -105,7 +106,7 @@ export default function AdminDashboard() {
 
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'services' | 'categories' | 'uploadCategories' | 'dynamicFields' | 'phases'>('services');
+  const [activeTab, setActiveTab] = useState<'services' | 'categories' | 'uploadCategories' | 'dynamicFields' | 'phases' | 'shops' | 'agents'>('services');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Phase management state
@@ -118,6 +119,158 @@ export default function AdminDashboard() {
   const [editingPhaseId, setEditingPhaseId] = useState<number | null>(null);
   const [editPhaseLabel, setEditPhaseLabel] = useState('');
   const [editPhaseDesc, setEditPhaseDesc] = useState('');
+
+  // Shop Categories state
+  interface ShopType {
+    id: number;
+    name: string;
+    is_premium?: boolean;
+    price_monthly?: number;
+    features?: string | string[];
+    max_products?: number;
+    base_storage_mb?: number;
+  }
+  const [shopTypes, setShopTypes] = useState<ShopType[]>([]);
+  const [shopTypeName, setShopTypeName] = useState('');
+  const [shopIsPremium, setShopIsPremium] = useState(false);
+  const [shopPriceMonthly, setShopPriceMonthly] = useState(0);
+  const [shopMaxProducts, setShopMaxProducts] = useState(100);
+  const [shopBaseStorageMb, setShopBaseStorageMb] = useState(1024);
+  const [shopFeaturesText, setShopFeaturesText] = useState('');
+  const [editingShopTypeId, setEditingShopTypeId] = useState<number | null>(null);
+
+  // Agent Management state
+  const [agentsList, setAgentsList] = useState<any[]>([]);
+  const [withdrawalsList, setWithdrawalsList] = useState<any[]>([]);
+
+  // Agent Settings Configuration
+  const [referralRewardAmount, setReferralRewardAmount] = useState<number>(1000);
+  const [minimumWithdrawalAmount, setMinimumWithdrawalAmount] = useState<number>(5000);
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [settingsMessage, setSettingsMessage] = useState('');
+  const [isEditingSettings, setIsEditingSettings] = useState(false);
+
+  const fetchAgents = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/agents`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAgentsList(data.agents || []);
+      }
+    } catch (err) {
+      console.error('Error fetching agents:', err);
+    }
+  };
+
+  const fetchWithdrawals = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/withdrawals`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setWithdrawalsList(data.withdrawals || []);
+      }
+    } catch (err) {
+      console.error('Error fetching withdrawals:', err);
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/agent/settings`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const settings = await res.json();
+        setReferralRewardAmount(settings.referralRewardAmount || 1000);
+        setMinimumWithdrawalAmount(settings.minimumWithdrawalAmount || 5000);
+      }
+    } catch (err) {
+      console.error('Failed to load agent settings:', err);
+    }
+  };
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    setSettingsMessage('');
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/settings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          referralRewardAmount: Number(referralRewardAmount),
+          minimumWithdrawalAmount: Number(minimumWithdrawalAmount)
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSettingsMessage('✅ Agent settings updated successfully!');
+        setIsEditingSettings(false);
+        fetchSettings();
+      } else {
+        setSettingsMessage(`❌ ${data.error || 'Failed to save settings'}`);
+      }
+    } catch (err) {
+      setSettingsMessage('❌ Failed to connect to server');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
+  const handleApproveWithdrawal = async (id: number) => {
+    if (!window.confirm('Are you sure you want to approve this withdrawal request?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/withdrawals/${id}/approve`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('Withdrawal request approved successfully.');
+        fetchWithdrawals();
+        fetchAgents();
+      } else {
+        alert(data.error || 'Failed to approve request.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error connecting to server');
+    }
+  };
+
+  const handleRejectWithdrawal = async (id: number) => {
+    if (!window.confirm('Are you sure you want to reject this withdrawal request? (Balance will be refunded)')) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/withdrawals/${id}/reject`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('Withdrawal request rejected and balance refunded.');
+        fetchWithdrawals();
+        fetchAgents();
+      } else {
+        alert(data.error || 'Failed to reject request.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error connecting to server');
+    }
+  };
 
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -144,6 +297,10 @@ export default function AdminDashboard() {
         fetchMarketProductCats();
         fetchUploadCategories();
         fetchPhases();
+        fetchShopTypes();
+        fetchAgents();
+        fetchWithdrawals();
+        fetchSettings();
       }
     } catch (err) {
       navigate('/admin/login');
@@ -464,7 +621,7 @@ export default function AdminDashboard() {
   };
 
   const handleSubscriptions = () => {
-    navigate('/admin/upgarede/subscriptions');
+    navigate('/admin/upgrade/subscriptions');
   };
 
   // Phase Handlers
@@ -553,6 +710,140 @@ export default function AdminDashboard() {
       fetchPhases();
     } catch (err) {
       setPhaseMsg(err instanceof Error ? `❌ ${err.message}` : '❌ Failed to update phase');
+    }
+  };
+
+  // Shop Categories Handlers
+  const fetchShopTypes = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/shopping-types`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setShopTypes(data.shopping_types || []);
+      }
+    } catch (err) {
+      console.error('Error fetching shop types:', err);
+    }
+  };
+
+  const handleSaveShopType = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!shopTypeName.trim()) return;
+
+    try {
+      const url = editingShopTypeId
+        ? `${API_BASE}/api/admin/shopping-types/${editingShopTypeId}`
+        : `${API_BASE}/api/admin/shopping-types`;
+      const method = editingShopTypeId ? 'PUT' : 'POST';
+
+      const featuresArray = shopFeaturesText
+        .split('\n')
+        .map(f => f.trim())
+        .filter(Boolean);
+
+      const isOther = editingShopTypeId ? (shopTypes.find(st => st.id === editingShopTypeId)?.key === 'other') : false;
+
+      const body = {
+        name: shopTypeName.trim(),
+        is_premium: !isOther,
+        price_monthly: !isOther ? Number(shopPriceMonthly) : 0,
+        max_products: !isOther ? Number(shopMaxProducts) : 100,
+        base_storage_mb: !isOther ? Number(shopBaseStorageMb) : 1024,
+        features: !isOther ? featuresArray : []
+      };
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage(editingShopTypeId ? '✅ Shop category updated successfully' : '✅ Shop category created successfully');
+        setShopTypeName('');
+        setShopIsPremium(false);
+        setShopPriceMonthly(0);
+        setShopMaxProducts(100);
+        setShopBaseStorageMb(1024);
+        setShopFeaturesText('');
+        setEditingShopTypeId(null);
+        fetchShopTypes();
+      } else {
+        setMessage(`❌ ${data.error || 'Failed to save shop category'}`);
+      }
+    } catch (err) {
+      setMessage('❌ Failed to connect to server');
+    }
+  };
+
+  const startEditingShopType = (st: ShopType) => {
+    setEditingShopTypeId(st.id);
+    setShopTypeName(st.name);
+    setShopIsPremium(st.key !== 'other');
+    setShopPriceMonthly(st.price_monthly || 0);
+    setShopMaxProducts(st.max_products || 100);
+    setShopBaseStorageMb(st.base_storage_mb || 1024);
+    
+    let fText = '';
+    if (st.features) {
+      if (Array.isArray(st.features)) {
+        fText = st.features.join('\n');
+      } else {
+        try {
+          const parsed = typeof st.features === 'string' ? JSON.parse(st.features) : st.features;
+          if (Array.isArray(parsed)) {
+            fText = parsed.join('\n');
+          }
+        } catch {
+          fText = '';
+        }
+      }
+    }
+    setShopFeaturesText(fText);
+    setMessage('');
+  };
+
+  const cancelShopTypeEdit = () => {
+    setEditingShopTypeId(null);
+    setShopTypeName('');
+    setShopIsPremium(false);
+    setShopPriceMonthly(0);
+    setShopMaxProducts(100);
+    setShopBaseStorageMb(1024);
+    setShopFeaturesText('');
+    setMessage('');
+  };
+
+  const handleDeleteShopType = async (id: number, name: string) => {
+    if (!window.confirm(`Are you sure you want to delete the shop category "${name}"?`)) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/shopping-types/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage('✅ Shop category deleted successfully');
+        fetchShopTypes();
+      } else {
+        setMessage(`❌ ${data.message || data.error || 'Failed to delete shop category'}`);
+      }
+    } catch (err) {
+      setMessage('❌ Failed to connect to server');
     }
   };
 
@@ -860,7 +1151,39 @@ export default function AdminDashboard() {
             <Layers className="w-4 h-4" />
             <span>App Phases</span>
           </button>
-        </div>ers         {/* Services Tab */}
+          <button
+            onClick={() => { setActiveTab('shops'); setMessage(''); }}
+            className={`flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+              activeTab === 'shops'
+                ? darkMode
+                  ? 'bg-emerald-500/10 text-emerald-455 border-emerald-500/20'
+                  : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                : darkMode
+                ? 'bg-gray-800 border-transparent text-gray-400 hover:bg-gray-700/50 hover:text-gray-200'
+                : 'bg-transparent border-transparent text-gray-555 hover:bg-gray-100 hover:text-gray-700'
+            }`}
+            style={{ borderRadius: '2px' }}
+          >
+            <Store className="w-4 h-4" />
+            <span>Shops</span>
+          </button>
+          <button
+            onClick={() => { setActiveTab('agents'); fetchAgents(); fetchWithdrawals(); fetchSettings(); }}
+            className={`flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+              activeTab === 'agents'
+                ? darkMode
+                  ? 'bg-emerald-500/10 text-emerald-455 border-emerald-500/20'
+                  : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                : darkMode
+                ? 'bg-gray-800 border-transparent text-gray-400 hover:bg-gray-700/50 hover:text-gray-200'
+                : 'bg-transparent border-transparent text-gray-555 hover:bg-gray-100 hover:text-gray-700'
+            }`}
+            style={{ borderRadius: '2px' }}
+          >
+            <Shield className="w-4 h-4" />
+            <span>Agents</span>
+          </button>
+        </div>         {/* Services Tab */}
         {activeTab === 'services' && (
           <div className="space-y-8">
             {/* Create Service Form */}
@@ -2269,6 +2592,268 @@ if (!isPhaseEnabled('phase_1')) return null; // 👈 feature hidden until enable
                   </pre>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Shops Tab */}
+        {activeTab === 'shops' && (
+          <div className="max-w-xl mx-auto text-center py-12 px-6">
+            <div className={`p-8 border ${
+              darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+            }`} style={{ borderRadius: '2px' }}>
+              <Store className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
+              <h3 className={`text-lg font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                Unified Plan Manager
+              </h3>
+              <p className={`text-sm mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Shop categories and their monthly VIP plans have been integrated into the central subscriptions and plan manager.
+              </p>
+              <a
+                href="/admin/upgrade/subscriptions"
+                className="inline-flex items-center gap-2 px-6 py-3 font-bold uppercase text-xs tracking-wider transition-colors bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm"
+                style={{ borderRadius: '2px' }}
+              >
+                <span>Go to Subscriptions & Plans</span>
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* Agents Tab */}
+        {activeTab === 'agents' && (
+          <div className="space-y-8 animate-fadeIn">
+            {/* Agent Configurations Card */}
+            <div className={`border p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`} style={{ borderRadius: '2px' }}>
+              <h3 className={`text-base font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                Agent Reward & Cashout settings
+              </h3>
+              <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-6`}>
+                Configure referral rewards and minimum withdrawal amounts applied globally to all agents.
+              </p>
+
+              <form onSubmit={handleSaveSettings} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                      Referral Code Claim Reward (RWF)
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      value={referralRewardAmount}
+                      onChange={(e) => setReferralRewardAmount(Number(e.target.value))}
+                      disabled={!isEditingSettings || savingSettings}
+                      className={`w-full px-3 py-2 border outline-none text-sm transition-colors
+                        ${darkMode 
+                          ? 'bg-gray-900 border-gray-750 text-white focus:border-emerald-500' 
+                          : 'bg-white border-gray-300 text-gray-855 focus:border-emerald-600'}`}
+                      style={{ borderRadius: '2px' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                      Minimum Cashout Limit (RWF)
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      value={minimumWithdrawalAmount}
+                      onChange={(e) => setMinimumWithdrawalAmount(Number(e.target.value))}
+                      disabled={!isEditingSettings || savingSettings}
+                      className={`w-full px-3 py-2 border outline-none text-sm transition-colors
+                        ${darkMode 
+                          ? 'bg-gray-900 border-gray-750 text-white focus:border-emerald-500' 
+                          : 'bg-white border-gray-300 text-gray-855 focus:border-emerald-600'}`}
+                      style={{ borderRadius: '2px' }}
+                    />
+                  </div>
+                </div>
+
+                {settingsMessage && (
+                  <div className={`p-3 border text-xs font-semibold ${
+                    settingsMessage.startsWith('✅') 
+                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
+                      : 'bg-red-500/10 border-red-500/20 text-red-500'}`} 
+                    style={{ borderRadius: '2px' }}
+                  >
+                    {settingsMessage}
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  {!isEditingSettings ? (
+                    <button
+                      key="edit-btn"
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsEditingSettings(true);
+                        setSettingsMessage('');
+                      }}
+                      className={`py-2 px-6 text-white font-bold text-xs uppercase tracking-wider transition-colors border bg-emerald-500 hover:bg-emerald-600 border-emerald-500`}
+                      style={{ borderRadius: '2px' }}
+                    >
+                      Edit Settings
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        key="save-btn"
+                        type="submit"
+                        disabled={savingSettings}
+                        className={`py-2 px-6 text-white font-bold text-xs uppercase tracking-wider transition-colors border
+                          ${savingSettings
+                            ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                            : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500'}`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        {savingSettings ? 'Saving...' : 'Save Settings'}
+                      </button>
+                      <button
+                        key="cancel-btn"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setIsEditingSettings(false);
+                          setSettingsMessage('');
+                          fetchSettings();
+                        }}
+                        disabled={savingSettings}
+                        className={`py-2 px-6 font-bold text-xs uppercase tracking-wider transition-colors border
+                          ${darkMode
+                            ? 'bg-gray-800 hover:bg-gray-750 border-gray-700 text-gray-300'
+                            : 'bg-white hover:bg-gray-55 border-gray-300 text-gray-600'}`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  )}
+                </div>
+              </form>
+            </div>
+
+            {/* Withdrawal Requests */}
+            <div className={`border p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`} style={{ borderRadius: '2px' }}>
+              <h3 className={`text-base font-bold uppercase tracking-wider mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                Agent Withdrawal Requests
+              </h3>
+              
+              {withdrawalsList.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">No withdrawal requests found.</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700 font-bold uppercase tracking-wider text-gray-400">
+                        <th className="pb-3">Agent</th>
+                        <th className="pb-3">Amount</th>
+                        <th className="pb-3">Recipient Phone</th>
+                        <th className="pb-3">Registered Name</th>
+                        <th className="pb-3">Requested At</th>
+                        <th className="pb-3 text-center">Status</th>
+                        <th className="pb-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-150 dark:divide-gray-755 text-gray-700 dark:text-gray-300">
+                      {withdrawalsList.map((w: any) => (
+                        <tr key={w.id}>
+                          <td className="py-3">
+                            <span className="font-bold">{w.agent_username}</span>
+                            <div className="text-[10px] text-gray-500">{w.agent_email} ({w.agent_location})</div>
+                          </td>
+                          <td className="py-3 font-bold text-emerald-500">RWF {parseFloat(w.amount).toLocaleString()}</td>
+                          <td className="py-3 font-mono">{w.phone_number}</td>
+                          <td className="py-3">{w.phone_name}</td>
+                          <td className="py-3 text-gray-500">{new Date(w.created_at).toLocaleString()}</td>
+                          <td className="py-3 text-center">
+                            <span className={`px-2 py-0.5 border text-[9px] font-bold uppercase
+                              ${w.status === 'approved' 
+                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
+                                : w.status === 'rejected' 
+                                ? 'bg-red-500/10 border-red-500/20 text-red-500' 
+                                : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-500'}`}
+                              style={{ borderRadius: '2px' }}
+                            >
+                              {w.status}
+                            </span>
+                          </td>
+                          <td className="py-3 text-right">
+                            {w.status === 'pending' && (
+                              <div className="flex justify-end gap-1.5">
+                                <button
+                                  onClick={() => handleApproveWithdrawal(w.id)}
+                                  className="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold uppercase tracking-wider text-[9px]"
+                                  style={{ borderRadius: '2px' }}
+                                >
+                                  Approve
+                                </button>
+                                <button
+                                  onClick={() => handleRejectWithdrawal(w.id)}
+                                  className="px-2.5 py-1 bg-red-500 hover:bg-red-655 text-white font-bold uppercase tracking-wider text-[9px]"
+                                  style={{ borderRadius: '2px' }}
+                                >
+                                  Reject
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Registered Agents List */}
+            <div className={`border p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`} style={{ borderRadius: '2px' }}>
+              <h3 className={`text-base font-bold uppercase tracking-wider mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                Registered HafiConnect Agents
+              </h3>
+              
+              {agentsList.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">No agents registered.</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700 font-bold uppercase tracking-wider text-gray-400">
+                        <th className="pb-3">Agent</th>
+                        <th className="pb-3">Email / Phone</th>
+                        <th className="pb-3">Sector Location</th>
+                        <th className="pb-3 text-right">Current Balance</th>
+                        <th className="pb-3 text-right">Total Claims</th>
+                        <th className="pb-3 text-right">Withdrawals</th>
+                        <th className="pb-3 text-right">Joined</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-150 dark:divide-gray-755 text-gray-700 dark:text-gray-300">
+                      {agentsList.map((a: any) => (
+                        <tr key={a.id}>
+                          <td className="py-3">
+                            <span className="font-bold">{a.name || 'No Name'}</span>
+                            <div className="text-[10px] text-gray-500">@{a.username}</div>
+                          </td>
+                          <td className="py-3">
+                            <div>{a.email}</div>
+                            <div className="text-[10px] text-gray-500">{a.phone_number || 'No Phone'}</div>
+                          </td>
+                          <td className="py-3 font-semibold">{a.location}</td>
+                          <td className="py-3 text-right font-extrabold text-emerald-500">RWF {parseFloat(a.balance).toLocaleString()}</td>
+                          <td className="py-3 text-right font-bold">{a.referrals_claimed}</td>
+                          <td className="py-3 text-right">{a.withdrawals_count} requests</td>
+                          <td className="py-3 text-right text-gray-500">{new Date(a.created_at).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         )}

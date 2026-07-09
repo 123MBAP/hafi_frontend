@@ -75,7 +75,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ roles, logout, darkMo
         <Menu.Item>
           {({ active }) => (
             <Link
-              to="/seller/dashboard"
+              to="/dashboard/seller"
               onClick={closeMenu}
               className={`block px-4 py-2 text-sm ${active ? 'bg-hafi-teal text-white' : ''}`}
             >
@@ -88,7 +88,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ roles, logout, darkMo
         <Menu.Item>
           {({ active }) => (
             <Link
-              to="/dashboard"
+              to="/dashboard/provider"
               onClick={closeMenu}
               className={`block px-4 py-2 text-sm ${active ? 'bg-hafi-teal text-white' : ''}`}
             >

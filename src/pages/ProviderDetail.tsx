@@ -550,7 +550,9 @@ export default function ProviderDetail() {
                         <div className="mt-2">
                           <button
                             onClick={(e) => { e.stopPropagation(); img.type === "product" ? handleBuyProduct(img) : handleBookService(img); }}
-                            className={`w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium transition-colors ${darkMode ? 'bg-gray-700 text-white hover:bg-emerald-600' : 'bg-gray-100 text-gray-700 hover:bg-emerald-500 hover:text-white'}`}
+                            className={`w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium transition-colors 
+                              ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
+                                : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
                             style={{ borderRadius: '2px' }}
                           >
                             {img.type === "product" ? (

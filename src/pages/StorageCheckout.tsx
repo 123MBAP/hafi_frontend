@@ -62,7 +62,7 @@ export default function StorageCheckout() {
 
         // Current storage plan
         try {
-          const res = await fetch(`${API_BASE}/api/storage-plan`, { headers });
+          const res = await fetch(`${API_BASE}/api/storage/plan`, { headers });
           if (res.ok) {
             const data = await res.json();
             console.log('Fetched user storage plan:', data);
@@ -422,7 +422,7 @@ export default function StorageCheckout() {
                 className={`w-full px-3 py-2 border rounded-lg ${darkMode
                     ? 'bg-gray-700 border-gray-600 text-white'
                     : 'bg-white border-gray-300 text-gray-900'
-                  } focus:outline-none focus:ring-2 focus:ring-purple-500`}
+                  } focus:outline-none focus:ring-2 focus:ring-emerald-500`}
               />
             </div>
           )}
@@ -433,7 +433,7 @@ export default function StorageCheckout() {
             disabled={submitting}
             className={`w-full py-3 px-4 rounded-lg font-semibold text-white transition-colors ${submitting
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-purple-600 hover:bg-purple-700'
+                : 'bg-emerald-500 hover:bg-emerald-600'
               }`}
           >
             {submitting
@@ -492,7 +492,7 @@ export default function StorageCheckout() {
 
           {/* Back Button */}
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/dashboard')}
             className={`w-full mt-4 py-2 px-4 rounded-lg font-medium transition-colors ${darkMode
                 ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'

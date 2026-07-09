@@ -2,7 +2,7 @@ import { useDarkMode } from "@/context/DarkMode";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import {
   ChevronRight,
-  Eye,
+
   Grid3X3,
   List,
   Menu,
@@ -63,6 +63,10 @@ function MarketProductCard({
     <div
       className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-md flex flex-col h-full ${darkMode ? 'bg-gray-800' : 'bg-white'} border-0 shadow-sm`}
       style={{ borderRadius: '2px' }}
+        onClick={(e) => {
+                e.stopPropagation();
+                onView(product.id);
+              }}
     >
       {/* Image section - fixed height for consistency */}
       <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-700">
@@ -102,8 +106,7 @@ function MarketProductCard({
           
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-2 text-xs text-gray-400">
-              <Eye className="w-3 h-3" />
-              <span>{product.views?.length || 0}</span>
+            
               {product.rating && (
                 <span className="flex items-center gap-0.5 ml-1">
                   <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
@@ -111,16 +114,7 @@ function MarketProductCard({
                 </span>
               )}
             </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onView(product.id);
-              }}
-              className={`text-xs font-medium px-2.5 py-1 transition-colors ${darkMode ? 'bg-gray-700 text-white hover:bg-emerald-600' : 'bg-gray-100 text-gray-700 hover:bg-emerald-500 hover:text-white'}`}
-              style={{ borderRadius: '2px' }}
-            >
-              View
-            </button>
+       
           </div>
         </div>
       </div>

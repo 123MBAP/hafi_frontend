@@ -27,6 +27,7 @@ type Props = {
   setProductMadeInRwanda: (v: boolean) => void;
   featureValues?: Record<string, any>;
   setFeatureValues?: (values: Record<string, any>) => void;
+  uploadProgress?: number | null;
 };
 
 export default function ProductUploadCard({
@@ -50,6 +51,7 @@ export default function ProductUploadCard({
   setProductMadeInRwanda,
   featureValues = {},
   setFeatureValues = () => { },
+  uploadProgress,
 }: Props) {
   return (
     <div
@@ -315,7 +317,7 @@ export default function ProductUploadCard({
                         className={`text-[9px] font-bold uppercase tracking-wider text-center mt-1.5 ${darkMode ? 'text-gray-500' : 'text-gray-400'
                           }`}
                       >
-                        Supported: MP4, MOV, AVI (Max 50MB per video)
+                        Supported: MP4, MOV, AVI (Max 3GB per video)
                       </p>
                     </>
                   )}
@@ -325,10 +327,30 @@ export default function ProductUploadCard({
           </div>
         </div>
 
-        <RestrictionCard
+        <div className='mt-4'>
+            <RestrictionCard
           subscription={subscription?.subscription}
           requiredFeature="upload_products"
         />
+        {uploadProgress !== null && uploadProgress !== undefined && (
+          <div className="w-full mb-4 px-6 space-y-1.5">
+            <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
+              <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
+                {uploadProgress < 100 
+                  ? "Uploading Product Files..." 
+                  : "Processing and optimizing media on Cloudinary..."}
+              </span>
+              <span className="text-emerald-500 font-bold">{uploadProgress}%</span>
+            </div>
+            <div className={`w-full h-1.5 ${darkMode ? 'bg-gray-900' : 'bg-gray-200'} overflow-hidden`} style={{ borderRadius: '1px' }}>
+              <div 
+                className="h-full bg-emerald-500 transition-all duration-300"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
+         </div>
 
         <div className="mt-6 flex justify-end gap-3">
           <button

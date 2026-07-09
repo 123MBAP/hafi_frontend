@@ -52,6 +52,10 @@ export default function DashboardOverviewPage() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
+    if (roles.includes('agent')) {
+      navigate('/dashboard/agent', { replace: true });
+      return;
+    }
     let active = true;
     const loadOverviewData = async () => {
       if (!token) return;

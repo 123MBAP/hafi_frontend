@@ -1,4 +1,6 @@
 import { useDarkMode } from "@/context/DarkMode";
+import { FaEnvelope, FaPhone, FaWhatsapp } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
@@ -31,6 +33,12 @@ interface ProductOrServiceDetailProps {
   setQuantity?: React.Dispatch<React.SetStateAction<number>>;
   setMessage?: (msg: string) => void;
   message?: string;
+  providerId?: string;
+  providerName?: string;
+  providerEmail?: string;
+  providerPhone?: string;
+  providerWhatsapp?: string;
+  providerProfileImage?: string;
 }
 
 
@@ -48,6 +56,12 @@ export default function ProductOrServiceDetail({
   setMessage,
   message,
   type,
+  providerId,
+  providerName,
+  providerEmail,
+  providerPhone,
+  providerWhatsapp,
+  providerProfileImage,
 }: ProductOrServiceDetailProps) {
   const [quantity, setQuantity] = useState(minQuantity);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -56,6 +70,7 @@ export default function ProductOrServiceDetail({
   const [noCustomizationNeeded, setNoCustomizationNeeded] = useState(false);
   const [customizationError, setCustomizationError] = useState("");
   const { darkMode } = useDarkMode();
+  const navigate = useNavigate();
 
   // Format amounts as Rwandan Francs (RWF) without decimals
   const formatFrw = (amount: number) => `${Math.round(amount).toLocaleString('en-US')} RWF`;
@@ -119,9 +134,75 @@ export default function ProductOrServiceDetail({
   };
 
   return (
-    <div className={`w-full flex flex-col md:flex-row gap-8 px-4 py-10 mx-auto ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"}`}>
-      {/* Image Grid */}
-      <div className="w-full md:w-2/3 flex-shrink-0">
+    <div className={`w-full px-4 py-10 mx-auto ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"}`}>
+      {(providerId || providerName || providerEmail || providerPhone || providerWhatsapp) && (
+        <div className={`mb-6 p-4 border ${darkMode ? "border-gray-700 bg-gray-900/40" : "border-gray-200 bg-gray-50"}`} style={{ borderRadius: '2px' }}>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <img
+                src={providerProfileImage || '/default-profile.png'}
+                alt={providerName || providerEmail || 'Provider profile'}
+                className="w-14 h-14 object-cover flex-shrink-0"
+                style={{ borderRadius: '2px' }}
+              />
+              <div className="min-w-0 flex-1">
+                <div className={`text-xs uppercase tracking-wide ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Service provider
+                </div>
+                <h3 className={`text-base font-semibold truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {providerName || providerEmail?.split('@')[0] || 'Provider'}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => providerId && navigate(`/provider/${providerId}/uploads`)}
+                  className={`mt-2 inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold transition-colors md:w-auto w-full
+                      ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
+                        : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  View more products and services by {providerName || 'this provider'}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-shrink-0">
+              {providerPhone && (
+                <a
+                  href={`tel:${providerPhone}`}
+                  className={`flex items-center gap-2 text-sm transition-colors ${darkMode ? 'text-gray-200 hover:text-emerald-400' : 'text-gray-700 hover:text-emerald-600'}`}
+                >
+                  <FaPhone className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>{providerPhone}</span>
+                </a>
+              )}
+              {providerEmail && (
+                <a
+                  href={`mailto:${providerEmail}`}
+                  className={`flex items-center gap-2 text-sm transition-colors ${darkMode ? 'text-gray-200 hover:text-emerald-400' : 'text-gray-700 hover:text-emerald-600'}`}
+                >
+                  <FaEnvelope className="w-3.5 h-3.5 text-emerald-500" />
+                  <span className="truncate">{providerEmail}</span>
+                </a>
+              )}
+              {providerWhatsapp && (
+                <a
+                  href={`https://wa.me/${providerWhatsapp.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex items-center gap-2 text-sm transition-colors ${darkMode ? 'text-gray-200 hover:text-emerald-400' : 'text-gray-700 hover:text-emerald-600'}`}
+                >
+                  <FaWhatsapp className="w-3.5 h-3.5 text-green-500" />
+                  <span>{providerWhatsapp}</span>
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Image Grid */}
+        <div className="w-full md:w-2/3 flex-shrink-0">
         <div className="grid grid-cols-2 gap-4">
           {allImages.slice(0, 2).map((img, index) => (
             <div
@@ -315,13 +396,15 @@ export default function ProductOrServiceDetail({
         {/* Add to cart */}
         <button
           onClick={handleAddToCart}
-          className={`w-full py-3 text-base font-semibold shadow transition ${darkMode ? "bg-hafi-teal text-white hover:brightness-90" : "bg-hafi-teal text-white hover:bg-hafi-green"
-            }`}
+          className={`w-full py-3 text-base font-semibold shadow transition 
+             ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
+                        : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
         >
           {type === "service" ? "Add service to cart" : "Add to cart"}
         </button>
       </div>
 
+      </div>
 
       {/* Full Image Modal */}
       {showFullImage && (

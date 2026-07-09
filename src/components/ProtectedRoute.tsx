@@ -7,14 +7,15 @@ import { useAuth } from '../context/AuthContext';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles?: string[]; // Optional list of allowed roles
+  fallbackPath?: string; // Optional custom fallback path
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles, fallbackPath = '/login' }) => {
   const { isLoggedIn, user } = useAuth();
 
   // Redirect to login if not authenticated
   if (!isLoggedIn) {
-    return <Navigate to="/login" />;
+    return <Navigate to={fallbackPath} />;
   }
 
   // If allowedRoles is specified, check if user has at least one of the required roles

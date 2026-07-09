@@ -84,8 +84,8 @@ const RestrictionCard: React.FC<RestrictionCardProps> = ({
     );
   };
 
-  // 1. No subscription at all
-  if (!subscription) {
+  // 1. No subscription at all or unpaid/implicit subscription (no ends_at)
+  if (!subscription || !subscription.ends_at) {
     return renderRestrictionCard(
       restrictionStyles.noSubscription,
       "You need an active subscription to access this content. Choose a plan that fits your needs.",

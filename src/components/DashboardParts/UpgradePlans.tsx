@@ -1,22 +1,16 @@
 import { useDarkMode } from "@/context/DarkMode";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import LoadingSpinner from '@/components/LoadingSpinner';
 import {
-  AlertTriangle,
   ArrowRight,
   Check,
-  CheckCircle2,
   ClipboardList,
-  HardDrive,
   Loader2,
-  Package,
-  X,
   XCircle,
-  Zap,
   Shield,
-  Cloud,
-  DollarSign
+  X,
 } from "lucide-react";
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
@@ -52,9 +46,9 @@ type AdminPlan = {
   features: {
     can_upload_images: boolean;
     can_upload_videos: boolean;
-    max_image_size_mb: number;
-    max_video_size_mb: number;
-    max_products: number;
+    max_image_size_mb: number | string;
+    max_video_size_mb: number | string;
+    max_products: number | string;
     support_level: string;
     analytics_enabled: boolean;
   };
@@ -88,6 +82,7 @@ type StorageUsage = {
   used_storage_gb: number;
   total_storage_gb: number;
   usage_percentage: number;
+  usedMB:number;
 };
 
 const convertDbPlanToAdminPlan = (dbPlan: DbPlan): AdminPlan => {
@@ -153,10 +148,36 @@ export default function UpgradePlans() {
   const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
   const [renewAddonAmount, setRenewAddonAmount] = useState<number>(0);
   const [renewAddonUnit, setRenewAddonUnit] = useState<string>('GB');
-  const [editingStorage, setEditingStorage] = useState<boolean>(false);
+  const [selectedPlanForRenewal, setSelectedPlanForRenewal] = useState<AdminPlan | null>(null);
+  const [renewalModalOpen, setRenewalModalOpen] = useState<boolean>(false);
+  const [isAddingMoreStorage, setIsAddingMoreStorage] = useState<boolean>(false);
+  const [storageActionType, setStorageActionType] = useState<'purchase' | 'reduce'>('purchase');
+  const [reductionLoading, setReductionLoading] = useState<boolean>(false);
+  const [reductionMessage, setReductionMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [isReducingStorage, setIsReducingStorage] = useState<boolean>(false);
+  const [renewReductionAmount, setRenewReductionAmount] = useState<number>(0);
+  const [renewReductionUnit, setRenewReductionUnit] = useState<string>('GB');
 
   const { darkMode } = useDarkMode();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const visiblePlans = useMemo(() => {
+    const isSeller = user?.roles?.includes('seller');
+    const shoppingTypeKey = (userPlanInfo as any)?.shopping_type_key || null;
+    const shoppingTypeName = (userPlanInfo as any)?.shopping_type_name || null;
+    const isCustomSeller = isSeller && (
+      (shoppingTypeKey && shoppingTypeKey !== 'other') ||
+      (shoppingTypeName && shoppingTypeName.toLowerCase() !== 'other')
+    );
+
+    return adminPlans.filter(plan => {
+      if (!plan.is_active) return false;
+      if (isCustomSeller) {
+        return plan.name === 'PREMIUM_SHOP';
+      } else {
+        return plan.name !== 'PREMIUM_SHOP';
+      }
+    });
+  }, [adminPlans, userPlanInfo, user]);
 
   const pageBg = darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900";
   const cardBase = darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200";
@@ -172,131 +193,110 @@ export default function UpgradePlans() {
     ? "bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white"
     : "bg-white hover:bg-gray-50 border border-gray-300 text-gray-900";
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const headers: Record<string, string> = {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        };
+  const fetchData = useCallback(async () => {
+    try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+      };
 
-        try {
-          const plansRes = await fetch(`${API_BASE}/api/provider/upgrade/plans`, { headers });
-          if (plansRes.ok) {
-            const plansData = await plansRes.json();
-            const convertedPlans = plansData.map(convertDbPlanToAdminPlan);
-            setAdminPlans(convertedPlans);
-          } else {
-            setAdminPlans(getDefaultAdminPlans());
-          }
-        } catch {
+      try {
+        const plansRes = await fetch(`${API_BASE}/api/provider/upgrade/plans`, { headers });
+        if (plansRes.ok) {
+          const plansData = await plansRes.json();
+          const convertedPlans = plansData.map(convertDbPlanToAdminPlan);
+          setAdminPlans(convertedPlans);
+        } else {
           setAdminPlans(getDefaultAdminPlans());
         }
+      } catch {
+        setAdminPlans(getDefaultAdminPlans());
+      }
 
-        try {
-          const pricingRes = await fetch(`${API_BASE}/api/user/storage-pricing`, { headers });
-          if (pricingRes.ok) {
-            const pricingData = await pricingRes.json();
-            setStoragePricing(pricingData.pricing);
-          } else {
-            setStoragePricing(getDefaultStoragePricing());
-          }
-        } catch {
+      try {
+        const pricingRes = await fetch(`${API_BASE}/api/user/storage-pricing`, { headers });
+        if (pricingRes.ok) {
+          const pricingData = await pricingRes.json();
+          setStoragePricing(pricingData.pricing);
+        } else {
           setStoragePricing(getDefaultStoragePricing());
         }
+      } catch {
+        setStoragePricing(getDefaultStoragePricing());
+      }
 
-        try {
-          const userRes = await fetch(`${API_BASE}/api/user/plan-info`, { headers });
-          if (userRes.ok) {
-            const userData = await userRes.json();
-            setUserPlanInfo(userData.plan_info);
-          } else {
-            setUserPlanInfo(getDefaultUserPlanInfo());
-          }
-        } catch {
+      try {
+        const userRes = await fetch(`${API_BASE}/api/user/plan-info`, { headers });
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          setUserPlanInfo(userData.plan_info);
+        } else {
           setUserPlanInfo(getDefaultUserPlanInfo());
         }
-
-        setLoading(false);
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch plan data");
-        setLoading(false);
+      } catch {
+        setUserPlanInfo(getDefaultUserPlanInfo());
       }
+
+      setLoading(false);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch plan data");
+      setLoading(false);
     }
-    fetchData();
-  }, []);
+  }, [token]);
 
-  useEffect(() => {
-    const currentId = (userPlanInfo as any)?.current_plan?.id as number | undefined;
-    const fallback = adminPlans.find(p => p.is_active)?.id;
-    setSelectedPlanId(currentId ?? fallback ?? null);
-  }, [userPlanInfo, adminPlans]);
+  const fetchPlanAndUsage = useCallback(async () => {
+    try {
+      const planRes = await fetch(`${API_BASE}/api/storage/plan`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-  useEffect(() => {
-    const fetchPlanAndUsage = async () => {
-      try {
-        const planRes = await fetch(`${API_BASE}/api/storage/plan`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+      if (planRes.ok) {
+        const planData = await planRes.json();
+        if (planData.success) {
+          const plan = planData.data;
+          setUserStoragePlan(plan);
 
-        if (planRes.ok) {
-          const planData = await planRes.json();
-          if (planData.success) {
-            const plan = planData.data;
-            setUserStoragePlan(plan);
-
-            const now = new Date();
-            if (!plan.expires_at || new Date(plan.expires_at) <= now) {
-              setCanPurchaseBase(true);
-            } else {
-              setCanPurchaseBase(false);
-            }
-
-            const usageRes = await fetch(`${API_BASE}/api/users/storage-usage`, {
-              headers: { Authorization: `Bearer ${token}` }
-            });
-
-            if (usageRes.ok) {
-              const usageData = await usageRes.json();
-              if (usageData.success) {
-                setStorageUsage(usageData.data);
-              }
-            }
-          } else {
+          const now = new Date();
+          if (!plan || !plan.expires_at || new Date(plan.expires_at) <= now) {
             setCanPurchaseBase(true);
+          } else {
+            setCanPurchaseBase(false);
+          }
+
+          const usageRes = await fetch(`${API_BASE}/api/users/storage-usage`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (usageRes.ok) {
+            const usageData = await usageRes.json();
+            if (usageData.success) {
+              setStorageUsage(usageData.data);
+            }
           }
         } else {
           setCanPurchaseBase(true);
         }
-      } catch (err) {
-        console.error(err);
+      } else {
         setCanPurchaseBase(true);
       }
-    };
-
-    fetchPlanAndUsage();
-  }, []);
-
-  const getDefaultAdminPlans = (): AdminPlan[] => [
-    {
-      id: 1,
-      name: 'basic',
-      display_name: 'Basic',
-      monthly_fee: 0,
-      base_storage_gb: 1,
-      features: {
-        can_upload_images: true,
-        can_upload_videos: false,
-        max_image_size_mb: 5,
-        max_video_size_mb: 0,
-        max_products: 50,
-        support_level: 'Basic',
-        analytics_enabled: false
-      },
-      feature_list: ['Basic Support', 'Image Upload', 'Up to 50 Products'],
-      is_active: true
+    } catch (err) {
+      console.error(err);
+      setCanPurchaseBase(true);
     }
-  ];
+  }, [token]);
+
+  useEffect(() => {
+    fetchData();
+    fetchPlanAndUsage();
+  }, [fetchData, fetchPlanAndUsage]);
+
+  useEffect(() => {
+    const currentId = (userPlanInfo as any)?.current_plan?.id as number | undefined;
+    const fallback = visiblePlans[0]?.id;
+    setSelectedPlanId(currentId ?? fallback ?? null);
+  }, [userPlanInfo, visiblePlans]);
+
+  const getDefaultAdminPlans = (): AdminPlan[] => [];
 
   const getDefaultStoragePricing = (): StoragePricing => ({
     price_per_gb_rwf: 500,
@@ -339,6 +339,8 @@ export default function UpgradePlans() {
   const addonGb = userPlanInfo?.additional_storage_purchased_gb ?? 0;
   const primaryPlanActive = userPlanInfo?.subscription_status === 'active';
 
+
+
   if (error) {
     return (
       <div className={`min-h-screen ${pageBg}`}>
@@ -354,15 +356,17 @@ export default function UpgradePlans() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${pageBg}`}>
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
-          </div>
+      <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'}`}>
+        <div className="text-center py-16">
+          <LoadingSpinner size="lg" message="Loading plans..." variant="dots" />
         </div>
       </div>
     );
   }
+
+  const calculatedAddedGb = convertToGB(storageAmount, storageUnit);
+  const calculatedUnitPrice = storagePricing?.price_per_gb_rwf ?? 500;
+  const calculatedTotalPrice = Math.round(calculatedAddedGb * calculatedUnitPrice);
 
   return (
     <div className={`min-h-screen ${pageBg}`}>
@@ -387,114 +391,445 @@ export default function UpgradePlans() {
           </Link>
         </div>
 
-        {/* Current Plan Summary */}
-        <div className={`border-0 shadow-sm overflow-hidden`} style={{ borderRadius: '2px' }}>
-          <div className={`p-5 ${cardBase}`}>
-            <div className="flex items-center gap-2 mb-4">
-              <Package className="w-5 h-5 text-emerald-500" />
-              <h2 className="text-base font-semibold">Current Subscription</h2>
-            </div>
+  
 
-            {(() => {
-              const currentPlan = userPlanInfo?.current_plan || null;
-              const planDisplay = currentPlan?.display_name || currentPlan?.name || 'No plan';
-              const baseStorageGb = userPlanInfo?.current_storage_gb ?? (userStoragePlan?.storagePlanGb ?? 0);
-              const subscriptionStatus = userPlanInfo?.subscription_status || (hasActivePlan ? 'active' : hasExpiredPlan ? 'expired' : 'inactive');
-              
-              return (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 border border-gray-100 dark:border-gray-700" style={{ borderRadius: '2px' }}>
-                    <div className="text-xs text-gray-400 uppercase tracking-wider">Current Plan</div>
-                    <div className="mt-1 text-lg font-semibold">{planDisplay}</div>
-                    <div className="mt-2">
-                      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium ${
-                        subscriptionStatus === "active"
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
-                          : subscriptionStatus === "expired"
-                            ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
-                            : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
-                      }`} style={{ borderRadius: '2px' }}>
-                        {subscriptionStatus === "active" ? <CheckCircle2 className="w-3 h-3" /> : <AlertTriangle className="w-3 h-3" />}
-                        {subscriptionStatus}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="p-4 border border-gray-100 dark:border-gray-700" style={{ borderRadius: '2px' }}>
-                    <div className="text-xs text-gray-400 uppercase tracking-wider">Storage</div>
-                    <div className="mt-1 text-lg font-semibold">{formatStorage(baseStorageGb)} base</div>
-                    <div className="text-sm text-gray-400 mt-1">Add-ons: {addonGb} GB</div>
-                  </div>
+        {/* Two-Column Grid: Plans on Left (3/5), Storage Add-ons on Right (2/5) */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          
+          {/* Left Column: Base Plans or Active Plan Info (3/5) */}
+          <div className="lg:col-span-3 space-y-4">
+            { (canPurchaseBase || userPlanInfo?.subscription_status !== "active") ? (
+              <>
+                <div className="flex items-center gap-2">
+          
+                  <h2 className="text-base font-semibold">Base Plans</h2>
                 </div>
-              );
-            })()}
-          </div>
-        </div>
-
-        {/* Renewal Section (when not active) */}
-        {userPlanInfo?.subscription_status !== "active" && (
-          <div className={`p-5 border-0 shadow-sm ${darkMode ? 'bg-gray-800' : 'bg-white'}`} style={{ borderRadius: '2px' }}>
-            <div className="flex items-start gap-3 mb-4">
-              <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
-              <div>
-                <h3 className="text-base font-semibold">Renew Your Plan</h3>
-                <p className={`text-sm ${mutedText} mt-1`}>
-                  Your subscription is not active. Renew to restore uploads and visibility.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-              {/* Plan Selection */}
-              <div>
-                <label className={`block text-xs font-medium uppercase tracking-wider mb-2 ${subText}`}>Select Plan</label>
-                <div className="space-y-2">
-                  {adminPlans.filter(p => p.is_active).map(p => {
-                    const selected = selectedPlanId === p.id;
-                    return (
-                      <button
-                        key={p.id}
-                        onClick={() => setSelectedPlanId(p.id)}
-                        className={`w-full text-left p-3 border transition-colors ${selected
-                          ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
-                          : darkMode ? 'border-gray-700 hover:border-gray-600' : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        style={{ borderRadius: '2px' }}
-                      >
-                        <div className="text-sm font-semibold">{p.display_name}</div>
-                        <div className={`text-xs ${subText}`}>{p.monthly_fee.toLocaleString()} RWF / month</div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Storage Add-on */}
-              <div>
-                <label className={`block text-xs font-medium uppercase tracking-wider mb-2 ${subText}`}>Storage Add-on</label>
-                {!editingStorage ? (
-                  <div className="p-3 border border-gray-200 dark:border-gray-700" style={{ borderRadius: '2px' }}>
-                    <div className="text-sm">Current: {addonGb} GB</div>
-                    <button
-                      onClick={() => setEditingStorage(true)}
-                      className={`mt-2 w-full px-3 py-1.5 text-sm transition-colors ${buttonSecondary}`}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {visiblePlans.map((plan, index) => (
+                    <div
+                      key={plan.id}
+                      className={`p-4 border shadow-sm relative ${cardBase}`}
                       style={{ borderRadius: '2px' }}
                     >
-                      Add Storage
-                    </button>
+                      {index === 1 && (
+                        <div className="absolute -top-2 left-3">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-emerald-500 text-white" style={{ borderRadius: '2px' }}>
+                            Popular
+                          </span>
+                        </div>
+                      )}
+                      <div className="text-center">
+                        <h3 className="text-base font-bold">{plan.display_name}</h3>
+                        <div className="mt-2 text-2xl font-bold">
+                          {plan.monthly_fee.toLocaleString()} <span className="text-sm font-normal text-gray-400">RWF</span>
+                        </div>
+                        <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-700" style={{ borderRadius: '2px' }}>
+                          {formatStorage(plan.base_storage_gb)} included
+                        </div>
+                      </div>
+                      <ul className="mt-4 space-y-1.5">
+                        {plan.feature_list.slice(0, 4).map((feature, idx) => (
+                          <li key={idx} className="flex items-center gap-2 text-xs">
+                            <Check className="w-3 h-3 text-emerald-500" />
+                            <span className={mutedText}>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      
+                      {userPlanInfo?.subscription_status !== "active" ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedPlanForRenewal(plan);
+                            setRenewalModalOpen(true);
+                            setRenewAddonAmount(0);
+                            setIsAddingMoreStorage(false);
+                            setRenewMessage(null);
+                          }}
+                          className={`mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-semibold transition-colors ${buttonPrimary}`}
+                          style={{ borderRadius: '2px' }}
+                        >
+                          {plan.monthly_fee === 0 ? "Get Started" : "Subscribe"}
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      ) : (
+                        <Link
+                          to={`/checkout?plan=${plan.id}&type=base`}
+                          className={`mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-semibold transition-colors ${buttonPrimary}`}
+                          style={{ borderRadius: '2px' }}
+                        >
+                          {plan.monthly_fee === 0 ? "Get Started" : "Subscribe"}
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              userPlanInfo?.current_plan && (
+                <>
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-emerald-500" />
+                    <h2 className="text-base font-semibold">Active Plan Info</h2>
                   </div>
-                ) : (
-                  <div className="space-y-2">
-                    <div className="flex gap-2">
+                  <div className={`p-5 border shadow-sm relative ${cardBase}`} style={{ borderRadius: '2px' }}>
+                    <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 mb-4" style={{ borderRadius: '2px' }}>
+                      <h4 className="text-lg font-bold text-emerald-500">{userPlanInfo.current_plan.display_name}</h4>
+                      <p className={`text-xs ${mutedText} mt-1`}>Active Subscription</p>
+                    </div>
+                    <ul className="space-y-2 mt-4 text-xs">
+                      <li className="flex justify-between py-1 border-b border-gray-150 dark:border-gray-700/50">
+                        <span className={subText}>Monthly Fee:</span>
+                        <span className="font-semibold">{userPlanInfo.current_plan.monthly_fee.toLocaleString()} RWF</span>
+                      </li>
+                      <li className="flex justify-between py-1 border-b border-gray-150 dark:border-gray-700/50">
+                        <span className={subText}>Base Storage:</span>
+                        <span className="font-semibold">{formatStorage(userPlanInfo.current_plan.base_storage_gb)}</span>
+                      </li>
+                      <li className="flex justify-between py-1 border-b border-gray-150 dark:border-gray-700/50">
+                        <span className={subText}>Support Level:</span>
+                        <span className="font-semibold">{userPlanInfo.current_plan.features.support_level}</span>
+                      </li>
+                      <li className="flex justify-between py-1">
+                        <span className={subText}>Analytics:</span>
+                        <span className="font-semibold">{userPlanInfo.current_plan.features.analytics_enabled ? 'Enabled' : 'Disabled'}</span>
+                      </li>
+                    </ul>
+                  </div>
+                </>
+              )
+            )}
+          </div>
+
+          {/* Right Column: Storage Add-ons (2/5) */}
+          <div className="lg:col-span-2 space-y-4">
+            {storagePricing && (
+              <>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-semibold">Storage Add-ons</h2>
+                </div>
+
+                {/* Usage Bar */}
+                {storageUsage && (
+                  <div className={`p-4 border ${cardBase}`} style={{ borderRadius: '2px' }}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className={mutedText}>Used: {formatFileSize(storageUsage.used_storage_gb)}</span>
+                      <span className={mutedText}>Total: {formatFileSize(storageUsage.total_storage_gb)}</span>
+                    </div>
+                    <div className="h-1.5 bg-gray-200 dark:bg-gray-700 overflow-hidden" style={{ borderRadius: '2px' }}>
+                      <div
+                        className="h-full bg-emerald-500 transition-all"
+                        style={{ width: `${Math.min(storageUsage.usage_percentage, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className={`p-5 border shadow-sm ${!primaryPlanActive ? 'opacity-60' : ''} ${cardBase}`} style={{ borderRadius: '2px' }}>
+                  <div className="space-y-6">
+                    {/* Action Tabs: Purchase vs Reduce */}
+                    {primaryPlanActive && (
+                      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStorageActionType('purchase');
+                            setReductionMessage(null);
+                          }}
+                          className={`flex-1 pb-2 text-xs font-bold uppercase tracking-wider border-b-2 text-center transition-colors ${
+                            storageActionType === 'purchase'
+                              ? 'border-emerald-500 text-emerald-500'
+                              : 'border-transparent text-gray-400 hover:text-gray-300'
+                          }`}
+                        >
+                          Purchase
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStorageActionType('reduce');
+                            setReductionMessage(null);
+                          }}
+                          className={`flex-1 pb-2 text-xs font-bold uppercase tracking-wider border-b-2 text-center transition-colors ${
+                            storageActionType === 'reduce'
+                              ? 'border-emerald-500 text-emerald-500'
+                              : 'border-transparent text-gray-400 hover:text-gray-300'
+                          }`}
+                        >
+                          Reduce
+                        </button>
+                      </div>
+                    )}
+
+                    {storageActionType === 'purchase' ? (
+                      <>
+                        <div className="space-y-4">
+                          <div>
+                            <label className={`block text-xs font-medium uppercase tracking-wider mb-2 ${subText}`}>Amount</label>
+                            <input
+                              type="number"
+                              min="0.1"
+                              step="0.1"
+                              value={storageAmount}
+                              onChange={(e) => setStorageAmount(parseFloat(e.target.value) || 0)}
+                              disabled={!primaryPlanActive}
+                              className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
+                              style={{ borderRadius: '2px' }}
+                            />
+                          </div>
+                          <div>
+                            <label className={`block text-xs font-medium uppercase tracking-wider mb-2 ${subText}`}>Unit</label>
+                            <select
+                              value={storageUnit}
+                              onChange={(e) => setStorageUnit(e.target.value)}
+                              disabled={!primaryPlanActive}
+                              className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
+                              style={{ borderRadius: '2px' }}
+                            >
+                              {storagePricing.available_units.map(unit => <option key={unit} value={unit}>{unit}</option>)}
+                            </select>
+                          </div>
+                          <div className="p-3 border border-gray-150 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30" style={{ borderRadius: '2px' }}>
+                            <div className={`text-sm ${mutedText}`}>Price: {storagePricing.price_per_gb_rwf.toLocaleString()} RWF/GB</div>
+                            <div className={`text-xs ${subText} mt-1`}>Min: {formatStorage(storagePricing.min_purchase_gb)}</div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="p-4 border border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/20 dark:bg-gray-900/10" style={{ borderRadius: '2px' }}>
+                            <h3 className="text-sm font-semibold mb-3">Summary</h3>
+                            {(() => {
+                              const addedGb = convertToGB(storageAmount, storageUnit);
+                              const unitPrice = storagePricing.price_per_gb_rwf;
+                              const totalPrice = Math.round(addedGb * unitPrice);
+                              return (
+                                <>
+                                  <div className="flex justify-between py-2 text-sm">
+                                    <span className={mutedText}>Additional Storage:</span>
+                                    <span className="font-medium">{storageAmount} {storageUnit}</span>
+                                  </div>
+                                  <div className="flex justify-between py-2 text-sm">
+                                    <span className={mutedText}>Equivalent in GB:</span>
+                                    <span className="font-medium">{addedGb.toFixed(2)} GB</span>
+                                  </div>
+                                  <div className="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2">
+                                    <div className="flex justify-between py-2">
+                                      <span className="font-semibold">Total:</span>
+                                      <span className="text-lg font-bold text-emerald-500">{totalPrice.toLocaleString()} RWF</span>
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            })()}
+                          </div>
+                          {primaryPlanActive ? (
+                            <Link
+                              to={`/storage-checkout?storage_amount=${storageAmount}&storage_unit=${storageUnit}&type=addon&price=${calculatedTotalPrice}&price_total=${calculatedTotalPrice}`}
+                              className={`mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold transition-colors ${storageAmount > 0 ? buttonPrimary : (darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-500')}`}
+                              style={{ borderRadius: '2px', pointerEvents: storageAmount > 0 ? 'auto' : 'none' }}
+                            >
+                              Purchase Add-on <ArrowRight className="w-4 h-4" />
+                            </Link>
+                          ) : (
+                            <div className="mt-4 w-full text-center px-4 py-2.5 text-sm bg-gray-100 dark:bg-gray-800 text-gray-500" style={{ borderRadius: '2px' }}>
+                              Subscribe to a plan first
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="space-y-4">
+                          <div>
+                            <label className={`block text-xs font-medium uppercase tracking-wider mb-2 ${subText}`}>Amount to Remove</label>
+                            <input
+                              type="number"
+                              min="0.1"
+                              step="0.1"
+                              value={storageAmount}
+                              onChange={(e) => setStorageAmount(parseFloat(e.target.value) || 0)}
+                              disabled={!primaryPlanActive}
+                              className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
+                              style={{ borderRadius: '2px' }}
+                            />
+                          </div>
+                          <div>
+                            <label className={`block text-xs font-medium uppercase tracking-wider mb-2 ${subText}`}>Unit</label>
+                            <select
+                              value={storageUnit}
+                              onChange={(e) => setStorageUnit(e.target.value)}
+                              disabled={!primaryPlanActive}
+                              className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
+                              style={{ borderRadius: '2px' }}
+                            >
+                              {storagePricing.available_units.map(unit => <option key={unit} value={unit}>{unit}</option>)}
+                            </select>
+                          </div>
+                          
+                          <div className={`p-3 border text-[11px] leading-relaxed ${darkMode ? 'border-amber-500/30 bg-amber-500/5 text-amber-400' : 'border-amber-200 bg-amber-50 text-amber-700'}`} style={{ borderRadius: '2px' }}>
+                            ⚠️ You can reduce free/unoccupied space only. If you try to remove space that is currently holding uploaded files, the request will fail.
+                          </div>
+                        </div>
+
+                        <div>
+                          {reductionMessage && (
+                            <div className={`p-3 border text-xs font-semibold mb-4 leading-relaxed ${
+                              reductionMessage.type === 'success' 
+                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
+                                : 'bg-red-500/10 border-red-500/20 text-red-500'}`} 
+                              style={{ borderRadius: '2px' }}
+                            >
+                              {reductionMessage.text}
+                            </div>
+                          )}
+
+                          {primaryPlanActive ? (
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                setReductionLoading(true);
+                                setReductionMessage(null);
+                                try {
+                                  const res = await fetch(`${API_BASE}/api/storage/reduce`, {
+                                    method: 'POST',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                      Authorization: `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify({ amount: storageAmount, unit: storageUnit })
+                                  });
+                                  const data = await res.json();
+                                  if (!res.ok) {
+                                    throw new Error(data.error || 'Failed to reduce storage');
+                                  }
+                                  setReductionMessage({ type: 'success', text: data.message || 'Storage reduced successfully!' });
+                                  
+                                  // Refresh user data
+                                  fetchData();
+                                  fetchPlanAndUsage();
+                                } catch (err: any) {
+                                  setReductionMessage({ type: 'error', text: err.message });
+                                } finally {
+                                  setReductionLoading(false);
+                                }
+                              }}
+                              disabled={reductionLoading || storageAmount <= 0}
+                              className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold transition-colors ${storageAmount > 0 ? buttonPrimary : (darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-500')}`}
+                              style={{ borderRadius: '2px' }}
+                            >
+                              {reductionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Confirm Reduction <ArrowRight className="w-4 h-4" /></>}
+                            </button>
+                          ) : (
+                            <div className="mt-4 w-full text-center px-4 py-2.5 text-sm bg-gray-100 dark:bg-gray-800 text-gray-500" style={{ borderRadius: '2px' }}>
+                              Subscribe to a plan first
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+        </div>
+      </div>
+
+      {/* Combined Renewal Modal */}
+      {renewalModalOpen && selectedPlanForRenewal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div 
+            className={`w-full max-w-md p-6 border shadow-lg ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-800'}`}
+            style={{ borderRadius: '2px' }}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-base font-extrabold uppercase tracking-wider text-emerald-500">
+                Renew Subscription & Storage
+              </h3>
+              <button 
+                onClick={() => {
+                  setRenewalModalOpen(false);
+                  setSelectedPlanForRenewal(null);
+                }} 
+                className="p-1 hover:opacity-70"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Plan Summary */}
+              <div className="p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30" style={{ borderRadius: '2px' }}>
+                <div className="flex justify-between text-sm py-1">
+                  <span className="font-semibold">{selectedPlanForRenewal.display_name} Plan:</span>
+                  <span>{selectedPlanForRenewal.monthly_fee.toLocaleString()} RWF</span>
+                </div>
+                {addonGb > 0 && (
+                  <div className="flex justify-between text-sm py-1">
+                    <span className="font-semibold">Existing Storage Add-on ({addonGb} GB):</span>
+                    <span>{(addonGb * (storagePricing?.price_per_gb_rwf ?? 500)).toLocaleString()} RWF</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Add/Reduce Storage Options */}
+              <div className="space-y-3">
+                <div className="flex flex-col gap-2">
+                  <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={isAddingMoreStorage}
+                      onChange={(e) => {
+                        setIsAddingMoreStorage(e.target.checked);
+                        if (e.target.checked) {
+                          setIsReducingStorage(false);
+                          setRenewAddonAmount(0);
+                          setRenewReductionAmount(0);
+                        }
+                      }}
+                      className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    />
+                    <span>Add/Expand storage add-on</span>
+                  </label>
+
+                  {addonGb > 0 && (
+                    <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={isReducingStorage}
+                        onChange={(e) => {
+                          setIsReducingStorage(e.target.checked);
+                          if (e.target.checked) {
+                            setIsAddingMoreStorage(false);
+                            setRenewAddonAmount(0);
+                            setRenewReductionAmount(0);
+                          }
+                        }}
+                        className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                      />
+                      <span>Reduce storage add-on</span>
+                    </label>
+                  )}
+                </div>
+
+                {isAddingMoreStorage && (
+                  <div className="flex gap-2 p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-900/20" style={{ borderRadius: '2px' }}>
+                    <div className="flex-1">
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${subText}`}>Extra Storage</label>
                       <input
                         type="number"
                         min="0"
                         step="0.1"
                         value={renewAddonAmount}
                         onChange={(e) => setRenewAddonAmount(parseFloat(e.target.value) || 0)}
-                        className={`flex-1 px-3 py-1.5 text-sm border ${inputBase}`}
+                        className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
                         style={{ borderRadius: '2px' }}
                       />
+                    </div>
+                    <div>
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${subText}`}>Unit</label>
                       <select
                         value={renewAddonUnit}
                         onChange={(e) => setRenewAddonUnit(e.target.value)}
@@ -504,255 +839,248 @@ export default function UpgradePlans() {
                         {storagePricing?.available_units.map(u => <option key={u} value={u}>{u}</option>)}
                       </select>
                     </div>
-                    <button
-                      onClick={() => setEditingStorage(false)}
-                      className={`w-full px-3 py-1.5 text-sm transition-colors ${buttonPrimary}`}
-                      style={{ borderRadius: '2px' }}
-                    >
-                      Done
-                    </button>
+                  </div>
+                )}
+
+                {isReducingStorage && (
+                  <div className="flex gap-2 p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-900/20" style={{ borderRadius: '2px' }}>
+                    <div className="flex-1">
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${subText}`}>Amount to Remove</label>
+                      <input
+                        type="number"
+                        min="0.1"
+                        step="0.1"
+                        value={renewReductionAmount}
+                        onChange={(e) => setRenewReductionAmount(parseFloat(e.target.value) || 0)}
+                        className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
+                        style={{ borderRadius: '2px' }}
+                      />
+                    </div>
+                    <div>
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${subText}`}>Unit</label>
+                      <select
+                        value={renewReductionUnit}
+                        onChange={(e) => setRenewReductionUnit(e.target.value)}
+                        className={`px-3 py-1.5 text-sm border ${inputBase}`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        {storagePricing?.available_units.map(u => <option key={u} value={u}>{u}</option>)}
+                      </select>
+                    </div>
                   </div>
                 )}
               </div>
+              {/* Total Summary & Validation */}
+              {(() => {
+                if (isReducingStorage) {
+                  const reductionGb = convertToGB(renewReductionAmount, renewReductionUnit);
+                  const totalNewStorageMB = (selectedPlanForRenewal.base_storage_gb * 1024) + ((addonGb - reductionGb) * 1024);
+                  const usedStorageMB = storageUsage ? storageUsage.usedMB : 0;
+                  const isOverLimit = totalNewStorageMB < usedStorageMB;
 
-              {/* Payment */}
-              <div>
-                <label className={`block text-xs font-medium uppercase tracking-wider mb-2 ${subText}`}>Payment</label>
-                <div className="space-y-3">
-                  <input
-                    type="tel"
-                    value={renewPhone}
-                    onChange={(e) => setRenewPhone(e.target.value)}
-                    placeholder="Phone (MTN MoMo)"
-                    className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
-                    style={{ borderRadius: '2px' }}
-                  />
-                  <div className="p-3 border border-gray-200 dark:border-gray-700" style={{ borderRadius: '2px' }}>
-                    {(() => {
-                      const selectedPlan = adminPlans.find(p => p.id === selectedPlanId);
-                      const planFee = Number(selectedPlan?.monthly_fee ?? 0);
-                      const addedGb = convertToGB(renewAddonAmount, renewAddonUnit);
-                      const totalAddonGb = addonGb + addedGb;
-                      const addonFee = Math.round(totalAddonGb * (storagePricing?.price_per_gb_rwf ?? 500));
-                      const total = planFee + addonFee;
-                      return (
-                        <>
-                          <div className="text-xs text-gray-400">Total</div>
-                          <div className="text-xl font-bold text-emerald-500">{total.toLocaleString()} RWF</div>
-                          <div className="text-xs text-gray-400 mt-1">Plan: {planFee} + Storage: {addonFee}</div>
-                        </>
-                      );
-                    })()}
-                  </div>
-                </div>
-              </div>
-            </div>
+                  return (
+                    <div className="space-y-4">
+                      {isOverLimit && (
+                        <div className="p-3 border border-red-500/20 bg-red-500/5 text-red-500 text-xs font-semibold leading-relaxed" style={{ borderRadius: '2px' }}>
+                          ⚠️ You need to first delete the uploaded products/services occupying this storage you want to reduce to be able to reduce the storage (you can reduce the free space only)
+                        </div>
+                      )}
 
-            <button
-              onClick={async () => {
-                setRenewMessage(null);
-                setRenewLoading(true);
-                try {
-                  const token = localStorage.getItem('token');
-                  const headers = {
-                    'Content-Type': 'application/json',
-                    ...(token ? { Authorization: `Bearer ${token}` } : {})
-                  };
-                  if (!selectedPlanId) throw new Error('Please select a plan');
-                  const addedGb = convertToGB(renewAddonAmount, renewAddonUnit);
-                  const totalAddonGb = addonGb + addedGb;
-                  const body = {
-                    plan_id: selectedPlanId,
-                    phone: renewPhone,
-                    provider: 'mtn',
-                    addon_gb: addedGb,
-                    addon_gb_total: totalAddonGb,
-                    price_per_gb: storagePricing?.price_per_gb_rwf ?? 500,
-                  };
-                  const res = await fetch(`${API_BASE}/api/provider/upgrade/combined/momo/initiate`, {
-                    method: 'POST', headers, body: JSON.stringify(body)
-                  });
-                  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                  const data = await res.json();
-                  setRenewMessage(`Payment initiated. Ref: ${data?.data?.referenceId}`);
-                } catch (e: any) {
-                  setRenewMessage(e?.message || 'Failed to initiate renewal');
-                } finally {
-                  setRenewLoading(false);
+                      {renewMessage && (
+                        <div className={`p-3 border text-xs font-semibold ${
+                          renewMessage.startsWith('✅')
+                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
+                            : 'bg-red-500/10 border-red-500/20 text-red-500'}`} 
+                          style={{ borderRadius: '2px' }}
+                        >
+                          {renewMessage}
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      <div className="flex gap-2 pt-2">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            setRenewMessage(null);
+                            setRenewLoading(true);
+                            try {
+                              const res = await fetch(`${API_BASE}/api/storage/reduce`, {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  Authorization: `Bearer ${token}`
+                                },
+                                body: JSON.stringify({ amount: renewReductionAmount, unit: renewReductionUnit })
+                              });
+                              const data = await res.json();
+                              if (!res.ok) {
+                                throw new Error(data.error || 'Failed to reduce storage');
+                              }
+                              setRenewMessage('✅ Storage reduced successfully! You can now proceed to renew your plan.');
+                              
+                              // Refresh plan & usage
+                              await fetchData();
+                              await fetchPlanAndUsage();
+
+                              // Reset checkboxes
+                              setIsReducingStorage(false);
+                              setRenewReductionAmount(0);
+                            } catch (err: any) {
+                              setRenewMessage(`❌ ${err.message}`);
+                            } finally {
+                              setRenewLoading(false);
+                            }
+                          }}
+                          disabled={renewLoading || renewReductionAmount <= 0 || isOverLimit}
+                          className={`flex-grow py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5`}
+                          style={{ borderRadius: '2px' }}
+                        >
+                          {renewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Reduction'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setRenewalModalOpen(false);
+                            setSelectedPlanForRenewal(null);
+                            setRenewMessage(null);
+                          }}
+                          disabled={renewLoading}
+                          className={`px-4 py-2 border font-bold text-xs uppercase tracking-wider transition-colors
+                            ${darkMode ? 'bg-gray-700 hover:bg-gray-650 border-gray-600 text-gray-200' : 'bg-white hover:bg-gray-50 border-gray-300 text-gray-600'}`}
+                          style={{ borderRadius: '2px' }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  );
                 }
-              }}
-              disabled={renewLoading || !renewPhone || !selectedPlanId}
-              className={`mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold transition-colors ${buttonPrimary} disabled:opacity-50`}
-              style={{ borderRadius: '2px' }}
-            >
-              {renewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Renew Now <ArrowRight className="w-4 h-4" /></>}
-            </button>
-            {renewMessage && (
-              <div className={`mt-3 p-3 text-sm border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`} style={{ borderRadius: '2px' }}>
-                {renewMessage}
-              </div>
-            )}
-          </div>
-        )}
 
-        {/* Base Plans */}
-        {canPurchaseBase && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <HardDrive className="w-5 h-5 text-emerald-500" />
-              <h2 className="text-base font-semibold">Base Plans</h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-              {adminPlans.filter(plan => plan.is_active).map((plan, index) => (
-                <div
-                  key={plan.id}
-                  className={`p-4 border-0 shadow-sm relative ${cardBase}`}
-                  style={{ borderRadius: '2px' }}
-                >
-                  {index === 1 && (
-                    <div className="absolute -top-2 left-3">
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-emerald-500 text-white" style={{ borderRadius: '2px' }}>
-                        <Zap className="w-3 h-3" />
-                        Popular
-                      </span>
+                // Normal Pay/Renewal Flow (when not reducing)
+                let changeGb = 0;
+                let totalAddonGb = addonGb;
+
+                if (isAddingMoreStorage) {
+                  changeGb = convertToGB(renewAddonAmount, renewAddonUnit);
+                  totalAddonGb = addonGb + changeGb;
+                }
+
+                const planFee = Number(selectedPlanForRenewal.monthly_fee);
+                const addonFee = Math.round(totalAddonGb * (storagePricing?.price_per_gb_rwf ?? 500));
+                const total = planFee + addonFee;
+
+                return (
+                  <div className="space-y-4">
+                    <div className="p-3 border border-emerald-500/25 bg-emerald-500/5 text-emerald-500 flex justify-between items-center" style={{ borderRadius: '2px' }}>
+                      <span className="font-extrabold uppercase text-xs tracking-wider">Total Combined Price</span>
+                      <div className="text-right">
+                        <div className="text-xl font-black">{total.toLocaleString()} RWF</div>
+                        {totalAddonGb > 0 && (
+                          <div className="text-[10px] opacity-80">Incl. {totalAddonGb.toFixed(2)} GB Storage</div>
+                        )}
+                      </div>
                     </div>
-                  )}
-                  <div className="text-center">
-                    <h3 className="text-base font-bold">{plan.display_name}</h3>
-                    <div className="mt-2 text-2xl font-bold">
-                      {plan.monthly_fee.toLocaleString()} <span className="text-sm font-normal text-gray-400">RWF</span>
+
+                    {/* MTN MoMo Input */}
+                    <div>
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${subText}`}>
+                        MTN Mobile Money Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        value={renewPhone}
+                        onChange={(e) => setRenewPhone(e.target.value)}
+                        placeholder="e.g. 078XXXXXXX"
+                        className={`w-full px-3 py-2 border outline-none text-sm ${inputBase}`}
+                        style={{ borderRadius: '2px' }}
+                      />
                     </div>
-                    <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-700" style={{ borderRadius: '2px' }}>
-                      <Cloud className="w-3 h-3" />
-                      {formatStorage(plan.base_storage_gb)} included
+
+                    {renewMessage && (
+                      <div className={`p-3 border text-xs font-semibold ${
+                        renewMessage.includes('initiated') || renewMessage.startsWith('✅')
+                          ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
+                          : 'bg-red-500/10 border-red-500/20 text-red-500'}`} 
+                        style={{ borderRadius: '2px' }}
+                      >
+                        {renewMessage}
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        onClick={async () => {
+                          setRenewMessage(null);
+                          setRenewLoading(true);
+                          try {
+                            if (!selectedPlanForRenewal.id) throw new Error('Please select a plan');
+                            const body = {
+                              plan_id: selectedPlanForRenewal.id,
+                              phone: renewPhone,
+                              provider: 'mtn',
+                              addon_gb: changeGb,
+                              addon_gb_total: totalAddonGb,
+                              price_per_gb: storagePricing?.price_per_gb_rwf ?? 500,
+                            };
+                            const res = await fetch(`${API_BASE}/api/provider/upgrade/combined/momo/initiate`, {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${token}`
+                              },
+                              body: JSON.stringify(body)
+                            });
+                            if (!res.ok) {
+                              const errData = await res.json();
+                              throw new Error(errData.error || `HTTP ${res.status}`);
+                            }
+                            const data = await res.json();
+                            setRenewMessage(`✅ Payment initiated. Ref: ${data?.data?.referenceId}`);
+                            // Refresh plan status after payment trigger
+                            setTimeout(() => {
+                              setRenewalModalOpen(false);
+                              setSelectedPlanForRenewal(null);
+                              setRenewMessage(null);
+                              fetchData();
+                              fetchPlanAndUsage();
+                            }, 4000);
+                          } catch (e: any) {
+                            setRenewMessage(`❌ ${e?.message || 'Failed to initiate renewal'}`);
+                          } finally {
+                            setRenewLoading(false);
+                          }
+                        }}
+                        disabled={renewLoading || !renewPhone}
+                        className={`flex-grow py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        {renewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm & Pay'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setRenewalModalOpen(false);
+                          setSelectedPlanForRenewal(null);
+                          setRenewMessage(null);
+                        }}
+                        disabled={renewLoading}
+                        className={`px-4 py-2 border font-bold text-xs uppercase tracking-wider transition-colors
+                          ${darkMode ? 'bg-gray-700 hover:bg-gray-650 border-gray-600 text-gray-200' : 'bg-white hover:bg-gray-50 border-gray-300 text-gray-600'}`}
+                        style={{ borderRadius: '2px' }}
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </div>
-                  <ul className="mt-4 space-y-1.5">
-                    {plan.feature_list.slice(0, 4).map((feature, idx) => (
-                      <li key={idx} className="flex items-center gap-2 text-xs">
-                        <Check className="w-3 h-3 text-emerald-500" />
-                        <span className={mutedText}>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    to={`/checkout?plan=${plan.id}&type=base`}
-                    className={`mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-semibold transition-colors ${buttonPrimary}`}
-                    style={{ borderRadius: '2px' }}
-                  >
-                    {plan.monthly_fee === 0 ? "Get Started" : "Subscribe"}
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Storage Add-ons */}
-        {storagePricing && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Cloud className="w-5 h-5 text-emerald-500" />
-              <h2 className="text-base font-semibold">Storage Add-ons</h2>
-            </div>
-
-            {/* Usage Bar */}
-            {storageUsage && (
-              <div className="p-4 border border-gray-100 dark:border-gray-700" style={{ borderRadius: '2px' }}>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className={mutedText}>Used: {formatFileSize(storageUsage.used_storage_gb)}</span>
-                  <span className={mutedText}>Total: {formatFileSize(storageUsage.total_storage_gb)}</span>
-                </div>
-                <div className="h-1.5 bg-gray-200 dark:bg-gray-700 overflow-hidden" style={{ borderRadius: '2px' }}>
-                  <div
-                    className="h-full bg-emerald-500 transition-all"
-                    style={{ width: `${Math.min(storageUsage.usage_percentage, 100)}%` }}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className={`p-5 border-0 shadow-sm ${!primaryPlanActive ? 'opacity-60' : ''} ${cardBase}`} style={{ borderRadius: '2px' }}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className={`block text-xs font-medium uppercase tracking-wider mb-2 ${subText}`}>Amount</label>
-                    <input
-                      type="number"
-                      min="0.1"
-                      step="0.1"
-                      value={storageAmount}
-                      onChange={(e) => setStorageAmount(parseFloat(e.target.value) || 0)}
-                      disabled={!primaryPlanActive}
-                      className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
-                      style={{ borderRadius: '2px' }}
-                    />
-                  </div>
-                  <div>
-                    <label className={`block text-xs font-medium uppercase tracking-wider mb-2 ${subText}`}>Unit</label>
-                    <select
-                      value={storageUnit}
-                      onChange={(e) => setStorageUnit(e.target.value)}
-                      disabled={!primaryPlanActive}
-                      className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
-                      style={{ borderRadius: '2px' }}
-                    >
-                      {storagePricing.available_units.map(unit => <option key={unit} value={unit}>{unit}</option>)}
-                    </select>
-                  </div>
-                  <div className="p-3 border border-gray-100 dark:border-gray-700" style={{ borderRadius: '2px' }}>
-                    <div className={`text-sm ${mutedText}`}>Price: {storagePricing.price_per_gb_rwf.toLocaleString()} RWF/GB</div>
-                    <div className={`text-xs ${subText} mt-1`}>Min: {formatStorage(storagePricing.min_purchase_gb)}</div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="p-4 border border-dashed border-gray-200 dark:border-gray-700" style={{ borderRadius: '2px' }}>
-                    <h3 className="text-sm font-semibold mb-3">Summary</h3>
-                    {(() => {
-                      const addedGb = convertToGB(storageAmount, storageUnit);
-                      const unitPrice = storagePricing.price_per_gb_rwf;
-                      const totalPrice = Math.round(addedGb * unitPrice);
-                      return (
-                        <>
-                          <div className="flex justify-between py-2 text-sm">
-                            <span className={mutedText}>Additional Storage:</span>
-                            <span className="font-medium">{storageAmount} {storageUnit}</span>
-                          </div>
-                          <div className="flex justify-between py-2 text-sm">
-                            <span className={mutedText}>Equivalent in GB:</span>
-                            <span className="font-medium">{addedGb.toFixed(2)} GB</span>
-                          </div>
-                          <div className="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2">
-                            <div className="flex justify-between py-2">
-                              <span className="font-semibold">Total:</span>
-                              <span className="text-lg font-bold text-emerald-500">{totalPrice.toLocaleString()} RWF</span>
-                            </div>
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
-                  {primaryPlanActive ? (
-                    <Link
-                      to={`/storage-checkout?storage_amount=${storageAmount}&storage_unit=${storageUnit}&type=addon`}
-                      className={`mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold transition-colors ${storageAmount > 0 ? buttonPrimary : (darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-500')}`}
-                      style={{ borderRadius: '2px', pointerEvents: storageAmount > 0 ? 'auto' : 'none' }}
-                    >
-                      Purchase Add-on <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  ) : (
-                    <div className="mt-4 w-full text-center px-4 py-2.5 text-sm bg-gray-100 dark:bg-gray-800 text-gray-500" style={{ borderRadius: '2px' }}>
-                      Subscribe to a plan first
-                    </div>
-                  )}
-                </div>
-              </div>
+                );
+              })()}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -7,7 +7,6 @@ import MediaManagementSection from '../components/DashboardParts/MediaManagement
 import SubscriptionBanner from '../components/DashboardParts/PlansScrollingBanner';
 import ProductUploadCard from '../components/DashboardParts/ProductUploadCard';
 import ServiceUploadCard from '../components/DashboardParts/ServiceUploadCard';
-import WhatsAppPromptBanner from '../components/DashboardParts/WhatsAppPromptBanner';
 import ServicePromptBanner from '../components/DashboardParts/ServicePromptBanner';
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
@@ -28,8 +27,51 @@ interface UploadedMedia {
   mediaFiles?: UploadedMedia[]; // For grouped products with multiple media
 }
 
+function uploadWithProgress(
+  method: string,
+  url: string,
+  formData: FormData,
+  onProgress: (percent: number) => void
+): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+
+    const token = localStorage.getItem("token");
+    if (token) {
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    }
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = Math.round((event.loaded / event.total) * 100);
+        onProgress(percentComplete);
+      }
+    };
+
+    xhr.onload = () => {
+      let responseBody;
+      try {
+        responseBody = JSON.parse(xhr.responseText);
+      } catch (e) {
+        responseBody = xhr.responseText;
+      }
+
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(responseBody);
+      } else {
+        reject(new Error(responseBody?.error || `Upload failed with status ${xhr.status}`));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error("Network error"));
+    xhr.send(formData);
+  });
+}
+
 export default function Dashboard() {
   const { darkMode } = useDarkMode();
+  const [productUploadProgress, setProductUploadProgress] = useState<number | null>(null);
   const [productImages, setProductImages] = useState<File[]>([]);
   const [productVideos, setProductVideos] = useState<File[]>([]);
   const [productViews, setProductViews] = useState<File[][]>([]);
@@ -372,84 +414,63 @@ export default function Dashboard() {
       console.log('Upload URL:', uploadUrl);
       console.log('API_BASE:', API_BASE);
 
-      const response = await fetch(uploadUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: formData
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-
-        // Create unified product entry for display (typed to satisfy TS)
-        const unifiedProduct: UploadedMedia = {
-          id: data.groupId,
-          url: data.files[0]?.url || '',
-          title: productTitle,
-          desc: productDesc,
-          price: parseFloat(productPrice),
-          type: "product",
-          fileType:
-            hasImages && hasVideos ? "mixed" : hasImages ? "image" : "video",
-          visible: true,
-          views: data.files
-            .filter((f: any) => f.isView)
-            .map((f: any) => f.url),
-          madeInRwanda: productMadeInRwanda,
-        };
-
-        setUploadedProductImages(prev => [...prev, unifiedProduct]);
-        alert(`Product uploaded successfully with ${data.files.length} media files!`);
-
-        // Clear form
-        setProductImages([]);
-        setProductVideos([]);
-        setProductViews([]);
-        setProductTitle('');
-        setProductDesc('');
-        setProductPrice('');
-        setProductMadeInRwanda(false);
-        // Reset feature values
-        if (service?.specific_features && service?.features) {
-          const resetValues: Record<string, any> = {};
-          service.features.forEach((feature) => {
-            if (feature.type === 'simple') {
-              resetValues[feature.name] = '';
-            } else if (feature.type === 'object') {
-              resetValues[feature.name] = {};
-            }
-          });
-          setFeatureValues(resetValues);
+      setProductUploadProgress(0);
+      const data = await uploadWithProgress(
+        "POST",
+        uploadUrl,
+        formData,
+        (percent) => {
+          setProductUploadProgress(percent);
         }
-      } else {
-        // Check if response has content before trying to parse JSON
-        const contentType = response.headers.get('content-type');
-        let errorMessage = `Upload failed with status: ${response.status} ${response.statusText}`;
+      );
 
-        if (contentType && contentType.includes('application/json')) {
-          try {
-            const error = await response.json();
-            errorMessage = `Upload failed: ${error.error || error.message || 'Unknown error'}`;
-          } catch (parseError) {
-            console.error('Failed to parse error response:', parseError);
-          }
-        } else {
-          const errorText = await response.text();
-          if (errorText) {
-            errorMessage = `Upload failed: ${errorText}`;
-          }
-        }
+      // Create unified product entry for display (typed to satisfy TS)
+      const unifiedProduct: UploadedMedia = {
+        id: data.groupId,
+        url: data.files[0]?.url || '',
+        title: productTitle,
+        desc: productDesc,
+        price: parseFloat(productPrice),
+        type: "product",
+        fileType:
+          hasImages && hasVideos ? "mixed" : hasImages ? "image" : "video",
+        visible: true,
+        views: data.files
+          .filter((f: any) => f.isView)
+          .map((f: any) => f.url),
+        madeInRwanda: productMadeInRwanda,
+      };
 
-        alert(errorMessage);
+      setUploadedProductImages(prev => [...prev, unifiedProduct]);
+      alert(`Product uploaded successfully with ${data.files.length} media files!`);
+
+      // Clear form
+      setProductImages([]);
+      setProductVideos([]);
+      setProductViews([]);
+      setProductTitle('');
+      setProductDesc('');
+      setProductPrice('');
+      setProductMadeInRwanda(false);
+      // Reset feature values
+      if (service?.specific_features && service?.features) {
+        const resetValues: Record<string, any> = {};
+        service.features.forEach((feature) => {
+          if (feature.type === 'simple') {
+            resetValues[feature.name] = '';
+          } else if (feature.type === 'object') {
+            resetValues[feature.name] = {};
+          }
+        });
+        setFeatureValues(resetValues);
       }
 
     } catch (err) {
       console.error('Upload error:', err);
-      alert('Upload failed. Please try again.');
+      alert(err instanceof Error ? err.message : 'Upload failed. Please try again.');
     } finally {
       setIsUploadingProduct(false);
+      setProductUploadProgress(null);
     }
   };
 
@@ -1042,6 +1063,7 @@ export default function Dashboard() {
           setProductMadeInRwanda={setProductMadeInRwanda}
           featureValues={featureValues}
           setFeatureValues={setFeatureValues}
+          uploadProgress={productUploadProgress}
         />
       )}
 

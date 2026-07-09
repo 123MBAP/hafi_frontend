@@ -6,13 +6,11 @@
  * Determines the appropriate dashboard path based on user roles
  * Priority:
  * 1. Admin → /admin/dashboard
- * 2. Seller only → /seller/dashboard
- * 3. Service Provider (with any other roles) → /dashboard
- * 4. Seller + Customer → /seller/dashboard
- * 5. Default → /services
+ * 2. Service Provider (with any other roles) → /dashboard/provider
+ * 3. Seller (with any other roles) → /dashboard/seller
+ * 4. Default → /services
  * 
- * Note: Users with multiple roles (e.g., service_provider + seller) 
- * will go to /dashboard but can navigate to /seller/dashboard via the UI menu
+ * Note: Users with multiple roles can navigate to alternate dashboards via the UI menu.
  */
 export function getNavigationPath(roles: string[] | string): string {
     const roleArr = Array.isArray(roles)
@@ -22,20 +20,14 @@ export function getNavigationPath(roles: string[] | string): string {
     // Admin gets priority routing
     if (roleArr.includes('admin')) return '/admin/dashboard';
 
-    // If user only has seller role, go to seller dashboard
-    if (roleArr.includes('seller') && !roleArr.includes('service_provider') && !roleArr.includes('customer')) {
-        return '/seller/dashboard';
-    }
+    // Agent routing
+    if (roleArr.includes('agent')) return '/dashboard/agent';
 
     // If user has service_provider role (with or without other roles), go to provider dashboard
-    // They can navigate to seller dashboard via the UI menu if they also have seller role
-    if (roleArr.includes('service_provider')) return '/dashboard';
+    if (roleArr.includes('service_provider')) return '/dashboard/provider';
 
-    // If user only has seller role with customer
-    if (roleArr.includes('seller') && roleArr.includes('customer')) return '/seller/dashboard';
-
-    // Pure seller role
-    if (roleArr.includes('seller')) return '/seller/dashboard';
+    // If user has seller role (with or without other roles), go to seller dashboard
+    if (roleArr.includes('seller')) return '/dashboard/seller';
 
     // Default to services page
     return '/services';

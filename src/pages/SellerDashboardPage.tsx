@@ -6,7 +6,6 @@ import { FiEdit2, FiSave, FiSearch, FiTrash2, FiUpload, FiVideo, FiX } from "rea
 import SubscriptionBanner from '../components/DashboardParts/PlansScrollingBanner';
 import RestrictionCard from '../components/PlansParts/RestrictionCards';
 import { cachedFetch } from '../utils/cachedFetch';
-import WhatsAppPromptBanner from '../components/DashboardParts/WhatsAppPromptBanner';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 // Types (unchanged)
@@ -24,6 +23,48 @@ interface Product {
 }
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+
+function uploadWithProgress(
+  method: string,
+  url: string,
+  formData: FormData,
+  onProgress: (percent: number) => void
+): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+
+    const token = localStorage.getItem("token");
+    if (token) {
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    }
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = Math.round((event.loaded / event.total) * 100);
+        onProgress(percentComplete);
+      }
+    };
+
+    xhr.onload = () => {
+      let responseBody;
+      try {
+        responseBody = JSON.parse(xhr.responseText);
+      } catch (e) {
+        responseBody = xhr.responseText;
+      }
+
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(responseBody);
+      } else {
+        reject(new Error(responseBody?.error || `Upload failed with status ${xhr.status}`));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error("Network error"));
+    xhr.send(formData);
+  });
+}
 
 export default function SellerDashboardPage() {
   const { darkMode } = useDarkMode();
@@ -43,30 +84,151 @@ export default function SellerDashboardPage() {
   const [originalUploads, setOriginalUploads] = useState<Record<string, Product[]>>({});
   const [loading, setLoading] = useState(true);
   const [subscription, setSubscription] = useState<any>(null);
+  const [sellerProfile, setSellerProfile] = useState<any>(null);
+  const [uploadingCids, setUploadingCids] = useState<Record<string, boolean>>({});
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  const [editUploadProgress, setEditUploadProgress] = useState<number | null>(null);
+
+  // Edit modal states
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editForm, setEditForm] = useState<Product | null>(null);
+  const [editMainFile, setEditMainFile] = useState<File | null>(null);
+  const [editPreviewMain, setEditPreviewMain] = useState<string>("");
+  const [editViewFiles, setEditViewFiles] = useState<File[]>([]);
+  const [editPreviewViews, setEditPreviewViews] = useState<string[]>([]);
+  const [editVideoFile, setEditVideoFile] = useState<File | null>(null);
+  const [editPreviewVideo, setEditPreviewVideo] = useState<string>("");
+  const [editMadeInRwanda, setEditMadeInRwanda] = useState<boolean>(false);
+  const [editIsSaving, setEditIsSaving] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (editingProduct) {
+      setEditForm(editingProduct);
+      setEditMainFile(null);
+      setEditPreviewMain(editingProduct.image_url || "");
+      setEditViewFiles([]);
+      setEditPreviewViews(editingProduct.views || []);
+      setEditVideoFile(null);
+      setEditPreviewVideo(editingProduct.video_url || "");
+      setEditMadeInRwanda(editingProduct.madeInRwanda || false);
+    } else {
+      setEditForm(null);
+      setEditMainFile(null);
+      setEditPreviewMain("");
+      setEditViewFiles([]);
+      setEditPreviewViews([]);
+      setEditVideoFile(null);
+      setEditPreviewVideo("");
+      setEditMadeInRwanda(false);
+    }
+  }, [editingProduct]);
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct || !editForm) return;
+
+    setEditIsSaving(true);
+    setEditUploadProgress(0);
+    const form = new FormData();
+    form.append("title", editForm.title);
+    form.append("description", editForm.description);
+    form.append("price", editForm.price);
+    form.append("madeInRwanda", String(editMadeInRwanda));
+
+    if (editMainFile) {
+      form.append("image", editMainFile);
+    }
+    if (editViewFiles.length > 0) {
+      editViewFiles.forEach(f => form.append("views", f));
+    }
+    if (editVideoFile) {
+      form.append("video", editVideoFile);
+    }
+
+    try {
+      const data = await uploadWithProgress(
+        "PATCH",
+        `${API_BASE}/api/seller/product/${editingProduct.id}`,
+        form,
+        (percent) => {
+          setEditUploadProgress(percent);
+        }
+      );
+
+      // Update local product state
+      setProductUploads(prev => {
+        const next = { ...prev };
+        for (const cid in next) {
+          next[cid] = next[cid].map(p => p.id === editingProduct.id ? data.product : p);
+        }
+        return next;
+      });
+
+      setEditingProduct(null);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to save product changes.");
+    } finally {
+      setEditIsSaving(false);
+      setEditUploadProgress(null);
+    }
+  };
 
   const { fetchWithAutoLogout, token } = useAuth();
 
 
-  // No need for manual auth check - ProtectedRoute already handles this in App.tsx
-
-  // Get categories with counts
+  // Load profile and categories
   useEffect(() => {
-    cachedFetch<{ uploadCategories: Category[] }>(
-      `${API_BASE}/api/upload/categories?type=product`
-    )
-      .then(data => {
-        if (data.uploadCategories) {
-          setCategories(data.uploadCategories);
-          const initialUploads: Record<string, Product[]> = {};
-          data.uploadCategories.forEach((cat: Category) => {
-            initialUploads[cat.id] = [];
-          });
-          setProductUploads(initialUploads);
+    let active = true;
+    const initData = async () => {
+      try {
+        setLoading(true);
+        // 1. Fetch profile first
+        const profileRes = await fetchWithAutoLogout(`${API_BASE}/api/profile`);
+        if (!profileRes.ok) throw new Error("Failed to load profile");
+        const profileData = await profileRes.json();
+        console.log("DEBUG: Fetched profileData:", profileData);
+        if (!active) return;
+        setSellerProfile(profileData);
+
+        // 2. Determine categories
+        if (profileData.shopping_type_id && profileData.shopping_type_key !== 'other') {
+          console.log("DEBUG: User has specific shop category:", profileData.shopping_type_name);
+          // If seller has a specific category (other than 'other'), use that as their single category!
+          const sellerCat: Category = {
+            id: String(profileData.shopping_type_id),
+            name: profileData.shopping_type_name || "My Shop Category",
+            description: `Products under ${profileData.shopping_type_name}`
+          };
+          setCategories([sellerCat]);
+          setSelected([sellerCat.id]);
+          setShowForm({ [sellerCat.id]: true }); // Auto-open the upload form for convenience!
+          setProductUploads({ [sellerCat.id]: [] });
+        } else {
+          console.log("DEBUG: User has other category or no category:", profileData.shopping_type_key);
+          // Otherwise fetch all product upload categories
+          const catRes = await fetch(`${API_BASE}/api/upload/categories?type=product`);
+          if (!catRes.ok) throw new Error("Failed to load categories");
+          const catData = await catRes.json();
+          if (!active) return;
+          if (catData.uploadCategories) {
+            setCategories(catData.uploadCategories);
+            const initialUploads: Record<string, Product[]> = {};
+            catData.uploadCategories.forEach((cat: Category) => {
+              initialUploads[cat.id] = [];
+            });
+            setProductUploads(initialUploads);
+          }
         }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+      } catch (err) {
+        console.error("Initialization error:", err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    initData();
+    return () => { active = false; };
+  }, [fetchWithAutoLogout]);
 
   // Get products (unchanged logic)
   useEffect(() => {
@@ -151,8 +313,8 @@ export default function SellerDashboardPage() {
   const handleSubmit = async (e: React.FormEvent, cid: string) => {
     e.preventDefault();
 
-    // Check if subscription is active
-    if (subscription?.subscription?.status !== 'active') {
+    // Check if subscription is active and has an expiration date
+    if (subscription?.subscription?.status !== 'active' || !subscription?.subscription?.ends_at) {
       alert("Your subscription is not active. Please upgrade your plan to upload products.");
       return;
     }
@@ -175,14 +337,17 @@ export default function SellerDashboardPage() {
     form.append("madeInRwanda", String(madeInRwanda[cid] || false));
 
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API_BASE}/api/upload/seller-product`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: form,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
+      setUploadingCids(prev => ({ ...prev, [cid]: true }));
+      setUploadProgress(prev => ({ ...prev, [cid]: 0 }));
+
+      const data = await uploadWithProgress(
+        "POST",
+        `${API_BASE}/api/upload/seller-product`,
+        form,
+        (percent) => {
+          setUploadProgress(prev => ({ ...prev, [cid]: percent }));
+        }
+      );
 
       // Update UI
       setProductUploads(prev => ({
@@ -191,7 +356,10 @@ export default function SellerDashboardPage() {
       }));
       resetForm(cid);
     } catch (err) {
-      alert("Upload failed. Please try again.");
+      alert(err instanceof Error ? err.message : "Upload failed. Please try again.");
+    } finally {
+      setUploadingCids(prev => ({ ...prev, [cid]: false }));
+      setUploadProgress(prev => { const { [cid]: _, ...rest } = prev; return rest; });
     }
   };
 
@@ -247,46 +415,48 @@ export default function SellerDashboardPage() {
 
       <main className="max-w-full mx-auto py-4 px-0 sm:px-4">
         {/* Category Selector */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold tracking-tighter uppercase mb-4 flex items-center gap-2">
-            <span 
-              className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border border-emerald-500/20 px-3 py-1 text-sm font-bold"
-              style={{ borderRadius: '2px' }}
-            >
-              {categories.length}
-            </span>
-            Product Categories
-          </h2>
-          <p className='text-gray-600 dark:text-gray-400 mb-6'>
-            Select from the product category list to start uploading your products
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => toggleCategory(cat.id)}
-                className={`px-4 py-2 font-semibold text-xs uppercase tracking-wider transition-all duration-300 flex items-center gap-2 border
-                  ${selectedCategoryIds.includes(cat.id)
-                    ? "bg-emerald-500 border-emerald-500 text-white shadow-sm"
-                    : darkMode
-                      ? "bg-gray-800 border-gray-750 hover:bg-gray-700 text-gray-300"
-                      : "bg-white hover:bg-gray-100 border-gray-200 text-gray-750"}
-                  ${productUploads[cat.id]?.length ? "pr-3" : "pr-4"}`}
+        {(!sellerProfile?.shopping_type_id || sellerProfile.shopping_type_key === 'other') && (
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold tracking-tighter uppercase mb-4 flex items-center gap-2">
+              <span 
+                className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border border-emerald-500/20 px-3 py-1 text-sm font-bold"
                 style={{ borderRadius: '2px' }}
               >
-                {cat.name}
-                {productUploads[cat.id]?.length > 0 && (
-                  <span 
-                    className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5"
-                    style={{ borderRadius: '2px' }}
-                  >
-                    {productUploads[cat.id]?.length}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        </section>
+                {categories.length}
+              </span>
+              Product Categories
+            </h2>
+            <p className='text-gray-600 dark:text-gray-400 mb-6'>
+              Select from the product category list to start uploading your products
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => toggleCategory(cat.id)}
+                  className={`px-4 py-2 font-semibold text-xs uppercase tracking-wider transition-all duration-300 flex items-center gap-2 border
+                    ${selectedCategoryIds.includes(cat.id)
+                      ? "bg-emerald-500 border-emerald-500 text-white shadow-sm"
+                      : darkMode
+                        ? "bg-gray-800 border-gray-750 hover:bg-gray-700 text-gray-300"
+                        : "bg-white hover:bg-gray-100 border-gray-200 text-gray-750"}
+                    ${productUploads[cat.id]?.length ? "pr-3" : "pr-4"}`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  {cat.name}
+                  {productUploads[cat.id]?.length > 0 && (
+                    <span 
+                      className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5"
+                      style={{ borderRadius: '2px' }}
+                    >
+                      {productUploads[cat.id]?.length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Selected Categories */}
         {selectedCategoryIds.length > 0 && (
@@ -331,16 +501,18 @@ export default function SellerDashboardPage() {
                             </>
                           )}
                         </button>
-                        <button
-                          onClick={() => toggleCategory(cid)}
-                          className={`flex items-center gap-1 px-3 py-2 font-semibold text-xs border uppercase tracking-wider transition-colors
-                            ${darkMode
-                              ? "bg-gray-850 border-gray-750 text-gray-300 hover:bg-gray-700"
-                              : "bg-white border-gray-250 text-gray-700 hover:bg-gray-50"}`}
-                          style={{ borderRadius: '2px' }}
-                        >
-                          <FiX size={14} /> Close
-                        </button>
+                        {(!sellerProfile?.shopping_type_id || sellerProfile.shopping_type_key === 'other') && (
+                          <button
+                            onClick={() => toggleCategory(cid)}
+                            className={`flex items-center gap-1 px-3 py-2 font-semibold text-xs border uppercase tracking-wider transition-colors
+                              ${darkMode
+                                ? "bg-gray-850 border-gray-750 text-gray-300 hover:bg-gray-700"
+                                : "bg-white border-gray-250 text-gray-700 hover:bg-gray-50"}`}
+                            style={{ borderRadius: '2px' }}
+                          >
+                            <FiX size={14} /> Close
+                          </button>
+                        )}
                       </div>
                     </div>
 
@@ -508,11 +680,31 @@ export default function SellerDashboardPage() {
                             </div>
                           </div>
                         </div>
-
+                        <div className="mt-4">
                         <RestrictionCard
+                      
                           subscription={subscription?.subscription}
                           requiredFeature="upload_products"
                         />
+                        </div>
+                        {uploadProgress[cid] !== undefined && (
+                          <div className="w-full mt-4 space-y-1.5">
+                            <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
+                              <span className={darkMode ? "text-gray-405" : "text-gray-500"}>
+                                {uploadProgress[cid] < 100 
+                                  ? "Uploading Files..." 
+                                  : "Processing and optimizing media on Cloudinary..."}
+                              </span>
+                              <span className="text-emerald-500">{uploadProgress[cid]}%</span>
+                            </div>
+                            <div className={`w-full h-1.5 rounded-full overflow-hidden ${darkMode ? "bg-gray-750" : "bg-gray-200"}`}>
+                              <div 
+                                className="h-full bg-emerald-500 transition-all duration-300 ease-out" 
+                                style={{ width: `${uploadProgress[cid]}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
 
                         <div className="mt-6 flex justify-end gap-3">
                           <button
@@ -521,22 +713,28 @@ export default function SellerDashboardPage() {
                             className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border
                               ${darkMode 
                                 ? "bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700" 
-                                : "bg-white border-gray-250 text-gray-700 hover:bg-gray-50"}`}
+                                : "bg-red-100 border-gray-250 text-gray-700 hover:bg-red-300"}`}
                             style={{ borderRadius: '2px' }}
                           >
                             Reset
                           </button>
                           <button
                             type="submit"
-                            disabled={subscription?.subscription?.status !== 'active'}
-                            className={`px-6 py-2 font-semibold text-xs uppercase tracking-wider transition-all
-                              ${subscription?.subscription?.status === 'active'
-                                ? "bg-emerald-50 text-white hover:bg-emerald-600 shadow-sm"
+                            disabled={uploadingCids[cid] || subscription?.subscription?.status !== 'active' || !subscription?.subscription?.ends_at}
+                            className={`px-6 py-2 font-semibold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2
+                              ${(subscription?.subscription?.status === 'active' && subscription?.subscription?.ends_at)
+                                ? "bg-emerald-300 text-white hover:bg-emerald-600 shadow-sm"
                                 : "bg-gray-450 cursor-not-allowed text-gray-200"
                               }`}
                             style={{ borderRadius: '2px' }}
                           >
-                            Upload Product
+                            {uploadingCids[cid] ? (
+                              <>
+                                <span className="animate-spin">↻</span> Uploading...
+                              </>
+                            ) : (
+                              "Upload Product"
+                            )}
                           </button>
                         </div>
                       </form>
@@ -603,6 +801,7 @@ export default function SellerDashboardPage() {
                           key={product.id}
                           product={product}
                           darkMode={darkMode}
+                          onEdit={(p) => setEditingProduct(p)}
                           onUpdate={() => {
                             // Refresh products after update
                             const token = localStorage.getItem("token");
@@ -631,20 +830,222 @@ export default function SellerDashboardPage() {
             </div>
           )}
         </section>
+      {/* Product Edit Modal */}
+      {editingProduct && editForm && (
+        <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 overflow-y-auto backdrop-blur-sm">
+          <div 
+            className={`w-full max-w-2xl border ${darkMode ? "bg-gray-900 border-gray-800 text-white" : "bg-white border-gray-200 text-gray-900"} max-h-[90vh] flex flex-col shadow-2xl`}
+            style={{ borderRadius: '4px' }}
+          >
+            {/* Modal Header */}
+            <div className={`p-4 border-b ${darkMode ? "border-gray-800" : "border-gray-150"} flex items-center justify-between`}>
+              <h3 className="font-bold text-lg uppercase tracking-tight">Edit Product</h3>
+              <button 
+                onClick={() => setEditingProduct(null)}
+                className={`p-2 hover:bg-gray-500/10 transition-colors`}
+                style={{ borderRadius: '2px' }}
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-4 flex-1">
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                {/* Title */}
+                <div>
+                  <label className="block text-xs uppercase font-bold tracking-wider mb-1">Title</label>
+                  <input
+                    type="text"
+                    required
+                    value={editForm.title}
+                    onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                    className={`w-full p-3 border text-sm focus:ring-1 focus:ring-emerald-500 focus:outline-none ${darkMode ? "bg-gray-950 border-gray-850" : "bg-gray-50 border-gray-250"}`}
+                    style={{ borderRadius: '2px' }}
+                  />
+                </div>
+
+                {/* Price */}
+                <div>
+                  <label className="block text-xs uppercase font-bold tracking-wider mb-1">Price ($)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={editForm.price}
+                    onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                    className={`w-full p-3 border text-sm focus:ring-1 focus:ring-emerald-500 focus:outline-none ${darkMode ? "bg-gray-950 border-gray-850" : "bg-gray-50 border-gray-250"}`}
+                    style={{ borderRadius: '2px' }}
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-xs uppercase font-bold tracking-wider mb-1">Description</label>
+                  <textarea
+                    required
+                    value={editForm.description}
+                    onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                    rows={3}
+                    className={`w-full p-3 border text-sm focus:ring-1 focus:ring-emerald-500 focus:outline-none ${darkMode ? "bg-gray-950 border-gray-850" : "bg-gray-50 border-gray-250"}`}
+                    style={{ borderRadius: '2px' }}
+                  />
+                </div>
+
+                {/* Made in Rwanda */}
+                <div className="flex items-center gap-2 py-1">
+                  <input
+                    type="checkbox"
+                    id="edit-madeInRwanda"
+                    checked={editMadeInRwanda}
+                    onChange={(e) => setEditMadeInRwanda(e.target.checked)}
+                    className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+                  />
+                  <label htmlFor="edit-madeInRwanda" className="text-sm font-semibold select-none cursor-pointer">
+                    🇷🇼 Made in Rwanda
+                  </label>
+                </div>
+
+                <div className={`h-[1px] ${darkMode ? "bg-gray-800" : "bg-gray-150"} my-4`} />
+
+                {/* Main Image Upload */}
+                <div>
+                  <label className="block text-xs uppercase font-bold tracking-wider mb-1">Main Image</label>
+                  <div className="flex gap-4 items-center">
+                    {editPreviewMain && (
+                      <div className="relative w-20 h-20 border border-gray-700/30 bg-black/10 flex items-center justify-center overflow-hidden" style={{ borderRadius: '2px' }}>
+                        <img src={editPreviewMain} className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setEditMainFile(file);
+                          setEditPreviewMain(URL.createObjectURL(file));
+                        }
+                      }}
+                      className="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-none file:border file:border-gray-300 file:text-xs file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+                    />
+                  </div>
+                </div>
+
+                {/* Additional View Images */}
+                <div>
+                  <label className="block text-xs uppercase font-bold tracking-wider mb-1">Additional Views (Optional)</label>
+                  <div className="space-y-3">
+                    {editPreviewViews.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {editPreviewViews.map((url, idx) => (
+                          <div key={idx} className="relative w-16 h-16 border border-gray-700/20 bg-black/5 flex items-center justify-center overflow-hidden" style={{ borderRadius: '2px' }}>
+                            <img src={url} className="w-full h-full object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        if (files.length > 0) {
+                          setEditViewFiles(files);
+                          setEditPreviewViews(files.map(f => URL.createObjectURL(f)));
+                        }
+                      }}
+                      className="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-none file:border file:border-gray-300 file:text-xs file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+                    />
+                  </div>
+                </div>
+
+                {/* Video Upload */}
+                <div>
+                  <label className="block text-xs uppercase font-bold tracking-wider mb-1">Product Video (Optional)</label>
+                  <div className="space-y-3">
+                    {editPreviewVideo && (
+                      <div className="relative w-full max-h-48 border border-gray-750 bg-black/10 flex items-center justify-center overflow-hidden" style={{ borderRadius: '2px' }}>
+                        <video src={editPreviewVideo} controls className="max-w-full max-h-48" />
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setEditVideoFile(file);
+                          setEditPreviewVideo(URL.createObjectURL(file));
+                        }
+                      }}
+                      className="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-none file:border file:border-gray-300 file:text-xs file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+                    />
+                  </div>
+                </div>
+
+                {editUploadProgress !== null && (
+                  <div className="w-full space-y-1.5 mb-4">
+                    <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
+                      <span className={darkMode ? "text-gray-400" : "text-gray-500"}>
+                        {editUploadProgress < 100 
+                          ? "Saving and Uploading..." 
+                          : "Processing and optimizing media on Cloudinary..."}
+                      </span>
+                      <span className="text-emerald-500 font-bold">{editUploadProgress}%</span>
+                    </div>
+                    <div className={`w-full h-1.5 rounded-full overflow-hidden ${darkMode ? "bg-gray-950" : "bg-gray-250"}`}>
+                      <div 
+                        className="h-full bg-emerald-500 transition-all duration-300 ease-out" 
+                        style={{ width: `${editUploadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 justify-end pt-4 border-t border-gray-800">
+                  <button
+                    type="button"
+                    onClick={() => setEditingProduct(null)}
+                    disabled={editIsSaving}
+                    className={`px-5 py-2.5 border font-bold text-xs uppercase tracking-wider transition-colors
+                      ${darkMode ? "bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700" : "bg-white border-gray-250 text-gray-750 hover:bg-gray-50"}`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={editIsSaving}
+                    className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all"
+                    style={{ borderRadius: '2px' }}
+                  >
+                    {editIsSaving ? (
+                      <>
+                        <span className="animate-spin">↻</span> Saving...
+                      </>
+                    ) : (
+                      <>
+                        <FiSave size={14} /> Save Changes
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
       </main>
     </div>
   );
 }
 
 // Enhanced Product Card Component
-function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMode: boolean; onUpdate: () => void }) {
+function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product; darkMode: boolean; onUpdate: () => void; onEdit: (product: Product) => void }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({
-    title: product.title,
-    description: product.description,
-    price: product.price,
-  });
   const [isDeleting, setIsDeleting] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
@@ -707,25 +1108,7 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
     }
   };
 
-  const handleUpdate = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API_BASE}/api/seller/products/${product.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(editData),
-      });
-      if (!res.ok) throw new Error("Update failed");
-      setIsEditing(false);
-      onUpdate(); // Refresh product list
-    } catch (err) {
-      console.error("Update error:", err);
-      alert("Failed to update product");
-    }
-  };
+
 
   return (
     <>
@@ -926,47 +1309,19 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
 
         {/* Product Info */}
         <div className="p-4">
-          {isEditing ? (
-            <div className="space-y-3">
-              <input
-                type="text"
-                value={editData.title}
-                onChange={(e) => setEditData({ ...editData, title: e.target.value })}
-                className={`w-full p-2 border text-sm ${darkMode ? "bg-gray-900 border-gray-750 text-white" : "bg-white border-gray-250 text-gray-900"} focus:ring-1 focus:ring-emerald-500 focus:outline-none`}
-                style={{ borderRadius: '2px' }}
-              />
-              <textarea
-                value={editData.description}
-                onChange={(e) => setEditData({ ...editData, description: e.target.value })}
-                className={`w-full p-2 border text-sm ${darkMode ? "bg-gray-900 border-gray-750 text-white" : "bg-white border-gray-250 text-gray-900"} focus:ring-1 focus:ring-emerald-500 focus:outline-none`}
-                style={{ borderRadius: '2px' }}
-                rows={2}
-              />
-              <input
-                type="number"
-                value={editData.price}
-                onChange={(e) => setEditData({ ...editData, price: e.target.value })}
-                className={`w-full p-2 border text-sm ${darkMode ? "bg-gray-900 border-gray-750 text-white" : "bg-white border-gray-250 text-gray-900"} focus:ring-1 focus:ring-emerald-500 focus:outline-none`}
-                style={{ borderRadius: '2px' }}
-              />
-            </div>
-          ) : (
-            <>
-              <h3 className="font-bold text-sm uppercase tracking-tight mb-1 line-clamp-1">{product.title}</h3>
-              <p className={`text-xs mb-2 line-clamp-2 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
-                {product.description}
-              </p>
-              <p className="font-bold text-sm text-emerald-500">
-                ${product.price}
-              </p>
-            </>
-          )}
+          <h3 className="font-bold text-sm uppercase tracking-tight mb-1 line-clamp-1">{product.title}</h3>
+          <p className={`text-xs mb-2 line-clamp-2 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+            {product.description}
+          </p>
+          <p className="font-bold text-sm text-emerald-500">
+            ${product.price}
+          </p>
         </div>
 
         {/* Action Buttons */}
         <div className={`px-4 pb-4 flex flex-col gap-2 ${darkMode ? "bg-gray-800" : "bg-white"}`}>
           {/* View Video Button */}
-          {product.video_url && !isEditing && (
+          {product.video_url && (
             <button
               onClick={() => {
                 // Open modal at video index (last item in mediaItems)
@@ -981,53 +1336,31 @@ function ProductCard({ product, darkMode, onUpdate }: { product: Product; darkMo
           )}
 
           <div className="flex gap-2">
-            {isEditing ? (
-              <>
-                <button
-                  onClick={() => setIsEditing(false)}
-                  className={`flex-1 py-2 border flex items-center justify-center gap-1 font-semibold text-xs transition-colors uppercase tracking-wider
-                    ${darkMode ? "bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700" : "bg-white border-gray-250 text-gray-750 hover:bg-gray-50"}`}
-                  style={{ borderRadius: '2px' }}
-                >
-                  <FiX size={14} /> Cancel
-                </button>
-                <button
-                  onClick={handleUpdate}
-                  className="flex-1 py-2 bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center gap-1 font-semibold text-xs transition-all uppercase tracking-wider"
-                  style={{ borderRadius: '2px' }}
-                >
-                  <FiSave size={14} /> Save
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className={`flex-1 py-2 border flex items-center justify-center gap-1 font-semibold text-xs transition-colors uppercase tracking-wider
-                    ${darkMode ? "bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700" : "bg-white border-gray-250 text-gray-750 hover:bg-gray-50"}`}
-                  style={{ borderRadius: '2px' }}
-                >
-                  <FiEdit2 size={14} /> Edit
-                </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className={`flex-1 py-2 border flex items-center justify-center gap-1 font-semibold text-xs transition-colors uppercase tracking-wider
-                    ${darkMode 
-                      ? "bg-red-950/20 border-red-900/30 text-red-400 hover:bg-red-950/40" 
-                      : "bg-red-50 border-red-200 text-red-650 hover:bg-red-100"}`}
-                  style={{ borderRadius: '2px' }}
-                >
-                  {isDeleting ? (
-                    <span className="animate-spin">↻</span>
-                  ) : (
-                    <>
-                      <FiTrash2 size={14} /> Delete
-                    </>
-                  )}
-                </button>
-              </>
-            )}
+            <button
+              onClick={() => onEdit(product)}
+              className={`flex-1 py-2 border flex items-center justify-center gap-1 font-semibold text-xs transition-colors uppercase tracking-wider
+                ${darkMode ? "bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700" : "bg-white border-gray-250 text-gray-750 hover:bg-gray-50"}`}
+              style={{ borderRadius: '2px' }}
+            >
+              <FiEdit2 size={14} /> Edit
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className={`flex-1 py-2 border flex items-center justify-center gap-1 font-semibold text-xs transition-colors uppercase tracking-wider
+                ${darkMode 
+                  ? "bg-red-950/20 border-red-900/30 text-red-400 hover:bg-red-950/40" 
+                  : "bg-red-50 border-red-200 text-red-650 hover:bg-red-100"}`}
+              style={{ borderRadius: '2px' }}
+            >
+              {isDeleting ? (
+                <span className="animate-spin">↻</span>
+              ) : (
+                <>
+                  <FiTrash2 size={14} /> Delete
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>

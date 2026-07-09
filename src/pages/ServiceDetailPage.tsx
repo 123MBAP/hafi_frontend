@@ -9,7 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useDarkMode } from '../context/DarkMode';
 import { cachedFetch } from '../utils/cachedFetch';
 import blankProfileImage from './images/blankProfileImage.png';
-import { Briefcase, ChevronRight, MapPin, Package, Users } from 'lucide-react';
+import { ChevronRight, MapPin, Package, Users } from 'lucide-react';
 
 L.Icon.Default.mergeOptions({ iconUrl: markerIcon, shadowUrl: markerShadow });
 
@@ -355,25 +355,6 @@ export default function ServiceDetailPage() {
     return R * c;
   }
 
-  const parseAddress = (address: Address | string | undefined): Address => {
-    if (!address) return {};
-    if (typeof address === 'string') {
-      try {
-        return JSON.parse(address) as Address;
-      } catch {
-        const parts = address.split(', ');
-        return {
-          district: parts[0],
-          sector: parts[1],
-          cell: parts[2],
-          village: parts[3],
-          known_place: parts[4]
-        };
-      }
-    }
-    return address;
-  };
-
   const handleSearch = () => {
     if (viewMode === 'providers') {
       setSubmittedProviderSearchTerm(providerSearchTerm);
@@ -560,7 +541,7 @@ export default function ServiceDetailPage() {
               No providers found for this service.
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-3">
               {filteredProviders.map((provider) => {
               const imagePath = toAbsoluteImageUrl(provider.profile_image || provider.profile_image_url) || blankProfileImage;
 
@@ -585,7 +566,7 @@ export default function ServiceDetailPage() {
                     style={{ borderRadius: '2px' }}
                   >
                   {/* Image */}
-                  <div className="relative h-28 overflow-hidden bg-gray-100 dark:bg-gray-700">
+                  <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-700">
                     <img
                       src={imagePath}
                       alt={provider.email.split('@')[0]}
@@ -636,7 +617,7 @@ export default function ServiceDetailPage() {
             No products or services found for this service.
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-3">
             {filteredListings.map((item) => {
               const imagePath = toAbsoluteImageUrl(item.url) || blankProfileImage;
               const providerLabel = item.providerEmail.split('@')[0];
@@ -648,7 +629,7 @@ export default function ServiceDetailPage() {
                   style={{ borderRadius: '2px' }}
                   onClick={() => navigate(`/product-or-service-detail/${item.providerId}/${item.productId}`)}
                 >
-                  <div className="relative h-28 overflow-hidden bg-gray-100 dark:bg-gray-700">
+                  <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-700">
                     <img
                       src={imagePath}
                       alt={item.title || 'Item'}

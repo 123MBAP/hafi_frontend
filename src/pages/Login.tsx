@@ -490,16 +490,28 @@ const Login = () => {
               </div>
 
               {/* Register Link */}
-              <div className="text-center">
-                <Link
-                  to="/register"
-                  className={`inline-flex items-center gap-2 text-sm font-medium transition-colors ${
-                    darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-650 hover:text-gray-900'
-                  }`}
-                >
-                  <UserPlus className="w-4 h-4" />
-                  Don't have an account? Sign up
-                </Link>
+              <div className="text-center space-y-3">
+                <div>
+                  <Link
+                    to="/register"
+                    className={`inline-flex items-center gap-2 text-sm font-medium transition-colors ${
+                      darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-655 hover:text-gray-900'
+                    }`}
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    Don't have an account? Sign up
+                  </Link>
+                </div>
+                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <Link
+                    to="/agent/login"
+                    className={`text-xs font-bold uppercase tracking-wider transition-colors ${
+                      darkMode ? 'text-emerald-450 hover:text-emerald-350' : 'text-emerald-600 hover:text-emerald-700'
+                    }`}
+                  >
+                    Login as HafiConnect Agent
+                  </Link>
+                </div>
               </div>
             </div>
           )}

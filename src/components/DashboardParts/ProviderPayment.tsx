@@ -1,10 +1,12 @@
 import { useDarkMode } from '@/context/DarkMode';
 import React, { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AirtelIcon from '../../pages/images/airtel money.png';
 import MtnIcon from '../../pages/images/mtn.png';
 import StorageCheckout from '../../pages/StorageCheckout';
 import { useAuth } from '@/context/AuthContext';
+import { ArrowLeft } from 'lucide-react';
+import LoadingSpinner from '@/components/LoadingSpinner';
 // import WalletIcon from '../../pages/images/wallet.png';
 
 type PaymentMethod = 'mtn' | 'airtel' | 'wallet';
@@ -23,6 +25,7 @@ const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").repla
 
 export default function ProviderUpgradePaymentPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const planParam = params.get('plan') || '';
   const typeParam = params.get('type') || '';
@@ -237,34 +240,73 @@ export default function ProviderUpgradePaymentPage() {
 
   if (error) {
     return (
-      <div className={`p-6 max-w-xl mx-auto min-h-screen ${bgColor} ${textColor}`}>
+      <div className={`p-6 max-w-xl mx-auto min-h-screen ${bgColor} ${textColor} flex flex-col justify-center items-center`}>
         <h1 className="text-2xl font-bold text-center mb-4">Upgrade</h1>
-        <div className="text-red-600 text-center">{error}</div>
+        <div className="text-red-600 text-center mb-6">{error}</div>
+        <button
+          onClick={() => navigate('/dashboard/upgrade')}
+          className={`w-full py-2.5 px-4 rounded font-bold text-xs uppercase tracking-wider transition-colors ${
+            darkMode ? 'bg-gray-850 hover:bg-gray-750 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+          }`}
+          style={{ borderRadius: '2px' }}
+        >
+          Back to Plans
+        </button>
       </div>
     );
   }
 
   if (plans === null) {
-    return (
-      <div className={`p-6 max-w-xl mx-auto min-h-screen ${bgColor} ${textColor}`}>
-        <h1 className="text-2xl font-bold text-center mb-4">Upgrade</h1>
-        <div className="text-center">Loading plans…</div>
-      </div>
-    );
-  }
+       return (
+         <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'}`}>
+           <div className="text-center py-16">
+             <LoadingSpinner size="lg" message="Processing plan..." variant="dots" />
+           </div>
+         </div>
+       );
+     }
+   
 
   if (plans.length === 0) {
     return (
-      <div className={`p-6 max-w-xl mx-auto min-h-screen ${bgColor} ${textColor}`}>
-        <h1 className="text-2xl font-bold text-center mb-4">Upgrade</h1>
-        <div className="text-center">No plans available.</div>
+      <div className={`p-6 max-w-xl mx-auto min-h-screen ${bgColor} ${textColor} flex flex-col justify-center items-center`}>
+        <h1 className={`text-2xl font-bold tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              Subscribe
+        </h1>
+        <div className="text-center mb-6">No plans available.</div>
+        <button
+          onClick={() => navigate('/dashboard/upgrade')}
+          className={`w-full py-2.5 px-4 rounded font-bold text-xs uppercase tracking-wider transition-colors ${
+            darkMode ? 'bg-gray-850 hover:bg-gray-750 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+          }`}
+          style={{ borderRadius: '2px' }}
+        >
+          Back to Plans
+        </button>
       </div>
     );
   }
 
   return (
-    <div className={`p-6 max-w-3xl mx-auto min-h-screen ${bgColor}`}>
-      <h1 className={`text-2xl font-bold text-center mb-6 ${textColor}`}>Upgrade</h1>
+    <div className={`p-6 max-w-xl mx-auto min-h-screen ${bgColor}`}>
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+        <button
+          onClick={() => navigate('/dashboard/upgrade')}
+          className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold uppercase tracking-wider border transition-colors ${
+            darkMode 
+              ? 'border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700' 
+              : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+          }`}
+          style={{ borderRadius: '2px' }}
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to Plans</span>
+        </button>
+        <h1 className={`text-2xl font-bold tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              Subscribe
+        </h1>
+        <div className="hidden sm:block w-[110px]" /> {/* Spacer to balance flex header alignment */}
+      </div>
 
       {/* Plans selector */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -322,8 +364,8 @@ export default function ProviderUpgradePaymentPage() {
 
           {/* Payment method */}
           <div className="mb-6">
-            <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-3 ${textColor}`}>Payment Method:</h3>
-            <div className="flex gap-3 mb-4">
+            <h3 className={`text-[12px] font-bold uppercase tracking-wider mb-3 ${textColor}`}>Payment Method:</h3>
+            <div className="flex flex-col sm:flex-row gap-4 mb-4">
               <button 
                 onClick={() => setSelectedMethod('mtn')} 
                 className={`flex-1 p-3 border transition-colors flex items-center justify-center ${
