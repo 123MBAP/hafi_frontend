@@ -1,11 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDarkMode } from '@/context/DarkMode';
+import { 
+  AlertCircle, 
+  CheckCircle, 
+  Mail, 
+  Key, 
+  Edit2, 
+  Save, 
+  RefreshCw,
+  ArrowLeft
+} from 'lucide-react';
 import { getNavigationPath } from '../utils/navigationUtils';
 
 const VERIFY_EMAIL_KEY = 'verify_email';
 const VERIFY_CODE_KEY = 'verify_code';
 
 const VerifyEmailForm = ({ email: propEmail }: { email: string }) => {
+  const { darkMode } = useDarkMode();
   const [email, setEmail] = useState(() => localStorage.getItem(VERIFY_EMAIL_KEY) || propEmail);
   const [oldEmail, setOldEmail] = useState(() => localStorage.getItem(VERIFY_EMAIL_KEY) || propEmail);
   const [code, setCode] = useState(() => localStorage.getItem(VERIFY_CODE_KEY) || '');
@@ -120,73 +132,162 @@ const VerifyEmailForm = ({ email: propEmail }: { email: string }) => {
     }
   };
 
+  const inputBg = darkMode
+    ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
+    : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400';
+
   return (
-    <form onSubmit={handleSubmit}>
-      <label className="block mb-2">Email to verify:</label>
-      <div className="flex mb-2">
-        {editMode ? (
-          <>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              className="border p-2 rounded w-full mr-2"
-            />
-            <button
-              type="button"
-              onClick={handleSaveEmail}
-              disabled={submitting}
-              className="bg-green-600 text-white px-3 py-1 rounded"
-            >
-              Save
-            </button>
-          </>
-        ) : (
-          <>
-            <input
-              type="email"
-              value={email}
-              disabled
-              className="border p-2 rounded w-full mr-2 bg-gray-100"
-            />
-            <button
-              type="button"
-              onClick={() => setEditMode(true)}
-              className="bg-blue-600 text-white px-3 py-1 rounded"
-            >
-              Edit
-            </button>
-          </>
+    <div className={`w-full max-w-md mx-auto px-0 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+      <div
+        className={`p-0 sm:p-8 border-0 sm:border transition-all duration-300 ${
+          darkMode ? 'bg-gray-955 bg-gray-950 sm:bg-gray-900 sm:border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
+        }`}
+        style={{ borderRadius: '2px' }}
+      >
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className={`text-2xl font-bold uppercase tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            Verify Email
+          </h1>
+          <p className={`text-xs font-bold uppercase tracking-wider mt-1 ${darkMode ? 'text-emerald-450' : 'text-emerald-600'}`}>
+            Confirm ownership of your email address
+          </p>
+        </div>
+
+        {/* Notifications and messages */}
+        {notification && (
+          <div
+            className={`flex items-start gap-3 p-3 border mb-4 text-xs font-semibold ${
+              darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+            }`}
+            style={{ borderRadius: '2px' }}
+          >
+            <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+            <span>{notification}</span>
+          </div>
         )}
+
+        {error && (
+          <div
+            className={`flex items-start gap-3 p-3 border mb-4 text-xs font-semibold ${
+              darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-655'
+            }`}
+            style={{ borderRadius: '2px' }}
+          >
+            <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {success && (
+          <div
+            className={`flex items-start gap-3 p-3 border mb-4 text-xs font-semibold ${
+              darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-450' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+            }`}
+            style={{ borderRadius: '2px' }}
+          >
+            <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+            <span>{success}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Email field */}
+          <div>
+            <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+              Registered Email
+            </label>
+            <div className="flex gap-2">
+              <div className="relative flex-grow">
+                <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                <input
+                  type="email"
+                  value={email}
+                  disabled={!editMode}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                  placeholder="name@example.com"
+                  className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${inputBg} ${
+                    !editMode && (darkMode ? 'bg-gray-950 opacity-70' : 'bg-gray-50 opacity-70')
+                  } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                  style={{ borderRadius: '2px' }}
+                />
+              </div>
+              {editMode ? (
+                <button
+                  type="button"
+                  onClick={handleSaveEmail}
+                  disabled={submitting}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 text-xs font-bold uppercase tracking-wider shadow-sm flex items-center gap-1 shrink-0"
+                  style={{ borderRadius: '2px' }}
+                >
+                  <Save className="w-4 h-4" /> Save
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setEditMode(true)}
+                  className={`px-4 text-xs font-bold uppercase border shadow-sm flex items-center gap-1 shrink-0 ${
+                    darkMode ? 'border-gray-700 hover:bg-gray-800 text-gray-300' : 'border-gray-250 hover:bg-gray-50 text-gray-700'
+                  }`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  <Edit2 className="w-4 h-4" /> Edit
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Verification Code field */}
+          <div>
+            <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+              Verification Code
+            </label>
+            <div className="relative">
+              <Key className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+              <input
+                type="text"
+                value={code}
+                onChange={e => setCode(e.target.value)}
+                required
+                placeholder="Enter verification code"
+                className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${inputBg} focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                style={{ borderRadius: '2px' }}
+              />
+            </div>
+          </div>
+
+          {/* Resend Actions */}
+          <div className="flex justify-between items-center pt-2">
+            <span className={`text-[11px] ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              Didn't receive the code?
+            </span>
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={submitting || !email}
+              className="text-xs font-bold uppercase tracking-wider text-emerald-500 hover:text-emerald-600 transition-colors flex items-center gap-1 disabled:opacity-50"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Resend Code
+            </button>
+          </div>
+
+          {/* Submit Action */}
+          <button
+            type="submit"
+            disabled={submitting}
+            className={`w-full py-2.5 px-4 mt-2 text-white text-xs font-bold uppercase tracking-wider transition-colors border ${
+              submitting
+                ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm'
+            }`}
+            style={{ borderRadius: '2px' }}
+          >
+            {submitting ? 'Verifying...' : 'Verify Registration'}
+          </button>
+        </form>
       </div>
-      <label className="block mb-2">Enter verification code from email:</label>
-      <input
-        type="text"
-        value={code}
-        onChange={e => setCode(e.target.value)}
-        required
-        className="border p-2 rounded w-full mb-2"
-      />
-      <button
-        type="button"
-        onClick={handleResend}
-        disabled={submitting || !email}
-        className="bg-gray-500 text-white px-3 py-1 rounded mb-3"
-      >
-        Resend Code
-      </button>
-      {notification && <div className="text-green-600 mb-2">{notification}</div>}
-      {error && <div className="text-red-600 mb-2">{error}</div>}
-      {success && <div className="text-green-600 mb-2">{success}</div>}
-      <button
-        type="submit"
-        disabled={submitting}
-        className="bg-purple-600 text-white px-4 py-2 rounded w-full"
-      >
-        {submitting ? 'Verifying...' : 'Verify'}
-      </button>
-    </form>
+    </div>
   );
 };
 

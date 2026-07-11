@@ -1,11 +1,24 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useDarkMode } from '@/context/DarkMode';
+import { 
+  Lock, 
+  Mail, 
+  Key, 
+  Eye, 
+  EyeOff, 
+  CheckCircle, 
+  AlertCircle, 
+  ArrowLeft 
+} from 'lucide-react';
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 const ResetPassword = () => {
+  const { darkMode } = useDarkMode();
   const navigate = useNavigate();
   const location = useLocation();
+  
   // Extract email and code from query params if present
   const params = new URLSearchParams(location.search);
   const emailFromLink = params.get('email') || '';
@@ -104,145 +117,230 @@ const ResetPassword = () => {
     setResending(false);
   };
 
+  const inputBg = darkMode
+    ? 'bg-gray-955 bg-gray-950 border-gray-700 text-white placeholder-gray-550'
+    : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400';
+
   return (
-    <div className="max-w-md mx-auto p-8 bg-white shadow-md rounded-md mt-8">
-      <h2 className="text-2xl font-bold mb-4">Reset Password</h2>
+    <div className={`min-h-screen pt-4 pb-12 transition-colors duration-300 ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
+      <div className="w-full max-w-md mx-auto px-0">
+        {/* Back Link */}
+        <Link
+          to="/login"
+          className={`mb-4 inline-flex items-center text-sm font-medium transition-colors ${
+            darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-650 hover:text-gray-900'
+          }`}
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to standard login
+        </Link>
 
-      {!success && step === 1 && (
-        <>
-          <p className="text-gray-600 mb-2">
-            Enter your registered email and the verification code sent to it.
-          </p>
-          <input
-            type="email"
-            placeholder="Registered Email"
-            className="w-full p-2 mb-2 border rounded"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Verification Code"
-            className="w-full p-2 mb-2 border rounded"
-            value={code}
-            onChange={e => setCode(e.target.value)}
-          />
-          {codeError && <div className="text-red-500 mb-2">{codeError}</div>}
+        {/* Card */}
+        <div
+          className={`p-0 sm:p-8 border-0 sm:border transition-all duration-300 ${
+            darkMode ? 'bg-gray-955 bg-gray-955 bg-gray-950 sm:bg-gray-900 sm:border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
+          }`}
+          style={{ borderRadius: '2px' }}
+        >
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className={`text-2xl font-bold uppercase tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              Reset Password
+            </h1>
+            <p className={`text-xs font-bold uppercase tracking-wider mt-1 ${darkMode ? 'text-emerald-450' : 'text-emerald-600'}`}>
+              Securely retrieve access to your account
+            </p>
+          </div>
 
-          <button
-            onClick={handleVerifyCode}
-            className="w-full p-2 bg-blue-500 text-white rounded"
-          >
-            Verify Code
-          </button>
-
-          <div className="mt-4 text-sm text-gray-700 flex flex-col gap-2 items-center">
-            <span>Haven&apos;t received the code?</span>
-            <button
-              className="text-blue-600 underline"
-              disabled={resending || !email}
-              onClick={handleResendCode}
-              type="button"
+          {/* Verification Code Errors */}
+          {codeError && (
+            <div
+              className={`flex items-start gap-3 p-3 border mb-4 text-xs font-semibold ${
+                darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-655'
+              }`}
+              style={{ borderRadius: '2px' }}
             >
-              {resending ? "Resending..." : "Resend code"}
-            </button>
-            {resendMsg && (
-              <span className="text-green-600">{resendMsg}</span>
-            )}
-          </div>
-        </>
-      )}
+              <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+              <span>{codeError}</span>
+            </div>
+          )}
 
-      {!success && step === 2 && (
-        <>
-          <p className="text-gray-600 mb-2">Enter your new password below.</p>
-          <div className="relative mb-2">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="New Password"
-              className="w-full p-2 border rounded pr-10"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-            />
-            <button
-              type="button"
-              tabIndex={-1}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
-              onClick={() => setShowPassword((v) => !v)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
+          {/* Password Reset Errors */}
+          {passwordError && (
+            <div
+              className={`flex items-start gap-3 p-3 border mb-4 text-xs font-semibold ${
+                darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-655'
+              }`}
+              style={{ borderRadius: '2px' }}
             >
-              {showPassword ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10a9.959 9.959 0 011.176-4.824m2.675-2.675A9.959 9.959 0 0112 1c5.523 0 10 4.477 10 10a9.96 9.96 0 01-2.674 6.823M3 3l18 18"/>
-                </svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.269 2.943 9.542 7-.73 2.685-2.885 5.06-5.542 6.456"/>
-                </svg>
-              )}
-            </button>
-          </div>
-          <div className="relative mb-2">
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="Confirm New Password"
-              className="w-full p-2 border rounded pr-10"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-            />
-            <button
-              type="button"
-              tabIndex={-1}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
-              onClick={() => setShowConfirmPassword((v) => !v)}
-              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-            >
-              {showConfirmPassword ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10a9.959 9.959 0 011.176-4.824m2.675-2.675A9.959 9.959 0 0112 1c5.523 0 10 4.477 10 10a9.96 9.96 0 01-2.674 6.823M3 3l18 18"/>
-                </svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.269 2.943 9.542 7-.73 2.685-2.885 5.06-5.542 6.456"/>
-                </svg>
-              )}
-            </button>
-          </div>
-          {passwordError && <div className="text-red-500 mb-2">{passwordError}</div>}
-          <button
-            onClick={handleResetPassword}
-            className="w-full p-2 bg-blue-500 text-white rounded"
-          >
-            Reset Password
-          </button>
-        </>
-      )}
+              <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+              <span>{passwordError}</span>
+            </div>
+          )}
 
-      {success && (
-        <div className="text-center">
-          <div className="text-green-600 mb-4 font-semibold">
-            Password has been successfully reset!
-          </div>
-          <button
-            className="p-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={() => navigate('/dashboard')}
-          >
-            Go to Dashboard
-          </button>
+          {/* Resend Notifications */}
+          {resendMsg && (
+            <div
+              className={`flex items-start gap-3 p-3 border mb-4 text-xs font-semibold ${
+                darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+              }`}
+              style={{ borderRadius: '2px' }}
+            >
+              <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+              <span>{resendMsg}</span>
+            </div>
+          )}
+
+          {!success && step === 1 && (
+            <div className="space-y-4">
+              <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Enter your registered email and the verification code sent to it.
+              </p>
+
+              {/* Email Input */}
+              <div>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+                  Registered Email
+                </label>
+                <div className="relative">
+                  <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                  <input
+                    type="email"
+                    placeholder="Registered Email"
+                    className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${inputBg} focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                    style={{ borderRadius: '2px' }}
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Code Input */}
+              <div>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+                  Verification Code
+                </label>
+                <div className="relative">
+                  <Key className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                  <input
+                    type="text"
+                    placeholder="Verification Code"
+                    className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${inputBg} focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                    style={{ borderRadius: '2px' }}
+                    value={code}
+                    onChange={e => setCode(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Verify button */}
+              <button
+                onClick={handleVerifyCode}
+                className="w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm"
+                style={{ borderRadius: '2px' }}
+              >
+                Verify Reset Code
+              </button>
+
+              {/* Resend actions */}
+              <div className="mt-4 text-xs flex flex-col gap-2 items-center border-t pt-4 border-gray-200 dark:border-gray-800">
+                <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Haven't received the code?</span>
+                <button
+                  className="text-emerald-500 hover:text-emerald-600 font-bold uppercase tracking-wider text-[11px]"
+                  disabled={resending || !email}
+                  onClick={handleResendCode}
+                  type="button"
+                >
+                  {resending ? "Resending..." : "Resend code"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {!success && step === 2 && (
+            <div className="space-y-4">
+              <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-650'}`}>Enter your new password below.</p>
+
+              {/* Password field */}
+              <div>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                  New Password
+                </label>
+                <div className="relative">
+                  <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="New Password"
+                    className={`w-full pl-10 pr-10 py-2.5 border text-sm transition-colors ${inputBg} focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                    style={{ borderRadius: '2px' }}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-650"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm Password field */}
+              <div>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm New Password"
+                    className={`w-full pl-10 pr-10 py-2.5 border text-sm transition-colors ${inputBg} focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                    style={{ borderRadius: '2px' }}
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-655"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Reset button */}
+              <button
+                onClick={handleResetPassword}
+                className="w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm"
+                style={{ borderRadius: '2px' }}
+              >
+                Reset Password
+              </button>
+            </div>
+          )}
+
+          {success && (
+            <div className="text-center space-y-4">
+              <div className="text-emerald-500 font-bold uppercase tracking-wider text-sm flex items-center justify-center gap-2">
+                <CheckCircle className="w-5 h-5" /> Password reset successfully!
+              </div>
+              <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                You can now log in to HafiConnect with your new credentials.
+              </p>
+              <button
+                className="w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm"
+                style={{ borderRadius: '2px' }}
+                onClick={() => navigate('/login')}
+              >
+                Go to Login
+              </button>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

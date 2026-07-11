@@ -16,11 +16,8 @@ import {
   AlertCircle,
   Clock,
   Calendar,
-  X,
-  Send,
   Info
 } from 'lucide-react';
-import { FaWhatsapp } from 'react-icons/fa';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
@@ -127,7 +124,7 @@ const formatAddress = (addressStr?: string | null) => {
     try {
       const parsed = JSON.parse(trimmed);
       if (parsed && typeof parsed === 'object') {
-        const { lat, lng, name, address, district, sector, cell, village, known_place, knownPlace } = parsed as Record<string, unknown>;
+        const { lat, lng, name, address, district, sector, cell, village, known_place, knownPlace } = parsed as Record<string, any>;
         if (lat != null && lng != null) {
           return (
             <div className="flex flex-col items-end gap-0.5">
@@ -310,9 +307,6 @@ const OrderSummaryCards = ({ summary, darkMode }: { summary: OrderSummary; darkM
     { label: 'Completed', value: summary.delivered, icon: <CheckCircle className="w-5 h-5 text-green-500" /> },
   ];
 
-  const bgColor = darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200';
-  const textColor = darkMode ? 'text-gray-100' : 'text-gray-900';
-  const secondaryTextColor = darkMode ? 'text-gray-400' : 'text-gray-650';
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
@@ -369,7 +363,6 @@ const ActionButton = ({
 
 const QuoteSection = ({ 
   item, 
-  orderUuid, 
   orderStatus,
   onQuote, 
   saving,
@@ -487,7 +480,6 @@ const OrderCard = ({
 }) => {
   const cardBg = darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200';
   const borderColor = darkMode ? 'border-gray-800' : 'border-gray-250';
-  const textColor = darkMode ? 'text-gray-100' : 'text-gray-900';
   const secondaryTextColor = darkMode ? 'text-gray-400' : 'text-gray-650';
 
   const isSaving = savingOrderUuid === order.orderUuid;
@@ -506,7 +498,7 @@ const OrderCard = ({
 
   const renderActionButtons = () => {
     const nextActions = STATUS_CONFIG[order.status]?.nextActions || [];
-    const actionMap: Record<OrderStatus, { label: string; variant: 'primary' | 'secondary' }> = {
+    const actionMap: Partial<Record<OrderStatus, { label: string; variant: 'primary' | 'secondary' }>> = {
       order_received: { label: 'Receive Order', variant: 'primary' },
       payment_received: { label: 'Verify Payment Cleared', variant: 'secondary' },
       delivery_pending: { label: 'Confirm Transport Completed', variant: 'primary' },

@@ -37,7 +37,7 @@ const generateRowLayout = (itemCount: number): Array<'quad' | 'quint' | 'hex' | 
     const layouts: Array<'quad' | 'quint' | 'hex' | 'triple' | 'scrolling'> = [
         'quad', 'quint', 'hex', 'quad', 'quint', 'hex', 'quad', 'triple', 'hex', 'quint', 'quad', 'scrolling'
     ];
-    const result = [];
+    const result: Array<'quad' | 'quint' | 'hex' | 'triple' | 'scrolling'> = [];
     let remaining = itemCount;
     
     while (remaining > 0) {

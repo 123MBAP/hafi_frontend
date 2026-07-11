@@ -7,7 +7,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { cachedFetch } from '../utils/cachedFetch';
 import ChatBox from './ChatBox';
-import { Package, Briefcase, Heart, ShoppingBag, Calendar, ChevronRight, X, MapPin, Phone as PhoneIcon, Mail, MessageCircle } from 'lucide-react';
+import { Package, Briefcase, Heart, ShoppingBag, Calendar, ChevronRight, X, MapPin, Phone as PhoneIcon, Mail, MessageCircle, FileText } from 'lucide-react';
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
