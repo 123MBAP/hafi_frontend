@@ -68,12 +68,12 @@ export default function ServiceUploadCard({
 
   return (
     <div
-      className={`border transition-all duration-300 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+      className={`border transition-all duration-300 ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
         } shadow-sm overflow-hidden`}
       style={{ borderRadius: '2px' }}
     >
       <div
-        className={`px-6 py-4 border-b ${darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'
+        className={`px-6 py-4 border-b ${darkMode ? 'border-gray-800 bg-gray-950/50' : 'border-gray-200 bg-gray-50'
           } flex justify-between items-center`}
       >
         <h3 className={`text-base font-bold uppercase tracking-tight flex items-center gap-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -89,7 +89,7 @@ export default function ServiceUploadCard({
 
       <form
         onSubmit={handleServiceUpload}
-        className={`p-6 ${darkMode ? 'bg-gray-800/40' : 'bg-gray-50/50'}`}
+        className={`p-6 ${darkMode ? 'bg-gray-900/40' : 'bg-gray-50/50'}`}
       >
         {/* Top Section: Title/Description and Media Selection */}
         <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -103,7 +103,7 @@ export default function ServiceUploadCard({
                 value={serviceTitle}
                 onChange={(e) => setServiceTitle(e.target.value)}
                 className={`w-full p-2.5 border text-sm ${darkMode
-                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                  ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-550'
                   : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                   } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
                 style={{ borderRadius: '2px' }}
@@ -118,7 +118,7 @@ export default function ServiceUploadCard({
                 value={serviceDesc}
                 onChange={(e) => setServiceDesc(e.target.value)}
                 className={`w-full p-2.5 border text-sm ${darkMode
-                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                  ? 'bg-gray-955 border-gray-800 text-white placeholder-gray-550'
                   : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                   } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
                 style={{ borderRadius: '2px' }}
@@ -136,7 +136,7 @@ export default function ServiceUploadCard({
                     value={servicePrice}
                     onChange={(e) => setServicePrice(e.target.value)}
                     className={`w-full p-2.5 border text-sm ${darkMode
-                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                      ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-550'
                       : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                       } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
                     style={{ borderRadius: '2px' }}
@@ -154,7 +154,7 @@ export default function ServiceUploadCard({
               </label>
               <div
                 className={`border-2 border-dashed ${darkMode
-                  ? 'border-gray-700 bg-gray-900/30'
+                  ? 'border-gray-800 bg-gray-950/30'
                   : 'border-gray-300 bg-white'
                   } p-4 transition hover:border-emerald-500`}
                 style={{ borderRadius: '2px' }}
@@ -210,7 +210,7 @@ export default function ServiceUploadCard({
                 </label>
                 <div
                   className={`border-2 border-dashed ${darkMode
-                    ? 'border-gray-700 bg-gray-900/30'
+                    ? 'border-gray-800 bg-gray-950/30'
                     : 'border-gray-300 bg-white'
                     } p-4 transition hover:border-emerald-500`}
                   style={{ borderRadius: '2px' }}
@@ -265,7 +265,7 @@ export default function ServiceUploadCard({
               </label>
               <div
                 className={`border-2 border-dashed ${darkMode
-                  ? 'border-gray-700 bg-gray-900/30'
+                  ? 'border-gray-800 bg-gray-950/30'
                   : 'border-gray-300 bg-white'
                   } p-4 flex flex-col items-center justify-center transition hover:border-emerald-500`}
                 style={{ borderRadius: '2px' }}
@@ -372,7 +372,7 @@ export default function ServiceUploadCard({
                   value={servicePrice}
                   onChange={(e) => setServicePrice(e.target.value)}
                   className={`w-full p-2.5 border text-sm ${darkMode
-                    ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                    ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-550'
                     : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                     } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
                   style={{ borderRadius: '2px' }}
@@ -383,7 +383,7 @@ export default function ServiceUploadCard({
               {service?.specific_features && (!service?.features || service.features.length === 0) && (
                 <div
                   className={`p-4 border mt-4 ${darkMode
-                    ? 'bg-gray-900/40 border-gray-750'
+                    ? 'bg-gray-950/40 border-gray-800'
                     : 'bg-white border-gray-200'
                     }`}
                   style={{ borderRadius: '2px' }}
@@ -432,7 +432,7 @@ export default function ServiceUploadCard({
             disabled={isUploading}
             className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border
               ${darkMode
-                ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800'
                 : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
               }`}
             style={{ borderRadius: '2px' }}

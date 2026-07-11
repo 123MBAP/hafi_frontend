@@ -61,7 +61,7 @@ function ShopProductCard({
 
   return (
     <div
-      className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-md flex flex-col h-full ${darkMode ? 'bg-gray-800' : 'bg-white'} border-0 shadow-sm`}
+      className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-full ${darkMode ? 'bg-gray-900' : 'bg-white'} border-0 shadow-sm`}
       style={{ borderRadius: '2px' }}
        onClick={(e) => {
                 e.stopPropagation();
@@ -70,7 +70,7 @@ function ShopProductCard({
       
     >
       {/* Image section */}
-      <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-700">
+      <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-800">
         {mainImage ? (
           <img
             src={mainImage}
@@ -346,7 +346,7 @@ export default function ShopsPage() {
   };
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-55'}`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-55'}`}>
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -363,7 +363,7 @@ export default function ShopsPage() {
           <div className="flex gap-2">
             <button
               onClick={handleFilterToggle}
-              className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border border-transparent shadow-sm`}
+              className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider ${darkMode ? 'bg-gray-900 text-gray-300' : 'bg-white text-gray-700'} border border-transparent shadow-sm`}
               style={{ borderRadius: '2px' }}
             >
               <Filter className="w-4 h-4" />
@@ -374,7 +374,7 @@ export default function ShopsPage() {
 
         {/* Filters Panel */}
         {showFilters && (
-          <div className={`border p-4 mb-6 shadow-sm ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`} style={{ borderRadius: '2px' }}>
+          <div className={` p-4 mb-6 shadow-sm ${darkMode ? 'bg-gray-950' : 'bg-white'}`} style={{ borderRadius: '2px' }}>
             <div className="flex flex-col md:flex-row md:items-center gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -383,7 +383,7 @@ export default function ShopsPage() {
                   placeholder="Search products..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full pl-9 pr-4 py-2 text-sm border ${darkMode ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500' : 'bg-gray-50 border-gray-250 text-gray-900 placeholder-gray-400'} focus:ring-1 focus:ring-emerald-500`}
+                  className={`w-full pl-9 pr-4 py-2 text-sm border ${darkMode ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-500' : 'bg-gray-50 border-gray-250 text-gray-900 placeholder-gray-400'} focus:ring-1 focus:ring-emerald-500`}
                   style={{ borderRadius: '2px' }}
                 />
               </div>
@@ -392,7 +392,7 @@ export default function ShopsPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-250 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer`}
+                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-gray-950 border-gray-700 text-white' : 'bg-gray-50 border-gray-250 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer`}
                   style={{ borderRadius: '2px' }}
                 >
                   <option value="popular">Most Popular</option>
@@ -408,7 +408,7 @@ export default function ShopsPage() {
                     const cat = categories.find(c => String(c.id) === catId);
                     setSelectedCategory(cat || null);
                   }}
-                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-250 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer`}
+                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-gray-950 border-gray-700 text-white' : 'bg-gray-50 border-gray-250 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer`}
                   style={{ borderRadius: '2px' }}
                 >
                   <option value="">All Shop Types</option>
@@ -424,7 +424,7 @@ export default function ShopsPage() {
                   onChange={(e) => {
                     setSelectedProductCategory(e.target.value || null);
                   }}
-                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-gray-50 border-gray-250 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer`}
+                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-gray-950 border-gray-700 text-white' : 'bg-gray-50 border-gray-250 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer`}
                   style={{ borderRadius: '2px' }}
                 >
                   <option value="">All Product Categories</option>
@@ -459,7 +459,7 @@ export default function ShopsPage() {
               onClick={() => handleCategorySelect(null)}
               className={`flex shrink-0 items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors border shadow-sm ${!selectedCategory
                   ? darkMode ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-emerald-500 border-emerald-500 text-white'
-                  : darkMode ? 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  : darkMode ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                 }`}
               style={{ borderRadius: '2px' }}
             >
@@ -473,7 +473,7 @@ export default function ShopsPage() {
                 onClick={() => handleCategorySelect(cat)}
                 className={`flex shrink-0 items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors border shadow-sm ${selectedCategory?.id === cat.id
                     ? darkMode ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-emerald-500 border-emerald-500 text-white'
-                    : darkMode ? 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-55'
+                    : darkMode ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-55'
                   }`}
                 style={{ borderRadius: '2px' }}
               >
@@ -490,8 +490,8 @@ export default function ShopsPage() {
             <LoadingSpinner size="lg" message="Loading shop products..." variant="dots" />
           </div>
         ) : filteredAndSortedProducts.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-gray-800 border dark:border-gray-700" style={{ borderRadius: '2px' }}>
-            <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+          <div className="text-center py-16 bg-white dark:bg-gray-900 border dark:border-gray-700" style={{ borderRadius: '2px' }}>
+            <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
               <Store className="w-6 h-6 text-gray-400" />
             </div>
             <h3 className={`text-base font-semibold mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>

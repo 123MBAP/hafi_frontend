@@ -11,7 +11,9 @@ import {
   ShoppingCart,
   Target,
   User,
-  Users
+  Users,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
@@ -34,6 +36,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: '',
+    businessName: '',
     role: '',
     service: '',
     shopping_type_id: '',
@@ -44,6 +47,9 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [googleUserData, setGoogleUserData] = useState<any>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { darkMode } = useDarkMode();
   const navigate = useNavigate();
@@ -102,8 +108,17 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
 
+    if (form.password !== confirmPassword) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
     let location = null;
-    if (form.role === 'service_provider' && form.locationOption === 'auto') {
+    const isPremiumSeller = form.role === 'seller' && selectedShopType && selectedShopType.key !== 'other';
+    const requiresLocation = form.role === 'service_provider' || isPremiumSeller;
+
+    if (requiresLocation && form.locationOption === 'auto') {
       try {
         const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
           navigator.geolocation.getCurrentPosition(resolve, reject)
@@ -114,7 +129,7 @@ export default function RegisterPage() {
         setLoading(false);
         return;
       }
-    } else if (form.role === 'service_provider' && form.locationOption === 'manual') {
+    } else if (requiresLocation && form.locationOption === 'manual') {
       const [lat, lng] = form.location.split(',').map(s => s.trim());
       location = { lat: parseFloat(lat), lng: parseFloat(lng) };
     }
@@ -127,11 +142,18 @@ export default function RegisterPage() {
         role: form.role,
       };
 
+      if (form.role === 'service_provider' || form.role === 'seller') {
+        payload.business_name = form.businessName;
+      }
+
       if (form.role === 'service_provider') {
         payload.service_id = form.service;
         payload.location = location;
       } else if (form.role === 'seller') {
         payload.shopping_type_id = form.shopping_type_id ? parseInt(form.shopping_type_id) : null;
+        if (isPremiumSeller) {
+          payload.location = location;
+        }
       }
 
       const res = await fetch(`${API_BASE}/api/register`, {
@@ -206,7 +228,10 @@ export default function RegisterPage() {
     setError('');
 
     let location = null;
-    if (form.role === 'service_provider' && form.locationOption === 'auto') {
+    const isPremiumSeller = form.role === 'seller' && selectedShopType && selectedShopType.key !== 'other';
+    const requiresLocation = form.role === 'service_provider' || isPremiumSeller;
+
+    if (requiresLocation && form.locationOption === 'auto') {
       try {
         const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
           navigator.geolocation.getCurrentPosition(resolve, reject)
@@ -217,7 +242,7 @@ export default function RegisterPage() {
         setLoading(false);
         return;
       }
-    } else if (form.role === 'service_provider' && form.locationOption === 'manual') {
+    } else if (requiresLocation && form.locationOption === 'manual') {
       const [lat, lng] = form.location.split(',').map(s => s.trim());
       location = { lat: parseFloat(lat), lng: parseFloat(lng) };
     }
@@ -228,11 +253,18 @@ export default function RegisterPage() {
         role: form.role,
       };
 
+      if (form.role === 'service_provider' || form.role === 'seller') {
+        payload.business_name = form.businessName;
+      }
+
       if (form.role === 'service_provider') {
         payload.service_id = form.service;
         payload.location = location;
       } else if (form.role === 'seller') {
         payload.shopping_type_id = form.shopping_type_id ? parseInt(form.shopping_type_id) : null;
+        if (isPremiumSeller) {
+          payload.location = location;
+        }
       }
 
       const res = await fetch(`${API_BASE}/api/auth/google/complete-registration`, {
@@ -272,12 +304,13 @@ export default function RegisterPage() {
 
   const showServiceField = form.role === 'service_provider';
   const showShopField = form.role === 'seller';
-  const showLocationFields = form.role === 'service_provider';
   const selectedShopType = shoppingTypes.find(st => String(st.id) === String(form.shopping_type_id));
+  const isPremiumSeller = form.role === 'seller' && selectedShopType && selectedShopType.key !== 'other';
+  const showLocationFields = form.role === 'service_provider' || isPremiumSeller;
 
   return (
-    <div className={`min-h-screen pt-2 pb-8 transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-      <div className="w-full max-w-2xl mx-auto px-4">
+    <div className={`min-h-screen pt-2 pb-8 transition-colors duration-300 ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
+      <div className="w-full max-w-2xl mx-auto px-0">
         {/* Back Button */}
         {step === 'verify' && (
           <button
@@ -293,8 +326,8 @@ export default function RegisterPage() {
 
         {/* Main Card */}
         <div
-          className={`p-8 border transition-all duration-300 ${
-            darkMode ? 'bg-gray-800 border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
+          className={`p-0 sm:p-8 border-0 sm:border transition-all duration-300 ${
+            darkMode ? 'bg-gray-950 sm:bg-gray-900 sm:border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
           }`}
           style={{ borderRadius: '2px' }}
         >
@@ -363,8 +396,8 @@ export default function RegisterPage() {
                       required
                       className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
                         darkMode
-                          ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
-                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                          ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
+                          : 'bg-white border-gray- text-gray-900 placeholder-gray-400'
                       } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
                       style={{ borderRadius: '2px' }}
                     />
@@ -498,48 +531,14 @@ export default function RegisterPage() {
                               
                               {/* Selected Premium Shop Type Details */}
                               {selectedShopType && selectedShopType.key !== 'other' && (
-                                <div className={`mt-3 p-3 border transition-colors ${darkMode ? 'bg-amber-950/20 border-amber-900/50' : 'bg-amber-50/50 border-amber-200'} space-y-2`} style={{ borderRadius: '2px' }}>
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-[9px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                                      👑 {shopPlan?.display_name || 'VIP Shop Plan'}
-                                    </span>
-                                    <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-450">
-                                      RWF {(shopPlan?.price_monthly || 15000).toLocaleString()} / mo
-                                    </span>
+                                <div className={`mt-3 p-3.5 border transition-colors ${darkMode ? 'bg-emerald-950/20 border-emerald-900/40 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'} space-y-2`} style={{ borderRadius: '2px' }}>
+                                  <div className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+                                   Premium Seller Shop
                                   </div>
-                                  
-                                  <div className="text-[10px] text-gray-400 dark:text-gray-300 space-y-0.5">
-                                    <div>Products: {shopPlan?.max_products || 100} max</div>
-                                    <div>Storage: {shopPlan?.base_storage_mb || 1024} MB</div>
-                                  </div>
-
-                                  {shopPlan?.features && (() => {
-                                    let list: string[] = [];
-                                    if (Array.isArray(shopPlan.features)) {
-                                      list = shopPlan.features;
-                                    } else {
-                                      try {
-                                        const parsed = typeof shopPlan.features === 'string' ? JSON.parse(shopPlan.features) : shopPlan.features;
-                                        if (Array.isArray(parsed)) list = parsed;
-                                      } catch {
-                                        list = [];
-                                      }
-                                    }
-                                    if (list.length === 0) return null;
-                                    return (
-                                      <div className="pt-1.5 border-t border-gray-800/10 dark:border-gray-700/30">
-                                        <div className="text-[9px] font-bold text-gray-550 uppercase tracking-wider mb-1">Features Included:</div>
-                                        <div className="grid grid-cols-1 gap-1">
-                                          {list.map((f, i) => (
-                                            <div key={i} className="text-[10px] flex items-center gap-1 text-gray-600 dark:text-gray-355">
-                                              <span className="text-emerald-500">•</span>
-                                              <span>{f}</span>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    );
-                                  })()}
+                                  <p className="text-[11px] leading-relaxed text-gray-600 dark:text-gray-300">
+                                    The selected shop type is a Premium Seller Shop that provides outstanding VIP features. 
+                                    All of your products will be displayed in the shops workspace, and you can easily change your options later.
+                                  </p>
                                 </div>
                               )}
                             </div>
@@ -550,9 +549,34 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
+                {/* Business Name Field */}
+                {(form.role === 'service_provider' || form.role === 'seller') && (
+                  <div>
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+                      Business name {form.role === 'seller' && selectedShopType?.key === 'other' ? '(Optional)' : ''}
+                    </label>
+                    <div className="relative">
+                      <Building className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                      <input
+                        name="businessName"
+                        placeholder="Enter your business name"
+                        value={form.businessName}
+                        onChange={handleChange}
+                        required={!(form.role === 'seller' && selectedShopType?.key === 'other')}
+                        className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
+                          darkMode
+                            ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                            : 'bg-white border-gray-255 text-gray-900 placeholder-gray-400'
+                        } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                        style={{ borderRadius: '2px' }}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {/* Email Field */}
                 <div>
-                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
                     Email address
                   </label>
                   <div className="relative">
@@ -566,7 +590,7 @@ export default function RegisterPage() {
                       required
                       className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
                         darkMode
-                          ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                          ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
                           : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                       } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
                       style={{ borderRadius: '2px' }}
@@ -574,7 +598,7 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {/* Password Field */}
+                 {/* Password Field */}
                 <div>
                   <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
                     Password
@@ -583,18 +607,55 @@ export default function RegisterPage() {
                     <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                     <input
                       name="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="Create a password"
                       value={form.password}
                       onChange={handleChange}
                       required
-                      className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
+                      className={`w-full pl-10 pr-10 py-2.5 border text-sm transition-colors ${
                         darkMode
-                          ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-555'
+                          ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
                           : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                       } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
                       style={{ borderRadius: '2px' }}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Confirm Password Field */}
+                <div>
+                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm your password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      className={`w-full pl-10 pr-10 py-2.5 border text-sm transition-colors ${
+                        darkMode
+                          ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
+                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                      } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                      style={{ borderRadius: '2px' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </div>
 
@@ -612,7 +673,7 @@ export default function RegisterPage() {
                               ? 'border-emerald-500 bg-emerald-500/10'
                               : 'border-emerald-500 bg-emerald-50'
                             : darkMode
-                            ? 'border-gray-700 bg-gray-900'
+                            ? 'border-gray-750 bg-gray-950'
                             : 'border-gray-255 bg-white'
                         }`}
                         style={{ borderRadius: '2px' }}
@@ -646,7 +707,7 @@ export default function RegisterPage() {
                               ? 'border-emerald-500 bg-emerald-500/10'
                               : 'border-emerald-500 bg-emerald-50'
                             : darkMode
-                            ? 'border-gray-700 bg-gray-900'
+                            ? 'border-gray-750 bg-gray-955'
                             : 'border-gray-255 bg-white'
                         }`}
                         style={{ borderRadius: '2px' }}
@@ -683,7 +744,7 @@ export default function RegisterPage() {
                             onChange={handleChange}
                             className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
                               darkMode
-                                ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                                ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
                                 : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                             } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
                             style={{ borderRadius: '2px' }}
@@ -698,7 +759,7 @@ export default function RegisterPage() {
                               ? 'border-gray-650 bg-gray-750'
                               : 'border-gray-350 bg-gray-100'
                             : darkMode
-                            ? 'border-gray-700 bg-gray-900'
+                            ? 'border-gray-750 bg-gray-955'
                             : 'border-gray-255 bg-white'
                         }`}
                         style={{ borderRadius: '2px' }}
@@ -802,7 +863,7 @@ export default function RegisterPage() {
                                 ? 'border-emerald-500 bg-emerald-500/10'
                                 : 'border-emerald-500 bg-emerald-50'
                               : darkMode
-                              ? 'border-gray-700 bg-gray-900 hover:border-gray-600'
+                              ? 'border-gray-750 bg-gray-950 hover:border-gray-600'
                               : 'border-gray-255 bg-white hover:border-gray-350'
                           }`}
                           style={{ borderRadius: '2px' }}
@@ -853,7 +914,7 @@ export default function RegisterPage() {
                                   required
                                   className={`w-full p-2 border text-xs transition-colors ${
                                     darkMode
-                                      ? 'bg-gray-955 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
+                                      ? 'bg-gray-950 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
                                       : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
                                   }`}
                                   style={{ borderRadius: '2px' }}
@@ -885,7 +946,7 @@ export default function RegisterPage() {
                                   required
                                   className={`w-full p-2 border text-xs transition-colors ${
                                     darkMode
-                                      ? 'bg-gray-955 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
+                                      ? 'bg-gray-950 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
                                       : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
                                   }`}
                                   style={{ borderRadius: '2px' }}
@@ -905,51 +966,16 @@ export default function RegisterPage() {
                                     ))}
                                 </select>
                               )}
-                              
-                              {/* Selected Premium Shop Type Details */}
+                                                          {/* Selected Premium Shop Type Details */}
                               {selectedShopType && selectedShopType.key !== 'other' && (
-                                <div className={`mt-3 p-3 border transition-colors ${darkMode ? 'bg-amber-950/20 border-amber-900/50' : 'bg-amber-50/50 border-amber-200'} space-y-2`} style={{ borderRadius: '2px' }}>
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-[9px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                                      👑 {shopPlan?.display_name || 'VIP Shop Plan'}
-                                    </span>
-                                    <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-450">
-                                      RWF {(shopPlan?.price_monthly || 15000).toLocaleString()} / mo
-                                    </span>
+                                <div className={`mt-3 p-3.5 border transition-colors ${darkMode ? 'bg-emerald-950/20 border-emerald-900/40 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'} space-y-2`} style={{ borderRadius: '2px' }}>
+                                  <div className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+                                   Premium Seller Shop
                                   </div>
-                                  
-                                  <div className="text-[10px] text-gray-400 dark:text-gray-300 space-y-0.5">
-                                    <div>Products: {shopPlan?.max_products || 100} max</div>
-                                    <div>Storage: {shopPlan?.base_storage_mb || 1024} MB</div>
-                                  </div>
-
-                                  {shopPlan?.features && (() => {
-                                    let list: string[] = [];
-                                    if (Array.isArray(shopPlan.features)) {
-                                      list = shopPlan.features;
-                                    } else {
-                                      try {
-                                        const parsed = typeof shopPlan.features === 'string' ? JSON.parse(shopPlan.features) : shopPlan.features;
-                                        if (Array.isArray(parsed)) list = parsed;
-                                      } catch {
-                                        list = [];
-                                      }
-                                    }
-                                    if (list.length === 0) return null;
-                                    return (
-                                      <div className="pt-1.5 border-t border-gray-800/10 dark:border-gray-700/30">
-                                        <div className="text-[9px] font-bold text-gray-550 uppercase tracking-wider mb-1">Features Included:</div>
-                                        <div className="grid grid-cols-1 gap-1">
-                                          {list.map((f, i) => (
-                                            <div key={i} className="text-[10px] flex items-center gap-1 text-gray-600 dark:text-gray-355">
-                                              <span className="text-emerald-500">•</span>
-                                              <span>{f}</span>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    );
-                                  })()}
+                                  <p className="text-[11px] leading-relaxed text-gray-600 dark:text-gray-300">
+                                    The selected shop type is a Premium Seller Shop that provides outstanding VIP features. 
+                                    All of your products will be displayed in the shops workspace, and you can easily change your options later.
+                                  </p>
                                 </div>
                               )}
                             </div>
@@ -959,6 +985,31 @@ export default function RegisterPage() {
                     })}
                   </div>
                 </div>
+
+                {/* Business Name Field for Google Sign-In */}
+                {(form.role === 'service_provider' || form.role === 'seller') && (
+                  <div>
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+                      Business name {form.role === 'seller' && selectedShopType?.key === 'other' ? '(Optional)' : ''}
+                    </label>
+                    <div className="relative">
+                      <Building className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                      <input
+                        name="businessName"
+                        placeholder="Enter your business name"
+                        value={form.businessName}
+                        onChange={handleChange}
+                        required={!(form.role === 'seller' && selectedShopType?.key === 'other')}
+                        className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
+                          darkMode
+                            ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                            : 'bg-white border-gray-255 text-gray-900 placeholder-gray-400'
+                        } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                        style={{ borderRadius: '2px' }}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {/* Location Fields - Only for Service Providers */}
                 {showLocationFields && (
@@ -1045,7 +1096,7 @@ export default function RegisterPage() {
                             onChange={handleChange}
                             className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
                               darkMode
-                                ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                                ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
                                 : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                             } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
                             style={{ borderRadius: '2px' }}

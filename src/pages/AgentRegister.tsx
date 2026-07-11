@@ -1,7 +1,8 @@
 import { useDarkMode } from '@/context/DarkMode';
-import { AlertCircle, ArrowLeft, Lock, Mail, MapPin, User, CheckCircle, Phone } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Lock, Mail, MapPin, User, CheckCircle, Phone, Eye, EyeOff } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import RwandaLocationSelector from '@/components/RwandaLocationSelector';
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
@@ -23,15 +24,11 @@ export default function AgentRegister() {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const locationsList = [
-    'Kigali-Kimironko',
-    'Kigali-Kicukiro',
-    'Kigali-Remera',
-    'Kigali-Kacyiru',
-    'Kigali-Nyarugenge',
-    'Kigali-Gisozi',
-    'Kigali-Nyamirambo',
-  ];
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [selectedProvince, setSelectedProvince] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
+  const [selectedSector, setSelectedSector] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -50,6 +47,7 @@ export default function AgentRegister() {
     }
 
     try {
+      const combinedLocation = selectedSector ? `${selectedSector}, ${selectedDistrict}, ${selectedProvince}` : '';
       const res = await fetch(`${API_BASE}/api/agent/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,7 +58,7 @@ export default function AgentRegister() {
           phoneNumber: form.phoneNumber,
           password: form.password,
           passwordConfirm: form.passwordConfirm,
-          location: form.location,
+          location: combinedLocation,
         }),
       });
 
@@ -82,7 +80,7 @@ export default function AgentRegister() {
 
   return (
     <div className={`min-h-screen pt-4 pb-12 transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-55 text-gray-900'}`}>
-      <div className="w-full max-w-lg mx-auto px-4">
+      <div className="w-full max-w-lg mx-auto px-0">
         {/* Back link */}
         <Link
           to="/register"
@@ -96,8 +94,8 @@ export default function AgentRegister() {
 
         {/* Card container */}
         <div
-          className={`p-8 border transition-all duration-300 ${
-            darkMode ? 'bg-gray-800 border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
+          className={`p-0 sm:p-8 border-0 sm:border transition-all duration-300 ${
+            darkMode ? 'bg-gray-950 sm:bg-gray-800 sm:border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
           }`}
           style={{ borderRadius: '2px' }}
         >
@@ -241,18 +239,25 @@ export default function AgentRegister() {
                 <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                 <input
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Create password"
                   value={form.password}
                   onChange={handleChange}
                   required
-                  className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
+                  className={`w-full pl-10 pr-10 py-2.5 border text-sm transition-colors ${
                     darkMode
                       ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-555'
                       : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                   } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
                   style={{ borderRadius: '2px' }}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-650"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
@@ -265,47 +270,77 @@ export default function AgentRegister() {
                 <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                 <input
                   name="passwordConfirm"
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   placeholder="Re-type password"
                   value={form.passwordConfirm}
                   onChange={handleChange}
                   required
-                  className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
+                  className={`w-full pl-10 pr-10 py-2.5 border text-sm transition-colors ${
                     darkMode
                       ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-555'
                       : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                   } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
                   style={{ borderRadius: '2px' }}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-650"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
-            {/* Location Select */}
-            <div>
-              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
-                Location (Kigali Region)
+            {/* Location Select (Province, District, Sector) */}
+            <div className="space-y-3.5">
+              <label className={`block text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                Location details
               </label>
-              <div className="relative">
-                <MapPin className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                <select
-                  name="location"
-                  value={form.location}
-                  onChange={handleChange}
-                  required
-                  className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
-                    darkMode
-                      ? 'bg-gray-900 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
-                      : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
-                  }`}
-                  style={{ borderRadius: '2px' }}
-                >
-                  <option value="">-- Choose Kigali Sector / Region --</option>
-                  {locationsList.map((loc) => (
-                    <option key={loc} value={loc}>
-                      {loc}
-                    </option>
-                  ))}
-                </select>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {/* Province */}
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1">Province</label>
+                  <RwandaLocationSelector
+                    level="province"
+                    value={selectedProvince}
+                    onChange={(val) => {
+                      setSelectedProvince(val);
+                      setSelectedDistrict("");
+                      setSelectedSector("");
+                    }}
+                    darkMode={darkMode}
+                  />
+                </div>
+
+                {/* District */}
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1">District</label>
+                  <RwandaLocationSelector
+                    level="district"
+                    value={selectedDistrict}
+                    parentValues={{ province: selectedProvince }}
+                    onChange={(val) => {
+                      setSelectedDistrict(val);
+                      setSelectedSector("");
+                    }}
+                    darkMode={darkMode}
+                  />
+                </div>
+
+                {/* Sector */}
+                <div>
+                  <label className="block text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1">Sector</label>
+                  <RwandaLocationSelector
+                    level="sector"
+                    value={selectedSector}
+                    parentValues={{ district: selectedDistrict }}
+                    onChange={(val) => {
+                      setSelectedSector(val);
+                    }}
+                    darkMode={darkMode}
+                  />
+                </div>
               </div>
             </div>
 

@@ -1,5 +1,6 @@
 
 import NestedFeatureBuilder from '@/components/NestedFeatureBuilder';
+import AdminSubscriptionReports from '@/components/DashboardParts/AdminParts/AdminSubscriptionReports';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { useAuth } from '@/context/AuthContext';
 import { useDarkMode } from '@/context/DarkMode';
@@ -11,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   AlertCircle,
   ArrowRight,
+  BarChart3,
   Check,
   Database,
   Edit3,
@@ -106,7 +108,7 @@ export default function AdminDashboard() {
 
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'services' | 'categories' | 'uploadCategories' | 'dynamicFields' | 'phases' | 'shops' | 'agents'>('services');
+  const [activeTab, setActiveTab] = useState<'services' | 'categories' | 'uploadCategories' | 'dynamicFields' | 'phases' | 'shops' | 'agents' | 'users' | 'subscriptionReports'>('services');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Phase management state
@@ -149,6 +151,30 @@ export default function AdminDashboard() {
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsMessage, setSettingsMessage] = useState('');
   const [isEditingSettings, setIsEditingSettings] = useState(false);
+
+  // Users state
+  const [usersList, setUsersList] = useState<any[]>([]);
+  const [fetchingUsers, setFetchingUsers] = useState(false);
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userRoleFilter, setUserRoleFilter] = useState('all');
+  const [userStatusFilter, setUserStatusFilter] = useState('all');
+
+  const fetchUsers = async () => {
+    setFetchingUsers(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/users`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUsersList(data.users || []);
+      }
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    } finally {
+      setFetchingUsers(false);
+    }
+  };
 
   const fetchAgents = async () => {
     try {
@@ -301,6 +327,7 @@ export default function AdminDashboard() {
         fetchAgents();
         fetchWithdrawals();
         fetchSettings();
+        fetchUsers();
       }
     } catch (err) {
       navigate('/admin/login');
@@ -1182,6 +1209,38 @@ export default function AdminDashboard() {
           >
             <Shield className="w-4 h-4" />
             <span>Agents</span>
+          </button>
+          <button
+            onClick={() => { setActiveTab('users'); fetchUsers(); }}
+            className={`flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+              activeTab === 'users'
+                ? darkMode
+                  ? 'bg-emerald-500/10 text-emerald-455 border-emerald-500/20'
+                  : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                : darkMode
+                ? 'bg-gray-800 border-transparent text-gray-400 hover:bg-gray-700/50 hover:text-gray-200'
+                : 'bg-transparent border-transparent text-gray-555 hover:bg-gray-100 hover:text-gray-700'
+            }`}
+            style={{ borderRadius: '2px' }}
+          >
+            <Users className="w-4 h-4" />
+            <span>Users</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('subscriptionReports')}
+            className={`flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider border transition-colors flex-1 ${
+              activeTab === 'subscriptionReports'
+                ? darkMode
+                  ? 'bg-emerald-500/10 text-emerald-455 border-emerald-500/20'
+                  : 'bg-emerald-50 text-emerald-600 border-emerald-500/10'
+                : darkMode
+                ? 'bg-gray-800 border-transparent text-gray-400 hover:bg-gray-700/50 hover:text-gray-200'
+                : 'bg-transparent border-transparent text-gray-555 hover:bg-gray-100 hover:text-gray-700'
+            }`}
+            style={{ borderRadius: '2px' }}
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>Reports</span>
           </button>
         </div>         {/* Services Tab */}
         {activeTab === 'services' && (
@@ -2856,6 +2915,250 @@ if (!isPhaseEnabled('phase_1')) return null; // 👈 feature hidden until enable
               )}
             </div>
           </div>
+        )}
+
+        {/* Users Tab */}
+        {activeTab === 'users' && (
+          <div className="space-y-8 animate-fadeIn">
+            {/* Metrics Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className={`p-6 border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`} style={{ borderRadius: '2px' }}>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Total Users</p>
+                    <h3 className={`text-2xl font-black mt-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{usersList.length}</h3>
+                  </div>
+                  <div className={`p-3 border ${darkMode ? 'bg-gray-900/50 border-gray-700 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-500'}`} style={{ borderRadius: '2px' }}>
+                    <Users className="w-5 h-5" />
+                  </div>
+                </div>
+              </div>
+
+              <div className={`p-6 border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`} style={{ borderRadius: '2px' }}>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Active Subscriptions</p>
+                    <h3 className="text-2xl font-black mt-1 text-emerald-500">
+                      {usersList.filter(u => u.subscription_status === 'active').length}
+                    </h3>
+                  </div>
+                  <div className={`p-3 border ${darkMode ? 'bg-emerald-950/20 border-emerald-800/30 text-emerald-455' : 'bg-emerald-50 border-emerald-100 text-emerald-600'}`} style={{ borderRadius: '2px' }}>
+                    <Shield className="w-5 h-5" />
+                  </div>
+                </div>
+              </div>
+
+              <div className={`p-6 border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`} style={{ borderRadius: '2px' }}>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Revenue (Latest Monthly)</p>
+                    <h3 className="text-2xl font-black mt-1 text-blue-500">
+                      RWF {usersList
+                        .filter(u => u.subscription_status === 'active' && u.subscription_fee)
+                        .reduce((sum, u) => sum + parseFloat(u.subscription_fee || 0), 0)
+                        .toLocaleString()}
+                    </h3>
+                  </div>
+                  <div className={`p-3 border ${darkMode ? 'bg-blue-950/20 border-blue-800/30 text-blue-400' : 'bg-blue-50 border-blue-100 text-blue-600'}`} style={{ borderRadius: '2px' }}>
+                    <Save className="w-5 h-5" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Search & Filters */}
+            <div className={`border p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`} style={{ borderRadius: '2px' }}>
+              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div className="w-full md:w-1/3">
+                   <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                    Search Users
+                  </label>
+                  <input
+                    type="text"
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    placeholder="Search by name, email or contact..."
+                    className={`w-full px-3 py-2 border outline-none text-sm transition-colors
+                      ${darkMode 
+                        ? 'bg-gray-900 border-gray-750 text-white focus:border-emerald-500 placeholder-gray-600' 
+                        : 'bg-white border-gray-300 text-gray-855 focus:border-emerald-600 placeholder-gray-400'}`}
+                    style={{ borderRadius: '2px' }}
+                  />
+                </div>
+
+                <div className="w-full md:w-1/4">
+                   <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                    Filter by Role
+                  </label>
+                  <select
+                    value={userRoleFilter}
+                    onChange={(e) => setUserRoleFilter(e.target.value)}
+                    className={`w-full px-3 py-2 border outline-none text-sm transition-colors
+                      ${darkMode 
+                        ? 'bg-gray-900 border-gray-750 text-white focus:border-emerald-500' 
+                        : 'bg-white border-gray-300 text-gray-855 focus:border-emerald-600'}`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    <option value="all">All Roles</option>
+                    <option value="customer">Customer</option>
+                    <option value="seller">Seller</option>
+                    <option value="service_provider">Service Provider</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+
+                <div className="w-full md:w-1/4">
+                   <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                    Filter by Subscription
+                  </label>
+                  <select
+                    value={userStatusFilter}
+                    onChange={(e) => setUserStatusFilter(e.target.value)}
+                    className={`w-full px-3 py-2 border outline-none text-sm transition-colors
+                      ${darkMode 
+                        ? 'bg-gray-900 border-gray-750 text-white focus:border-emerald-500' 
+                        : 'bg-white border-gray-300 text-gray-855 focus:border-emerald-600'}`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    <option value="all">All Subscriptions</option>
+                    <option value="active">Active Only</option>
+                    <option value="expired">Expired Only</option>
+                    <option value="inactive">Inactive / Free Only</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Users Table */}
+            <div className={`border p-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`} style={{ borderRadius: '2px' }}>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className={`text-base font-bold uppercase tracking-wider ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  User Registry
+                </h3>
+                <button
+                  onClick={fetchUsers}
+                  className={`px-3 py-1.5 border text-xs font-bold uppercase tracking-wider transition-colors
+                    ${darkMode 
+                      ? 'bg-gray-900 border-gray-750 text-white hover:bg-gray-800' 
+                      : 'bg-white border-gray-300 text-gray-855 hover:bg-gray-50'}`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  {fetchingUsers ? 'Refreshing...' : 'Refresh List'}
+                </button>
+              </div>
+
+              {fetchingUsers && usersList.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">Loading user records...</div>
+              ) : usersList.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">No users found.</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700 font-bold uppercase tracking-wider text-gray-400">
+                        <th className="pb-3 pr-2">User details</th>
+                        <th className="pb-3 pr-2">Roles</th>
+                        <th className="pb-3 pr-2">Address</th>
+                        <th className="pb-3 text-center pr-2">Subscription Status</th>
+                        <th className="pb-3 text-right pr-2">Subscription Fee</th>
+                        <th className="pb-3 text-right">Joined</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-150 dark:divide-gray-755 text-gray-700 dark:text-gray-300">
+                      {usersList
+                        .filter((user: any) => {
+                          // Search filter
+                          const matchesSearch = 
+                            String(user.name || '').toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                            String(user.email || '').toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                            String(user.contact || '').toLowerCase().includes(userSearchQuery.toLowerCase());
+                          
+                          // Role filter
+                          const matchesRole = 
+                            userRoleFilter === 'all' || 
+                            (Array.isArray(user.roles) && user.roles.includes(userRoleFilter)) ||
+                            (typeof user.roles === 'string' && user.roles.includes(userRoleFilter));
+                          
+                          // Subscription status filter
+                          let matchesStatus = true;
+                          if (userStatusFilter === 'active') {
+                            matchesStatus = user.subscription_status === 'active';
+                          } else if (userStatusFilter === 'expired') {
+                             matchesStatus = user.subscription_status === 'expired';
+                          } else if (userStatusFilter === 'inactive') {
+                            matchesStatus = !user.subscription_status || user.subscription_status === 'inactive';
+                          }
+                          
+                          return matchesSearch && matchesRole && matchesStatus;
+                        })
+                        .map((user: any) => {
+                          // Format address object safely
+                          const formatAddress = (addr: any) => {
+                            if (!addr) return 'Not set';
+                            const parts = [];
+                            if (addr.known_place) parts.push(addr.known_place);
+                            if (addr.village) parts.push(addr.village);
+                            if (addr.cell) parts.push(addr.cell);
+                            if (addr.sector) parts.push(addr.sector);
+                            if (addr.district) parts.push(addr.district);
+                            return parts.length > 0 ? parts.join(', ') : 'Not set';
+                          };
+
+                          return (
+                            <tr key={user.id} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                              <td className="py-3.5 pr-2">
+                                <span className="font-bold block text-sm">{user.name || 'Anonymous User'}</span>
+                                <span className="text-[10px] text-gray-500 block">{user.email}</span>
+                                {user.contact && (
+                                  <span className="text-[10px] text-gray-400 block font-mono">Ph: {user.contact}</span>
+                                )}
+                              </td>
+                              <td className="py-3.5 pr-2 capitalize">
+                                {Array.isArray(user.roles) 
+                                  ? user.roles.join(', ') 
+                                  : String(user.roles || 'customer')}
+                              </td>
+                              <td className="py-3.5 pr-2 max-w-xs break-words text-gray-500 dark:text-gray-450 leading-relaxed">
+                                {formatAddress(user.address)}
+                              </td>
+                              <td className="py-3.5 text-center pr-2">
+                                <span className={`px-2 py-0.5 border text-[9px] font-bold uppercase
+                                  ${user.subscription_status === 'active' 
+                                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
+                                    : user.subscription_status === 'expired' 
+                                    ? 'bg-red-500/10 border-red-500/20 text-red-500' 
+                                    : 'bg-gray-500/10 border-gray-500/20 text-gray-500'}`}
+                                  style={{ borderRadius: '2px' }}
+                                >
+                                  {user.subscription_status 
+                                    ? `${user.subscription_status} (${user.plan_name || 'PLAN'})` 
+                                    : 'Inactive'}
+                                </span>
+                              </td>
+                              <td className="py-3.5 text-right font-bold text-gray-800 dark:text-white pr-2">
+                                {user.subscription_fee && parseFloat(user.subscription_fee) > 0
+                                  ? `RWF ${parseFloat(user.subscription_fee).toLocaleString()}`
+                                  : 'Free'}
+                              </td>
+                              <td className="py-3.5 text-right text-gray-500">
+                                {user.created_at 
+                                  ? new Date(user.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) 
+                                  : 'N/A'}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Reports Tab */}
+        {activeTab === 'subscriptionReports' && (
+          <AdminSubscriptionReports token={token} darkMode={darkMode} />
         )}
       </div>
     </div>

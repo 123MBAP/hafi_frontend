@@ -24,7 +24,7 @@ export default function CategoryFilter({
       onChange={handleChange}
       className={`px-3 py-2 border rounded-md text-sm w-full transition-colors duration-300 ${
         darkMode
-          ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+          ? 'bg-gray-900 border-gray-600 text-white placeholder-gray-400'
           : 'bg-white border-gray-300 text-gray-800'
       }`}
     >

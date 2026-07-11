@@ -108,7 +108,7 @@ export default function Services() {
   const hasActiveFilters = searchQuery || selectedCategory !== null;
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
@@ -134,7 +134,8 @@ export default function Services() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`lg:hidden flex items-center gap-1.5 px-3 py-2 text-sm ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} shadow-sm`}
+              className={`lg:hidden flex items-center gap-1.5 px-3 py-2 text-sm 
+                ${darkMode ? 'bg-gray-950 border border-gray-800 text-gray-300' : 'bg-white text-gray-700'} shadow-sm`}
               style={{ borderRadius: '2px' }}
             >
               <Filter className="w-4 h-4" />
@@ -165,7 +166,7 @@ export default function Services() {
                 onClick={() => handleCategoryChange(undefined)}
                 className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors shadow-sm ${!selectedCategory
                     ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                    : darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50'
+                    : darkMode ? 'bg-gray-950 border border-gray-800 text-gray-400 hover:bg-gray-800' : 'bg-white text-gray-600 hover:bg-gray-50'
                   }`}
                 style={{ borderRadius: '2px' }}
               >
@@ -178,7 +179,7 @@ export default function Services() {
                   onClick={() => handleCategoryChange(cat.id)}
                   className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors shadow-sm ${selectedCategory === cat.id
                       ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                      : darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50'
+                      : darkMode ? 'bg-gray-950 border border-gray-800 text-gray-400 hover:bg-gray-800' : 'bg-white text-gray-600 hover:bg-gray-50'
                     }`}
                   style={{ borderRadius: '2px' }}
                 >
@@ -237,7 +238,7 @@ export default function Services() {
               </>
             ) : (
               <div className="text-center py-16">
-                <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`} style={{ borderRadius: '2px' }}>
+                <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`} style={{ borderRadius: '2px' }}>
                   <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
@@ -251,7 +252,7 @@ export default function Services() {
                 {hasActiveFilters && (
                   <button
                     onClick={clearFilters}
-                    className={`mt-4 px-4 py-2 text-sm ${darkMode ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-50'} shadow-sm`}
+                    className={`mt-4 px-4 py-2 text-sm ${darkMode ? 'bg-gray-900 text-white hover:bg-gray-800' : 'bg-white text-gray-700 hover:bg-gray-50'} shadow-sm`}
                     style={{ borderRadius: '2px' }}
                   >
                     Clear all filters

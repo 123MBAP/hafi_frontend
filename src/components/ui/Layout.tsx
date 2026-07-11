@@ -10,8 +10,8 @@ export default function Layout() {
   return (
     <div
       className={`flex flex-col min-h-screen transition-colors duration-300 overflow-x-hidden ${
-        darkMode ? 'bg-gray-900 text-white' : 'bg-white text-hafi-teal'
-      }`}
+        darkMode ? 'bg-gray-950 text-white' : 'bg-white text-hafi-teal'
+      }`} 
     >
       <Navbar notificationCount={notificationCount} />
       <main className="flex-grow min-w-0 overflow-x-hidden px-0 py-4 sm:px-2">

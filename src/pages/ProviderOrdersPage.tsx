@@ -127,7 +127,7 @@ const formatAddress = (addressStr?: string | null) => {
     try {
       const parsed = JSON.parse(trimmed);
       if (parsed && typeof parsed === 'object') {
-        const { lat, lng, name, address } = parsed;
+        const { lat, lng, name, address, district, sector, cell, village, known_place, knownPlace } = parsed as Record<string, unknown>;
         if (lat != null && lng != null) {
           return (
             <div className="flex flex-col items-end gap-0.5">
@@ -143,6 +143,32 @@ const formatAddress = (addressStr?: string | null) => {
               </a>
             </div>
           );
+        }
+
+        const knownPlaceValue = known_place != null ? known_place : knownPlace;
+        const fieldRows = [
+          { label: 'District', value: district },
+          { label: 'Sector', value: sector },
+          { label: 'Cell', value: cell },
+          { label: 'Village', value: village },
+          { label: 'Known Place', value: knownPlaceValue },
+        ];
+
+        if (fieldRows.some(field => field.value != null && String(field.value).trim() !== '')) {
+          return (
+            <div className="flex flex-col items-end gap-0.5 text-right">
+              <span className="font-semibold">Address</span>
+              {fieldRows.map(field => (
+                <span key={field.label} className="font-medium text-[11px] leading-snug">
+                  {field.label}: {field.value != null && String(field.value).trim() !== '' ? String(field.value) : 'Not Available'}
+                </span>
+              ))}
+            </div>
+          );
+        }
+
+        if (address) {
+          return <span className="font-semibold text-right">{address}</span>;
         }
       }
     } catch {
@@ -291,7 +317,7 @@ const OrderSummaryCards = ({ summary, darkMode }: { summary: OrderSummary; darkM
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
       {cards.map((card, idx) => (
-        <div key={idx} className={`border p-4 shadow-sm flex flex-col justify-between`} style={{ borderRadius: '2px', ...{ backgroundColor: darkMode ? '#111827' : '#ffffff' } }}>
+        <div key={idx} className={`border p-4 shadow-sm flex flex-col justify-between ${darkMode ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'}`} style={{ borderRadius: '2px', ...{ backgroundColor: darkMode ? '#111827' : '#ffffff' } }}>
           <div className="flex justify-between items-center mb-2">
             <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">{card.label}</span>
             {card.icon}

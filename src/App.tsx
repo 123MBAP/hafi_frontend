@@ -83,8 +83,8 @@ const App: React.FC = () => {
 
 
   return (
-    <div className={darkMode ? 'dark bg-gray-900 text-white overflow-x-hidden' : 'bg-white text-black overflow-x-hidden'}>
-      <div className="flex flex-col min-h-screen bg-white text-hafi-teal dark:bg-gray-900 dark:text-white overflow-x-hidden">
+    <div className={darkMode ? 'dark bg-gray-950 text-white overflow-x-hidden' : 'bg-white text-black overflow-x-hidden'}>
+      <div className="flex flex-col min-h-screen bg-white text-hafi-teal dark:bg-gray-950 dark:text-white overflow-x-hidden">
 
         <main className="flex-grow px-4 py-6 overflow-x-hidden">
 

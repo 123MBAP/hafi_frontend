@@ -51,7 +51,7 @@ export default function AgentLogin() {
 
   return (
     <div className={`min-h-screen pt-12 pb-16 transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-      <div className="w-full max-w-md mx-auto px-4">
+      <div className="w-full max-w-md mx-auto px-0">
         {/* Back Link */}
         <Link
           to="/login"
@@ -65,8 +65,8 @@ export default function AgentLogin() {
 
         {/* Card */}
         <div
-          className={`p-8 border transition-all duration-300 ${
-            darkMode ? 'bg-gray-800 border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
+          className={`p-0 sm:p-8 border-0 sm:border transition-all duration-300 ${
+            darkMode ? 'bg-gray-950 sm:bg-gray-800 sm:border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
           }`}
           style={{ borderRadius: '2px' }}
         >

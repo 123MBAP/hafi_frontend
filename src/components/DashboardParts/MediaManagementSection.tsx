@@ -144,7 +144,7 @@ export default function MediaManagementSection({
                   </button>
                   <button
                     className={`px-3 py-1 font-semibold text-xs uppercase tracking-wider border transition-colors ${darkMode
-                      ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                      ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800'
                       : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
                       }`}
                     style={{ borderRadius: '2px' }}
@@ -176,7 +176,7 @@ export default function MediaManagementSection({
                   <div
                     key={idx}
                     className={`flex flex-col border shadow-sm transition-all duration-300 relative ${darkMode
-                      ? 'bg-gray-800 border-gray-700'
+                      ? 'bg-gray-900 border-gray-800'
                       : 'bg-white border-gray-200'
                       } ${isDeleting && !isPendingUndo
                         ? 'opacity-50 pointer-events-none'
@@ -221,7 +221,7 @@ export default function MediaManagementSection({
                       )}
 
                       <div
-                        className={`w-full aspect-[4/3] flex items-center justify-center ${darkMode ? 'bg-gray-700/50' : 'bg-gray-100'
+                        className={`w-full aspect-[4/3] flex items-center justify-center ${darkMode ? 'bg-gray-950/50' : 'bg-gray-100'
                           }`}
                         style={{ borderRadius: '2px 2px 0 0' }}
                       >
@@ -356,7 +356,7 @@ export default function MediaManagementSection({
                     <div className="flex justify-center gap-2 mb-2 mt-2 z-0 px-4">
                       <button
                         className={`flex-1 py-1.5 font-semibold text-xs border uppercase tracking-wider transition-colors ${darkMode
-                          ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                          ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800'
                           : 'bg-white border-gray-250 text-gray-750 hover:bg-gray-50'
                           }`}
                         style={{ borderRadius: '2px' }}
@@ -411,7 +411,7 @@ export default function MediaManagementSection({
                 </button>
                 <button
                   className={`px-3 py-1 font-semibold text-xs uppercase tracking-wider border transition-colors ${darkMode
-                    ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                    ? 'bg-gray-900 border-gray-750 text-gray-300 hover:bg-gray-950/50'
                     : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
                     }`}
                   style={{ borderRadius: '2px' }}
@@ -443,7 +443,7 @@ export default function MediaManagementSection({
                 <div
                   key={idx}
                   className={`flex flex-col border shadow-sm transition-all duration-300 relative ${darkMode
-                    ? 'bg-gray-800 border-gray-700'
+                    ? 'bg-gray-900 border-gray-800'
                     : 'bg-white border-gray-200'
                     } ${isDeleting && !isPendingUndo
                       ? 'opacity-50 pointer-events-none'
@@ -478,7 +478,7 @@ export default function MediaManagementSection({
                     )}
 
                     <div
-                      className={`w-full aspect-[4/3] flex items-center justify-center relative ${darkMode ? 'bg-gray-700/50' : 'bg-gray-100'
+                      className={`w-full aspect-[4/3] flex items-center justify-center relative ${darkMode ? 'bg-gray-950/50' : 'bg-gray-100'
                         }`}
                       style={{ borderRadius: '2px 2px 0 0' }}
                     >
@@ -589,7 +589,7 @@ export default function MediaManagementSection({
                   <div className="flex justify-center gap-2 mb-2 mt-2 z-0 px-4">
                     <button
                       className={`flex-1 py-1.5 font-semibold text-xs border uppercase tracking-wider transition-colors ${darkMode
-                        ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                        ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800'
                         : 'bg-white border-gray-250 text-gray-750 hover:bg-gray-50'
                         }`}
                       style={{ borderRadius: '2px' }}
@@ -625,15 +625,15 @@ export default function MediaManagementSection({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
           <div
             className={`shadow-lg p-8 relative w-full max-w-md max-h-[90vh] overflow-y-auto border ${darkMode
-              ? 'bg-gray-800 border-gray-700'
+              ? 'bg-gray-900 border-gray-800'
               : 'bg-white border-gray-200'
               }`}
             style={{ borderRadius: '2px' }}
           >
             <button
               className={`absolute top-2 right-2 p-2 transition-colors border ${darkMode
-                ? 'bg-gray-800 border-gray-750 text-gray-350 hover:bg-gray-700'
-                : 'bg-white border-gray-250 text-gray-750 hover:bg-gray-50'
+                ? 'bg-gray-900 border-gray-800 text-gray-350 hover:bg-gray-800'
+                : 'bg-white border-gray-255 text-gray-750 hover:bg-gray-50'
                 }`}
               style={{ borderRadius: '2px' }}
               onClick={onCloseEdit}
@@ -648,7 +648,7 @@ export default function MediaManagementSection({
             </label>
             <input
               className={`border p-2 w-full mb-3 text-sm ${darkMode
-                ? 'bg-gray-900 border-gray-750 text-white focus:ring-1 focus:ring-emerald-500 focus:outline-none'
+                ? 'bg-gray-950 border-gray-800 text-white focus:ring-1 focus:ring-emerald-500 focus:outline-none'
                 : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500 focus:outline-none'
                 }`}
               style={{ borderRadius: '2px' }}
@@ -660,8 +660,8 @@ export default function MediaManagementSection({
             </label>
             <textarea
               className={`border p-2 w-full mb-3 text-sm ${darkMode
-                ? 'bg-gray-900 border-gray-750 text-white focus:ring-1 focus:ring-emerald-500 focus:outline-none'
-                : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500 focus:outline-none'
+                ? 'bg-gray-950 border-gray-800 text-white focus:ring-1 focus:ring-emerald-500 focus:outline-none'
+                : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-550 focus:outline-none'
                 }`}
               style={{ borderRadius: '2px' }}
               rows={4}
@@ -673,7 +673,7 @@ export default function MediaManagementSection({
             </label>
             <input
               className={`border p-2 w-full mb-3 text-sm ${darkMode
-                ? 'bg-gray-900 border-gray-750 text-white focus:ring-1 focus:ring-emerald-500 focus:outline-none'
+                ? 'bg-gray-950 border-gray-800 text-white focus:ring-1 focus:ring-emerald-500 focus:outline-none'
                 : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500 focus:outline-none'
                 }`}
               style={{ borderRadius: '2px' }}

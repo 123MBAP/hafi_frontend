@@ -72,7 +72,9 @@ export default function CommissionerDetailPage() {
                     email: p.email,
                     photo: resolvedProfileImage,
                     operatingLocations: {
-                        districts: p.address?.district ? [p.address.district] : [],
+                        districts: Array.isArray(p.operating_areas) && p.operating_areas.length > 0
+                            ? p.operating_areas
+                            : (p.address?.district ? [p.address.district] : []),
                         sectors: p.address?.sector ? [p.address.sector] : []
                     },
                     priceRange: {
@@ -82,7 +84,8 @@ export default function CommissionerDetailPage() {
                     verified: true,
                     propertiesManaged: providerProps.length,
                     yearsOfExperience: 3,
-                    bio: `Professional real estate agent focused on ${p.address?.district || 'Rwanda'}.`
+                    bio: p.bio || `Professional real estate agent focused on ${p.address?.district || 'Rwanda'}.`,
+                    specialization: Array.isArray(p.specializations) ? p.specializations : []
                 };
 
                 setCommissioner(mappedCommissioner);
@@ -131,11 +134,11 @@ export default function CommissionerDetailPage() {
 
     if (loading) {
         return (
-            <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+            <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
                 <div className="max-w-7xl mx-auto px-4 py-6">
                     <button
                         onClick={() => navigate('/real-estate/commissioners')}
-                        className={`flex items-center gap-2 mb-6 px-3 py-1.5 transition-colors ${darkMode ? 'text-gray-400 hover:text-white hover:bg-gray-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
+                        className={`flex items-center gap-2 mb-6 px-3 py-1.5 transition-colors ${darkMode ? 'text-gray-400 hover:text-white hover:' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
                         style={{ borderRadius: '2px' }}
                     >
                         <ArrowLeft className="w-4 h-4" />
@@ -151,13 +154,13 @@ export default function CommissionerDetailPage() {
 
     if (!commissioner) {
         return (
-            <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+            <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
                 <div className="text-center">
                     <h2 className="text-2xl font-bold mb-4">Agent Not Found</h2>
                     <button
                         onClick={() => navigate('/real-estate/commissioners')}
-                        className="px-6 py-2 bg-emerald-600 text-white transition-colors"
-                        style={{ borderRadius: '2px' }}
+                        className={`px-6 py-2 bg-emerald-600 text-white transition-colors ${darkMode ? ' border border-gray-800' : ''}
+                        style={{ borderRadius: '2px' }}`}
                     >
                         Back to Agents
                     </button>
@@ -167,12 +170,12 @@ export default function CommissionerDetailPage() {
     }
 
     return (
-        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
             <div className="max-w-7xl mx-auto px-4 py-6">
                 {/* Back Button */}
                 <button
                     onClick={() => navigate('/real-estate/commissioners')}
-                    className={`flex items-center gap-2 mb-6 px-3 py-1.5 transition-colors ${darkMode ? 'text-gray-400 hover:text-white hover:bg-gray-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
+                    className={`flex items-center gap-2 mb-6 px-3 py-1.5 transition-colors ${darkMode ? 'text-gray-400 hover:text-white border border-gray-800 hover:' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
                     style={{ borderRadius: '2px' }}
                 >
                     <ArrowLeft className="w-4 h-4" />
@@ -183,7 +186,7 @@ export default function CommissionerDetailPage() {
                     {/* Main Content - Left Column */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Agent Profile Card */}
-                        <div className={`p-5 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
+                        <div className={`p-5 ${darkMode ? 'bg-gray-950' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
                             <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-5">
                                 <div className="relative flex-shrink-0">
                                     <img
@@ -196,11 +199,6 @@ export default function CommissionerDetailPage() {
                                             e.currentTarget.src = 'https://i.pravatar.cc/100?img=1';
                                         }}
                                     />
-                                    {commissioner.verified && (
-                                        <div className="absolute -bottom-1 -right-1 bg-emerald-500 p-0.5" style={{ borderRadius: '2px' }}>
-                                            <BadgeCheck className="w-3.5 h-3.5 text-white" />
-                                        </div>
-                                    )}
                                 </div>
                                 <div className="flex-1">
                                     <h1 className={`text-2xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -209,7 +207,7 @@ export default function CommissionerDetailPage() {
                                     <div className="flex flex-wrap items-center gap-3 mb-2">
                                         {commissioner.verified && (
                                             <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium ${darkMode ? 'bg-emerald-900/50 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`} style={{ borderRadius: '2px' }}>
-                                                <BadgeCheck className="w-3 h-3" />
+
                                                 Verified Agent
                                             </span>
                                         )}
@@ -231,14 +229,6 @@ export default function CommissionerDetailPage() {
                                     </div>
                                     <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                         Properties
-                                    </div>
-                                </div>
-                                <div className="text-center">
-                                    <div className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        {commissioner.yearsOfExperience || 0}+
-                                    </div>
-                                    <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                        Years exp.
                                     </div>
                                 </div>
                                 <div className="text-center">
@@ -270,12 +260,12 @@ export default function CommissionerDetailPage() {
                                 </h3>
                                 <div className="space-y-3">
                                     <div>
-                                        <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-1`}>Districts</div>
+                                       
                                         <div className="flex flex-wrap gap-1.5">
                                             {commissioner.operatingLocations.districts.map((district, idx) => (
                                                 <span
                                                     key={idx}
-                                                    className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}
+                                                    className={`text-sm px-2 py-0.5 ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`}
                                                     style={{ borderRadius: '2px' }}
                                                 >
                                                     {district}
@@ -284,19 +274,18 @@ export default function CommissionerDetailPage() {
                                         </div>
                                     </div>
                                     <div>
-                                        <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-1`}>Sectors</div>
                                         <div className="flex flex-wrap gap-1.5">
                                             {commissioner.operatingLocations.sectors.slice(0, 6).map((sector, idx) => (
                                                 <span
                                                     key={idx}
-                                                    className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}
+                                                    className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`}
                                                     style={{ borderRadius: '2px' }}
                                                 >
                                                     {sector}
                                                 </span>
                                             ))}
                                             {commissioner.operatingLocations.sectors.length > 6 && (
-                                                <span className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`} style={{ borderRadius: '2px' }}>
+                                                <span className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`} style={{ borderRadius: '2px' }}>
                                                     +{commissioner.operatingLocations.sectors.length - 6} more
                                                 </span>
                                             )}
@@ -329,12 +318,12 @@ export default function CommissionerDetailPage() {
 
                         {/* Managed Properties */}
                         {managedProperties.length > 0 && (
-                            <div className={`p-5 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
+                            <div className={`p-5 ${darkMode ? '' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className={`text-base font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                                         Properties Managed
                                     </h3>
-                                    <span className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-500'}`} style={{ borderRadius: '2px' }}>
+                                    <span className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-500'}`} style={{ borderRadius: '2px' }}>
                                         {managedProperties.length} properties
                                     </span>
                                 </div>
@@ -345,7 +334,7 @@ export default function CommissionerDetailPage() {
                                             onClick={() => navigate(`/real-estate/property/${property.id}`)}
                                             className="group cursor-pointer"
                                         >
-                                            <div className={`overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`} style={{ borderRadius: '2px' }}>
+                                            <div className={`overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`} style={{ borderRadius: '2px' }}>
                                                 <img
                                                     src={property.images[0]}
                                                     alt={property.title}
@@ -376,7 +365,7 @@ export default function CommissionerDetailPage() {
                     {/* Sidebar - Right Column */}
                     <div className="lg:col-span-1 space-y-6">
                         {/* Contact Card */}
-                        <div className={`p-5 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm sticky top-6`} style={{ borderRadius: '2px' }}>
+                        <div className={`p-5 ${darkMode ? '' : 'bg-white'} shadow-sm sticky top-6`} style={{ borderRadius: '2px' }}>
                             <h3 className={`text-sm font-semibold uppercase tracking-wider mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                 Contact Agent
                             </h3>
@@ -416,7 +405,7 @@ export default function CommissionerDetailPage() {
                         </div>
 
                         {/* Quick Info Card */}
-                        <div className={`p-5 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
+                        <div className={`p-5 ${darkMode ? '' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
                             <h3 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                 Quick Info
                             </h3>

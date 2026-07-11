@@ -197,7 +197,7 @@ export default function DashboardOverviewPage() {
 
   if (loading && refreshKey === 0) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'}`}>
+      <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-800'}`}>
         <div className="text-center py-16">
           <LoadingSpinner size="lg" message="Loading dashboard..." variant="dots" />
         </div>
@@ -206,7 +206,7 @@ export default function DashboardOverviewPage() {
   }
 
   return (
-    <div className={`min-h-screen -mx-4 sm:mx-0 overflow-x-hidden transition-colors duration-200 ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-800'}`}>
+    <div className={`min-h-screen -mx-4 sm:mx-0 overflow-x-hidden transition-colors duration-200 ${darkMode ? 'bg-gray-950 text-gray-100' : 'bg-gray-50 text-gray-800'}`}>
       {/* Plans scrolling banner at navbar top */}
       <div
         className="sticky z-30 w-full overflow-x-hidden overflow-y-visible bg-yellow-100 border-b border-yellow-400 mb-2"
@@ -216,7 +216,7 @@ export default function DashboardOverviewPage() {
       </div>
 
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6">
-        
+
         {/* Title Bar - Matching Services page uppercase bold style */}
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -230,8 +230,8 @@ export default function DashboardOverviewPage() {
           <button
             onClick={triggerRefresh}
             className={`px-3 py-2 border transition-all flex items-center gap-1.5 text-sm font-medium shadow-sm
-              ${darkMode 
-                ? 'bg-gray-850 hover:bg-gray-800 border-gray-700 text-emerald-400 hover:text-emerald-350' 
+              ${darkMode
+                ? 'bg-gray-900 hover:bg-gray-800 border-gray-800 text-emerald-400 hover:text-emerald-350'
                 : 'bg-white hover:bg-gray-50 border-gray-200 text-emerald-600 hover:text-emerald-700'}`}
             style={{ borderRadius: '2px' }}
           >
@@ -241,13 +241,13 @@ export default function DashboardOverviewPage() {
         </div>
 
         {/* 1. Hero Welcoming Card - Matching Homepage clean card borders with flat accent border */}
-        <div 
+        <div
           className={`relative overflow-hidden border p-6 md:p-8 mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6
-            ${darkMode ? 'bg-gray-850 border-gray-800' : 'bg-white border-gray-200'} border-l-4 border-l-emerald-500`}
+            ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} border-l-4 border-l-emerald-500`}
           style={{ borderRadius: '2px' }}
         >
           <div className="relative z-10">
-            <span 
+            <span
               className={`text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 shadow-sm
                 ${darkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-500/10 text-emerald-600'}`}
               style={{ borderRadius: '2px' }}
@@ -261,7 +261,7 @@ export default function DashboardOverviewPage() {
               Here is a unified look at your listings, appointments, statistics, and billing profiles.
             </p>
           </div>
-          
+
           {/* Roles container */}
           <div className="flex flex-wrap gap-2 md:self-end z-10">
             {roles.map(role => {
@@ -296,13 +296,13 @@ export default function DashboardOverviewPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {/* Merchant Products listing count */}
           {isSeller && (
-            <div 
+            <div
               className={`p-5 border shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5
-                ${darkMode ? 'bg-gray-800 border-gray-750' : 'bg-white border-gray-200'}`}
+                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
               style={{ borderRadius: '2px' }}
             >
-              <div 
-                className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+              <div
+                className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                 style={{ borderRadius: '2px' }}
               >
                 <Store className="w-5 h-5" />
@@ -316,13 +316,13 @@ export default function DashboardOverviewPage() {
 
           {/* Service Provider portfolio count */}
           {isServiceProvider && (
-            <div 
+            <div
               className={`p-5 border shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5
-                ${darkMode ? 'bg-gray-800 border-gray-750' : 'bg-white border-gray-200'}`}
+                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
               style={{ borderRadius: '2px' }}
             >
-              <div 
-                className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+              <div
+                className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                 style={{ borderRadius: '2px' }}
               >
                 <Briefcase className="w-5 h-5" />
@@ -336,13 +336,13 @@ export default function DashboardOverviewPage() {
 
           {/* Active Orders count */}
           {(isSeller || isServiceProvider) && (
-            <div 
+            <div
               className={`p-5 border shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5
-                ${darkMode ? 'bg-gray-800 border-gray-750' : 'bg-white border-gray-200'}`}
+                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
               style={{ borderRadius: '2px' }}
             >
-              <div 
-                className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+              <div
+                className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                 style={{ borderRadius: '2px' }}
               >
                 <ShoppingBag className="w-5 h-5" />
@@ -356,13 +356,13 @@ export default function DashboardOverviewPage() {
 
           {/* Unread customer chats count */}
           {(isSeller || isServiceProvider) && (
-            <div 
+            <div
               className={`p-5 border shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5
-                ${darkMode ? 'bg-gray-800 border-gray-750' : 'bg-white border-gray-200'}`}
+                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
               style={{ borderRadius: '2px' }}
             >
-              <div 
-                className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+              <div
+                className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                 style={{ borderRadius: '2px' }}
               >
                 <MessageCircle className="w-5 h-5" />
@@ -378,13 +378,13 @@ export default function DashboardOverviewPage() {
 
           {/* Pending Bookings count (Phase 2 feature) */}
           {isServiceProvider && showPhase2Features && (
-            <div 
+            <div
               className={`p-5 border shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5
-                ${darkMode ? 'bg-gray-800 border-gray-750' : 'bg-white border-gray-200'}`}
+                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
               style={{ borderRadius: '2px' }}
             >
-              <div 
-                className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+              <div
+                className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                 style={{ borderRadius: '2px' }}
               >
                 <Calendar className="w-5 h-5" />
@@ -398,13 +398,13 @@ export default function DashboardOverviewPage() {
 
           {/* Pending Customization requests count (Phase 2 feature) */}
           {isServiceProvider && showPhase2Features && (
-            <div 
+            <div
               className={`p-5 border shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5
-                ${darkMode ? 'bg-gray-800 border-gray-750' : 'bg-white border-gray-200'}`}
+                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
               style={{ borderRadius: '2px' }}
             >
-              <div 
-                className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+              <div
+                className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                 style={{ borderRadius: '2px' }}
               >
                 <Sparkles className="w-5 h-5" />
@@ -419,18 +419,18 @@ export default function DashboardOverviewPage() {
 
         {/* 3. Subscription Plan and Storage Meter Panel */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          
+
           {/* Subscription Plan details */}
-          <div 
+          <div
             className={`p-6 border shadow-sm flex flex-col justify-between
-              ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
             style={{ borderRadius: '2px' }}
           >
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div 
-                    className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+                  <div
+                    className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                     style={{ borderRadius: '2px' }}
                   >
                     <Crown className="w-5 h-5" />
@@ -442,11 +442,11 @@ export default function DashboardOverviewPage() {
                     <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Plan restrictions and billing metrics</p>
                   </div>
                 </div>
-                
-                <span 
+
+                <span
                   className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 border
-                    ${plan.status === 'active' 
-                      ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' 
+                    ${plan.status === 'active'
+                      ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
                       : 'bg-red-500/10 text-red-600 border-red-500/20'}`}
                   style={{ borderRadius: '2px' }}
                 >
@@ -455,8 +455,8 @@ export default function DashboardOverviewPage() {
               </div>
 
               {/* Pricing Display */}
-              <div 
-                className={`mb-5 p-4 border ${darkMode ? 'bg-gray-900/40 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
+              <div
+                className={`mb-5 p-4 border ${darkMode ? 'bg-gray-950/40 border-gray-800' : 'bg-gray-50 border-gray-200'}`}
                 style={{ borderRadius: '2px' }}
               >
                 <span className={`text-[10px] font-bold uppercase tracking-widest block ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Current Pricing Tier</span>
@@ -469,9 +469,9 @@ export default function DashboardOverviewPage() {
               </div>
 
               {/* Expiry / Days Remaining */}
-              <div 
+              <div
                 className={`p-4 border flex items-center justify-between mb-4
-                  ${darkMode ? 'bg-gray-900/30 border-gray-750' : 'bg-gray-50/50 border-gray-150'}`}
+                  ${darkMode ? 'bg-gray-950/30 border-gray-800' : 'bg-gray-50/50 border-gray-150'}`}
                 style={{ borderRadius: '2px' }}
               >
                 <div className="flex items-center gap-3">
@@ -479,16 +479,16 @@ export default function DashboardOverviewPage() {
                   <div>
                     <p className={`text-[10px] uppercase font-bold tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Expiration Countdown</p>
                     <p className="text-sm font-bold mt-0.5">
-                      {plan.days_remaining > 0 
+                      {plan.days_remaining > 0
                         ? `${plan.days_remaining} days remaining`
-                        : plan.hours_remaining > 0 
+                        : plan.hours_remaining > 0
                           ? `${plan.hours_remaining} hours remaining`
                           : 'Expired or Unknown'}
                     </p>
                   </div>
                 </div>
                 {plan.days_remaining <= 5 && (
-                  <span 
+                  <span
                     className="text-[9px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 border border-amber-500/20 animate-pulse"
                     style={{ borderRadius: '2px' }}
                   >
@@ -512,16 +512,16 @@ export default function DashboardOverviewPage() {
           </div>
 
           {/* Storage Usage progress bar */}
-          <div 
+          <div
             className={`p-6 border shadow-sm flex flex-col justify-between
-              ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
             style={{ borderRadius: '2px' }}
           >
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div 
-                    className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+                  <div
+                    className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                     style={{ borderRadius: '2px' }}
                   >
                     <HardDrive className="w-5 h-5" />
@@ -564,17 +564,17 @@ export default function DashboardOverviewPage() {
 
               {/* Media Counts Breakdown */}
               <div className="grid grid-cols-3 gap-3 mb-4">
-                <div 
-                  className={`p-3 border text-center ${darkMode ? 'bg-gray-900/40 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
+                <div
+                  className={`p-3 border text-center ${darkMode ? 'bg-gray-950/40 border-gray-800' : 'bg-gray-50 border-gray-200'}`}
                   style={{ borderRadius: '2px' }}
                 >
                   <FileImage className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
                   <p className={`text-[9px] uppercase font-bold tracking-wide ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Images</p>
                   <p className="text-sm font-bold mt-0.5">{storage.fileCount?.images || 0}</p>
                 </div>
-                
-                <div 
-                  className={`p-3 border text-center ${darkMode ? 'bg-gray-900/40 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
+
+                <div
+                  className={`p-3 border text-center ${darkMode ? 'bg-gray-950/40 border-gray-800' : 'bg-gray-50 border-gray-200'}`}
                   style={{ borderRadius: '2px' }}
                 >
                   <FileVideo className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
@@ -582,8 +582,8 @@ export default function DashboardOverviewPage() {
                   <p className="text-sm font-bold mt-0.5">{storage.fileCount?.videos || 0}</p>
                 </div>
 
-                <div 
-                  className={`p-3 border text-center ${darkMode ? 'bg-gray-900/40 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
+                <div
+                  className={`p-3 border text-center ${darkMode ? 'bg-gray-950/40 border-gray-800' : 'bg-gray-50 border-gray-200'}`}
                   style={{ borderRadius: '2px' }}
                 >
                   <Database className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
@@ -596,8 +596,8 @@ export default function DashboardOverviewPage() {
             <Link
               to="/dashboard/account"
               className={`w-full py-2.5 px-4 border font-semibold text-center text-sm transition-all duration-200 flex items-center justify-center gap-1.5
-                ${darkMode 
-                  ? 'bg-gray-850 hover:bg-gray-800 border-gray-700 text-white' 
+                ${darkMode
+                  ? 'bg-gray-900 hover:bg-gray-800 border-gray-800 text-white'
                   : 'bg-white hover:bg-gray-550 hover:bg-gray-50 border-gray-200 text-gray-700'}`}
               style={{ borderRadius: '2px' }}
             >
@@ -612,18 +612,18 @@ export default function DashboardOverviewPage() {
           Dashboards & Navigation
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          
+
           {/* Seller catalog manager */}
           {isSeller && (
-            <div 
+            <div
               className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-                ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
               style={{ borderRadius: '2px' }}
             >
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div 
-                    className={`p-2.5 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+                  <div
+                    className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                     style={{ borderRadius: '2px' }}
                   >
                     <Store className="w-4 h-4" />
@@ -647,15 +647,15 @@ export default function DashboardOverviewPage() {
 
           {/* Service provider manager */}
           {isServiceProvider && (
-            <div 
+            <div
               className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-                ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
               style={{ borderRadius: '2px' }}
             >
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div 
-                    className={`p-2.5 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+                  <div
+                    className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                     style={{ borderRadius: '2px' }}
                   >
                     <Briefcase className="w-4 h-4" />
@@ -679,15 +679,15 @@ export default function DashboardOverviewPage() {
 
           {/* Client orders & fullfillment */}
           {(isSeller || isServiceProvider) && (
-            <div 
+            <div
               className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-                ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
               style={{ borderRadius: '2px' }}
             >
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div 
-                    className={`p-2.5 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+                  <div
+                    className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                     style={{ borderRadius: '2px' }}
                   >
                     <ShoppingBag className="w-4 h-4" />
@@ -711,15 +711,15 @@ export default function DashboardOverviewPage() {
 
           {/* Service appointments / ledger (Phase 2 feature) */}
           {isServiceProvider && showPhase2Features && (
-            <div 
+            <div
               className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-                ${darkMode ? 'bg-gray-850 bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
               style={{ borderRadius: '2px' }}
             >
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div 
-                    className={`p-2.5 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+                  <div
+                    className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                     style={{ borderRadius: '2px' }}
                   >
                     <Calendar className="w-4 h-4" />
@@ -743,15 +743,15 @@ export default function DashboardOverviewPage() {
 
           {/* Custom service request quotes (Phase 2 feature) */}
           {isServiceProvider && showPhase2Features && (
-            <div 
+            <div
               className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-                ${darkMode ? 'bg-gray-850 bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
               style={{ borderRadius: '2px' }}
             >
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div 
-                    className={`p-2.5 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+                  <div
+                    className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                     style={{ borderRadius: '2px' }}
                   >
                     <Sparkles className="w-4 h-4" />
@@ -775,15 +775,15 @@ export default function DashboardOverviewPage() {
 
           {/* Message Center */}
           {(isSeller || isServiceProvider) && (
-            <div 
+            <div
               className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-                ${darkMode ? 'bg-gray-850 bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
               style={{ borderRadius: '2px' }}
             >
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div 
-                    className={`p-2.5 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+                  <div
+                    className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                     style={{ borderRadius: '2px' }}
                   >
                     <MessageCircle className="w-4 h-4" />
@@ -806,15 +806,15 @@ export default function DashboardOverviewPage() {
           )}
 
           {/* General accounts setting */}
-          <div 
+          <div
             className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-              ${darkMode ? 'bg-gray-850 bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+              ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
             style={{ borderRadius: '2px' }}
           >
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <div 
-                  className={`p-2.5 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
+                <div
+                  className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
                   style={{ borderRadius: '2px' }}
                 >
                   <User className="w-4 h-4" />

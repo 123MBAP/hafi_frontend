@@ -994,7 +994,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className={`w-full mt-0 -mx-4 sm:mx-0 px-0 sm:px-2 overflow-x-hidden ${darkMode ? "bg-gray-900 text-gray-200" : "bg-white text-gray-800"}`}>
+    <div className={`w-full mt-0 -mx-4 sm:mx-0 px-0 sm:px-2 overflow-x-hidden ${darkMode ? "bg-gray-950 text-gray-200" : "bg-white text-gray-800"}`}>
       <div
         className="sticky z-40 w-full overflow-x-hidden overflow-y-visible bg-yellow-100 border-b border-yellow-400 mb-2"
         style={{ top: 'var(--navbar-height)' }}

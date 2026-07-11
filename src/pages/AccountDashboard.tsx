@@ -402,6 +402,28 @@ export default function AccountDashboard() {
           )}
         </div>
 
+        {!isPureCustomer && (
+          <div
+            className={`p-4 mb-6 border shadow-sm ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+            style={{ borderRadius: '2px' }}
+          >
+            <div className="text-center">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-450 dark:text-gray-450 block mb-1">
+                Subscription Time Remaining
+              </span>
+              <div className={`text-3xl font-mono font-extrabold tracking-widest leading-none ${timeRemaining.isExpired ? 'text-red-505' : 'text-emerald-505 animate-pulse'}`}>
+                {timeRemaining.days}:{timeRemaining.hours}:{timeRemaining.minutes}:{timeRemaining.seconds}
+              </div>
+              <div className="flex justify-center gap-6 mt-2 text-[9px] font-bold uppercase tracking-widest text-gray-450 dark:text-gray-550">
+                <span>Days</span>
+                <span>Hours</span>
+                <span>Mins</span>
+                <span>Secs</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Agent Referral Code Card */}
         {data?.referral_code && (
           <div 
@@ -484,7 +506,7 @@ export default function AccountDashboard() {
               className={`p-6 mb-6 border shadow-sm ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
               style={{ borderRadius: '2px' }}
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 items-center">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 items-center">
                 
                 {/* Col 1: Plan Icon & Name */}
                 <div className="flex items-center lg:col-span-2">
@@ -540,23 +562,7 @@ export default function AccountDashboard() {
                   </span>
                 </div>
 
-                {/* Col 4: Countdown Time Remaining (Takes 2 cols on lg) */}
-                <div className="lg:col-span-2 p-3 bg-gray-50 dark:bg-gray-905 border border-dashed border-gray-250 dark:border-gray-700 text-center" style={{ borderRadius: '2px' }}>
-                  <span className="text-[9px] font-extrabold uppercase tracking-wider text-gray-450 dark:text-gray-450 block mb-1">
-                    Subscription Time Remaining
-                  </span>
-                  <div className={`text-2xl font-mono font-extrabold tracking-widest leading-none ${timeRemaining.isExpired ? 'text-red-505' : 'text-emerald-505 animate-pulse'}`}>
-                    {timeRemaining.days}:{timeRemaining.hours}:{timeRemaining.minutes}:{timeRemaining.seconds}
-                  </div>
-                  <div className="flex justify-center gap-6 mt-1 text-[8px] font-bold uppercase tracking-widest text-gray-450 dark:text-gray-550">
-                    <span>Days</span>
-                    <span>Hours</span>
-                    <span>Mins</span>
-                    <span>Secs</span>
-                  </div>
-                </div>
-
-                {/* Col 5: Subscription Details & Status */}
+                {/* Col 4: Subscription Details & Status */}
                 <div className="flex flex-col gap-1 text-xs">
                   {plan.subscription_start && (
                     <div className="flex justify-between">

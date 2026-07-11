@@ -100,9 +100,9 @@ export default function AuthenticatedLayout() {
   );
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
       {/* Header Bar */}
-      <div className={`sticky top-0 z-40 border-b ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
+      <div className={`sticky top-0 z-40 border-b ${darkMode ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
         <div className="max-w-7xl mx-auto">
           {/* Desktop Navigation - Right Aligned */}
           <DesktopNav />

@@ -55,12 +55,12 @@ export default function ProductUploadCard({
 }: Props) {
   return (
     <div
-      className={`border transition-all duration-300 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+      className={`border transition-all duration-300 ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
         } shadow-sm overflow-hidden`}
       style={{ borderRadius: '2px' }}
     >
       <div
-        className={`px-6 py-4 border-b ${darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'
+        className={`px-6 py-4 border-b ${darkMode ? 'border-gray-800 bg-gray-950/50' : 'border-gray-200 bg-gray-50'
           } flex justify-between items-center`}
       >
         <h3 className={`text-base font-bold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -70,7 +70,7 @@ export default function ProductUploadCard({
 
       <form
         onSubmit={handleProductUpload}
-        className={`p-6 ${darkMode ? 'bg-gray-800/40' : 'bg-gray-50/50'}`}
+        className={`p-6 ${darkMode ? 'bg-gray-900/45' : 'bg-gray-50/50'}`}
       >
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-4">
@@ -83,7 +83,7 @@ export default function ProductUploadCard({
                 value={productTitle}
                 onChange={(e) => setProductTitle(e.target.value)}
                 className={`w-full p-2.5 border text-sm ${darkMode
-                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                  ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-550'
                   : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                   } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
                 style={{ borderRadius: '2px' }}
@@ -99,7 +99,7 @@ export default function ProductUploadCard({
                 value={productDesc}
                 onChange={(e) => setProductDesc(e.target.value)}
                 className={`w-full p-2.5 border text-sm ${darkMode
-                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                  ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-550'
                   : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                   } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
                 style={{ borderRadius: '2px' }}
@@ -117,7 +117,7 @@ export default function ProductUploadCard({
                 value={productPrice}
                 onChange={(e) => setProductPrice(e.target.value)}
                 className={`w-full p-2.5 border text-sm ${darkMode
-                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                  ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-550'
                   : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                   } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
                 style={{ borderRadius: '2px' }}
@@ -170,7 +170,7 @@ export default function ProductUploadCard({
               </label>
               <div
                 className={`border-2 border-dashed ${darkMode
-                  ? 'border-gray-700 bg-gray-900/30'
+                  ? 'border-gray-800 bg-gray-950/30'
                   : 'border-gray-300 bg-white'
                   } p-4 flex flex-col items-center justify-center transition hover:border-emerald-500`}
                 style={{ borderRadius: '2px' }}
@@ -222,8 +222,8 @@ export default function ProductUploadCard({
                 </label>
                 <div
                   className={`border-2 border-dashed ${darkMode
-                    ? 'border-gray-700 bg-gray-900/30'
-                    : 'border-gray-300 bg-white'
+                    ? 'border-gray-800 bg-gray-950/30'
+                    : 'border-gray-350 bg-white'
                     } p-4 transition hover:border-emerald-500`}
                   style={{ borderRadius: '2px' }}
                 >
@@ -273,7 +273,7 @@ export default function ProductUploadCard({
               </label>
               <div
                 className={`border-2 border-dashed ${darkMode
-                  ? 'border-gray-700 bg-gray-900/30'
+                  ? 'border-gray-800 bg-gray-950/30'
                   : 'border-gray-300 bg-white'
                   } p-4 flex flex-col items-center justify-center transition hover:border-emerald-500`}
                 style={{ borderRadius: '2px' }}
@@ -295,7 +295,7 @@ export default function ProductUploadCard({
                       {productVideos.map((video, i) => (
                         <div
                           key={i}
-                          className={`text-[10px] font-bold uppercase tracking-wider truncate ${darkMode ? 'text-red-400' : 'text-red-650'
+                          className={`text-[10px] font-bold uppercase tracking-wider truncate ${darkMode ? 'text-red-400' : 'text-red-655'
                             } bg-red-500/10 px-2 py-1 border border-red-500/25`}
                           style={{ borderRadius: '2px' }}
                         >
@@ -363,7 +363,7 @@ export default function ProductUploadCard({
             }}
             className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border
               ${darkMode
-                ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
+                ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800'
                 : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
               }`}
             style={{ borderRadius: '2px' }}

@@ -2,6 +2,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useDarkMode } from "@/context/DarkMode";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import RwandaLocationSelector from "@/components/RwandaLocationSelector";
 import { cachedFetch } from "../utils/cachedFetch";
 import { 
   User, 
@@ -19,13 +20,15 @@ import {
   Edit2, 
   ChevronRight, 
   Store,
-  FileText
+  FileText,
+  Building2
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 type Address = {
+  province?: string;
   district: string;
   sector: string;
   cell: string;
@@ -41,6 +44,7 @@ type Service = {
 type Profile = {
   id?: number;
   name: string;
+  business_name?: string | null;
   email: string;
   contact?: string;
   service_id?: string | null;
@@ -50,6 +54,9 @@ type Profile = {
   address?: Address;
   whatsapp_number?: string;
   roles?: string[];
+  bio?: string | null;
+  operating_areas?: string[];
+  specializations?: string[];
 };
 
 const allowedRoles = ["customer", "seller", "service_provider"];
@@ -75,7 +82,20 @@ export default function ProfilePage() {
   const [showServiceField, setShowServiceField] = useState(false);
   const [isUpdatingService, setIsUpdatingService] = useState(false);
 
+  const [showAddAreaInput, setShowAddAreaInput] = useState(false);
+  const [newAreaProvince, setNewAreaProvince] = useState("");
+  const [newAreaDistrict, setNewAreaDistrict] = useState("");
+  const [newAreaSector, setNewAreaSector] = useState("");
+  const [isSavingArea, setIsSavingArea] = useState(false);
+
+  // Load dynamic property categories from real estate service schema
+  const [propertyCategories, setPropertyCategories] = useState<string[]>(['Land', 'Residential', 'Commercial']);
+  const [isSavingSpecialization, setIsSavingSpecialization] = useState(false);
+  const [editSpecializationMode, setEditSpecializationMode] = useState(false);
+  const [tempSpecializations, setTempSpecializations] = useState<string[]>([]);
+
   const [addressFields, setAddressFields] = useState<Address>({
+    province: "",
     district: "",
     sector: "",
     cell: "",
@@ -93,6 +113,7 @@ export default function ProfilePage() {
   const inputBg = darkMode ? "bg-gray-950 border-gray-800 text-white focus:border-emerald-500" : "bg-white border-gray-250 text-gray-900 focus:border-emerald-500";
   const labelColor = darkMode ? "text-gray-400" : "text-gray-600";
   const containerClass = `max-w-6xl mx-auto px-4 py-8 min-h-screen ${bgColor}`;
+  const isRealEstate = profile?.service_title?.toLowerCase().trim() === 'real estate';
 
   // Fetch profile data
   useEffect(() => {
@@ -121,6 +142,7 @@ export default function ProfilePage() {
 
         // Initialize address fields
         setAddressFields({
+          province: data.address?.province || "",
           district: data.address?.district || "",
           sector: data.address?.sector || "",
           cell: data.address?.cell || "",
@@ -242,14 +264,92 @@ export default function ProfilePage() {
     setSelectedImage(null);
     setEditAddressMode(false);
     setShowServiceField(false);
+    setEditSpecializationMode(false);
     if (profile?.address) {
       setAddressFields({
+        province: profile.address.province || "",
         district: profile.address.district || "",
         sector: profile.address.sector || "",
         cell: profile.address.cell || "",
         village: profile.address.village || "",
         known_place: profile.address.known_place || ""
       });
+    }
+  };
+
+  // Load dynamic property categories from real estate service schema
+  useEffect(() => {
+    const fetchPropertyCategories = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/real-estate/service`);
+        if (res.ok) {
+          const data = await res.json();
+          const features = data?.service?.features;
+          if (Array.isArray(features)) {
+            for (const feature of features) {
+              if (feature && feature.type === 'object' && feature.schema && typeof feature.schema === 'object') {
+                const field = feature.schema.property_category;
+                const options = field?.options;
+                if (Array.isArray(options)) {
+                  setPropertyCategories(options.map((o) => String(o).trim()).filter(Boolean));
+                }
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load property categories:", error);
+      }
+    };
+
+    if (profile?.roles?.includes('service_provider') && profile.service_title?.toLowerCase().trim() === 'real estate') {
+      fetchPropertyCategories();
+    }
+  }, [profile]);
+
+  const startEditSpecialization = () => {
+    setTempSpecializations(profile?.specializations || []);
+    setEditSpecializationMode(true);
+  };
+
+  const cancelEditSpecialization = () => {
+    setEditSpecializationMode(false);
+    setTempSpecializations([]);
+  };
+
+  const handleToggleTempSpecialization = (category: string) => {
+    setTempSpecializations(prev =>
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const handleSaveSpecializations = async () => {
+    if (!profile) return;
+    setIsSavingSpecialization(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE}/api/profile`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ specializations: tempSpecializations }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Save failed");
+      }
+
+      setProfile(prev => prev ? { ...prev, specializations: tempSpecializations } : prev);
+      setEditSpecializationMode(false);
+    } catch (error) {
+      alert(`Failed to update specializations: ${error instanceof Error ? error.message : ""}`);
+    } finally {
+      setIsSavingSpecialization(false);
     }
   };
 
@@ -286,6 +386,70 @@ export default function ProfilePage() {
       alert(`Failed to update profile: ${error instanceof Error ? error.message : ""}`);
     } finally {
       setIsSavingProfile(false);
+    }
+  };
+
+  const handleAddOperatingArea = async () => {
+    if (!profile || !newAreaProvince || !newAreaDistrict || !newAreaSector) return;
+    const area = `${newAreaSector}, ${newAreaDistrict}, ${newAreaProvince}`;
+    const currentAreas = profile.operating_areas || [];
+    if (currentAreas.includes(area)) {
+      alert("Area is already added");
+      return;
+    }
+    const updatedAreas = [...currentAreas, area];
+    setIsSavingArea(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE}/api/profile`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ operating_areas: updatedAreas }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Save failed");
+      }
+
+      setProfile(prev => prev ? { ...prev, operating_areas: updatedAreas } : prev);
+      setShowAddAreaInput(false);
+      setNewAreaProvince("");
+      setNewAreaDistrict("");
+      setNewAreaSector("");
+    } catch (error) {
+      alert(`Failed to add operating area: ${error instanceof Error ? error.message : ""}`);
+    } finally {
+      setIsSavingArea(false);
+    }
+  };
+
+  const handleRemoveOperatingArea = async (areaToRemove: string) => {
+    if (!profile) return;
+    const currentAreas = profile.operating_areas || [];
+    const updatedAreas = currentAreas.filter(a => a !== areaToRemove);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE}/api/profile`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ operating_areas: updatedAreas }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Save failed");
+      }
+
+      setProfile(prev => prev ? { ...prev, operating_areas: updatedAreas } : prev);
+    } catch (error) {
+      alert(`Failed to remove operating area: ${error instanceof Error ? error.message : ""}`);
     }
   };
 
@@ -400,7 +564,12 @@ export default function ProfilePage() {
   return (
     <div className={containerClass}>
       {/* Profile Header Banner */}
-      <div className={`border ${cardBg} overflow-hidden mb-6 shadow-sm`} style={{ borderRadius: '2px' }}>
+      <div 
+        className={`group border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+          darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700/60' : 'bg-white border-gray-200 hover:border-emerald-300'
+        } overflow-hidden mb-6`} 
+        style={{ borderRadius: '2px' }}
+      >
         {/* <div className="h-12  bg-gray-100 dark:bg-gray-900 border-4 border-white dark:border-gray-900 "></div> */}
         <div className="p-6 relative flex flex-col md:flex-row items-center md:items-end gap-6 -mt-16">
           {/* Avatar container */}
@@ -461,13 +630,320 @@ export default function ProfilePage() {
         
         {/* Left Column: Account Details */}
         <div className="lg:col-span-2 space-y-6">
-          
+
+          {/* About Me / Bio Card */}
+          <div 
+            className={`group p-6 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+              darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700/60' : 'bg-white border-gray-200 hover:border-emerald-300'
+            }`} 
+            style={{ borderRadius: '2px' }}
+          >
+            <div className="flex items-center justify-between mb-4 border-b pb-3 dark:border-gray-800">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-emerald-500" />
+                <h2 className={`text-xs font-semibold uppercase tracking-[0.22em] ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                  About Me / Bio
+                </h2>
+              </div>
+              {editField !== "bio" && (
+                <button
+                  onClick={() => handleEdit("bio", profile.bio || "")}
+                  className="text-emerald-500 hover:text-emerald-600 p-1"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {editField === "bio" ? (
+              <div className="space-y-3">
+                <textarea
+                  value={editValue}
+                  onChange={e => setEditValue(e.target.value)}
+                  placeholder="Add your bio to help viewers understand what you do."
+                  className={`px-3 py-2 text-sm border focus:outline-none w-full h-32 resize-none ${inputBg}`}
+                  style={{ borderRadius: '2px' }}
+                />
+                <div className="flex justify-between items-center text-xs">
+                  <span className={`${
+                    (editValue || "").trim().split(/\s+/).filter(Boolean).length > 100 
+                      ? 'text-red-500 font-bold' 
+                      : 'text-gray-400'
+                  }`}>
+                    {(editValue || "").trim().split(/\s+/).filter(Boolean).length} / 100 words
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleSave("bio")}
+                      disabled={isSavingProfile || (editValue || "").trim().split(/\s+/).filter(Boolean).length > 100}
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 text-xs font-bold uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ borderRadius: '2px' }}
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={handleCancel}
+                      className={`px-3 py-2 text-xs font-bold uppercase border ${darkMode ? 'border-gray-700 text-gray-300' : 'border-gray-250 text-gray-600'}`}
+                      style={{ borderRadius: '2px' }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+                {(editValue || "").trim().split(/\s+/).filter(Boolean).length > 100 && (
+                  <p className="text-[10px] text-red-500 font-semibold mt-1">Bio cannot exceed 100 words.</p>
+                )}
+              </div>
+            ) : (
+              <p className={`text-sm leading-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                {profile.bio || "Add your bio to help viewers understand what you do."}
+              </p>
+            )}
+          </div>
+
+          {/* Operating Areas Card */}
+          {profile.roles?.includes('service_provider') && isRealEstate && (
+            <div 
+              className={`group p-6 border shadow-sm transition-all duration-350 hover:-translate-y-0.5 hover:shadow-md ${
+                darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700/60' : 'bg-white border-gray-200 hover:border-emerald-300'
+              }`} 
+              style={{ borderRadius: '2px' }}
+            >
+              <div className="flex items-center justify-between mb-4 border-b pb-3 dark:border-gray-800">
+                <div className="flex items-center gap-2">
+                  <Compass className="w-5 h-5 text-emerald-500" />
+                  <h2 className={`text-xs font-semibold uppercase tracking-[0.22em] ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                    Operating Areas
+                  </h2>
+                </div>
+              </div>
+
+              {/* List of areas */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {(profile.operating_areas || []).map((area, idx) => (
+                  <span 
+                    key={idx}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs border ${borderColor} ${
+                      darkMode ? 'bg-gray-950 text-gray-300' : 'bg-gray-50 text-gray-700'
+                    }`}
+                    style={{ borderRadius: '2px' }}
+                  >
+                    {area}
+                    {canEdit() && (
+                      <button
+                        onClick={() => handleRemoveOperatingArea(area)}
+                        className="hover:text-red-500 transition-colors p-0.5"
+                        title="Remove area"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </span>
+                ))}
+                {(profile.operating_areas || []).length === 0 && (
+                  <p className={`text-xs italic ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                    No custom operating areas added. (Default: {profile.address?.district || 'None'})
+                  </p>
+                )}
+              </div>
+
+              {/* Add Area Section */}
+              {canEdit() && (
+                <div className="space-y-4">
+                  {showAddAreaInput ? (
+                    <div className="space-y-3 max-w-md">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        {/* Province Select */}
+                        <div>
+                          <label className="block text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1">Province</label>
+                          <RwandaLocationSelector
+                            level="province"
+                            value={newAreaProvince}
+                            onChange={(val) => {
+                              setNewAreaProvince(val);
+                              setNewAreaDistrict("");
+                              setNewAreaSector("");
+                            }}
+                            darkMode={darkMode}
+                          />
+                        </div>
+
+                        {/* District Select */}
+                        <div>
+                          <label className="block text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1">District</label>
+                          <RwandaLocationSelector
+                            level="district"
+                            value={newAreaDistrict}
+                            parentValues={{ province: newAreaProvince }}
+                            onChange={(val) => {
+                              setNewAreaDistrict(val);
+                              setNewAreaSector("");
+                            }}
+                            darkMode={darkMode}
+                          />
+                        </div>
+
+                        {/* Sector Select */}
+                        <div>
+                          <label className="block text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1">Sector</label>
+                          <RwandaLocationSelector
+                            level="sector"
+                            value={newAreaSector}
+                            parentValues={{ district: newAreaDistrict }}
+                            onChange={(val) => {
+                              setNewAreaSector(val);
+                            }}
+                            darkMode={darkMode}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleAddOperatingArea}
+                          disabled={isSavingArea || !newAreaProvince || !newAreaDistrict || !newAreaSector}
+                          className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 text-xs font-bold uppercase tracking-wider disabled:opacity-50"
+                          style={{ borderRadius: '2px' }}
+                        >
+                          Add Area
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowAddAreaInput(false);
+                            setNewAreaProvince("");
+                            setNewAreaDistrict("");
+                            setNewAreaSector("");
+                          }}
+                          className={`px-3 py-1.5 text-xs font-bold uppercase border ${
+                            darkMode ? 'border-gray-700 text-gray-300' : 'border-gray-250 text-gray-650'
+                          }`}
+                          style={{ borderRadius: '2px' }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowAddAreaInput(true)}
+                      className="text-xs font-semibold text-emerald-500 hover:text-emerald-600 flex items-center gap-1 uppercase tracking-wider"
+                    >
+                      + Add Operating Area
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Real Estate Property Specialization */}
+          {profile.roles?.includes('service_provider') && isRealEstate && (
+            <div 
+              className={`group p-6 border shadow-sm transition-all duration-355 hover:-translate-y-0.5 hover:shadow-md ${
+                darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700/60' : 'bg-white border-gray-200 hover:border-emerald-300'
+              }`} 
+              style={{ borderRadius: '2px' }}
+            >
+              <div className="flex items-center gap-2 mb-4 border-b pb-3 border-gray-200 dark:border-gray-800">
+                <Building2 className="w-5 h-5 text-emerald-500" />
+                <h2 className={`text-xs font-semibold uppercase tracking-[0.22em] ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                  Property Specializations
+                </h2>
+              </div>
+
+              {editSpecializationMode ? (
+                <div className="space-y-4">
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider font-bold">
+                    Select the types of properties you handle:
+                  </p>
+
+                  <div className="space-y-2.5">
+                    {propertyCategories.map((category) => {
+                      const isChecked = tempSpecializations.includes(category);
+                      return (
+                        <label key={category} className="flex items-center gap-3 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            disabled={isSavingSpecialization}
+                            onChange={() => handleToggleTempSpecialization(category)}
+                            className="w-4 h-4 text-emerald-500 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 dark:focus:ring-emerald-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-750 dark:border-gray-650 cursor-pointer"
+                          />
+                          <span className={`text-sm font-semibold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            {category}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex gap-2 pt-3 border-t dark:border-gray-800">
+                    <button
+                      onClick={handleSaveSpecializations}
+                      disabled={isSavingSpecialization}
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider"
+                      style={{ borderRadius: '2px' }}
+                    >
+                      Save Specializations
+                    </button>
+                    <button
+                      onClick={cancelEditSpecialization}
+                      className={`px-4 py-2 text-xs font-bold uppercase border ${darkMode ? 'border-gray-700 text-gray-300' : 'border-gray-250 text-gray-655'}`}
+                      style={{ borderRadius: '2px' }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="space-y-2.5">
+                    {propertyCategories.map((category) => {
+                      const isChecked = (profile.specializations || []).includes(category);
+                      return (
+                        <label key={category} className="flex items-center gap-3 cursor-not-allowed select-none opacity-80">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            disabled={true}
+                            className="w-4 h-4 text-emerald-500 bg-gray-100 border-gray-300 rounded focus:ring-emerald-500 dark:focus:ring-emerald-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-750 dark:border-gray-650 cursor-not-allowed"
+                          />
+                          <span className={`text-sm font-semibold uppercase tracking-wider ${isChecked ? (darkMode ? 'text-gray-300' : 'text-gray-700') : (darkMode ? 'text-gray-600' : 'text-gray-400')}`}>
+                            {category}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex justify-end pt-3 border-t dark:border-gray-800">
+                    <button
+                      onClick={startEditSpecialization}
+                      className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider border border-emerald-500/20 text-emerald-500 px-3 py-1.5 hover:bg-emerald-500 hover:text-white transition-all"
+                      style={{ borderRadius: '2px' }}
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      Edit Specializations
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Service Provider Select Block */}
           {profile.roles?.includes('service_provider') && (
-            <div className={`border p-6 shadow-sm ${cardBg}`} style={{ borderRadius: '2px' }}>
+            <div 
+              className={`group p-6 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+                darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700/60' : 'bg-white border-gray-200 hover:border-emerald-300'
+              }`} 
+              style={{ borderRadius: '2px' }}
+            >
               <div className="flex items-center gap-2 mb-4 border-b pb-3 border-gray-200 dark:border-gray-800">
                 <Briefcase className="w-5 h-5 text-emerald-500" />
-                <h2 className="text-sm font-bold uppercase tracking-wider">Service Configuration</h2>
+                <h2 className={`text-xs font-semibold uppercase tracking-[0.22em] ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                  Service Configuration
+                </h2>
               </div>
               
               {showServiceField ? (
@@ -521,10 +997,17 @@ export default function ProfilePage() {
           )}
 
           {/* Account Profile Fields */}
-          <div className={`border p-6 shadow-sm ${cardBg}`} style={{ borderRadius: '2px' }}>
+          <div 
+            className={`group p-6 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+              darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700/60' : 'bg-white border-gray-200 hover:border-emerald-300'
+            }`} 
+            style={{ borderRadius: '2px' }}
+          >
             <div className="flex items-center gap-2 mb-6 border-b pb-3 border-gray-200 dark:border-gray-800">
               <User className="w-5 h-5 text-emerald-500" />
-              <h2 className="text-sm font-bold uppercase tracking-wider">Account Information</h2>
+              <h2 className={`text-xs font-semibold uppercase tracking-[0.22em] ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                Account Information
+              </h2>
             </div>
             
             <div className="space-y-5">
@@ -570,6 +1053,51 @@ export default function ProfilePage() {
                   </button>
                 )}
               </div>
+
+              {/* Business Name */}
+              {(profile.roles?.includes('seller') || profile.roles?.includes('service_provider')) && (
+                <div className="flex justify-between items-start gap-4 border-t pt-4 dark:border-gray-800">
+                  <div className="flex-1">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Business Name</label>
+                    {editField === "business_name" ? (
+                      <div className="flex gap-2 max-w-md">
+                        <input
+                          type="text"
+                          value={editValue}
+                          onChange={e => setEditValue(e.target.value)}
+                          className={`px-3 py-2 text-sm border focus:outline-none w-full ${inputBg}`}
+                          style={{ borderRadius: '2px' }}
+                        />
+                        <button
+                          onClick={() => handleSave("business_name")}
+                          disabled={isSavingProfile}
+                          className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 text-xs font-bold uppercase tracking-wider"
+                          style={{ borderRadius: '2px' }}
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={handleCancel}
+                          className={`px-3 py-2 text-xs font-bold uppercase border ${darkMode ? 'border-gray-700 text-gray-300' : 'border-gray-250 text-gray-650'}`}
+                          style={{ borderRadius: '2px' }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-sm font-medium">{profile.business_name || "None"}</div>
+                    )}
+                  </div>
+                  {editField !== "business_name" && (
+                    <button
+                      onClick={() => handleEdit("business_name", profile.business_name || "")}
+                      className="text-emerald-500 hover:text-emerald-600 p-1"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Phone Number */}
               <div className="flex justify-between items-start gap-4 border-t pt-4 dark:border-gray-800">
@@ -670,34 +1198,145 @@ export default function ProfilePage() {
           </div>
 
           {/* Address Details */}
-          <div className={`border p-6 shadow-sm ${cardBg}`} style={{ borderRadius: '2px' }}>
+          {!isRealEstate && (
+            <div 
+              className={`group p-6 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+                darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700/60' : 'bg-white border-gray-200 hover:border-emerald-300'
+              }`} 
+              style={{ borderRadius: '2px' }}
+            >
             <div className="flex items-center gap-2 mb-6 border-b pb-3 border-gray-200 dark:border-gray-800">
               <MapPin className="w-5 h-5 text-emerald-500" />
-              <h2 className="text-sm font-bold uppercase tracking-wider">Address Details</h2>
+              <h2 className={`text-xs font-semibold uppercase tracking-[0.22em] ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                Address Details
+              </h2>
             </div>
             
             {editAddressMode ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(addressFields).map(([field, value]) => (
-                  <div key={field}>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1 capitalize">
-                      {field.replace('_', ' ')}
-                    </label>
-                    <input
-                      type="text"
-                      value={value}
-                      onChange={(e) =>
-                        setAddressFields(prev => ({
-                          ...prev,
-                          [field]: e.target.value
-                        }))
-                      }
-                      className={`px-3 py-2 text-sm border focus:outline-none w-full ${inputBg}`}
-                      style={{ borderRadius: '2px' }}
-                      placeholder={`Enter ${field.replace('_', ' ')}`}
-                    />
-                  </div>
-                ))}
+                {/* Province */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                    Province
+                  </label>
+                  <RwandaLocationSelector
+                    level="province"
+                    value={addressFields.province}
+                    onChange={(val) => {
+                      setAddressFields(prev => ({
+                        ...prev,
+                        province: val,
+                        district: "",
+                        sector: "",
+                        cell: "",
+                        village: ""
+                      }));
+                    }}
+                    darkMode={darkMode}
+                  />
+                </div>
+
+                {/* District */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                    District
+                  </label>
+                  <RwandaLocationSelector
+                    level="district"
+                    value={addressFields.district}
+                    parentValues={{ province: addressFields.province }}
+                    onChange={(val) => {
+                      setAddressFields(prev => ({
+                        ...prev,
+                        district: val,
+                        sector: "",
+                        cell: "",
+                        village: ""
+                      }));
+                    }}
+                    darkMode={darkMode}
+                  />
+                </div>
+
+                {/* Sector */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                    Sector
+                  </label>
+                  <RwandaLocationSelector
+                    level="sector"
+                    value={addressFields.sector}
+                    parentValues={{ district: addressFields.district }}
+                    onChange={(val) => {
+                      setAddressFields(prev => ({
+                        ...prev,
+                        sector: val,
+                        cell: "",
+                        village: ""
+                      }));
+                    }}
+                    darkMode={darkMode}
+                  />
+                </div>
+
+                {/* Cell */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                    Cell
+                  </label>
+                  <RwandaLocationSelector
+                    level="cell"
+                    value={addressFields.cell}
+                    parentValues={{ sector: addressFields.sector }}
+                    onChange={(val) => {
+                      setAddressFields(prev => ({
+                        ...prev,
+                        cell: val,
+                        village: ""
+                      }));
+                    }}
+                    darkMode={darkMode}
+                  />
+                </div>
+
+                {/* Village */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                    Village
+                  </label>
+                  <RwandaLocationSelector
+                    level="village"
+                    value={addressFields.village}
+                    parentValues={{ cell: addressFields.cell }}
+                    onChange={(val) => {
+                      setAddressFields(prev => ({
+                        ...prev,
+                        village: val
+                      }));
+                    }}
+                    darkMode={darkMode}
+                  />
+                </div>
+
+                {/* Known Place */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                    Known Place
+                  </label>
+                  <input
+                    type="text"
+                    value={addressFields.known_place}
+                    onChange={(e) =>
+                      setAddressFields(prev => ({
+                        ...prev,
+                        known_place: e.target.value
+                      }))
+                    }
+                    className={`px-3 py-2 text-sm border focus:outline-none w-full ${inputBg}`}
+                    style={{ borderRadius: '2px' }}
+                    placeholder="Enter known place (e.g. Near Market)"
+                  />
+                </div>
                 
                 <div className="md:col-span-2 flex gap-2 pt-2 border-t dark:border-gray-800">
                   <button
@@ -721,6 +1360,10 @@ export default function ProfilePage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   <div>
+                    <label className="block text-[9px] uppercase tracking-wider text-gray-500 font-bold mb-0.5">Province</label>
+                    <div className="font-semibold">{profile.address?.province || "Not set"}</div>
+                  </div>
+                  <div>
                     <label className="block text-[9px] uppercase tracking-wider text-gray-500 font-bold mb-0.5">District</label>
                     <div className="font-semibold">{profile.address?.district || "Not set"}</div>
                   </div>
@@ -736,7 +1379,7 @@ export default function ProfilePage() {
                     <label className="block text-[9px] uppercase tracking-wider text-gray-500 font-bold mb-0.5">Village</label>
                     <div className="font-semibold">{profile.address?.village || "Not set"}</div>
                   </div>
-                  <div className="col-span-2 md:col-span-2">
+                  <div className="col-span-2 md:col-span-1">
                     <label className="block text-[9px] uppercase tracking-wider text-gray-500 font-bold mb-0.5">Known Place</label>
                     <div className="font-semibold">{profile.address?.known_place || "Not set"}</div>
                   </div>
@@ -755,12 +1398,20 @@ export default function ProfilePage() {
               </div>
             )}
           </div>
+          )}
 
           {/* Location & GPS */}
-          <div className={`border p-6 shadow-sm ${cardBg}`} style={{ borderRadius: '2px' }}>
+          <div 
+            className={`group p-6 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+              darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700/60' : 'bg-white border-gray-200 hover:border-emerald-300'
+            }`} 
+            style={{ borderRadius: '2px' }}
+          >
             <div className="flex items-center gap-2 mb-6 border-b pb-3 border-gray-200 dark:border-gray-800">
               <Compass className="w-5 h-5 text-emerald-500" />
-              <h2 className="text-sm font-bold uppercase tracking-wider">Geolocation Settings</h2>
+              <h2 className={`text-xs font-semibold uppercase tracking-[0.22em] ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                Geolocation Settings
+              </h2>
             </div>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-emerald-500/5 border border-emerald-500/10 p-4" style={{ borderRadius: '2px' }}>
@@ -811,11 +1462,18 @@ export default function ProfilePage() {
         <div className="space-y-6">
           
           {/* User Roles Card */}
-          <div className={`border p-6 shadow-sm ${cardBg}`} style={{ borderRadius: '2px' }}>
+          <div 
+            className={`group p-6 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+              darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700/60' : 'bg-white border-gray-200 hover:border-emerald-300'
+            }`} 
+            style={{ borderRadius: '2px' }}
+          >
             <div className="flex items-center justify-between mb-4 border-b pb-3 dark:border-gray-800">
               <div className="flex items-center gap-2">
                 <Shield className="w-5 h-5 text-emerald-500" />
-                <h2 className="text-sm font-bold uppercase tracking-wider">My Roles</h2>
+                <h2 className={`text-xs font-semibold uppercase tracking-[0.22em] ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                  My Roles
+                </h2>
               </div>
               <Link to="/account-dashboard" className="text-xs font-bold uppercase text-emerald-500 hover:underline">
                 Manage
@@ -844,10 +1502,17 @@ export default function ProfilePage() {
           </div>
 
           {/* Update Password Card */}
-          <div className={`border p-6 shadow-sm ${cardBg}`} style={{ borderRadius: '2px' }}>
+          <div 
+            className={`group p-6 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+              darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700/60' : 'bg-white border-gray-200 hover:border-emerald-300'
+            }`} 
+            style={{ borderRadius: '2px' }}
+          >
             <div className="flex items-center gap-2 mb-4 border-b pb-3 dark:border-gray-800">
               <Lock className="w-5 h-5 text-emerald-500" />
-              <h2 className="text-sm font-bold uppercase tracking-wider">Security Setting</h2>
+              <h2 className={`text-xs font-semibold uppercase tracking-[0.22em] ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                Security Setting
+              </h2>
             </div>
 
             {showPasswordForm ? (

@@ -273,10 +273,10 @@ const Login = () => {
     <div
       ref={containerRef}
       className={`min-h-screen pt-2 pb-8 p-0 transition-colors duration-300 ${
-        darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'
+        darkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'
       }`}
     >
-      <div className="w-full max-w-md mx-auto">
+      <div className="w-full max-w-md mx-auto px-0">
         {/* Back Button for Recovery */}
         {showRecovery && (
           <button
@@ -292,8 +292,8 @@ const Login = () => {
 
         {/* Main Card */}
         <div
-          className={`p-6 border transition-all duration-300 ${
-            darkMode ? 'bg-gray-800 border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
+          className={`p-0 sm:p-6 border-0 sm:border transition-all duration-300 ${
+            darkMode ? 'bg-gray-950 sm:bg-gray-900 sm:border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
           }`}
           style={{ borderRadius: '2px' }}
         >
@@ -349,7 +349,7 @@ const Login = () => {
                     placeholder="Enter your email"
                     className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
                       darkMode
-                        ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                        ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
                         : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                     } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
                     style={{ borderRadius: '2px' }}
@@ -408,7 +408,7 @@ const Login = () => {
                     placeholder="Enter your email"
                     className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
                       darkMode
-                        ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
+                        ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
                         : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                     } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
                     style={{ borderRadius: '2px' }}
@@ -431,7 +431,7 @@ const Login = () => {
                     placeholder="Enter your password"
                     className={`w-full pl-10 pr-12 py-2.5 border text-sm transition-colors ${
                       darkMode
-                        ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-555'
+                        ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-555'
                         : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
                     } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
                     style={{ borderRadius: '2px' }}

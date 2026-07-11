@@ -205,7 +205,7 @@ export default function NotificationsPage() {
             <button
                 type="button"
                 onClick={() => handleNotificationClick(notification)}
-                className="group w-full text-left transition-all duration-200 hover:shadow-md overflow-hidden bg-white dark:bg-gray-800 border-0 flex flex-col"
+                className="group w-full text-left transition-all duration-200 hover:shadow-md overflow-hidden bg-white dark:bg-gray-900 border dark:border-gray-800/60 flex flex-col"
                 style={{ borderRadius: '2px' }}
             >
                 {/* Image - takes priority, fixed small height */}
@@ -256,7 +256,7 @@ export default function NotificationsPage() {
             <button
                 type="button"
                 onClick={() => handleNotificationClick(notification)}
-                className="group w-64 flex-shrink-0 text-left transition-all duration-200 hover:shadow-md overflow-hidden bg-white dark:bg-gray-800 border-0 flex flex-col"
+                className="group w-64 flex-shrink-0 text-left transition-all duration-200 hover:shadow-md overflow-hidden bg-white dark:bg-gray-900 border dark:border-gray-800/60 flex flex-col"
                 style={{ borderRadius: '2px' }}
             >
                 <div className="relative h-32 overflow-hidden bg-gray-100 dark:bg-gray-700">
@@ -378,7 +378,7 @@ export default function NotificationsPage() {
 
     if (loading) {
         return (
-            <div className={`w-full min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+            <div className={`w-full min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
                 <div className="max-w-7xl mx-auto px-4 py-16">
                     <LoadingSpinner size="lg" message="Loading updates..." variant="dots" />
                 </div>
@@ -387,7 +387,7 @@ export default function NotificationsPage() {
     }
 
     return (
-        <div className={`w-full min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className={`w-full min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
             <div className="max-w-7xl mx-auto px-4 py-6">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-800">

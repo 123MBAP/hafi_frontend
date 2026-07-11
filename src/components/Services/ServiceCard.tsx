@@ -13,11 +13,11 @@ export default function ServiceCard({ service, darkMode }: ServiceCardProps) {
 
   return (
   <div
-      className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-md flex flex-col h-full ${darkMode ? 'bg-gray-800' : 'bg-white'} border-0 shadow-sm`}
+      className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-md flex flex-col h-full ${darkMode ? 'bg-gray-900' : 'bg-white'} border-0 shadow-sm`}
       style={{ borderRadius: '2px' }}
     >
       {/* Image section - fixed height */}
-      <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-700">
+      <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-800">
         <img
           src={service.image}
           alt={service.title}

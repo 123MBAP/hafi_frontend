@@ -17,6 +17,7 @@ interface RwandaLocationSelectorProps {
     onChange?: (value: string) => void;
     parentValues?: any;
     darkMode?: boolean;
+    className?: string;
 }
 
 const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
@@ -24,7 +25,8 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
     value,
     onChange,
     parentValues,
-    darkMode = false
+    darkMode = false,
+    className = "",
 }) => {
     const [provinces, setProvinces] = useState<LocationOption[]>([]);
     const [districts, setDistricts] = useState<LocationOption[]>([]);
@@ -311,10 +313,10 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
 
     // Controlled mode - render single dropdown for specific level
     if (level) {
-        const baseSelectClass = `w-full px-4 py-2 border ${darkMode
-            ? 'bg-gray-700 border-gray-600 focus:border-emerald-500 text-white disabled:bg-gray-800 disabled:text-gray-500'
-            : 'bg-white border-gray-300 focus:border-emerald-500 disabled:bg-gray-100 disabled:text-gray-400'
-            } focus:ring-2 focus:ring-emerald-500/20 transition disabled:cursor-not-allowed`;
+        const baseSelectClass = `w-full px-3 py-1.5 border text-sm ${darkMode
+            ? 'bg-gray-950 border-gray-800 focus:border-emerald-500 text-white disabled:bg-gray-900/50 disabled:text-gray-600'
+            : 'bg-gray-100 border-gray-300 focus:border-emerald-500 disabled:bg-gray-100 disabled:text-gray-400'
+            } focus:ring-1 focus:ring-emerald-500 transition disabled:cursor-not-allowed ${className}`;
 
         switch (level) {
             case 'province':

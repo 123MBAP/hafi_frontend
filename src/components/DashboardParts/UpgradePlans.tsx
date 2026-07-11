@@ -179,12 +179,12 @@ export default function UpgradePlans() {
     });
   }, [adminPlans, userPlanInfo, user]);
 
-  const pageBg = darkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900";
-  const cardBase = darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200";
+  const pageBg = darkMode ? "bg-gray-950 text-white" : "bg-gray-50 text-gray-900";
+  const cardBase = darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
   const mutedText = darkMode ? "text-gray-300" : "text-gray-600";
   const subText = darkMode ? "text-gray-400" : "text-gray-500";
   const inputBase = darkMode
-    ? "bg-gray-900 border-gray-700 text-white placeholder:text-gray-500 focus:border-emerald-500 focus:ring-emerald-500/20"
+    ? "bg-gray-950 border-gray-700 text-white placeholder:text-gray-500 focus:border-emerald-500 focus:ring-emerald-500/20"
     : "bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-emerald-600 focus:ring-emerald-600/20";
   const buttonPrimary = darkMode
     ? "bg-emerald-600 hover:bg-emerald-500 text-white"
@@ -356,7 +356,7 @@ export default function UpgradePlans() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'}`}>
+      <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-800'}`}>
         <div className="text-center py-16">
           <LoadingSpinner size="lg" message="Loading plans..." variant="dots" />
         </div>
@@ -590,14 +590,14 @@ export default function UpgradePlans() {
                               {storagePricing.available_units.map(unit => <option key={unit} value={unit}>{unit}</option>)}
                             </select>
                           </div>
-                          <div className="p-3 border border-gray-150 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30" style={{ borderRadius: '2px' }}>
+                          <div className="p-3 border border-gray-150 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-950/30" style={{ borderRadius: '2px' }}>
                             <div className={`text-sm ${mutedText}`}>Price: {storagePricing.price_per_gb_rwf.toLocaleString()} RWF/GB</div>
                             <div className={`text-xs ${subText} mt-1`}>Min: {formatStorage(storagePricing.min_purchase_gb)}</div>
                           </div>
                         </div>
 
                         <div>
-                          <div className="p-4 border border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/20 dark:bg-gray-900/10" style={{ borderRadius: '2px' }}>
+                          <div className="p-4 border border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/20 dark:bg-gray-950/10" style={{ borderRadius: '2px' }}>
                             <h3 className="text-sm font-semibold mb-3">Summary</h3>
                             {(() => {
                               const addedGb = convertToGB(storageAmount, storageUnit);
@@ -761,7 +761,7 @@ export default function UpgradePlans() {
 
             <div className="space-y-4">
               {/* Plan Summary */}
-              <div className="p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/30" style={{ borderRadius: '2px' }}>
+              <div className="p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-950/30" style={{ borderRadius: '2px' }}>
                 <div className="flex justify-between text-sm py-1">
                   <span className="font-semibold">{selectedPlanForRenewal.display_name} Plan:</span>
                   <span>{selectedPlanForRenewal.monthly_fee.toLocaleString()} RWF</span>
@@ -815,7 +815,7 @@ export default function UpgradePlans() {
                 </div>
 
                 {isAddingMoreStorage && (
-                  <div className="flex gap-2 p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-900/20" style={{ borderRadius: '2px' }}>
+                  <div className="flex gap-2 p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-950/20" style={{ borderRadius: '2px' }}>
                     <div className="flex-1">
                       <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${subText}`}>Extra Storage</label>
                       <input
@@ -843,7 +843,7 @@ export default function UpgradePlans() {
                 )}
 
                 {isReducingStorage && (
-                  <div className="flex gap-2 p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-900/20" style={{ borderRadius: '2px' }}>
+                  <div className="flex gap-2 p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-950/20" style={{ borderRadius: '2px' }}>
                     <div className="flex-1">
                       <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${subText}`}>Amount to Remove</label>
                       <input

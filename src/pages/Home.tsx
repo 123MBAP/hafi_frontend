@@ -353,7 +353,7 @@ const HomePage = () => {
     
     return (
       <Link to={`/services/${service.id}`} className="block h-full group">
-        <div className="h-full bg-white dark:bg-gray-800 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden" style={{ borderRadius: '2px' }}>
+        <div className="h-full bg-white dark:bg-gray-900 border dark:border-gray-800/60 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden" style={{ borderRadius: '2px' }}>
           <div className={`${cardHeight} overflow-hidden`}>
             <img 
               src={service.image || 'https://via.placeholder.com/400x300?text=Service'} 
@@ -410,7 +410,7 @@ const HomePage = () => {
     return (
       <button
         onClick={handleClick}
-        className="w-full h-full text-left group relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 flex flex-col"
+        className="w-full h-full text-left group relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900 border dark:border-gray-800/60 flex flex-col"
         style={{ borderRadius: '2px' }}
       >
         <div className={`${cardHeight} overflow-hidden relative`}>
@@ -604,7 +604,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'}`}>
+    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-55 text-gray-800'}`}>
       
       {/* Hero Section */}
       <section
@@ -678,7 +678,7 @@ const HomePage = () => {
             { title: 'Contact Instantly', desc: 'Message or call providers directly. Get quick answers without leaving.' },
             { title: 'Review & Trust', desc: 'Read authentic reviews and make informed decisions.' }
           ].map((item, i) => (
-            <div key={i} className="bg-white dark:bg-gray-800 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all" style={{ borderRadius: '2px' }}>
+            <div key={i} className="bg-white dark:bg-gray-900 border dark:border-gray-800/60 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all" style={{ borderRadius: '2px' }}>
               <h3 className="text-base sm:text-lg font-bold mb-2 text-gray-900 dark:text-white">{item.title}</h3>
               <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
             </div>
@@ -706,7 +706,7 @@ const HomePage = () => {
         <div className="flex justify-center mt-12">
           <Link
             to="/services"
-            className="px-8 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+            className="px-8 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
             style={{ borderRadius: '2px' }}
           >
             Browse All Services →
@@ -715,7 +715,7 @@ const HomePage = () => {
       </section>
 
       {/* Fresh Picks - Completely unpredictable */}
-      <section className="container mx-auto px-4 py-8 bg-white dark:bg-gray-800/50">
+      <section className="container mx-auto px-4 py-8 bg-white dark:bg-gray-900/30">
         <div className="mb-4">
           <h2 className="text-3xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase">
             Fresh Picks
@@ -775,7 +775,7 @@ const HomePage = () => {
               desc: 'Track the order or service outcome and complete delivery through the same platform.',
             },
           ].map((item) => (
-            <div key={item.step} className="bg-white dark:bg-gray-800 p-4 shadow-sm hover:shadow-md transition-all h-full" style={{ borderRadius: '2px' }}>
+            <div key={item.step} className="bg-white dark:bg-gray-900 border dark:border-gray-800/60 p-4 shadow-sm hover:shadow-md transition-all h-full" style={{ borderRadius: '2px' }}>
               <div className="inline-flex items-center justify-center w-9 h-9 mb-3 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold text-xs" style={{ borderRadius: '2px' }}>
                 {item.step}
               </div>

@@ -71,6 +71,7 @@ interface Provider {
     village?: string;
     known_place?: string;
   };
+  bio?: string;
 }
 
 interface ProviderImage {
@@ -114,6 +115,7 @@ export default function ProviderDetail() {
   const [customerId, setCustomerId] = useState<string>('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isContactCollapsed, setIsContactCollapsed] = useState(false);
+  const [isBioExpanded, setIsBioExpanded] = useState(false);
 
   const bgColor = darkMode ? 'bg-gray-900' : 'bg-gray-50';
   const cardBg = darkMode ? 'bg-gray-800' : 'bg-white';
@@ -442,6 +444,27 @@ export default function ProviderDetail() {
                 }
                 return null;
               })()}
+
+              {/* Bio */}
+              {provider.bio && (
+                <div className={`mt-4 pt-4 border-t ${borderColor} text-xs leading-relaxed`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileText className="w-4 h-4 text-emerald-500" />
+                    <span className={`text-xs font-medium uppercase ${mutedText}`}>About Provider</span>
+                  </div>
+                  <p className={`${
+                    isBioExpanded ? '' : 'line-clamp-4'
+                  } ${textColor}`}>
+                    {provider.bio}
+                  </p>
+                  <button
+                    onClick={() => setIsBioExpanded(!isBioExpanded)}
+                    className="text-emerald-500 hover:text-emerald-600 font-bold mt-1 text-[10px] uppercase tracking-wider block"
+                  >
+                    {isBioExpanded ? 'View Less' : 'View More'}
+                  </button>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="mt-6 pt-4 border-t ${borderColor} space-y-2">

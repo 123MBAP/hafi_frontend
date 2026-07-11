@@ -140,7 +140,7 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
 
   return (
     <header
-      className={`sticky top-0 z-50 shadow-md transition-colors duration-300 overflow-visible ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}
+      className={`sticky top-0 z-50 shadow-md transition-colors duration-300 overflow-visible ${darkMode ? 'bg-gray-950 text-white' : 'bg-white text-gray-800'}`}
       style={{ "--navbar-height": `${NAVBAR_HEIGHT}px` } as React.CSSProperties}
     >
 
@@ -157,7 +157,8 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
         {/* Search Bar */}
         <div className="flex-grow max-w-2xl mx-8 relative">
           <form onSubmit={handleSearchSubmit} className="relative">
-            <div className={`flex items-center border rounded-lg px-4 py-1 shadow-sm transition-colors duration-300 ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-gray-50'}`}>
+            <div className={`flex items-center border rounded-lg px-4 py-1 shadow-sm transition-colors duration-300 
+              ${darkMode ? 'border-gray-800 bg-gray-950' : 'border-gray-300 bg-gray-50'}`}>
               <input
                 type="text"
                 placeholder="Search services, products..."
@@ -278,7 +279,7 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
       </div>
 
       {/* Desktop secondary navigation row (full-width) */}
-      <div className={`hidden md:block border-t ${darkMode ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'}`}>
+      <div className={`hidden md:block border-t ${darkMode ? 'border-gray-800 bg-gray-950' : 'border-gray-200 bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-6 text-sm overflow-x-auto">
             <Link to="/" className={`mt-2 mb-1 font-medium transition-colors ${isActive('/')}`}>Home</Link>
@@ -317,7 +318,7 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
       <div className="md:hidden">
         {/* Unified Mobile Header */}
         <div className={`flex flex-col gap-0 px-4 pt-3 pb-3 transition-colors duration-300
-          ${darkMode ? 'bg-gray-900 border-b border-gray-800' : 'bg-white border-b border-gray-200'}
+          ${darkMode ? 'bg-gray-950 border-b border-gray-800' : 'bg-white border-b border-gray-200'}
           rounded-b-xl shadow-md relative`} // Card look
           style={{ minHeight: `${NAVBAR_HEIGHT}px` }}
         >
@@ -390,7 +391,7 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
         <div
           className={`fixed left-0 w-3/4 h-full z-50 shadow-xl transition-transform duration-300 ease-in-out
             ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-            ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}
+            ${darkMode ? 'bg-gray-950 text-white' : 'bg-white text-gray-800'}`}
           style={{ top: `${NAVBAR_HEIGHT}px` }} // Offset so header is always visible
         >
           <div className="flex justify-between items-center p-4 border-b">
