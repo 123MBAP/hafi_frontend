@@ -60,7 +60,6 @@ import VerifyEmailForm from './pages/VerifyEmailForm';
 import Wallet from './pages/Wallet';
 import About from './pages/About';
 import Contact from './pages/Contact';
-import FAQ from './pages/FAQ';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
 
 
@@ -102,7 +101,6 @@ const App: React.FC = () => {
               <Route path="/services" element={<Services />} />
               <Route path="/about-haficonnect" element={<About />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/faq" element={<FAQ />} />
               <Route path="/search" element={<Search />} />
               <Route path="/book/payment" element={<PaymentPage />} />
               <Route path="/market" element={<MarketPage />} />
@@ -141,7 +139,7 @@ const App: React.FC = () => {
               <Route path="/verify-email" element={<VerifyEmailAuto />} />
               <Route path="/product/:productId" element={<MarketProductDetil />} />
               <Route path="/made-in-rwanda/product/:productId" element={<MadeInRwandaProductDetail />} />
-              
+
               <Route path="/practice" element={<PracticePage />} />
               <Route path="/statements" element={<CustomerStatements />} />
 
@@ -189,7 +187,7 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 } />
                 <Route path="orders" element={
-                  <ProtectedRoute allowedRoles={['service_provider','seller']}>
+                  <ProtectedRoute allowedRoles={['service_provider', 'seller']}>
                     <ProviderOrdersPage />
                   </ProtectedRoute>
                 } />
@@ -237,8 +235,8 @@ const App: React.FC = () => {
 
 
         <footer className={`py-12 mt-auto border-t transition-colors duration-300
-          ${darkMode 
-            ? 'bg-gray-950 text-gray-400 border-gray-800' 
+          ${darkMode
+            ? 'bg-gray-950 text-gray-400 border-gray-800'
             : 'bg-white text-gray-600 border-gray-200'}`}>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -344,7 +342,7 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-8 lg:col-span-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <h4 className={`font-bold mb-3 text-sm uppercase tracking-wider ${darkMode ? 'text-white' : 'text-emerald-700'}`}>Quick Links</h4>
                   <ul className="space-y-2 text-sm">
@@ -362,8 +360,12 @@ const App: React.FC = () => {
                   <p className={`text-sm mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     Phone: <a href="tel:+250791689396" className="hover:text-emerald-500 transition-colors">+250 791 689 396</a>
                   </p>
+
                 </div>
+
               </div>
+
+
             </div>
           </div>
 
