@@ -422,7 +422,7 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
             <Link to="/real-estate" className={`px-4 py-3 rounded-md transition-colors ${isActive('/real-estate')} ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} onClick={closeMenu}>Real Estate</Link>
             <Link to="/real-estate/commissioners" className={`px-4 py-3 rounded-md transition-colors ${isActive('/real-estate/commissioners')} ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} onClick={closeMenu}>Commissioners</Link>
             <Link to="/updates" className={`px-4 py-3 rounded-md transition-colors ${isActive('/updates')} ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} onClick={closeMenu}>Updates</Link>
-            <Link to="/orders" className={`mt-2 mb-1 font-medium transition-colors ${isActive('/orders')}`}>My Orders</Link>
+            <Link to="/orders" className={`px-4 py-3 rounded-md transition-colors ${isActive('/orders')} ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} onClick={closeMenu}>My Orders</Link>
             <Link to="/customer-feedbacks" className={`px-4 py-3 rounded-md transition-colors ${isActive('/customer-feedbacks')} ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`} onClick={closeMenu}>Customer Feedbacks</Link>
             {isLoggedIn ? (
               <>
