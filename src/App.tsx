@@ -58,6 +58,9 @@ import Updates from './pages/UpdatesPage';
 import VerifyEmailAuto from './pages/VerifyEmailAuto';
 import VerifyEmailForm from './pages/VerifyEmailForm';
 import Wallet from './pages/Wallet';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import FAQ from './pages/FAQ';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
 
 
@@ -97,6 +100,9 @@ const App: React.FC = () => {
               <Route path="/agent/login" element={<AgentLogin />} />
               <Route path="/agent/register" element={<AgentRegister />} />
               <Route path="/services" element={<Services />} />
+              <Route path="/about-haficonnect" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/faq" element={<FAQ />} />
               <Route path="/search" element={<Search />} />
               <Route path="/book/payment" element={<PaymentPage />} />
               <Route path="/market" element={<MarketPage />} />
@@ -338,24 +344,25 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <h4 className={`font-bold mb-3 text-sm uppercase tracking-wider ${darkMode ? 'text-white' : 'text-emerald-700'}`}>Quick Links</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><a href="/about" className="hover:text-emerald-500 transition-colors">About Us</a></li>
-                  <li><a href="/contact" className="hover:text-emerald-500 transition-colors">Contact</a></li>
-                  <li><a href="/faq" className="hover:text-emerald-500 transition-colors">FAQs</a></li>
-                </ul>
-              </div>
+              <div className="grid grid-cols-2 gap-8 lg:col-span-2">
+                <div>
+                  <h4 className={`font-bold mb-3 text-sm uppercase tracking-wider ${darkMode ? 'text-white' : 'text-emerald-700'}`}>Quick Links</h4>
+                  <ul className="space-y-2 text-sm">
+                    <li><a href="/about-haficonnect" className="hover:text-emerald-500 transition-colors">About Us</a></li>
+                    <li><a href="/contact" className="hover:text-emerald-500 transition-colors">Contact</a></li>
+                    <li><a href="/faq" className="hover:text-emerald-500 transition-colors">FAQs</a></li>
+                  </ul>
+                </div>
 
-              <div>
-                <h4 className={`font-bold mb-3 text-sm uppercase tracking-wider ${darkMode ? 'text-white' : 'text-emerald-700'}`}>Contact</h4>
-                <p className={`text-sm mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  Email: <a href="mailto:support@haficonnect.com" className="hover:text-emerald-500 transition-colors">support@haficonnect.com</a>
-                </p>
-                <p className={`text-sm mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  Phone: <a href="tel:+1234567890" className="hover:text-emerald-500 transition-colors">+1 (234) 567-890</a>
-                </p>
-        
+                <div>
+                  <h4 className={`font-bold mb-3 text-sm uppercase tracking-wider ${darkMode ? 'text-white' : 'text-emerald-700'}`}>Contact</h4>
+                  <p className={`text-sm mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    Email: <a href="mailto:info@haficonnect.com" className="hover:text-emerald-500 transition-colors">info@haficonnect.com</a>
+                  </p>
+                  <p className={`text-sm mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    Phone: <a href="tel:+250791689396" className="hover:text-emerald-500 transition-colors">+250 791 689 396</a>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
