@@ -677,7 +677,7 @@ export default function AccountDashboard() {
                                 className="px-2 py-0.5 text-[9px] font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200"
                                 style={{ borderRadius: '2px' }}
                               >
-                                EXPIRED
+                                UNRENEWED STORAGE PLAN
                               </span>
                             )}
                             {storage.breakdown.purchasedStorageStatus === 'active' && (
@@ -1031,7 +1031,7 @@ export default function AccountDashboard() {
                             }`}
                           style={{ borderRadius: '2px' }}
                         >
-                          {storage.breakdown.purchasedStorageStatus || 'N/A'}
+                          {storage.breakdown.purchasedStorageStatus === 'expired' ? 'unrenewed storage plan' : (storage.breakdown.purchasedStorageStatus || 'N/A')}
                         </span>
                       </div>
                     </div>

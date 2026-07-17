@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import ImageCarouselCard from '@/pages/ImageCarouselCard';
 import { ServiceFeature } from '@/types/features';
 import { Loader2 } from 'lucide-react';
@@ -7,6 +8,16 @@ import FeatureFieldRenderer from './FeatureFieldRenderer';
 type MediaType = 'product' | 'service';
 
 type FileType = 'image' | 'video' | 'mixed';
+
+const PRICING_UNITS = [
+  { value: 'Per Item / Piece', label: 'Per Item / Piece (e.g., clothes, electronics, single objects)' },
+  { value: 'Per Kilogram (kg)', label: 'Per Kilogram (kg) (e.g., vegetables, meat, flour)' },
+  { value: 'Per Liter (L)', label: 'Per Liter (L) (e.g., drinks, oils, liquid chemicals)' },
+  { value: 'Per Square Meter (m²)', label: 'Per Square Meter (m²) (e.g., flooring, carpets, land tiles)' },
+  { value: 'Per Cubic Meter (m³)', label: 'Per Cubic Meter (m³) (e.g., sand, gravel, large cargo)' },
+  { value: 'Per Meter (m)', label: 'Per Meter (m) (e.g., ropes, cables, fabrics)' },
+  { value: 'Per Pack / Dozen', label: 'Per Pack / Dozen (e.g., box bundles, multipacks)' }
+];
 
 export interface UploadedMedia {
   id: string;
@@ -19,6 +30,9 @@ export interface UploadedMedia {
   visible: boolean;
   views?: string[];
   madeInRwanda?: boolean;
+  used?: boolean;
+  pricingUnit?: string;
+  inStock?: boolean;
   mediaFiles?: UploadedMedia[];
 }
 
@@ -37,6 +51,10 @@ type Props = {
   editingDesc: string;
   editingPrice: number | undefined;
   editingFeatureValues: Record<string, any>;
+  editingUsed: boolean;
+  editingPricingUnit: string;
+  setEditingUsed: (v: boolean) => void;
+  setEditingPricingUnit: (v: string) => void;
   service: { id?: string; title?: string; specific_features?: boolean; features?: ServiceFeature[] } | null;
   modalOpen: boolean;
   modalImage: string | null;
@@ -62,6 +80,7 @@ type Props = {
   setEditingDesc: (v: string) => void;
   setEditingPrice: (v: number | undefined) => void;
   setEditingFeatureValues: (v: Record<string, any>) => void;
+  onRefreshMedia?: () => void;
 };
 
 export default function MediaManagementSection({
@@ -79,6 +98,10 @@ export default function MediaManagementSection({
   editingDesc,
   editingPrice,
   editingFeatureValues,
+  editingUsed,
+  editingPricingUnit,
+  setEditingUsed,
+  setEditingPricingUnit,
   service,
   modalOpen,
   modalImage,
@@ -104,7 +127,11 @@ export default function MediaManagementSection({
   setEditingDesc,
   setEditingPrice,
   setEditingFeatureValues,
+  onRefreshMedia,
 }: Props) {
+  const [confirmStockProductId, setConfirmStockProductId] = useState<string | null>(null);
+  const [isUpdatingStock, setIsUpdatingStock] = useState(false);
+
   const resolveUrl = (url: string) => {
     if (!url) return url;
     return /^https?:\/\//i.test(url) ? url : `${apiBase}${url}`;
@@ -200,10 +227,20 @@ export default function MediaManagementSection({
                       onClick={() => openModal(item)}
                       className="focus:outline-none relative"
                     >
+                      {/* Out of Stock Badge */}
+                      {item.inStock === false && (
+                        <div 
+                          className="absolute top-2 left-10 z-35 bg-red-655 bg-red-600 text-white px-2 py-1 text-[9px] font-bold uppercase tracking-wider shadow-md"
+                          style={{ borderRadius: '2px' }}
+                        >
+                          Out of Stock
+                        </div>
+                      )}
+
                       {/* Made in Rwanda Badge */}
                       {item.madeInRwanda && (
                         <div 
-                          className="absolute top-2 left-10 z-20 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-3 py-1 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm border border-emerald-500/20"
+                          className={`absolute z-20 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-3 py-1 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm border border-emerald-500/20 ${item.inStock === false ? 'top-10' : 'top-2'} left-10`}
                           style={{ borderRadius: '2px' }}
                         >
                           🇷🇼 Made in Rwanda
@@ -310,8 +347,18 @@ export default function MediaManagementSection({
                     <div className={`text-center text-xs mb-1 px-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                       {item.desc}
                     </div>
-                    <div className="font-bold text-sm text-center text-emerald-500 mb-2">
-                      Price: ${item.price}
+                    <div className="font-bold text-sm text-center text-emerald-500 mb-2 flex items-center justify-center gap-2 flex-wrap">
+                      <span>
+                        Price: ${item.price}
+                        <span className={`text-[11px] font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} ml-1`}>
+                          / {item.pricingUnit || 'Per Item / Piece'}
+                        </span>
+                      </span>
+                      {item.used && (
+                        <span className="text-[9px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 py-0.5 font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+                          USED
+                        </span>
+                      )}
                     </div>
 
                     {/* View Video Button */}
@@ -331,10 +378,9 @@ export default function MediaManagementSection({
                     )}
 
                     {/* Undo & Spinner */}
-                    {isPendingUndo && (
+                    {isPendingUndo ? (
                       <div
-                        className={`absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 pointer-events-auto ${darkMode ? 'bg-gray-900/80' : 'bg-white/80'
-                          }`}
+                        className={`absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 pointer-events-auto ${darkMode ? 'bg-gray-900/80' : 'bg-white/80'}`}
                       >
                         <div className="flex items-center gap-2">
                           <Loader2 className="animate-spin w-4 h-4 text-red-650" />
@@ -350,31 +396,93 @@ export default function MediaManagementSection({
                           Undo
                         </button>
                       </div>
+                    ) : (
+                      <>
+                        {/* Stock Toggle Confirm Overlay */}
+                        <div className="px-4 mb-2 mt-1">
+                          {confirmStockProductId === item.id ? (
+                            <div className={`p-2 border ${darkMode ? 'border-gray-800 bg-gray-950 text-white' : 'border-gray-250 bg-gray-50 text-gray-900'} text-center space-y-2`} style={{ borderRadius: '2px' }}>
+                              <p className="text-[10px] font-bold uppercase tracking-wider">
+                                Mark as {item.inStock !== false ? 'Out of Stock' : 'In Stock'}?
+                              </p>
+                              <div className="flex gap-2 justify-center">
+                                <button
+                                  onClick={async (e) => {
+                                    e.stopPropagation();
+                                    setIsUpdatingStock(true);
+                                    try {
+                                      const token = localStorage.getItem("token");
+                                      const res = await fetch(`${apiBase}/api/media/${item.id}`, {
+                                        method: "PUT",
+                                        headers: { 
+                                          "Content-Type": "application/json",
+                                          Authorization: `Bearer ${token}` 
+                                        },
+                                        body: JSON.stringify({
+                                          inStock: !(item.inStock !== false)
+                                        })
+                                      });
+                                      if (!res.ok) throw new Error("Failed to update stock status");
+                                      onRefreshMedia?.();
+                                    } catch (e: any) {
+                                      alert(e.message);
+                                    } finally {
+                                      setIsUpdatingStock(false);
+                                      setConfirmStockProductId(null);
+                                    }
+                                  }}
+                                  disabled={isUpdatingStock}
+                                  className="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider"
+                                  style={{ borderRadius: '2px' }}
+                                >
+                                  Yes
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setConfirmStockProductId(null); }}
+                                  disabled={isUpdatingStock}
+                                  className={`px-3 py-1 border text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'bg-gray-900 border-gray-800 text-gray-300' : 'bg-white border-gray-250 text-gray-750'}`}
+                                  style={{ borderRadius: '2px' }}
+                                >
+                                  No
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setConfirmStockProductId(item.id); }}
+                              className={`w-full py-2 flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-wider transition-colors border
+                                ${item.inStock !== false ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20 border-red-500/25' : 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border-emerald-500/25'}`}
+                              style={{ borderRadius: '2px' }}
+                            >
+                              {item.inStock !== false ? 'Mark Out of Stock' : 'Mark In Stock'}
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Edit/Delete */}
+                        <div className="flex justify-center gap-2 mb-2 mt-2 z-0 px-4">
+                          <button
+                            className={`flex-1 py-1.5 font-semibold text-xs border uppercase tracking-wider transition-colors ${darkMode
+                              ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800'
+                              : 'bg-white border-gray-250 text-gray-750 hover:bg-gray-50'
+                              }`}
+                            style={{ borderRadius: '2px' }}
+                            onClick={() => startEditing(item)}
+                            disabled={isDeleting}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="flex-1 py-1.5 font-semibold text-xs uppercase tracking-wider bg-red-500 hover:bg-red-600 text-white transition-colors"
+                            style={{ borderRadius: '2px' }}
+                            onClick={() => deleteImage(item)}
+                            disabled={isDeleting}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </>
                     )}
-
-                    {/* Edit/Delete */}
-                    <div className="flex justify-center gap-2 mb-2 mt-2 z-0 px-4">
-                      <button
-                        className={`flex-1 py-1.5 font-semibold text-xs border uppercase tracking-wider transition-colors ${darkMode
-                          ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800'
-                          : 'bg-white border-gray-250 text-gray-750 hover:bg-gray-50'
-                          }`}
-                        style={{ borderRadius: '2px' }}
-                        onClick={() => startEditing(item)}
-                        disabled={isDeleting}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="flex-1 py-1.5 font-semibold text-xs uppercase tracking-wider bg-red-500 hover:bg-red-600 text-white transition-colors"
-                        style={{ borderRadius: '2px' }}
-                        onClick={() => deleteImage(item)}
-                        disabled={isDeleting}
-                      >
-                        Delete
-                      </button>
-                    </div>
-
                     {!item.visible && (
                       <div className={`text-[10px] font-bold uppercase text-center tracking-wider mb-2 ${darkMode ? 'text-red-400' : 'text-red-500'}`}>
                         Hidden from customers
@@ -668,24 +776,93 @@ export default function MediaManagementSection({
               value={editingDesc}
               onChange={(e) => setEditingDesc(e.target.value)}
             />
-            <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              Price
-            </label>
-            <input
-              className={`border p-2 w-full mb-3 text-sm ${darkMode
-                ? 'bg-gray-950 border-gray-800 text-white focus:ring-1 focus:ring-emerald-500 focus:outline-none'
-                : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500 focus:outline-none'
-                }`}
-              style={{ borderRadius: '2px' }}
-              type="number"
-              min={0}
-              value={editingPrice ?? ''}
-              onChange={(e) =>
-                setEditingPrice(
-                  e.target.value === '' ? undefined : Number(e.target.value),
-                )
-              }
-            />
+            {editingImage.type === 'product' ? (
+              <>
+                <div className="grid grid-cols-2 gap-4 mb-3">
+                  <div>
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Price
+                    </label>
+                    <input
+                      className={`border p-2 w-full text-sm ${darkMode
+                        ? 'bg-gray-950 border-gray-800 text-white focus:ring-1 focus:ring-emerald-500 focus:outline-none'
+                        : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500 focus:outline-none'
+                        }`}
+                      style={{ borderRadius: '2px' }}
+                      type="number"
+                      min={0}
+                      value={editingPrice ?? ''}
+                      onChange={(e) =>
+                        setEditingPrice(
+                          e.target.value === '' ? undefined : Number(e.target.value),
+                        )
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Pricing Unit
+                    </label>
+                    <select
+                      className={`border p-2 w-full text-sm ${darkMode
+                        ? 'bg-gray-950 border-gray-800 text-white focus:ring-1 focus:ring-emerald-500 focus:outline-none'
+                        : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500 focus:outline-none'
+                        }`}
+                      style={{ borderRadius: '2px' }}
+                      value={editingPricingUnit}
+                      onChange={(e) => setEditingPricingUnit(e.target.value)}
+                    >
+                      {PRICING_UNITS.map(unit => (
+                        <option key={unit.value} value={unit.value}>{unit.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1 mb-3 mt-1">
+                  <div className="flex items-center">
+                    <input
+                      id="edit-product-used"
+                      type="checkbox"
+                      checked={editingUsed}
+                      onChange={(e) => setEditingUsed(e.target.checked)}
+                      className="mr-2 text-emerald-600 focus:ring-emerald-500"
+                      style={{ borderRadius: '2px' }}
+                    />
+                    <label
+                      htmlFor="edit-product-used"
+                      className={`text-xs font-bold uppercase tracking-wider cursor-pointer select-none ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}
+                    >
+                      Used / Second Hand
+                    </label>
+                  </div>
+                  <p className={`text-[10px] ${darkMode ? 'text-gray-500' : 'text-gray-400'} pl-6 leading-tight`}>
+                    This product has been used before (second-hand item).
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  Price
+                </label>
+                <input
+                  className={`border p-2 w-full mb-3 text-sm ${darkMode
+                    ? 'bg-gray-950 border-gray-800 text-white focus:ring-1 focus:ring-emerald-500 focus:outline-none'
+                    : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500 focus:outline-none'
+                    }`}
+                  style={{ borderRadius: '2px' }}
+                  type="number"
+                  min={0}
+                  value={editingPrice ?? ''}
+                  onChange={(e) =>
+                    setEditingPrice(
+                      e.target.value === '' ? undefined : Number(e.target.value),
+                    )
+                  }
+                />
+              </>
+            )}
 
             {/* Feature Fields for Services */}
             {editingImage.type === 'service' && service?.specific_features && service?.features && (

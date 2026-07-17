@@ -21,6 +21,8 @@ export interface CartItem {
   providerId: string; // <-- Added provider ID for seller/service provider check
   type: string;
   description?: string;
+  used?: boolean;
+  pricingUnit?: string;
   serviceCustomization?: {
     needsCustomization: boolean;
     customizationRequest?: string;

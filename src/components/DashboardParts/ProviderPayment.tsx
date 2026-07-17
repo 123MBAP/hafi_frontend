@@ -180,10 +180,10 @@ export default function ProviderUpgradePaymentPage() {
 
       if (selectedMethod === 'mtn') {
         endpoint = `${API_BASE}/api/provider/upgrade/subscribe/mtn`;
-        payload.phone = formData.mtnPhone;
+        payload.phone = formData.mtnPhone.replace(/\D/g, "");
       } else if (selectedMethod === 'airtel') {
         endpoint = `${API_BASE}/api/provider/upgrade/subscribe/airtel`;
-        payload.phone = formData.airtelPhone;
+        payload.phone = formData.airtelPhone.replace(/\D/g, "");
       } else if (selectedMethod === 'wallet') {
         endpoint = `${API_BASE}/api/provider/upgrade/subscribe/wallet`;
       }
@@ -405,8 +405,8 @@ export default function ProviderUpgradePaymentPage() {
                   <input
                     type="text"
                     placeholder={selectedMethod === 'mtn' ? "078 123 4567" : "073 123 4567"}
-                    value={formData[selectedMethod + 'Phone' as keyof FormData]}
-                    onChange={(e) => handleInputChange(e, selectedMethod)}
+                    value={selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone}
+                    onChange={(e) => handleInputChange(e, selectedMethod as 'mtn' | 'airtel')}
                     disabled={status === 'processing'}
                     className={`w-full pl-14 pr-3 py-2.5 border text-sm ${
                       darkMode

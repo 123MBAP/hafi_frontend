@@ -151,11 +151,21 @@ const CartPage = () => {
                   )}
                   
                   {/* Prices */}
-                  <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-sm font-bold text-emerald-500">RWF {item.price.toLocaleString()}</span>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    <span className="text-sm font-bold text-emerald-500">
+                      RWF {item.price.toLocaleString()}
+                      <span className={`text-[10px] font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} ml-1`}>
+                        / {item.pricingUnit || 'Per Item / Piece'}
+                      </span>
+                    </span>
                     {item.oldPrice && (
                       <span className={`line-through text-[11px] ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                         RWF {item.oldPrice.toLocaleString()}
+                      </span>
+                    )}
+                    {item.used && (
+                      <span className="text-[9px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 py-0.5 font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+                        USED
                       </span>
                     )}
                   </div>

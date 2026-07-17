@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
-import bgImage1 from './images/Image_fx.jpg';
-import bgImage2 from './images/Image_fx (1).jpg';
-import bgImage3 from './images/bg.jpeg';
 import { useDarkMode } from '../context/DarkMode';
 import { cachedFetch } from '../utils/cachedFetch';
+
+import interiorDesignImage from "./images/bg_images/interior_design.jpg"
+import clothesShoppingImage from "./images/bg_images/clothes_shopping.avif"
+import madeInRwandaImage from "./images/bg_images/made_in_rwanda.jpg"
+import weddingDecorationImage from "./images/bg_images/wedding_decoration.png"
+import equipmrntRentalImage from "./images/bg_images/equipment_rental.jpg"
+import realEstateImage from "./images/bg_images/real_estate.jpg"
+import photoStudioImage from "./images/bg_images/photo_studio.jpg"
+import kidsOutdoorImage from "./images/bg_images/kids_outdoor.png"
+
+
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
@@ -54,7 +62,149 @@ interface PropertyItem {
   createdAt?: string;
 }
 
-const images = [bgImage1, bgImage2, bgImage3];
+const images = [
+  interiorDesignImage,
+  clothesShoppingImage,
+  madeInRwandaImage, 
+  weddingDecorationImage,
+  equipmrntRentalImage, 
+  realEstateImage, 
+  photoStudioImage, 
+  kidsOutdoorImage
+];
+
+const FALLBACK_ITEMS = [
+  {
+    id: "fallback-1",
+    title: "Modern Interior Design & Styling",
+    description: "Get bespoke home decoration, custom furniture setups, and elegant styling by local design experts.",
+    image: interiorDesignImage,
+    imageUrl: interiorDesignImage,
+    image_url: interiorDesignImage,
+    images: [interiorDesignImage],
+    price: 120000,
+    category: "upload",
+    type: "service",
+    created_at: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    providerId: "fallback-prov",
+  },
+  {
+    id: "fallback-2",
+    title: "Trending Fashion & Designer Outfits",
+    description: "Explore collections of tailored clothing, trendy street styles, and premium local designer fashion.",
+    image: clothesShoppingImage,
+    imageUrl: clothesShoppingImage,
+    image_url: clothesShoppingImage,
+    images: [clothesShoppingImage],
+    price: 25000,
+    category: "product",
+    type: "product",
+    created_at: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    providerId: "fallback-prov",
+  },
+  {
+    id: "fallback-3",
+    title: "Authentic Made in Rwanda Handcrafts",
+    description: "High quality local crafts, custom wood products, traditional baskets, and souvenirs made in Rwanda.",
+    image: madeInRwandaImage,
+    imageUrl: madeInRwandaImage,
+    image_url: madeInRwandaImage,
+    images: [madeInRwandaImage],
+    price: 35000,
+    category: "product",
+    type: "product",
+    created_at: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    providerId: "fallback-prov",
+  },
+  {
+    id: "fallback-4",
+    title: "Luxury Wedding Decoration & Catering",
+    description: "Plan the perfect wedding ceremony with bespoke stages, lights, decoration, and flower concepts.",
+    image: weddingDecorationImage,
+    imageUrl: weddingDecorationImage,
+    image_url: weddingDecorationImage,
+    images: [weddingDecorationImage],
+    price: 450000,
+    category: "upload",
+    type: "service",
+    created_at: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    providerId: "fallback-prov",
+  },
+  {
+    id: "fallback-5",
+    title: "Construction Equipment Rental",
+    description: "Rent concrete mixers, power drills, scaffoldings, and heavy duty machinery for your construction project.",
+    image: equipmrntRentalImage,
+    imageUrl: equipmrntRentalImage,
+    image_url: equipmrntRentalImage,
+    images: [equipmrntRentalImage],
+    price: 45000,
+    category: "upload",
+    type: "service",
+    created_at: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    providerId: "fallback-prov",
+  },
+  {
+    id: "fallback-6",
+    title: "Prime Real Estate & Offices",
+    description: "View top houses, villas, and apartments for rent or sale. Secure commercial office spaces in Kigali.",
+    image: realEstateImage,
+    imageUrl: realEstateImage,
+    image_url: realEstateImage,
+    images: [realEstateImage],
+    price: 900000,
+    category: "property",
+    type: "property",
+    created_at: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    providerId: "fallback-prov",
+  },
+  {
+    id: "fallback-7",
+    title: "Professional Studio Photography",
+    description: "Indoor studio shoots, outdoor family sessions, wedding coverage, and creative videography packages.",
+    image: photoStudioImage,
+    imageUrl: photoStudioImage,
+    image_url: photoStudioImage,
+    images: [photoStudioImage],
+    price: 30000,
+    category: "upload",
+    type: "service",
+    created_at: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    providerId: "fallback-prov",
+  },
+  {
+    id: "fallback-8",
+    title: "Kids Outdoor Playground",
+    description: "Rent custom bouncy castles, kids entertainment centers, and setups for children birthday parties.",
+    image: kidsOutdoorImage,
+    imageUrl: kidsOutdoorImage,
+    image_url: kidsOutdoorImage,
+    images: [kidsOutdoorImage],
+    price: 40000,
+    category: "upload",
+    type: "service",
+    created_at: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    providerId: "fallback-prov",
+  }
+];
+
+const fallbackServices: Service[] = FALLBACK_ITEMS.map(item => ({
+  id: item.id,
+  title: item.title,
+  description: item.description,
+  image: item.image,
+  created_at: item.created_at,
+}));
+
+const fallbackUpdates = FALLBACK_ITEMS;
 
 // Helper to shuffle array
 const shuffleArray = <T,>(array: T[]): T[] => {
@@ -73,7 +223,7 @@ const generateRowLayout = (itemCount: number): Array<'full' | 'half-half' | 'thi
     'third-two-thirds', 'large-small', 'small-large', 'scrolling'
   ];
   const shuffledLayouts = shuffleArray([...layouts]);
-  const result = [];
+  const result: any[] = [];
   let remaining = itemCount;
   
   while (remaining > 0) {
@@ -97,24 +247,25 @@ const generateRowLayout = (itemCount: number): Array<'full' | 'half-half' | 'thi
 };
 
 // Random height generator
-const getRandomHeight = (base: string = 'h-64'): string => {
-  const heights = ['h-48', 'h-56', 'h-64', 'h-72', 'h-80', 'h-96'];
-  return heights[Math.floor(Math.random() * heights.length)];
-};
+// const getRandomHeight = (): string => {
+//   const heights = ['h-48', 'h-56', 'h-64', 'h-72', 'h-80', 'h-96'];
+//   return heights[Math.floor(Math.random() * heights.length)];
+// };
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { darkMode } = useDarkMode();
-  const [allServices, setAllServices] = useState<Service[]>([]);
-  const [filteredServices, setFilteredServices] = useState<Service[]>([]);
-  const [latestUploadItems, setLatestUploadItems] = useState<UploadPreviewItem[]>([]);
-  const [latestMarketProducts, setLatestMarketProducts] = useState<MarketProduct[]>([]);
-  const [latestProperties, setLatestProperties] = useState<PropertyItem[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [locationTerm, setLocationTerm] = useState('');
+  // const [allServices, setAllServices] = useState<Service[]>(fallbackServices);
+  const [filteredServices, setFilteredServices] = useState<Service[]>(fallbackServices);
+  // Unused local state variables commented out to satisfy compiler rules
+  // const [latestUploadItems, setLatestUploadItems] = useState<UploadPreviewItem[]>([]);
+  // const [latestMarketProducts, setLatestMarketProducts] = useState<MarketProduct[]>([]);
+  // const [latestProperties, setLatestProperties] = useState<PropertyItem[]>([]);
+  // const [searchTerm, setSearchTerm] = useState('');
+  // const [locationTerm, setLocationTerm] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  const [shuffledUpdates, setShuffledUpdates] = useState<any[]>([]);
+  const [shuffledUpdates, setShuffledUpdates] = useState<any[]>(fallbackUpdates);
   const [serviceRows, setServiceRows] = useState<Array<{ layout: any; items: any[] }>>([]);
   const [updateRows, setUpdateRows] = useState<Array<{ layout: any; items: any[] }>>([]);
 
@@ -185,7 +336,7 @@ const HomePage = () => {
             }))
           : [];
 
-        setAllServices(servicesList);
+        // setAllServices(servicesList);
         setFilteredServices(servicesList);
         
         const uploads = uploadItems.sort((a, b) => {
@@ -200,9 +351,9 @@ const HomePage = () => {
           return (new Date(b.createdAt || 0).getTime() || 0) - (new Date(a.createdAt || 0).getTime() || 0);
         }).slice(0, 15);
 
-        setLatestUploadItems(uploads);
-        setLatestMarketProducts(products);
-        setLatestProperties(properties);
+        // setLatestUploadItems(uploads);
+        // setLatestMarketProducts(products);
+        // setLatestProperties(properties);
 
         // Combine all updates
         const allUpdates = shuffleArray([
@@ -214,12 +365,7 @@ const HomePage = () => {
         
       } catch (error) {
         console.error('Failed to load updates for home page:', error);
-        setAllServices([]);
-        setFilteredServices([]);
-        setLatestUploadItems([]);
-        setLatestMarketProducts([]);
-        setLatestProperties([]);
-        setShuffledUpdates([]);
+        // Keep fallback data active to avoid blank homepage on server issues
       }
     }
 
@@ -295,23 +441,23 @@ const HomePage = () => {
     }
   }, [shuffledUpdates]);
 
-  const handleSearch = () => {
-    const results = allServices.filter(service =>
-      (service.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.description?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (locationTerm
-        ? (service.location &&
-            (String(service.location.lat).includes(locationTerm) ||
-             String(service.location.lng).includes(locationTerm)) ||
-           service.description?.toLowerCase().includes(locationTerm.toLowerCase()))
-        : true)
-    );
-    setFilteredServices(results);
-  };
+  // const handleSearch = () => {
+  //   const results = allServices.filter(service =>
+  //     (service.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       service.description?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+  //     (locationTerm
+  //       ? (service.location &&
+  //           (String(service.location.lat).includes(locationTerm) ||
+  //            String(service.location.lng).includes(locationTerm)) ||
+  //          service.description?.toLowerCase().includes(locationTerm.toLowerCase()))
+  //       : true)
+  //   );
+  //   setFilteredServices(results);
+  // };
 
   const resolveImageUrl = (path: string | undefined) => {
     if (!path) return '';
-    if (path.startsWith('http')) return path;
+    if (path.startsWith('http') || path.startsWith('data:') || path.startsWith('blob:') || path.startsWith('/src/') || path.includes('/images/') || path.includes('/assets/')) return path;
     return `${API_BASE}/${path.replace(/^\/+/, '')}`;
   };
 
@@ -326,11 +472,12 @@ const HomePage = () => {
     }).format(date);
   };
 
-  const handleUploadClick = (item: UploadPreviewItem) => {
-    if (item.providerId) {
-      navigate(`/provider/${item.providerId}/uploads`);
-    }
-  };
+  // Commented out unused handler to satisfy compiler rules
+  // const handleUploadClick = (item: UploadPreviewItem) => {
+  //   if (item.providerId) {
+  //     navigate(`/provider/${item.providerId}/uploads`);
+  //   }
+  // };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -356,7 +503,7 @@ const HomePage = () => {
         <div className="h-full bg-white dark:bg-gray-900 border dark:border-gray-800/60 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden" style={{ borderRadius: '2px' }}>
           <div className={`${cardHeight} overflow-hidden`}>
             <img 
-              src={service.image || 'https://via.placeholder.com/400x300?text=Service'} 
+              src={resolveImageUrl(service.image) || 'https://via.placeholder.com/400x300?text=Service'} 
               alt={service.title} 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
@@ -631,36 +778,11 @@ const HomePage = () => {
 
         <div className="relative z-10 max-w-4xl mx-auto">
           <h2 className="text-3xl sm:text-5xl lg:text-7xl font-bold mb-4 uppercase tracking-tighter text-white drop-shadow-md">
-            Find Trusted Local Services
+            Services, Products & Real Estate
           </h2>
-          <p className="text-sm sm:text-lg lg:text-xl text-white/90 max-w-2xl mx-auto mb-8 sm:mb-10 drop-shadow-sm">
-            Discover cameramen, tailors, salons, and more – compare prices and connect instantly.
+          <p className="text-sm sm:text-lg lg:text-xl text-white/90 max-w-3xl mx-auto mb-8 sm:mb-10 drop-shadow-sm">
+            Find local services, shop Rwanda-made products, browse global market listings, and explore real estate opportunities near you.
           </p>
-          <div className="flex justify-center gap-3 flex-wrap">
-            <input
-              type="text"
-              placeholder="What do you need?"
-              className="px-4 py-3 text-gray-800 bg-white font-sans focus:outline-none focus:ring-1 focus:ring-emerald-500 w-full sm:w-64"
-              style={{ borderRadius: '2px' }}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Location"
-              className="px-4 py-3 text-gray-800 bg-white font-sans focus:outline-none focus:ring-1 focus:ring-emerald-500 w-full sm:w-48"
-              style={{ borderRadius: '2px' }}
-              value={locationTerm}
-              onChange={(e) => setLocationTerm(e.target.value)}
-            />
-            <button
-              className="px-8 py-3 bg-black text-white font-semibold hover:bg-gray-800 transition-all tracking-tight w-full sm:w-auto"
-              style={{ borderRadius: '2px' }}
-              onClick={handleSearch}
-            >
-              Search
-            </button>
-          </div>
         </div>
       </section>
 
@@ -742,7 +864,7 @@ const HomePage = () => {
           </p>
           <div className="w-12 h-0.5 bg-emerald-500 mx-auto mt-4"></div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-0  sm:gap-4 mt-4 sm:mt-8 p-0  sm:p-4">
           {[
             {
               step: '01',

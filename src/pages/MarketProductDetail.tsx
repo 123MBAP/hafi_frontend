@@ -81,7 +81,7 @@ export default function ProductDetail() {
     fetchProduct();
   }, [productId]);
 
-  const handleAddToCart = (item: { productId: string; title: string; price: number; quantity: number; imageUrl: string; type: string; description?: string }) => {
+  const handleAddToCart = (item: { productId: string; title: string; price: number; quantity: number; imageUrl: string; type: string; description?: string; used?: boolean; pricingUnit?: string }) => {
     const providerId = product.providerId || product.provider_id || product.seller_id || '';
 
     addToCart({
@@ -96,7 +96,9 @@ export default function ProductDetail() {
       shipping: product.shipping || 0,
       checked: true,
       providerId: String(providerId),
-      type: item.type || product.type || 'product'
+      type: item.type || product.type || 'product',
+      used: item.used || product.used || false,
+      pricingUnit: item.pricingUnit || product.pricingUnit || product.pricing_unit || 'Per Item / Piece'
     });
     setMessage("Product added to cart successfully");
   };
@@ -156,6 +158,9 @@ export default function ProductDetail() {
       providerWhatsapp={provider?.whatsapp_number}
       providerProfileImage={toAbsoluteMediaUrl(provider?.profile_image || provider?.profile_image_url)}
       madeInRwanda={product.madeInRwanda || product.made_in_rwanda || false}
+      used={product.used}
+      pricingUnit={product.pricingUnit || product.pricing_unit}
+      inStock={product.inStock !== false && product.in_stock !== false}
       viewMorePath={`/market?providerId=${product.providerId || product.provider_id || product.seller_id}`}
     />
   );

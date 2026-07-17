@@ -58,6 +58,10 @@ interface ProviderImage {
   mediaFiles?: Array<{ url: string; type: 'image' | 'video' }>;
   fileType?: 'image' | 'video' | 'mixed';
   madeInRwanda?: boolean;
+  used?: boolean;
+  pricingUnit?: string;
+  pricing_unit?: string;
+  inStock?: boolean;
 }
 
 export default function ProductOrServicesDetailPage() {
@@ -98,6 +102,10 @@ export default function ProductOrServicesDetailPage() {
             mediaFiles: Array.isArray(img.mediaFiles) ? img.mediaFiles : [],
             fileType: img.fileType || 'image',
             madeInRwanda: img.madeInRwanda || false,
+            used: img.used === true,
+            pricingUnit: img.pricingUnit || img.pricing_unit || 'Per Item / Piece',
+            pricing_unit: img.pricing_unit || img.pricingUnit || 'Per Item / Piece',
+            inStock: img.inStock !== false && img.in_stock !== false,
           })));
         }
 
@@ -224,6 +232,10 @@ export default function ProductOrServicesDetailPage() {
       providerWhatsapp={provider?.whatsapp_number}
       providerProfileImage={toAbsoluteMediaUrl(provider?.profile_image || provider?.profile_image_url)}
       madeInRwanda={imageData.madeInRwanda}
+      used={imageData.used}
+      pricingUnit={imageData.pricingUnit}
+      pricing_unit={imageData.pricing_unit}
+      inStock={imageData.inStock}
       viewMorePath={`/provider/${providerId}/uploads`}
     />
   );

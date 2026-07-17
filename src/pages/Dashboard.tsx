@@ -24,6 +24,8 @@ interface UploadedMedia {
   visible: boolean;
   views?: string[];
   madeInRwanda?: boolean;
+  used?: boolean;
+  pricingUnit?: string;
   mediaFiles?: UploadedMedia[]; // For grouped products with multiple media
 }
 
@@ -92,6 +94,8 @@ export default function Dashboard() {
   const [editingDesc, setEditingDesc] = useState('');
   const [editingPrice, setEditingPrice] = useState<number | undefined>(undefined);
   const [editingFeatureValues, setEditingFeatureValues] = useState<Record<string, any>>({});
+  const [editingUsed, setEditingUsed] = useState(false);
+  const [editingPricingUnit, setEditingPricingUnit] = useState('Per Item / Piece');
 
   // For selection
   const [selectedProductImages, setSelectedProductImages] = useState<Set<string>>(new Set());
@@ -105,6 +109,8 @@ export default function Dashboard() {
   const [productDesc, setProductDesc] = useState('');
   const [productPrice, setProductPrice] = useState('');
   const [productMadeInRwanda, setProductMadeInRwanda] = useState(false);
+  const [productUsed, setProductUsed] = useState(false);
+  const [productPricingUnit, setProductPricingUnit] = useState('Per Item / Piece');
   const [serviceTitle, setServiceTitle] = useState('');
   const [serviceDesc, setServiceDesc] = useState('');
   const [servicePrice, setServicePrice] = useState('');
@@ -139,7 +145,7 @@ export default function Dashboard() {
   const [isBulkDeleting, setIsBulkDeleting] = useState<MediaType | null>(null);
   const [isBulkHiding, setIsBulkHiding] = useState<MediaType | null>(null);
 
-  useEffect(() => {
+  const loadMedia = () => {
     if (!providerId) return;
     fetch(`${API_BASE}/api/providers/${providerId}/media`)
       .then(res => {
@@ -173,6 +179,9 @@ export default function Dashboard() {
             visible: media.visible !== false,
             views: Array.isArray(media.views) ? media.views : [],
             madeInRwanda: media.madeInRwanda === true,
+            used: media.used === true,
+            pricingUnit: media.pricingUnit || "Per Item / Piece",
+            inStock: media.inStock !== false && media.in_stock !== false,
             mediaFiles: media.mediaFiles, // Include mediaFiles
           }));
 
@@ -228,6 +237,9 @@ export default function Dashboard() {
                     visible: img.visible !== false,
                     views: Array.isArray(img.views) ? img.views : [],
                     madeInRwanda: img.madeInRwanda === true,
+                    used: img.used === true,
+                    pricingUnit: img.pricingUnit || "Per Item / Piece",
+                    inStock: img.inStock !== false && img.in_stock !== false,
                   };
                 }),
               );
@@ -269,6 +281,10 @@ export default function Dashboard() {
           })
           .catch(err => console.error("❌ Error fetching images:", err));
       });
+  };
+
+  useEffect(() => {
+    loadMedia();
   }, [providerId]);
 
   useEffect(() => {
@@ -395,6 +411,8 @@ export default function Dashboard() {
       formData.append('desc', productDesc);
       formData.append('price', productPrice);
       formData.append('madeInRwanda', String(productMadeInRwanda));
+      formData.append('used', String(productUsed));
+      formData.append('pricingUnit', productPricingUnit);
 
       // Add feature values if service has specific_features
       if (service?.specific_features && service?.features) {
@@ -439,6 +457,8 @@ export default function Dashboard() {
           .filter((f: any) => f.isView)
           .map((f: any) => f.url),
         madeInRwanda: productMadeInRwanda,
+        used: productUsed,
+        pricingUnit: productPricingUnit,
       };
 
       setUploadedProductImages(prev => [...prev, unifiedProduct]);
@@ -452,6 +472,8 @@ export default function Dashboard() {
       setProductDesc('');
       setProductPrice('');
       setProductMadeInRwanda(false);
+      setProductUsed(false);
+      setProductPricingUnit('Per Item / Piece');
       // Reset feature values
       if (service?.specific_features && service?.features) {
         const resetValues: Record<string, any> = {};
@@ -614,6 +636,8 @@ export default function Dashboard() {
     setEditingTitle(img.title);
     setEditingDesc(img.desc);
     setEditingPrice(img.price);
+    setEditingUsed(img.used || false);
+    setEditingPricingUnit(img.pricingUnit || "Per Item / Piece");
     // Load feature values if they exist
     const featureVals = (img as any).feature_values || {};
     console.log('🔧 [EDIT] Setting editingFeatureValues to:', featureVals);
@@ -631,7 +655,9 @@ export default function Dashboard() {
           title: editingTitle,
           desc: editingDesc,
           price: editingPrice,
-          featureValues: editingFeatureValues
+          featureValues: editingFeatureValues,
+          used: editingUsed,
+          pricingUnit: editingPricingUnit
         })
       });
 
@@ -648,7 +674,7 @@ export default function Dashboard() {
         setUploadedProductImages(prev =>
           prev.map(img =>
             img.id === editingImage.id
-              ? { ...img, title: editingTitle, desc: editingDesc, price: editingPrice }
+              ? { ...img, title: editingTitle, desc: editingDesc, price: editingPrice, used: editingUsed, pricingUnit: editingPricingUnit }
               : img
           )
         );
@@ -671,6 +697,8 @@ export default function Dashboard() {
     setEditingDesc('');
     setEditingPrice(undefined);
     setEditingFeatureValues({});
+    setEditingUsed(false);
+    setEditingPricingUnit('Per Item / Piece');
   };
 
   // Delete handler (single)
@@ -1052,6 +1080,8 @@ export default function Dashboard() {
           productDesc={productDesc}
           productPrice={productPrice}
           productMadeInRwanda={productMadeInRwanda}
+          productUsed={productUsed}
+          productPricingUnit={productPricingUnit}
           handleProductImageChange={handleProductImageChange}
           handleProductViewChange={handleProductViewChange}
           handleProductVideoChange={handleProductVideoChange}
@@ -1061,6 +1091,8 @@ export default function Dashboard() {
           setProductDesc={setProductDesc}
           setProductPrice={setProductPrice}
           setProductMadeInRwanda={setProductMadeInRwanda}
+          setProductUsed={setProductUsed}
+          setProductPricingUnit={setProductPricingUnit}
           featureValues={featureValues}
           setFeatureValues={setFeatureValues}
           uploadProgress={productUploadProgress}
@@ -1134,6 +1166,10 @@ export default function Dashboard() {
         editingDesc={editingDesc}
         editingPrice={editingPrice}
         editingFeatureValues={editingFeatureValues}
+        editingUsed={editingUsed}
+        editingPricingUnit={editingPricingUnit}
+        setEditingUsed={setEditingUsed}
+        setEditingPricingUnit={setEditingPricingUnit}
         service={service}
         modalOpen={modalOpen}
         modalImage={modalImage}
@@ -1159,6 +1195,7 @@ export default function Dashboard() {
         setEditingDesc={setEditingDesc}
         setEditingPrice={setEditingPrice}
         setEditingFeatureValues={setEditingFeatureValues}
+        onRefreshMedia={loadMedia}
       />
 
     </div>

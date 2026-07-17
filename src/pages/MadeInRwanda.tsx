@@ -50,6 +50,10 @@ interface MadeInRwandaProduct {
   providerId?: string | null;
   lat?: number;
   lng?: number;
+  used?: boolean;
+  pricingUnit?: string;
+  pricing_unit?: string;
+  inStock?: boolean;
 }
 
 interface Category {
@@ -88,16 +92,22 @@ function ProductCard({ product, darkMode, onView }: {
         <img
           src={product.image_url}
           alt={product.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${product.inStock === false ? 'opacity-60' : ''}`}
           loading="lazy"
-          // onClick={() => onOpen(product)}
         />
-        <div className="absolute top-2 left-2 px-1.5 py-0.5 text-[10px] font-medium bg-emerald-600 text-white" style={{ borderRadius: '2px' }}>
+        {product.inStock === false && (
+          <div className="absolute inset-0 bg-black/45 z-10 flex items-center justify-center">
+            <span className="bg-red-600 text-white text-[11px] font-black px-2.5 py-1.5 uppercase tracking-wider shadow-lg" style={{ borderRadius: '2px' }}>
+              OUT OF STOCK
+            </span>
+          </div>
+        )}
+        <div className="absolute top-2 left-2 px-1.5 py-0.5 text-[10px] font-medium bg-emerald-600 text-white z-10" style={{ borderRadius: '2px' }}>
           Made in Rwanda
         </div>
         {product.fileType === 'video' && (
-          <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-medium bg-black/60 text-white" style={{ borderRadius: '2px' }}>
-            🎥 Video
+          <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-medium bg-black/60 text-white z-10" style={{ borderRadius: '2px' }}>
+            Video
           </div>
         )}
       </div>
@@ -112,8 +122,18 @@ function ProductCard({ product, darkMode, onView }: {
         </p>
 
         <div className="mt-auto">
-          <div className={`text-lg font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
-            RWF {product.price.toLocaleString()}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className={`text-lg font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+              RWF {product.price.toLocaleString()}
+              <span className={`text-[10px] font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} ml-1`}>
+                / {product.pricingUnit || product.pricing_unit || 'Per Item / Piece'}
+              </span>
+            </div>
+            {product.used && (
+              <span className="text-[9px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 py-0.5 font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+                USED
+              </span>
+            )}
           </div>
    
         </div>
@@ -141,6 +161,7 @@ export default function MadeInRwanda() {
   const [nearbyRadiusKm, setNearbyRadiusKm] = useState<number>(10);
   const [nearbyOnly, setNearbyOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [conditionFilter, setConditionFilter] = useState<'all' | 'new' | 'used'>('all');
 
   // Auto-scroll ref
   const categoryStripRef = useRef<HTMLDivElement | null>(null);
@@ -228,6 +249,10 @@ export default function MadeInRwanda() {
               providerId: row.providerId || row.provider_id || row.seller_id || null,
               latitude: latitude !== undefined ? Number(latitude) : null,
               longitude: longitude !== undefined ? Number(longitude) : null,
+              used: row.used === true,
+              pricingUnit: row.pricingUnit || row.pricing_unit || 'Per Item / Piece',
+              pricing_unit: row.pricing_unit || row.pricingUnit || 'Per Item / Piece',
+              inStock: row.inStock !== false && row.in_stock !== false,
             } as MadeInRwandaProduct;
           });
 
@@ -290,6 +315,13 @@ export default function MadeInRwanda() {
           return false;
         }
 
+        // Apply conditionFilter
+        if (conditionFilter === 'new') {
+          if (p.used) return false;
+        } else if (conditionFilter === 'used') {
+          if (!p.used) return false;
+        }
+
         const title = (p.title || "").toLowerCase();
         const desc = (p.description || "").toLowerCase();
         const q = searchQuery.toLowerCase();
@@ -304,7 +336,7 @@ export default function MadeInRwanda() {
         const bViews = b.views?.length ?? 0;
         return bViews - aViews;
       });
-  }, [products, searchQuery, sortBy, selectedCategory, filterProviderId]);
+  }, [products, searchQuery, sortBy, selectedCategory, filterProviderId, conditionFilter]);
 
   const visibleProducts = useMemo(() => {
     if (!nearbyOnly || !userLocation) return filteredAndSorted;
@@ -358,6 +390,7 @@ export default function MadeInRwanda() {
     setSortBy("popular");
     setNearbyOnly(false);
     setUserLocation(null);
+    setConditionFilter("all");
   };
 
   // Compact Filters Panel
@@ -390,6 +423,18 @@ export default function MadeInRwanda() {
           <option value="popular">Most Popular</option>
           <option value="price-low">Price: Low to High</option>
           <option value="price-high">Price: High to Low</option>
+        </select>
+
+        {/* Condition select */}
+        <select
+          value={conditionFilter}
+          onChange={(e) => setConditionFilter(e.target.value as any)}
+          className={`px-3 py-1.5 text-sm ${darkMode ? 'bg-gray-950 border border-gray-700 text-white outline-0 border border-gray-700 dark:border-gray-700' : 'bg-gray-100 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer flex-shrink-0`}
+          style={{ borderRadius: '2px' }}
+        >
+          <option value="all">All Conditions</option>
+          <option value="new">New Only</option>
+          <option value="used">Used Only</option>
         </select>
 
         <button
@@ -425,7 +470,7 @@ export default function MadeInRwanda() {
           <span className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Show Map</span>
         </label>
 
-        {(searchQuery || selectedCategory !== "All" || sortBy !== "popular" || nearbyOnly) && (
+        {(searchQuery || selectedCategory !== "All" || sortBy !== "popular" || nearbyOnly || conditionFilter !== "all") && (
           <button onClick={clearFilters} className="text-xs text-emerald-500 hover:text-emerald-600 whitespace-nowrap flex-shrink-0">
             Clear all
           </button>

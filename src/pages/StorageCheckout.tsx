@@ -200,10 +200,10 @@ export default function StorageCheckout() {
 
       if (selectedMethod === 'mtn') {
         endpoint = `${API_BASE}/api/storage/purchase/mtn`;
-        payload.phone = formData.mtnPhone;
+        payload.phone = formData.mtnPhone.replace(/\D/g, "");
       } else if (selectedMethod === 'airtel') {
         endpoint = `${API_BASE}/api/storage/purchase/airtel`;
-        payload.phone = formData.airtelPhone;
+        payload.phone = formData.airtelPhone.replace(/\D/g, "");
       } else if (selectedMethod === 'wallet') {
         endpoint = `${API_BASE}/api/storage/purchase/wallet`;
       }
@@ -414,16 +414,21 @@ export default function StorageCheckout() {
               <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 {selectedMethod === 'mtn' ? 'MTN' : 'Airtel'} Phone Number
               </label>
-              <input
-                type="text"
-                placeholder="078 123 4567"
-                value={selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone}
-                onChange={(e) => handleInputChange(e, selectedMethod)}
-                className={`w-full px-3 py-2 border rounded-lg ${darkMode
-                    ? 'bg-gray-700 border-gray-600 text-white'
-                    : 'bg-white border-gray-300 text-gray-900'
-                  } focus:outline-none focus:ring-2 focus:ring-emerald-500`}
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>+250</span>
+                </div>
+                <input
+                  type="text"
+                  placeholder={selectedMethod === 'mtn' ? '078 123 4567' : '073 123 4567'}
+                  value={selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone}
+                  onChange={(e) => handleInputChange(e, selectedMethod as 'mtn' | 'airtel')}
+                  className={`w-full pl-14 pr-3 py-2 border rounded-lg ${darkMode
+                      ? 'bg-gray-700 border-gray-600 text-white'
+                      : 'bg-white border-gray-300 text-gray-900'
+                    } focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                />
+              </div>
             </div>
           )}
 

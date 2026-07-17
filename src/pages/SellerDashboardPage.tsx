@@ -20,7 +20,19 @@ interface Product {
   views?: string[];
   video_url?: string;
   madeInRwanda?: boolean;
+  used?: boolean;
+  pricing_unit?: string;
 }
+
+const PRICING_UNITS = [
+  { value: 'Per Item / Piece', label: 'Per Item / Piece (e.g., clothes, electronics, single objects)' },
+  { value: 'Per Kilogram (kg)', label: 'Per Kilogram (kg) (e.g., vegetables, meat, flour)' },
+  { value: 'Per Liter (L)', label: 'Per Liter (L) (e.g., drinks, oils, liquid chemicals)' },
+  { value: 'Per Square Meter (m²)', label: 'Per Square Meter (m²) (e.g., flooring, carpets, land tiles)' },
+  { value: 'Per Cubic Meter (m³)', label: 'Per Cubic Meter (m³) (e.g., sand, gravel, large cargo)' },
+  { value: 'Per Meter (m)', label: 'Per Meter (m) (e.g., ropes, cables, fabrics)' },
+  { value: 'Per Pack / Dozen', label: 'Per Pack / Dozen (e.g., box bundles, multipacks)' }
+];
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
@@ -113,6 +125,8 @@ export default function SellerDashboardPage() {
   const [editVideoFile, setEditVideoFile] = useState<File | null>(null);
   const [editPreviewVideo, setEditPreviewVideo] = useState<string>("");
   const [editMadeInRwanda, setEditMadeInRwanda] = useState<boolean>(false);
+  const [editUsed, setEditUsed] = useState<boolean>(false);
+  const [editPricingUnit, setEditPricingUnit] = useState<string>("Per Item / Piece");
   const [editIsSaving, setEditIsSaving] = useState<boolean>(false);
 
   useEffect(() => {
@@ -125,6 +139,8 @@ export default function SellerDashboardPage() {
       setEditVideoFile(null);
       setEditPreviewVideo(getUrl(editingProduct.video_url));
       setEditMadeInRwanda(editingProduct.madeInRwanda || false);
+      setEditUsed(editingProduct.used || false);
+      setEditPricingUnit(editingProduct.pricing_unit || "Per Item / Piece");
     } else {
       setEditForm(null);
       setEditMainFile(null);
@@ -134,6 +150,8 @@ export default function SellerDashboardPage() {
       setEditVideoFile(null);
       setEditPreviewVideo("");
       setEditMadeInRwanda(false);
+      setEditUsed(false);
+      setEditPricingUnit("Per Item / Piece");
     }
   }, [editingProduct]);
 
@@ -148,6 +166,8 @@ export default function SellerDashboardPage() {
     form.append("description", editForm.description);
     form.append("price", editForm.price);
     form.append("madeInRwanda", String(editMadeInRwanda));
+    form.append("used", String(editUsed));
+    form.append("pricingUnit", editPricingUnit);
     form.append("categoryId", editForm.category_id || "uncategorized");
 
     if (editMainFile) {
@@ -362,6 +382,8 @@ export default function SellerDashboardPage() {
     form.append("title", product.title);
     form.append("description", product.description);
     form.append("price", product.price);
+    form.append("used", String(product.used === 'true' || product.used === true));
+    form.append("pricingUnit", product.pricing_unit || "Per Item / Piece");
     
     const isPremium = sellerProfile?.shopping_type_id && sellerProfile.shopping_type_key !== 'other';
     const targetCategoryId = product.category_id || (isPremium ? "uncategorized" : cid);
@@ -397,7 +419,7 @@ export default function SellerDashboardPage() {
 
   const resetForm = (cid: string) => {
     const isPremium = sellerProfile?.shopping_type_id && sellerProfile.shopping_type_key !== 'other';
-    setProductForms(prev => ({ ...prev, [cid]: { title: "", description: "", price: "", image_url: "", category_id: isPremium ? "uncategorized" : cid } }));
+    setProductForms(prev => ({ ...prev, [cid]: { title: "", description: "", price: "", image_url: "", category_id: isPremium ? "uncategorized" : cid, used: false, pricing_unit: "Per Item / Piece" } }));
     setPreviewMain(prev => { const { [cid]: _, ...rest } = prev; return rest; });
     setPreviewViews(prev => { const { [cid]: _, ...rest } = prev; return rest; });
     setMainFiles(prev => { const { [cid]: _, ...rest } = prev; return rest; });
@@ -578,16 +600,31 @@ export default function SellerDashboardPage() {
                                 placeholder="DESCRIBE YOUR PRODUCT..."
                               />
                             </div>
-                            <div>
-                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Price ($)</label>
-                              <input
-                                type="number"
-                                value={productForms[cid]?.price || ""}
-                                onChange={(e) => handleInput(cid, "price", e.target.value)}
-                                className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-950 border-gray-800 text-white placeholder-gray-550" : "bg-white border-gray-250 text-gray-900 placeholder-gray-400"} focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
-                                style={{ borderRadius: '2px' }}
-                                placeholder="29.99"
-                              />
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Price ($)</label>
+                                <input
+                                  type="number"
+                                  value={productForms[cid]?.price || ""}
+                                  onChange={(e) => handleInput(cid, "price", e.target.value)}
+                                  className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-950 border-gray-800 text-white placeholder-gray-550" : "bg-white border-gray-250 text-gray-900 placeholder-gray-400"} focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                                  style={{ borderRadius: '2px' }}
+                                  placeholder="29.99"
+                                />
+                              </div>
+                              <div>
+                                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Pricing Unit</label>
+                                <select
+                                  value={productForms[cid]?.pricing_unit || "Per Item / Piece"}
+                                  onChange={(e) => handleInput(cid, "pricing_unit", e.target.value)}
+                                  className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-950 border-gray-800 text-white" : "bg-white border-gray-250 text-gray-900"} focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                                  style={{ borderRadius: '2px' }}
+                                >
+                                  {PRICING_UNITS.map(unit => (
+                                    <option key={unit.value} value={unit.value}>{unit.label}</option>
+                                  ))}
+                                </select>
+                              </div>
                             </div>
                             <div>
                               <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Category</label>
@@ -605,17 +642,34 @@ export default function SellerDashboardPage() {
                                 ))}
                               </select>
                             </div>
-                            <div>
-                              <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={madeInRwanda[cid] || false}
-                                  onChange={(e) => setMadeInRwanda(prev => ({ ...prev, [cid]: e.target.checked }))}
-                                  className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:outline-none border-gray-300"
-                                  style={{ borderRadius: '2px' }}
-                                />
-                                <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? "text-gray-300" : "text-gray-650"}`}>Made in Rwanda 🇷🇼</span>
-                              </label>
+                            <div className="flex flex-col gap-3">
+                              <div>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={madeInRwanda[cid] || false}
+                                    onChange={(e) => setMadeInRwanda(prev => ({ ...prev, [cid]: e.target.checked }))}
+                                    className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:outline-none border-gray-300"
+                                    style={{ borderRadius: '2px' }}
+                                  />
+                                  <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? "text-gray-300" : "text-gray-650"}`}>Made in Rwanda 🇷🇼</span>
+                                </label>
+                              </div>
+                              <div className="space-y-1">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={productForms[cid]?.used === 'true' || productForms[cid]?.used === true}
+                                    onChange={(e) => handleInput(cid, "used", e.target.checked ? "true" : "false")}
+                                    className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:outline-none border-gray-300"
+                                    style={{ borderRadius: '2px' }}
+                                  />
+                                  <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? "text-gray-300" : "text-gray-650"}`}>Used / Second Hand</span>
+                                </label>
+                                <p className={`text-[10.5px] ${darkMode ? "text-gray-450" : "text-gray-500"} pl-6 leading-tight`}>
+                                  This product has been used before (second-hand item).
+                                </p>
+                              </div>
                             </div>
                           </div>                           <div className="space-y-4">
                             <div>
@@ -893,18 +947,33 @@ export default function SellerDashboardPage() {
                   />
                 </div>
 
-                {/* Price */}
-                <div>
-                  <label className="block text-xs uppercase font-bold tracking-wider mb-1">Price ($)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    required
-                    value={editForm.price}
-                    onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-                    className={`w-full p-3 border text-sm focus:ring-1 focus:ring-emerald-500 focus:outline-none ${darkMode ? "bg-gray-950 border-gray-800" : "bg-gray-50 border-gray-250"}`}
-                    style={{ borderRadius: '2px' }}
-                  />
+                {/* Price and Pricing Unit */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs uppercase font-bold tracking-wider mb-1">Price ($)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      required
+                      value={editForm.price}
+                      onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                      className={`w-full p-3 border text-sm focus:ring-1 focus:ring-emerald-500 focus:outline-none ${darkMode ? "bg-gray-950 border-gray-800" : "bg-gray-50 border-gray-250"}`}
+                      style={{ borderRadius: '2px' }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase font-bold tracking-wider mb-1">Pricing Unit</label>
+                    <select
+                      value={editPricingUnit}
+                      onChange={(e) => setEditPricingUnit(e.target.value)}
+                      className={`w-full p-3 border text-sm focus:ring-1 focus:ring-emerald-500 focus:outline-none ${darkMode ? "bg-gray-950 border-gray-800 text-white" : "bg-gray-50 border-gray-250 text-gray-900"}`}
+                      style={{ borderRadius: '2px' }}
+                    >
+                      {PRICING_UNITS.map(unit => (
+                        <option key={unit.value} value={unit.value}>{unit.label}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 {/* Category */}
@@ -938,18 +1007,37 @@ export default function SellerDashboardPage() {
                   />
                 </div>
 
-                {/* Made in Rwanda */}
-                <div className="flex items-center gap-2 py-1">
-                  <input
-                    type="checkbox"
-                    id="edit-madeInRwanda"
-                    checked={editMadeInRwanda}
-                    onChange={(e) => setEditMadeInRwanda(e.target.checked)}
-                    className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
-                  />
-                  <label htmlFor="edit-madeInRwanda" className="text-sm font-semibold select-none cursor-pointer">
-                    🇷🇼 Made in Rwanda
-                  </label>
+                {/* Made in Rwanda & Used */}
+                <div className="flex flex-col gap-3 py-1">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="edit-madeInRwanda"
+                      checked={editMadeInRwanda}
+                      onChange={(e) => setEditMadeInRwanda(e.target.checked)}
+                      className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+                    />
+                    <label htmlFor="edit-madeInRwanda" className="text-sm font-semibold select-none cursor-pointer">
+                      🇷🇼 Made in Rwanda
+                    </label>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="edit-used"
+                        checked={editUsed}
+                        onChange={(e) => setEditUsed(e.target.checked)}
+                        className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+                      />
+                      <label htmlFor="edit-used" className="text-sm font-semibold select-none cursor-pointer">
+                        Used / Second Hand
+                      </label>
+                    </div>
+                    <p className={`text-[10.5px] ${darkMode ? "text-gray-450" : "text-gray-500"} pl-6 leading-tight`}>
+                      This product has been used before (second-hand item).
+                    </p>
+                  </div>
                 </div>
 
                 <div className={`h-[1px] ${darkMode ? "bg-gray-800" : "bg-gray-150"} my-4`} />
@@ -1096,6 +1184,8 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalImageIndex, setModalImageIndex] = useState(0);
+  const [showConfirmStock, setShowConfirmStock] = useState(false);
+  const [isUpdatingStock, setIsUpdatingStock] = useState(false);
 
 
 
@@ -1255,10 +1345,20 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
         className={`relative group border overflow-hidden shadow-sm transition-all duration-300 ${darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} hover:border-emerald-500 hover:shadow-md`}
         style={{ borderRadius: '2px' }}
       >
+        {/* Out of Stock Badge */}
+        {product.in_stock === false && (
+          <div 
+            className="absolute top-2 left-2 z-20 bg-red-600 text-white px-2 py-1 text-[9px] font-bold uppercase tracking-wider shadow-md"
+            style={{ borderRadius: '2px' }}
+          >
+            Out of Stock
+          </div>
+        )}
+
         {/* Made in Rwanda Badge */}
         {product.madeInRwanda && (
           <div 
-            className="absolute top-2 left-2 z-10 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-3 py-1 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm border border-emerald-500/20"
+            className={`absolute z-10 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-3 py-1 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm border border-emerald-500/20 ${product.in_stock === false ? 'top-10' : 'top-2'} left-2`}
             style={{ borderRadius: '2px' }}
           >
             🇷🇼 Made in Rwanda
@@ -1354,13 +1454,80 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
           <p className={`text-xs mb-2 line-clamp-2 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
             {product.description}
           </p>
-          <p className="font-bold text-sm text-emerald-500">
-            ${product.price}
+          <p className="font-bold text-sm text-emerald-500 flex items-center justify-between">
+            <span>
+              ${product.price}
+              <span className={`text-[11px] font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} ml-1`}>
+                / {product.pricing_unit || 'Item'}
+              </span>
+            </span>
+            {product.used && (
+              <span className="text-[9px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 py-0.5 font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+                USED
+              </span>
+            )}
           </p>
         </div>
 
         {/* Action Buttons */}
         <div className={`px-4 pb-4 flex flex-col gap-2 ${darkMode ? "bg-gray-900" : "bg-white"}`}>
+          {/* Stock Toggle Confirm Overlay */}
+          {showConfirmStock ? (
+            <div className={`p-2 mb-1 border ${darkMode ? 'border-gray-800 bg-gray-950 text-white' : 'border-gray-250 bg-gray-50 text-gray-900'} text-center space-y-2`} style={{ borderRadius: '2px' }}>
+              <p className="text-[10px] font-bold uppercase tracking-wider">
+                Mark as {product.in_stock !== false ? 'Out of Stock' : 'In Stock'}?
+              </p>
+              <div className="flex gap-2 justify-center">
+                <button
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    setIsUpdatingStock(true);
+                    try {
+                      const token = localStorage.getItem("token");
+                      const form = new FormData();
+                      form.append("in_stock", String(product.in_stock !== false ? 'false' : 'true'));
+                      
+                      const res = await fetch(`${API_BASE}/api/seller/product/${product.id}`, {
+                        method: "PATCH",
+                        headers: { Authorization: `Bearer ${token}` },
+                        body: form
+                      });
+                      if (!res.ok) throw new Error("Failed to update stock status");
+                      onUpdate();
+                    } catch (e: any) {
+                      alert(e.message);
+                    } finally {
+                      setIsUpdatingStock(false);
+                      setShowConfirmStock(false);
+                    }
+                  }}
+                  disabled={isUpdatingStock}
+                  className="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider"
+                  style={{ borderRadius: '2px' }}
+                >
+                  Yes
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setShowConfirmStock(false); }}
+                  disabled={isUpdatingStock}
+                  className={`px-3 py-1 border text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'bg-gray-900 border-gray-800 text-gray-300' : 'bg-white border-gray-250 text-gray-700'}`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowConfirmStock(true); }}
+              className={`w-full py-2 flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-wider transition-colors border
+                ${product.in_stock !== false ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20 border-red-500/25' : 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border-emerald-500/25'}`}
+              style={{ borderRadius: '2px' }}
+            >
+              {product.in_stock !== false ? 'Mark Out of Stock' : 'Mark In Stock'}
+            </button>
+          )}
+
           {/* View Video Button */}
           {product.video_url && (
             <button

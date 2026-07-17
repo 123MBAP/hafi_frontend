@@ -48,6 +48,8 @@ interface ProductOrServiceDetailProps {
     imageUrl: string;
     type: string;
     description?: string;
+    used?: boolean;
+    pricingUnit?: string;
     serviceCustomization?: {
       needsCustomization: boolean;
       customizationRequest?: string;
@@ -55,7 +57,7 @@ interface ProductOrServiceDetailProps {
     };
   }) => void;
 
-  type: string;
+  type?: string;
   minQuantity?: number;
   maxQuantity?: number;
   quantity?: number;
@@ -69,6 +71,10 @@ interface ProductOrServiceDetailProps {
   providerWhatsapp?: string;
   providerProfileImage?: string;
   madeInRwanda?: boolean;
+  used?: boolean;
+  pricingUnit?: string;
+  pricing_unit?: string;
+  inStock?: boolean;
   viewMorePath?: string;
 }
 
@@ -86,7 +92,7 @@ export default function ProductOrServiceDetail({
   maxQuantity = 100,
   setMessage,
   message,
-  type,
+  type = "product",
   providerId,
   providerName,
   providerEmail,
@@ -94,6 +100,10 @@ export default function ProductOrServiceDetail({
   providerWhatsapp,
   providerProfileImage,
   madeInRwanda,
+  used,
+  pricingUnit,
+  pricing_unit,
+  inStock,
   viewMorePath,
 }: ProductOrServiceDetailProps) {
   const [quantity, setQuantity] = useState(minQuantity);
@@ -102,8 +112,14 @@ export default function ProductOrServiceDetail({
   const [customizationRequest, setCustomizationRequest] = useState("");
   const [noCustomizationNeeded, setNoCustomizationNeeded] = useState(false);
   const [customizationError, setCustomizationError] = useState("");
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
   const { darkMode } = useDarkMode();
   const navigate = useNavigate();
+
+  const isOutOfStock = inStock === false || String(inStock) === 'false';
+
+  const descriptionLines = description ? description.split('\n') : [];
+  const hasLongDescription = descriptionLines.length > 15 || (description && description.length > 500);
 
   // Format amounts as Rwandan Francs (RWF) without decimals
   const formatFrw = (amount: number) => `${Math.round(amount).toLocaleString('en-US')} RWF`;
@@ -138,6 +154,8 @@ export default function ProductOrServiceDetail({
       imageUrl: allImages[0],
       type,
       description,
+      used,
+      pricingUnit: pricingUnit || pricing_unit || 'Per Item / Piece',
       ...(type === "service" && {
         serviceCustomization: {
           needsCustomization: !!customizationRequest.trim(),
@@ -167,7 +185,7 @@ export default function ProductOrServiceDetail({
   };
 
   return (
-    <div className={`w-full px-4 py-10 mx-auto ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"}`}>
+    <div className={`w-full px-4 py-10 mx-auto ${darkMode ? "bg-gray-950 text-gray-100" : "bg-gray-50 text-gray-900"}`}>
       {(providerId || providerName || providerEmail || providerPhone || providerWhatsapp) && (
         <div className={`mb-6 p-4 border ${darkMode ? "border-gray-700 bg-gray-900/40" : "border-gray-200 bg-gray-50"}`} style={{ borderRadius: '2px' }}>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -249,12 +267,17 @@ export default function ProductOrServiceDetail({
           {allImages.slice(0, 2).map((img, index) => (
             <div
               key={index}
-              className="relative group cursor-pointer"
+              className={`relative group cursor-pointer ${type === "product" && isOutOfStock ? "opacity-60" : ""}`}
               onClick={() => {
                 setCurrentImageIndex(index);
                 setShowFullImage(true);
               }}
             >
+              {index === 0 && type === "product" && isOutOfStock && (
+                <div className="absolute top-4 left-4 bg-red-600 text-white font-extrabold text-xs px-3 py-1.5 z-10 uppercase tracking-wider shadow-lg" style={{ borderRadius: '2px' }}>
+                  OUT OF STOCK
+                </div>
+              )}
               {isVideo(img) ? (
                 <div className="relative w-full h-full max-h-80">
                   <video
@@ -333,43 +356,79 @@ export default function ProductOrServiceDetail({
       </div>
 
       {/* Details */}
-      <div className={`w-full md:w-1/3 flex flex-col font-sans p-4 shadow-lg  ${darkMode ? "bg-gray-800 border border-gray-700 text-gray-100" : "bg-white border border-gray-200 text-gray-900"}`}>
+      <div className={`w-full md:w-1/3 flex flex-col font-sans p-4 shadow-lg  ${darkMode ? "bg-gray-900 border border-gray-800 text-gray-100" : "bg-white border border-gray-200 text-gray-900"}`}>
         <h2 className={`text-2xl font-semibold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>{title}</h2>
 
         {description && (
-          <div className={`mb-4 text-base whitespace-pre-line leading-relaxed ${darkMode ? "text-gray-300" : "text-gray-600"}`}>{description}</div>
+          <div className="mb-4">
+            <div 
+              className={`text-base whitespace-pre-line leading-relaxed ${darkMode ? "text-gray-300" : "text-gray-600"}`}
+              style={!isDescExpanded ? {
+                display: '-webkit-box',
+                WebkitLineClamp: 15,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden'
+              } : {}}
+            >
+              {description}
+            </div>
+            {hasLongDescription && (
+              <button
+                type="button"
+                onClick={() => setIsDescExpanded(!isDescExpanded)}
+                className="mt-1 text-xs font-bold uppercase tracking-wider text-emerald-500 hover:text-emerald-600 focus:outline-none transition-colors"
+              >
+                {isDescExpanded ? "View Less" : "View More"}
+              </button>
+            )}
+          </div>
         )}
 
-        <p className={`text-lg font-medium mb-1 ${darkMode ? "text-gray-100" : "text-gray-900"}`}>
-          Price: {formatFrw(price)}
-        </p>
+        <div className="flex items-center gap-2 flex-wrap mb-1">
+          <p className={`text-lg font-medium ${darkMode ? "text-gray-100" : "text-gray-900"}`}>
+            Price: {formatFrw(price)}
+            <span className={`text-xs font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} ml-1`}>
+              / {pricingUnit || pricing_unit || 'Per Item / Piece'}
+            </span>
+          </p>
+          {used && (
+            <span className="text-[10px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2 py-0.5 font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+              USED
+            </span>
+          )}
+          {type === "product" && isOutOfStock && (
+            <span className="text-[20px] bg-red-500/10 text-red-500 border border-red-500/20 px-4 py-0.5 font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+              OUT OF STOCK
+            </span>
+          )}
+        </div>
 
         <p className={`text-base font-medium mb-4 ${darkMode ? "text-gray-200" : "text-gray-700"}`}>
           Total: {formatFrw(price * quantity)}
         </p>
 
-        <div className={`mb-4 text-sm font-medium ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
-          Read more at the bottom of the page
-        </div>
+    
 
         {/* Quantity selector */}
-        <div className={`flex items-center overflow-hidden max-w-[200px] mb-5 ${darkMode ? "border border-gray-700" : "border border-gray-200"}`}>
-          <button
-            onClick={handleDecrease}
-            className={`flex-1 py-2 text-xl font-bold ${darkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-500 hover:bg-gray-100"} transition`}
-            type="button"
-          >
-            &minus;
-          </button>
-          <div className={`flex-1 text-center text-base font-medium py-2 ${darkMode ? "text-gray-100" : "text-gray-900"}`}>{quantity}</div>
-          <button
-            onClick={handleIncrease}
-            className={`flex-1 py-2 text-xl font-bold ${darkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-500 hover:bg-gray-100"} transition`}
-            type="button"
-          >
-            +
-          </button>
-        </div>
+        {!(type === "product" && isOutOfStock) && (
+          <div className={`flex items-center overflow-hidden max-w-[200px] mb-5 ${darkMode ? "border border-gray-700" : "border border-gray-200"}`}>
+            <button
+              onClick={handleDecrease}
+              className={`flex-1 py-2 text-xl font-bold ${darkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-500 hover:bg-gray-100"} transition`}
+              type="button"
+            >
+              &minus;
+            </button>
+            <div className={`flex-1 text-center text-base font-medium py-2 ${darkMode ? "text-gray-100" : "text-gray-900"}`}>{quantity}</div>
+            <button
+              onClick={handleIncrease}
+              className={`flex-1 py-2 text-xl font-bold ${darkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-500 hover:bg-gray-100"} transition`}
+              type="button"
+            >
+              +
+            </button>
+          </div>
+        )}
 
         {message && (
           <div className={`${darkMode ? "mb-4 p-2 bg-green-900 text-green-200 rounded text-sm" : "mb-4 p-2 bg-green-100 text-green-700 rounded text-sm"}`}>
@@ -382,7 +441,7 @@ export default function ProductOrServiceDetail({
           <div className={`mb-4 p-4 rounded-lg border ${darkMode ? "border-blue-600 bg-blue-900/20" : "border-blue-300 bg-blue-50"}`}>
             {/* Info Tag */}
             <div className={`mb-4 p-3 rounded text-sm font-medium ${darkMode ? "bg-blue-800 text-blue-100" : "bg-blue-100 text-blue-800"}`}>
-              ℹ️ The service provider will review and adjust the price based on your customization needs
+              The service provider will review and adjust the price based on your customization needs
             </div>
 
             {/* Customization Text Area */}
@@ -435,15 +494,68 @@ export default function ProductOrServiceDetail({
           </div>
         )}
 
-        {/* Add to cart */}
-        <button
-          onClick={handleAddToCart}
-          className={`w-full py-3 text-base font-semibold shadow transition 
-             ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
-                        : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
-        >
-          {type === "service" ? "Add service to cart" : "Add to cart"}
-        </button>
+        {/* Add to cart / Contact seller info if out of stock */}
+        {type === "product" && isOutOfStock ? (
+          <div className={`mt-2 p-5 border-2 border-dashed rounded-lg transition-all ${
+            darkMode 
+              ? "bg-red-950/20 border-red-900/60 text-gray-200" 
+              : "bg-red-50/50 border-red-200 text-gray-800"
+          }`}>
+            <h3 className="text-lg font-bold text-red-600 dark:text-red-400 mb-2 flex items-center gap-2">
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse"></span>
+              Temporarily Out of Stock
+            </h3>
+            <p className={`text-sm mb-4 leading-relaxed ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
+              This product is currently out of stock. Contact the service provider or seller to get details on when it will be available.
+            </p>
+            
+            <div className="flex flex-col gap-3">
+              {providerPhone && (
+                <a
+                  href={`tel:${providerPhone}`}
+                  className="flex items-center justify-center gap-3 py-3 px-4 rounded-md font-semibold text-sm transition-all shadow-sm bg-emerald-600 text-white hover:bg-emerald-500"
+                >
+                  <FaPhone className="w-4 h-4" />
+                  Call Seller: {providerPhone}
+                </a>
+              )}
+              {providerWhatsapp && (
+                <a
+                  href={`https://wa.me/${providerWhatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(
+                    `Hello! I'm interested in "${title}" which is out of stock. When will it be available in stock?`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-3 py-3 px-4 rounded-md font-semibold text-sm text-white transition-all shadow-sm bg-green-600 hover:bg-green-500"
+                >
+                  <FaWhatsapp className="w-4.5 h-4.5" />
+                  WhatsApp: {providerWhatsapp}
+                </a>
+              )}
+              {!providerPhone && !providerWhatsapp && providerEmail && (
+                <a
+                  href={`mailto:${providerEmail}?subject=${encodeURIComponent(`Inquiry about ${title}`)}&body=${encodeURIComponent(`Hello, I would like to know when the product "${title}" will be back in stock.`)}`}
+                  className="flex items-center justify-center gap-3 py-3 px-4 rounded-md font-semibold text-sm text-white transition-all shadow-sm bg-blue-600 hover:bg-blue-500"
+                >
+                  <FaEnvelope className="w-4 h-4" />
+                  Email Seller: {providerEmail}
+                </a>
+              )}
+              {!providerPhone && !providerWhatsapp && !providerEmail && (
+                <p className="text-xs text-gray-500 italic">No contact information is available for this seller.</p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={handleAddToCart}
+            className={`w-full py-3 text-base font-semibold shadow transition 
+               ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
+                          : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
+          >
+            {type === "service" ? "Add service to cart" : "Add to cart"}
+          </button>
+        )}
       </div>
 
       </div>

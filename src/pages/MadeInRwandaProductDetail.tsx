@@ -127,7 +127,7 @@ export default function MadeInRwandaProductDetail() {
         fetchProduct();
     }, [productId]);
 
-    const handleAddToCart = (item: { productId: string; title: string; price: number; quantity: number; imageUrl: string; type: string; description?: string }) => {
+    const handleAddToCart = (item: { productId: string; title: string; price: number; quantity: number; imageUrl: string; type: string; description?: string; used?: boolean; pricingUnit?: string }) => {
         if (!product) return;
         addToCart({
             productId: product.id,
@@ -141,7 +141,9 @@ export default function MadeInRwandaProductDetail() {
             shipping: product.shipping || 0,
             checked: true,
             providerId: product.providerId || null,
-            type: item.type || product.type || 'product'
+            type: item.type || product.type || 'product',
+            used: item.used || product.used || false,
+            pricingUnit: item.pricingUnit || product.pricingUnit || product.pricing_unit || 'Per Item / Piece'
         });
         setMessage('Product added to cart successfully');
     };
@@ -202,6 +204,9 @@ export default function MadeInRwandaProductDetail() {
                 providerWhatsapp={provider?.whatsapp_number}
                 providerProfileImage={toAbsoluteMediaUrl(provider?.profile_image || provider?.profile_image_url)}
                 madeInRwanda={product.madeInRwanda || product.made_in_rwanda || true}
+                used={product.used}
+                pricingUnit={product.pricingUnit || product.pricing_unit}
+                inStock={product.inStock !== false && product.in_stock !== false}
             />
             {/* Made in Rwanda Badge in sidebar */}
             {product.madeInRwanda && (

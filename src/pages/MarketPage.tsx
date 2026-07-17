@@ -38,6 +38,10 @@ interface Product {
   rating?: number;
   createdAt?: string;
   providerId?: string;
+  used?: boolean;
+  pricingUnit?: string;
+  pricing_unit?: string;
+  inStock?: boolean;
 }
 
 const getUrl = (path: string | undefined) => {
@@ -75,7 +79,7 @@ function MarketProductCard({
           <img
             src={mainImage}
             alt={product.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${product.inStock === false ? 'opacity-60' : ''}`}
             loading="lazy"
           />
         ) : (
@@ -83,8 +87,15 @@ function MarketProductCard({
             No image
           </div>
         )}
+        {product.inStock === false && (
+          <div className="absolute inset-0 bg-black/45 z-10 flex items-center justify-center">
+            <span className="bg-red-600 text-white text-[11px] font-black px-2.5 py-1.5 uppercase tracking-wider shadow-lg" style={{ borderRadius: '2px' }}>
+              OUT OF STOCK
+            </span>
+          </div>
+        )}
         {product.fileType === 'video' && (
-          <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-medium bg-black/60 text-white" style={{ borderRadius: '2px' }}>
+          <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-medium bg-black/60 text-white z-10" style={{ borderRadius: '2px' }}>
             🎥 Video
           </div>
         )}
@@ -101,8 +112,18 @@ function MarketProductCard({
         </p>
 
         <div className="mt-auto">
-          <div className={`text-lg font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
-            RWF {product.price.toLocaleString()}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className={`text-lg font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+              RWF {product.price.toLocaleString()}
+              <span className={`text-[10px] font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} ml-1`}>
+                / {product.pricingUnit || product.pricing_unit || 'Per Item / Piece'}
+              </span>
+            </div>
+            {product.used && (
+              <span className="text-[9px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 py-0.5 font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+                USED
+              </span>
+            )}
           </div>
           
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
@@ -138,6 +159,7 @@ export default function MarketWithCategoryProducts() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high' | 'newest'>('popular');
   const [showFilters, setShowFilters] = useState(false);
+  const [conditionFilter, setConditionFilter] = useState<'all' | 'new' | 'used'>('all');
 
   // Auto-scroll refs
   const categoryStripRef = useRef<HTMLDivElement | null>(null);
@@ -186,6 +208,11 @@ export default function MarketWithCategoryProducts() {
         }
         return true;
       })
+      .filter(product => {
+        if (conditionFilter === 'new') return !product.used;
+        if (conditionFilter === 'used') return !!product.used;
+        return true;
+      })
       .filter(product =>
         product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -203,7 +230,7 @@ export default function MarketWithCategoryProducts() {
             return (b.views?.length || 0) - (a.views?.length || 0);
         }
       });
-  }, [products, selectedCategory, searchQuery, sortBy, filterProviderId]);
+  }, [products, selectedCategory, searchQuery, sortBy, filterProviderId, conditionFilter]);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -255,6 +282,10 @@ export default function MarketWithCategoryProducts() {
             rating: product.rating,
             createdAt: product.createdAt || product.created_at || undefined,
             providerId: product.providerId || product.provider_id || product.seller_id || undefined,
+            used: product.used === true,
+            pricingUnit: product.pricingUnit || 'Per Item / Piece',
+            pricing_unit: product.pricing_unit || 'Per Item / Piece',
+            inStock: product.inStock !== false && product.in_stock !== false,
           }))
         : [];
 
@@ -313,6 +344,7 @@ export default function MarketWithCategoryProducts() {
     setSelectedCategory(null);
     setSearchQuery("");
     setSortBy('popular');
+    setConditionFilter('all');
   };
 
   const isVideo = (url: string) => {
@@ -420,8 +452,20 @@ export default function MarketWithCategoryProducts() {
           ))}
         </select>
 
+        {/* Condition selection */}
+        <select
+          value={conditionFilter}
+          onChange={(e) => setConditionFilter(e.target.value as any)}
+          className={`border outline-0 px-3 py-1.5 text-sm  ${darkMode ? 'bg-gray-950 text-white border-gray-700' : 'bg-gray-100 text-gray-900 border-gray-200'} focus:ring-1 focus:ring-emerald-500 cursor-pointer flex-shrink-0`}
+          style={{ borderRadius: '2px' }}
+        >
+          <option value="all">All Conditions</option>
+          <option value="new">New Only</option>
+          <option value="used">Used Only</option>
+        </select>
+
         {/* Clear filters */}
-        {(selectedCategory || searchQuery || sortBy !== 'popular') && (
+        {(selectedCategory || searchQuery || sortBy !== 'popular' || conditionFilter !== 'all') && (
           <button
             onClick={clearFilters}
             className="text-xs text-emerald-500 hover:text-emerald-600 whitespace-nowrap flex-shrink-0"

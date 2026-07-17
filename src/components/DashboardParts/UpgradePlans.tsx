@@ -12,6 +12,8 @@ import {
   Shield,
   X,
 } from "lucide-react";
+import MtnIcon from "../../pages/images/mtn.png";
+import AirtelIcon from "../../pages/images/airtel money.png";
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
@@ -142,7 +144,6 @@ export default function UpgradePlans() {
   const [canPurchaseBase, setCanPurchaseBase] = useState(false);
   const [userStoragePlan, setUserStoragePlan] = useState<StoragePlan | null>(null);
   const [storageUsage, setStorageUsage] = useState<StorageUsage | null>(null);
-  const [renewPhone, setRenewPhone] = useState<string>("");
   const [renewLoading, setRenewLoading] = useState<boolean>(false);
   const [renewMessage, setRenewMessage] = useState<string | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
@@ -157,7 +158,10 @@ export default function UpgradePlans() {
   const [isReducingStorage, setIsReducingStorage] = useState<boolean>(false);
   const [renewReductionAmount, setRenewReductionAmount] = useState<number>(0);
   const [renewReductionUnit, setRenewReductionUnit] = useState<string>('GB');
+  const [formData, setFormData] = useState({ mtnPhone: '', airtelPhone: '' });
+  const [selectedMethod, setSelectedMethod] = useState<'mtn' | 'airtel'>('mtn');
 
+ 
   const { darkMode } = useDarkMode();
   const { token, user } = useAuth();
   const visiblePlans = useMemo(() => {
@@ -312,6 +316,28 @@ export default function UpgradePlans() {
     additional_storage_purchased_gb: 0,
     subscription_status: 'inactive'
   });
+
+  // Format phone number
+  const formatPhoneNumber = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+    const limited = digits.slice(0, 10);
+    if (limited.length <= 3) return limited;
+    if (limited.length <= 6) return `${limited.slice(0, 3)} ${limited.slice(3)}`;
+    return `${limited.slice(0, 3)} ${limited.slice(3, 6)} ${limited.slice(6)}`;
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    networkType: 'mtn' | 'airtel'
+  ) => {
+    const raw = e.target.value.replace(/\D/g, "");
+    const formatted = formatPhoneNumber(raw);
+    setFormData((prev) => ({
+      ...prev,
+      [networkType + 'Phone']: formatted,
+    }));
+  };
+
 
   const convertToGB = (amount: number, unit: string): number => {
     switch (unit) {
@@ -982,20 +1008,64 @@ export default function UpgradePlans() {
                       </div>
                     </div>
 
-                    {/* MTN MoMo Input */}
-                    <div>
-                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${subText}`}>
-                        MTN Mobile Money Phone Number
+                    {/* Payment Methods */}
+                    <div className="mb-4">
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${subText}`}>
+                        Choose Payment Method
                       </label>
-                      <input
-                        type="tel"
-                        required
-                        value={renewPhone}
-                        onChange={(e) => setRenewPhone(e.target.value)}
-                        placeholder="e.g. 078XXXXXXX"
-                        className={`w-full px-3 py-2 border outline-none text-sm ${inputBase}`}
-                        style={{ borderRadius: '2px' }}
-                      />
+                      <div className="grid grid-cols-2 gap-3">
+                        {/* MTN Option */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedMethod('mtn')}
+                          className={`p-3 border-2 rounded-lg cursor-pointer transition-colors flex items-center justify-center gap-2 ${
+                            selectedMethod === 'mtn'
+                              ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
+                              : `border-gray-200 ${darkMode ? 'border-gray-700 hover:border-gray-600' : 'hover:border-gray-300'}`
+                          }`}
+                        >
+                          <img src={MtnIcon} alt="MTN MoMo" className="w-6 h-6 object-contain" />
+                          <span className={`text-xs font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                            MTN MoMo
+                          </span>
+                        </button>
+
+                        {/* Airtel Option */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedMethod('airtel')}
+                          className={`p-3 border-2 rounded-lg cursor-pointer transition-colors flex items-center justify-center gap-2 ${
+                            selectedMethod === 'airtel'
+                              ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
+                              : `border-gray-200 ${darkMode ? 'border-gray-700 hover:border-gray-600' : 'hover:border-gray-300'}`
+                          }`}
+                        >
+                          <img src={AirtelIcon} alt="Airtel Money" className="w-6 h-6 object-contain" />
+                          <span className={`text-xs font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                            Airtel Money
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Phone Input for Mobile Money */}
+                    <div className="mb-4">
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${subText}`}>
+                        {selectedMethod === 'mtn' ? 'MTN' : 'Airtel'} Phone Number
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <span className={`text-sm ${subText}`}>+250</span>
+                        </div>
+                        <input
+                          type="text"
+                          placeholder={selectedMethod === 'mtn' ? '078 123 4567' : '073 123 4567'}
+                          value={selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone}
+                          onChange={(e) => handleInputChange(e, selectedMethod)}
+                          className={`w-full pl-14 pr-3 py-2 border outline-none text-sm ${inputBase}`}
+                          style={{ borderRadius: '2px' }}
+                        />
+                      </div>
                     </div>
 
                     {renewMessage && (
@@ -1017,10 +1087,14 @@ export default function UpgradePlans() {
                           setRenewLoading(true);
                           try {
                             if (!selectedPlanForRenewal.id) throw new Error('Please select a plan');
+                            const activePhone = selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone;
+                            const cleanPhone = activePhone.replace(/\D/g, "");
+                            if (!cleanPhone) throw new Error('Please enter a valid phone number');
+
                             const body = {
                               plan_id: selectedPlanForRenewal.id,
-                              phone: renewPhone,
-                              provider: 'mtn',
+                              phone: cleanPhone,
+                              provider: selectedMethod,
                               addon_gb: changeGb,
                               addon_gb_total: totalAddonGb,
                               price_per_gb: storagePricing?.price_per_gb_rwf ?? 500,
@@ -1053,7 +1127,7 @@ export default function UpgradePlans() {
                             setRenewLoading(false);
                           }
                         }}
-                        disabled={renewLoading || !renewPhone}
+                        disabled={renewLoading || !(selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone)}
                         className={`flex-grow py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5`}
                         style={{ borderRadius: '2px' }}
                       >

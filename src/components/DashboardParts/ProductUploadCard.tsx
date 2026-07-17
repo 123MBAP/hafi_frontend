@@ -5,6 +5,16 @@ import { Loader2 } from 'lucide-react';
 import React from 'react';
 import { FiUpload } from 'react-icons/fi';
 
+const PRICING_UNITS = [
+  { value: 'Per Item / Piece', label: 'Per Item / Piece (e.g., clothes, electronics, single objects)' },
+  { value: 'Per Kilogram (kg)', label: 'Per Kilogram (kg) (e.g., vegetables, meat, flour)' },
+  { value: 'Per Liter (L)', label: 'Per Liter (L) (e.g., drinks, oils, liquid chemicals)' },
+  { value: 'Per Square Meter (m²)', label: 'Per Square Meter (m²) (e.g., flooring, carpets, land tiles)' },
+  { value: 'Per Cubic Meter (m³)', label: 'Per Cubic Meter (m³) (e.g., sand, gravel, large cargo)' },
+  { value: 'Per Meter (m)', label: 'Per Meter (m) (e.g., ropes, cables, fabrics)' },
+  { value: 'Per Pack / Dozen', label: 'Per Pack / Dozen (e.g., box bundles, multipacks)' }
+];
+
 type Props = {
   darkMode: boolean;
   subscription?: any;
@@ -16,6 +26,8 @@ type Props = {
   productDesc: string;
   productPrice: string;
   productMadeInRwanda: boolean;
+  productUsed: boolean;
+  productPricingUnit: string;
   handleProductImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleProductViewChange: (e: React.ChangeEvent<HTMLInputElement>, idx: number) => void;
   handleProductVideoChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -25,6 +37,8 @@ type Props = {
   setProductDesc: (v: string) => void;
   setProductPrice: (v: string) => void;
   setProductMadeInRwanda: (v: boolean) => void;
+  setProductUsed: (v: boolean) => void;
+  setProductPricingUnit: (v: string) => void;
   featureValues?: Record<string, any>;
   setFeatureValues?: (values: Record<string, any>) => void;
   uploadProgress?: number | null;
@@ -40,6 +54,8 @@ export default function ProductUploadCard({
   productDesc,
   productPrice,
   productMadeInRwanda,
+  productUsed,
+  productPricingUnit,
   handleProductImageChange,
   handleProductViewChange,
   handleProductVideoChange,
@@ -49,6 +65,8 @@ export default function ProductUploadCard({
   setProductDesc,
   setProductPrice,
   setProductMadeInRwanda,
+  setProductUsed,
+  setProductPricingUnit,
   featureValues = {},
   setFeatureValues = () => { },
   uploadProgress,
@@ -108,39 +126,82 @@ export default function ProductUploadCard({
               />
             </div>
 
-            <div>
-              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Price (RWF)
-              </label>
-              <input
-                type="number"
-                value={productPrice}
-                onChange={(e) => setProductPrice(e.target.value)}
-                className={`w-full p-2.5 border text-sm ${darkMode
-                  ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-550'
-                  : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                  } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
-                style={{ borderRadius: '2px' }}
-                placeholder="1000"
-                min={0}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  Price (RWF)
+                </label>
+                <input
+                  type="number"
+                  value={productPrice}
+                  onChange={(e) => setProductPrice(e.target.value)}
+                  className={`w-full p-2.5 border text-sm ${darkMode
+                    ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-550'
+                    : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                    } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                  style={{ borderRadius: '2px' }}
+                  placeholder="1000"
+                  min={0}
+                />
+              </div>
+              <div>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  Pricing Unit
+                </label>
+                <select
+                  value={productPricingUnit}
+                  onChange={(e) => setProductPricingUnit(e.target.value)}
+                  className={`w-full p-2.5 border text-sm ${darkMode
+                    ? 'bg-gray-950 border-gray-800 text-white'
+                    : 'bg-white border-gray-250 text-gray-900'
+                    } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
+                  style={{ borderRadius: '2px' }}
+                >
+                  {PRICING_UNITS.map(unit => (
+                    <option key={unit.value} value={unit.value}>{unit.label}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            <div className="flex items-center mt-2">
-              <input
-                id="made-in-rwanda"
-                type="checkbox"
-                checked={productMadeInRwanda}
-                onChange={(e) => setProductMadeInRwanda(e.target.checked)}
-                className="mr-2 text-emerald-600 focus:ring-emerald-500"
-                style={{ borderRadius: '2px' }}
-              />
-              <label
-                htmlFor="made-in-rwanda"
-                className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}
-              >
-                Made in Rwanda 🇷🇼
-              </label>
+            <div className="flex flex-col gap-3 mt-3">
+              <div className="flex items-center">
+                <input
+                  id="made-in-rwanda"
+                  type="checkbox"
+                  checked={productMadeInRwanda}
+                  onChange={(e) => setProductMadeInRwanda(e.target.checked)}
+                  className="mr-2 text-emerald-600 focus:ring-emerald-500"
+                  style={{ borderRadius: '2px' }}
+                />
+                <label
+                  htmlFor="made-in-rwanda"
+                  className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}
+                >
+                  Made in Rwanda 🇷🇼
+                </label>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center">
+                  <input
+                    id="product-used"
+                    type="checkbox"
+                    checked={productUsed}
+                    onChange={(e) => setProductUsed(e.target.checked)}
+                    className="mr-2 text-emerald-600 focus:ring-emerald-500"
+                    style={{ borderRadius: '2px' }}
+                  />
+                  <label
+                    htmlFor="product-used"
+                    className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}
+                  >
+                    Used / Second Hand
+                  </label>
+                </div>
+                <p className={`text-[10px] ${darkMode ? 'text-gray-500' : 'text-gray-400'} pl-6 leading-tight`}>
+                  This product has been used before (second-hand item).
+                </p>
+              </div>
             </div>
 
             {service?.specific_features && service?.features && service.features.length > 0 && (

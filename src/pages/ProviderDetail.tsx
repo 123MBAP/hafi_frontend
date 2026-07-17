@@ -87,6 +87,7 @@ interface ProviderImage {
   views?: string[];
   mediaFiles?: Array<{ url: string; type: 'image' | 'video' }>;
   madeInRwanda?: boolean;
+  inStock?: boolean;
 }
 
 interface ProfileImage {
@@ -161,6 +162,7 @@ export default function ProviderDetail() {
             views: img.views || [],
             mediaFiles: img.mediaFiles || [],
             madeInRwanda: img.madeInRwanda || false,
+            inStock: img.inStock !== false && img.in_stock !== false,
           })));
         }
         if (Array.isArray(data.service)) {
@@ -571,7 +573,7 @@ export default function ProviderDetail() {
                       <img
                         src={previewUrl || '/default-profile.png'}
                         alt={img.title || `item-${idx}`}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${img.type === 'product' && img.inStock === false ? 'opacity-60' : ''}`}
                         loading="lazy"
                         onError={(e) => {
                           e.currentTarget.src = '/default-profile.png';
@@ -579,6 +581,11 @@ export default function ProviderDetail() {
                       />
                         );
                       })()}
+                      {img.type === 'product' && img.inStock === false && (
+                        <div className="absolute top-2 left-2 px-1.5 py-0.5 text-[10px] font-bold bg-red-600 text-white z-10 shadow-sm" style={{ borderRadius: '2px' }}>
+                          OUT OF STOCK
+                        </div>
+                      )}
                       {img.type === "product" ? (
                         <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-medium bg-emerald-500 text-white" style={{ borderRadius: '2px' }}>
                           Product
@@ -608,25 +615,35 @@ export default function ProviderDetail() {
                         </div>
                         
                         <div className="mt-2">
-                          <button
-                            onClick={(e) => { e.stopPropagation(); img.type === "product" ? handleBuyProduct(img) : handleBookService(img); }}
-                            className={`w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium transition-colors 
-                              ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
-                                : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
-                            style={{ borderRadius: '2px' }}
-                          >
-                            {img.type === "product" ? (
-                              <>
-                                <ShoppingBag className="w-3 h-3" />
-                                Buy
-                              </>
-                            ) : (
-                              <>
-                                <Calendar className="w-3 h-3" />
-                                Book
-                              </>
-                            )}
-                          </button>
+                          {img.type === 'product' && img.inStock === false ? (
+                            <button
+                              disabled
+                              className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium bg-gray-450 dark:bg-gray-700 text-gray-200 dark:text-gray-400 cursor-not-allowed"
+                              style={{ borderRadius: '2px' }}
+                            >
+                              Out of Stock
+                            </button>
+                          ) : (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); img.type === "product" ? handleBuyProduct(img) : handleBookService(img); }}
+                              className={`w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium transition-colors 
+                                ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
+                                  : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
+                              style={{ borderRadius: '2px' }}
+                            >
+                              {img.type === "product" ? (
+                                <>
+                                  <ShoppingBag className="w-3 h-3" />
+                                  Buy
+                                </>
+                              ) : (
+                                <>
+                                  <Calendar className="w-3 h-3" />
+                                  Book
+                                </>
+                              )}
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
