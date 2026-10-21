@@ -39,6 +39,7 @@ export default function ProductDetail() {
   const [provider, setProvider] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [Message, setMessage] = useState<any>(null);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
 
   const { addToCart } = useCart(); // ✅ use cart context
   // const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -72,6 +73,7 @@ export default function ProductDetail() {
         console.log("Product object:", data.product);
 
         setProduct(data.product);
+        setRelatedProducts(data.related || []);
       } catch (err) {
         console.error("Error fetching product:", err);
       } finally {
@@ -162,6 +164,7 @@ export default function ProductDetail() {
       pricingUnit={product.pricingUnit || product.pricing_unit}
       inStock={product.inStock !== false && product.in_stock !== false}
       viewMorePath={`/market?providerId=${product.providerId || product.provider_id || product.seller_id}`}
+      relatedItems={relatedProducts}
     />
   );
 }

@@ -61,6 +61,7 @@ import Wallet from './pages/Wallet';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
+import Hafibot from './components/Hafibot';
 
 
 
@@ -229,6 +230,8 @@ const App: React.FC = () => {
             />
           )}
 
+          <Hafibot />
+
 
 
         </main>
@@ -236,107 +239,107 @@ const App: React.FC = () => {
 
         <footer className={`py-12 mt-auto border-t transition-colors duration-300
           ${darkMode
-            ? 'bg-gray-950 text-gray-400 border-gray-800'
-            : 'bg-white text-gray-600 border-gray-200'}`}>
+            ? 'bg-gray-900 text-gray-300 border-gray-800'
+            : 'bg-gray-900 text-gray-100 border-gray-800'}`}>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-10">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-5">
                 <div>
-                  <p className={`text-xs uppercase tracking-[0.28em] ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                  <p className={`text-xs uppercase tracking-[0.28em] ${darkMode ? 'text-emerald-400' : 'text-emerald-300'}`}>
                     Explore the platform
                   </p>
-                  <h3 className={`mt-2 text-2xl sm:text-3xl font-bold tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <h3 className={`mt-2 text-2xl sm:text-3xl font-bold tracking-tight ${darkMode ? 'text-white' : 'text-white'}`}>
                     One place for the four core ways people use HafiConnect.
                   </h3>
                 </div>
-                <p className={`max-w-2xl text-sm leading-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <p className={`max-w-2xl text-sm leading-6 ${darkMode ? 'text-gray-400' : 'text-gray-100'}`}>
                   Built to help people find help nearby, discover local goods, browse wider market listings, and connect with real estate opportunities without leaving the app.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                <a href="/services" className={`group p-5 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700' : 'bg-white border-gray-200 hover:border-emerald-300'}`} style={{ borderRadius: '2px' }}>
-                  <div className={`text-xs font-semibold uppercase tracking-[0.22em] mb-3 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                <a href="/services" className="group p-5 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md bg-gray-850 border-gray-800 hover:border-emerald-700" style={{ borderRadius: '2px' }}>
+                  <div className="text-xs font-semibold uppercase tracking-[0.22em] mb-3 text-emerald-400">
                     Services
                   </div>
-                  <h4 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <h4 className="text-lg font-semibold mb-2 text-white">
                     Find local service providers nearby
                   </h4>
-                  <p className={`text-sm leading-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className="text-sm leading-6 text-gray-400">
                     Search trusted professionals around you for repairs, care, delivery, beauty, and everyday help.
                   </p>
-                  <span className={`mt-4 inline-flex text-sm font-medium transition-colors ${darkMode ? 'text-emerald-400 group-hover:text-emerald-300' : 'text-emerald-600 group-hover:text-emerald-700'}`}>
+                  <span className="mt-4 inline-flex text-sm font-medium transition-colors text-emerald-400 group-hover:text-emerald-300">
                     Open Services →
                   </span>
                 </a>
 
-                <a href="/made-in-rwanda" className={`group p-5 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700' : 'bg-white border-gray-200 hover:border-emerald-300'}`} style={{ borderRadius: '2px' }}>
-                  <div className={`text-xs font-semibold uppercase tracking-[0.22em] mb-3 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                <a href="/made-in-rwanda" className="group p-5 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md bg-gray-850 border-gray-800 hover:border-emerald-700" style={{ borderRadius: '2px' }}>
+                  <div className="text-xs font-semibold uppercase tracking-[0.22em] mb-3 text-emerald-400">
                     Made in Rwanda
                   </div>
-                  <h4 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <h4 className="text-lg font-semibold mb-2 text-white">
                     Discover local products in one place
                   </h4>
-                  <p className={`text-sm leading-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className="text-sm leading-6 text-gray-400">
                     Shop Rwanda-made goods and support creators, makers, and sellers from across the country.
                   </p>
-                  <span className={`mt-4 inline-flex text-sm font-medium transition-colors ${darkMode ? 'text-emerald-400 group-hover:text-emerald-300' : 'text-emerald-600 group-hover:text-emerald-700'}`}>
+                  <span className="mt-4 inline-flex text-sm font-medium transition-colors text-emerald-400 group-hover:text-emerald-300">
                     Explore Local Products →
                   </span>
                 </a>
 
-                <a href="/market" className={`group p-5 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700' : 'bg-white border-gray-200 hover:border-emerald-300'}`} style={{ borderRadius: '2px' }}>
-                  <div className={`text-xs font-semibold uppercase tracking-[0.22em] mb-3 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                <a href="/market" className="group p-5 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md bg-gray-850 border-gray-800 hover:border-emerald-700" style={{ borderRadius: '2px' }}>
+                  <div className="text-xs font-semibold uppercase tracking-[0.22em] mb-3 text-emerald-400">
                     Global Market
                   </div>
-                  <h4 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <h4 className="text-lg font-semibold mb-2 text-white">
                     Browse products and goods across Rwanda and beyond
                   </h4>
-                  <p className={`text-sm leading-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className="text-sm leading-6 text-gray-400">
                     Find marketplace listings that connect buyers with goods, sellers, and opportunities beyond one location.
                   </p>
-                  <span className={`mt-4 inline-flex text-sm font-medium transition-colors ${darkMode ? 'text-emerald-400 group-hover:text-emerald-300' : 'text-emerald-600 group-hover:text-emerald-700'}`}>
+                  <span className="mt-4 inline-flex text-sm font-medium transition-colors text-emerald-400 group-hover:text-emerald-300">
                     Open Market →
                   </span>
                 </a>
 
-                <a href="/real-estate" className={`group p-5 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700' : 'bg-white border-gray-200 hover:border-emerald-300'}`} style={{ borderRadius: '2px' }}>
-                  <div className={`text-xs font-semibold uppercase tracking-[0.22em] mb-3 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                <a href="/real-estate" className="group p-5 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md bg-gray-850 border-gray-800 hover:border-emerald-700" style={{ borderRadius: '2px' }}>
+                  <div className="text-xs font-semibold uppercase tracking-[0.22em] mb-3 text-emerald-400">
                     Real Estate
                   </div>
-                  <h4 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <h4 className="text-lg font-semibold mb-2 text-white">
                     Find houses, land, buildings, and agents easily
                   </h4>
-                  <p className={`text-sm leading-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className="text-sm leading-6 text-gray-400">
                     Search properties and connect with commissioners and real estate professionals in a straightforward flow.
                   </p>
-                  <span className={`mt-4 inline-flex text-sm font-medium transition-colors ${darkMode ? 'text-emerald-400 group-hover:text-emerald-300' : 'text-emerald-600 group-hover:text-emerald-700'}`}>
+                  <span className="mt-4 inline-flex text-sm font-medium transition-colors text-emerald-400 group-hover:text-emerald-300">
                     Browse Real Estate →
                   </span>
                 </a>
               </div>
             </div>
 
-            <div className={`grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8 border-t ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
+            <div className={`grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8 border-t ${darkMode ? 'border-gray-800' : 'border-gray-700'}`}>
               <div>
-                <a href="/" className="text-2xl font-bold text-emerald-600 mb-3 block hover:opacity-85 transition-opacity">
+                <a href="/" className="text-2xl font-bold text-white mb-3 block hover:opacity-85 transition-opacity">
                   HafiConnect
                 </a>
-                <p className={`max-w-md text-sm leading-6 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                <p className={`max-w-md text-sm leading-6 ${darkMode ? 'text-gray-400' : 'text-gray-100'}`}>
                   HafiConnect brings services, local products, global market listings, and real estate opportunities into one practical place.
                 </p>
                 <div className="flex space-x-4 mt-5">
-                  <a href="#" aria-label="Facebook" className="hover:text-emerald-500 transition-colors">
+                  <a href="#" aria-label="Facebook" className="hover:text-emerald-300 transition-colors">
                     <i className="fab fa-facebook-f"></i>
                   </a>
-                  <a href="#" aria-label="Twitter" className="hover:text-emerald-500 transition-colors">
+                  <a href="#" aria-label="Twitter" className="hover:text-emerald-300 transition-colors">
                     <i className="fab fa-twitter"></i>
                   </a>
-                  <a href="#" aria-label="Instagram" className="hover:text-emerald-500 transition-colors">
+                  <a href="#" aria-label="Instagram" className="hover:text-emerald-300 transition-colors">
                     <i className="fab fa-instagram"></i>
                   </a>
-                  <a href="#" aria-label="LinkedIn" className="hover:text-emerald-500 transition-colors">
+                  <a href="#" aria-label="LinkedIn" className="hover:text-emerald-300 transition-colors">
                     <i className="fab fa-linkedin-in"></i>
                   </a>
                 </div>
@@ -344,21 +347,21 @@ const App: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <h4 className={`font-bold mb-3 text-sm uppercase tracking-wider ${darkMode ? 'text-white' : 'text-emerald-700'}`}>Quick Links</h4>
+                  <h4 className={`font-bold mb-3 text-sm uppercase tracking-wider ${darkMode ? 'text-white' : 'text-emerald-300'}`}>Quick Links</h4>
                   <ul className="space-y-2 text-sm">
-                    <li><a href="/about-haficonnect" className="hover:text-emerald-500 transition-colors">About Us</a></li>
-                    <li><a href="/contact" className="hover:text-emerald-500 transition-colors">Contact</a></li>
-                    <li><a href="/faq" className="hover:text-emerald-500 transition-colors">FAQs</a></li>
+                    <li><a href="/about-haficonnect" className="hover:text-emerald-300 transition-colors">About Us</a></li>
+                    <li><a href="/contact" className="hover:text-emerald-300 transition-colors">Contact</a></li>
+                    <li><a href="/faq" className="hover:text-emerald-300 transition-colors">FAQs</a></li>
                   </ul>
                 </div>
 
                 <div>
-                  <h4 className={`font-bold mb-3 text-sm uppercase tracking-wider ${darkMode ? 'text-white' : 'text-emerald-700'}`}>Contact</h4>
-                  <p className={`text-sm mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    Email: <a href="mailto:info@haficonnect.com" className="hover:text-emerald-500 transition-colors">info@haficonnect.com</a>
+                  <h4 className={`font-bold mb-3 text-sm uppercase tracking-wider ${darkMode ? 'text-white' : 'text-emerald-300'}`}>Contact</h4>
+                  <p className={`text-sm mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-100'}`}>
+                    Email: <a href="mailto:info@haficonnect.com" className="hover:text-emerald-300 transition-colors">info@haficonnect.com</a>
                   </p>
-                  <p className={`text-sm mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    Phone: <a href="tel:+250791689396" className="hover:text-emerald-500 transition-colors">+250 791 689 396</a>
+                  <p className={`text-sm mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-100'}`}>
+                    Phone: <a href="tel:+250791689396" className="hover:text-emerald-300 transition-colors">+250 791 689 396</a>
                   </p>
 
                 </div>
@@ -370,10 +373,10 @@ const App: React.FC = () => {
           </div>
 
           {/* Footer Bottom */}
-          <div className={`border-t mt-8 pt-4 text-center text-xs ${darkMode ? 'border-gray-800 text-gray-550' : 'border-gray-200 text-gray-400'}`}>
+          <div className={`border-t mt-8 pt-4 text-center text-xs ${darkMode ? 'border-gray-800 text-gray-400' : 'border-gray-800 text-gray-300'}`}>
             &copy; {new Date().getFullYear()} HafiConnect. All rights reserved. &nbsp;|&nbsp;
-            <a href="/terms" className="hover:text-hafi-green transition-colors">Terms of Service</a> &nbsp;|&nbsp;
-            <a href="/privacy" className="hover:text-hafi-green transition-colors">Privacy Policy</a>
+            <a href="/terms" className="hover:text-emerald-300 transition-colors">Terms of Service</a> &nbsp;|&nbsp;
+            <a href="/privacy" className="hover:text-emerald-300 transition-colors">Privacy Policy</a>
           </div>
         </footer>
       </div>

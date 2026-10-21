@@ -12,6 +12,9 @@ module.exports = {
       },
       colors: {
         'navy-dark': '#000033',
+        gray: {
+          850: '#182030',
+        },
         hafi: {
           green: '#43A047',
           greenLight: '#66BB6A',

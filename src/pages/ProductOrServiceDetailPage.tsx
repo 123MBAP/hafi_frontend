@@ -70,6 +70,7 @@ export default function ProductOrServicesDetailPage() {
   const [provider, setProvider] = useState<ProviderProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [providerImages, setProviderImages] = useState<ProviderImage[]>([]);
 
   const { addToCart } = useCart();
 
@@ -125,6 +126,8 @@ export default function ProductOrServicesDetailPage() {
             madeInRwanda: img.madeInRwanda || false,
           })));
         }
+
+        setProviderImages(allImages);
 
         const numericIndex = parseInt(imageIndex);
         const matchedByIndex = !isNaN(numericIndex) ? allImages[numericIndex] : undefined;
@@ -237,6 +240,7 @@ export default function ProductOrServicesDetailPage() {
       pricing_unit={imageData.pricing_unit}
       inStock={imageData.inStock}
       viewMorePath={`/provider/${providerId}/uploads`}
+      relatedItems={providerImages.filter(img => String(img.productId) !== String(imageData.productId))}
     />
   );
 }

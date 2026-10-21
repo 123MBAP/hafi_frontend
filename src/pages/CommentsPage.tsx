@@ -3,9 +3,10 @@ import { useDarkMode } from "@/context/DarkMode";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { FaPaperPlane, FaReply, FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import { FaReply,  FaThumbsUp } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MessageCircle, Heart, Send } from "lucide-react";
+import defaultProfile from "./images/profile_image.png";
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
@@ -69,7 +70,7 @@ export default function CommentBox() {
           map[p.providerId] = p.image_url;
         });
 
-        map[mockUser.sender] = `${API_BASE}/icons/you.png`;
+        map[mockUser.sender] = defaultProfile;
         setProfileImagesMap(map);
       } catch (err) {
         console.error("Failed to load profile images", err);
@@ -87,13 +88,28 @@ export default function CommentBox() {
       const res = await fetch(`${API_BASE}/api/comments?postId=123`);
       const data: Comment[] = await res.json();
 
-      const structured = data.map((comment: Comment) => ({
-        ...comment,
-        sender: comment.sender_name,
-        showReplyInput: false,
-        replies: [],
-        replyCount: comment.replyCount || 0
-      }));
+      const structured = await Promise.all(
+        data.map(async (comment: Comment) => {
+          let repliesList: Reply[] = [];
+          if (comment.replyCount && comment.replyCount > 0) {
+            try {
+              const repliesRes = await fetch(`${API_BASE}/api/comments/${comment.id}/replies`);
+              if (repliesRes.ok) {
+                repliesList = await repliesRes.json();
+              }
+            } catch (e) {
+              console.error(`Failed to fetch replies for comment ${comment.id}`, e);
+            }
+          }
+          return {
+            ...comment,
+            sender: comment.sender_name,
+            showReplyInput: false,
+            replies: repliesList,
+            replyCount: comment.replyCount || 0
+          };
+        })
+      );
 
       setChatComments(structured);
     } catch (error) {
@@ -403,14 +419,24 @@ export default function CommentBox() {
 
   const isLoading = loadingComments || loadingProfiles;
 
+  const getAvatarUrl = (name: string) => {
+    const rawUrl = profileImagesMap[name];
+    if (!rawUrl) return defaultProfile;
+    const cleanUrl = rawUrl.replace(/\\/g, "/");
+    if (cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://")) {
+      return cleanUrl;
+    }
+    return `${API_BASE}${cleanUrl.startsWith("/") ? "" : "/"}${cleanUrl}`;
+  };
+
   return (
-    <div className={`${darkMode ? 'bg-gray-900' : 'bg-gray-50'} w-full`}>
+    <div className={`${darkMode ? 'bg-gray-900' : 'bg-gray-50'} w-full font-sans`}>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-6 pb-4 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex items-center gap-2">
-            <MessageCircle className="w-5 h-5 text-emerald-500" />
-            <h1 className="text-lg font-bold tracking-tighter uppercase text-gray-900 dark:text-white">
+          <div className="flex items-center gap-3">
+            <MessageCircle className="w-6 h-6 text-emerald-500" />
+            <h1 className="text-2xl font-bold tracking-tighter uppercase text-gray-900 dark:text-white">
               Customer Feedback
             </h1>
           </div>
@@ -440,15 +466,12 @@ export default function CommentBox() {
                   {/* Avatar */}
                   <div className="flex-shrink-0">
                     <img
-                      src={
-                        profileImagesMap[c.sender_name]?.replace(/\\/g, "/") ||
-                        `${API_BASE}/icons/profile.png`
-                      }
+                      src={getAvatarUrl(c.sender_name)}
                       className="w-10 h-10 object-cover"
                       style={{ borderRadius: '2px' }}
                       alt={c.sender_name}
                       onError={(e) => {
-                        e.currentTarget.src = `${API_BASE}/icons/profile.png`;
+                        e.currentTarget.src = defaultProfile;
                       }}
                     />
                   </div>
@@ -456,8 +479,8 @@ export default function CommentBox() {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between flex-wrap gap-2 mb-1">
-                      <div className="flex items-center gap-2">
-                        <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      <div className="flex items-center gap-2.5">
+                        <span className={`text-base font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           @{c.sender_name}
                         </span>
                         <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
@@ -510,7 +533,7 @@ export default function CommentBox() {
                     {c.isEditing ? (
                       <div className="flex gap-2 mt-2">
                         <input
-                          className={`flex-1 px-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900'} focus:ring-1 focus:ring-emerald-500`}
+                          className={`flex-1 px-3 py-1.5 text-base border-0 ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900'} focus:ring-1 focus:ring-emerald-500`}
                           style={{ borderRadius: '2px' }}
                           value={c.text}
                           onChange={(e) => {
@@ -524,14 +547,14 @@ export default function CommentBox() {
                         />
                         <button
                           onClick={() => handleEditComment(index, c.text)}
-                          className="px-3 py-1.5 text-xs font-medium bg-emerald-500 text-white transition-colors hover:bg-emerald-600"
+                          className="px-3 py-1.5 text-sm font-medium bg-emerald-500 text-white transition-colors hover:bg-emerald-600"
                           style={{ borderRadius: '2px' }}
                         >
                           Save
                         </button>
                       </div>
                     ) : (
-                      <p className={`text-sm leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <p className={`text-base leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                         {c.text}
                       </p>
                     )}
@@ -540,7 +563,7 @@ export default function CommentBox() {
                     <div className="flex items-center gap-4 mt-3">
                       <button
                         onClick={() => toggleLike(index, true)}
-                        className={`flex items-center gap-1.5 text-xs transition-colors ${
+                        className={`flex items-center gap-1.5 text-sm transition-colors ${
                           darkMode ? 'text-gray-400 hover:text-emerald-400' : 'text-gray-500 hover:text-emerald-600'
                         }`}
                       >
@@ -549,7 +572,7 @@ export default function CommentBox() {
                       </button>
                       <button
                         onClick={() => toggleReplyInput(index)}
-                        className={`flex items-center gap-1.5 text-xs transition-colors ${
+                        className={`flex items-center gap-1.5 text-sm transition-colors ${
                           darkMode ? 'text-gray-400 hover:text-blue-400' : 'text-gray-500 hover:text-blue-600'
                         }`}
                       >
@@ -596,18 +619,18 @@ export default function CommentBox() {
                           >
                             <div className="flex gap-2">
                               <img
-                                src={
-                                  profileImagesMap[reply.sender_name]?.replace(/\\/g, "/") ||
-                                  `${API_BASE}/icons/profile.png`
-                                }
+                                src={getAvatarUrl(reply.sender_name)}
                                 className="w-6 h-6 object-cover"
                                 style={{ borderRadius: '2px' }}
                                 alt=""
+                                onError={(e) => {
+                                  e.currentTarget.src = defaultProfile;
+                                }}
                               />
                               <div className="flex-1">
                                 <div className="flex items-center justify-between flex-wrap gap-2 mb-1">
                                   <div className="flex items-center gap-2">
-                                    <span className={`text-xs font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                                       @{reply.sender_name}
                                     </span>
                                     <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
@@ -690,16 +713,16 @@ export default function CommentBox() {
                                   </div>
                                 ) : (
                                   <>
-                                    <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    <p className={`text-base leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                                       {reply.text}
                                     </p>
                                     <button
                                       onClick={() => handleReplyLike(index, replyIndex, true)}
-                                      className={`flex items-center gap-1 mt-2 text-xs transition-colors ${
+                                      className={`flex items-center gap-1.5 mt-2 text-sm transition-colors ${
                                         darkMode ? 'text-gray-400 hover:text-emerald-400' : 'text-gray-500 hover:text-emerald-600'
                                       }`}
                                     >
-                                      <Heart className="w-3 h-3" />
+                                      <Heart className="w-3.5 h-3.5" />
                                       {reply.likes || 0}
                                     </button>
                                   </>
@@ -730,22 +753,24 @@ export default function CommentBox() {
         </div>
 
         {/* Comment Input */}
-        <div className="flex gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
-          <input
-            type="text"
+        <div className="flex gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-800 items-end">
+          <textarea
             value={commentInput}
             onChange={(e) => setCommentInput(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") handleSend();
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                handleSend();
+              }
             }}
-            placeholder="Write a comment..."
-            className={`flex-1 px-3 py-2 text-sm border-0 ${darkMode ? 'bg-gray-800 text-white placeholder-gray-400' : 'bg-white text-gray-900 placeholder-gray-500'} shadow-sm focus:ring-1 focus:ring-emerald-500`}
+            placeholder="Write a comment... (Ctrl + Enter to post)"
+            rows={3}
+            className={`flex-1 px-3 py-2 text-base border resize-none ${darkMode ? 'border-gray-800 bg-gray-800 text-white placeholder-gray-400' : 'border-gray-300 bg-gray-100 text-gray-900 placeholder-gray-500'} shadow-sm focus:ring-1 focus:ring-emerald-500`}
             style={{ borderRadius: '2px' }}
           />
           <button
             onClick={handleSend}
-            className={`px-4 py-2 text-sm font-medium transition-colors ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-emerald-500 text-white hover:bg-emerald-600'} shadow-sm`}
-            style={{ borderRadius: '2px' }}
+            className={`px-5 py-2 text-base font-semibold transition-colors ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-emerald-500 text-white hover:bg-emerald-600'} shadow-sm`}
+            style={{ borderRadius: '2px', height: '40px' }}
           >
             Post
           </button>

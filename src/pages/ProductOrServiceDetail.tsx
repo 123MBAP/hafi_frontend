@@ -1,6 +1,6 @@
 import { useDarkMode } from "@/context/DarkMode";
 import { FaEnvelope, FaPhone, FaWhatsapp } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 
 
@@ -76,6 +76,15 @@ interface ProductOrServiceDetailProps {
   pricing_unit?: string;
   inStock?: boolean;
   viewMorePath?: string;
+  relatedItems?: Array<{
+    productId: string;
+    url: string;
+    title?: string;
+    price?: number;
+    type: "product" | "service";
+    description?: string;
+    desc?: string;
+  }>;
 }
 
 
@@ -105,6 +114,7 @@ export default function ProductOrServiceDetail({
   pricing_unit,
   inStock,
   viewMorePath,
+  relatedItems = [],
 }: ProductOrServiceDetailProps) {
   const [quantity, setQuantity] = useState(minQuantity);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -115,6 +125,7 @@ export default function ProductOrServiceDetail({
   const [isDescExpanded, setIsDescExpanded] = useState(false);
   const { darkMode } = useDarkMode();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const isOutOfStock = inStock === false || String(inStock) === 'false';
 
@@ -559,6 +570,78 @@ export default function ProductOrServiceDetail({
       </div>
 
       </div>
+
+      {/* Related Products & Services */}
+      {relatedItems && relatedItems.length > 0 && (
+        <div className="mt-16 border-t pt-10 border-gray-200 dark:border-gray-800">
+          <h3 className={`text-xl font-bold uppercase tracking-wider mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            Other products and services from this provider
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {relatedItems.slice(0, 4).map((item) => (
+              <div
+                key={item.productId}
+                onClick={() => {
+                  let targetPath = `/product-or-service-detail/${providerId}/${item.productId}`;
+                  if (location.pathname.startsWith('/made-in-rwanda/product/')) {
+                    targetPath = `/made-in-rwanda/product/${item.productId}`;
+                  } else if (location.pathname.startsWith('/product/')) {
+                    targetPath = `/product/${item.productId}`;
+                  }
+                  navigate(targetPath);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className={`group cursor-pointer border p-4 flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+                  darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700' : 'bg-white border-gray-200 hover:border-emerald-300'
+                }`}
+                style={{ borderRadius: '2px' }}
+              >
+                <div>
+                  <div className="aspect-square w-full mb-3 overflow-hidden bg-gray-55 dark:bg-gray-950 flex items-center justify-center">
+                    <img
+                      src={toAbsoluteMediaUrl(item.url)}
+                      alt={item.title || 'Related item'}
+                      className="object-contain w-full h-full max-h-36 transition-transform duration-300 group-hover:scale-105"
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder.png';
+                      }}
+                    />
+                  </div>
+                  <div className={`text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5 ${
+                    item.type === 'service' 
+                      ? (darkMode ? 'text-teal-400' : 'text-teal-600') 
+                      : (darkMode ? 'text-emerald-400' : 'text-emerald-600')
+                  }`}>
+                    {item.type}
+                  </div>
+                  <h5 className={`font-semibold text-base mb-1 group-hover:text-emerald-500 transition-colors line-clamp-1 ${
+                    darkMode ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {item.title || 'Untitled'}
+                  </h5>
+                  {(item.description || item.desc) && (
+                    <p className={`text-xs line-clamp-2 leading-relaxed mb-2 ${
+                      darkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
+                      {item.description || item.desc}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <div className={`text-sm font-semibold mt-2 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                    {item.price ? formatFrw(item.price) : 'Contact for price'}
+                  </div>
+                  <span className={`mt-3 inline-flex text-xs font-semibold items-center gap-1 transition-colors ${
+                    darkMode ? 'text-emerald-400 group-hover:text-emerald-300' : 'text-emerald-600 group-hover:text-emerald-700'
+                  }`}>
+                    View Details &rarr;
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Full Image Modal */}
       {showFullImage && (

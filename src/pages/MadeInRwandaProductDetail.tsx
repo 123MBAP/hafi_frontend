@@ -40,6 +40,7 @@ export default function MadeInRwandaProductDetail() {
     const [provider, setProvider] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState<string | undefined>(undefined);
+    const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
 
     const { addToCart } = useCart();
     const [quantity, setQuantity] = useState(1);
@@ -105,6 +106,19 @@ export default function MadeInRwandaProductDetail() {
                         }
                     }
                     setProduct(found);
+                    
+                    const related = items
+                        .filter((p) => String(p.id) !== String(productId))
+                        .slice(0, 4)
+                        .map(p => ({
+                            productId: p.id,
+                            url: p.image_url || p.image_path,
+                            title: p.title,
+                            price: p.price,
+                            type: p.type || 'product',
+                            description: p.description
+                        }));
+                    setRelatedProducts(related);
                     return;
                 }
 
@@ -113,12 +127,15 @@ export default function MadeInRwandaProductDetail() {
                 if (fallback.ok) {
                     const fb = await fallback.json();
                     setProduct(fb.product || null);
+                    setRelatedProducts(fb.related || []);
                 } else {
                     setProduct(null);
+                    setRelatedProducts([]);
                 }
             } catch (err) {
                 console.error('Failed to load Made in Rwanda product', err);
                 setProduct(null);
+                setRelatedProducts([]);
             } finally {
                 setLoading(false);
             }
@@ -207,6 +224,7 @@ export default function MadeInRwandaProductDetail() {
                 used={product.used}
                 pricingUnit={product.pricingUnit || product.pricing_unit}
                 inStock={product.inStock !== false && product.in_stock !== false}
+                relatedItems={relatedProducts}
             />
             {/* Made in Rwanda Badge in sidebar */}
             {product.madeInRwanda && (

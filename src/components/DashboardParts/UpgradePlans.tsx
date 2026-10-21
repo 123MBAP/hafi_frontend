@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import MtnIcon from "../../pages/images/mtn.png";
 import AirtelIcon from "../../pages/images/airtel money.png";
+import MastercardIcon from "@/assets/images/master_card.png";
+import VisaIcon from "@/assets/images/visa.png";
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
@@ -87,6 +89,13 @@ type StorageUsage = {
   usedMB:number;
 };
 
+type PaymentMethod = 'mtn' | 'airtel' | 'card';
+
+type PaymentFormData = {
+  mtnPhone: string;
+  airtelPhone: string;
+};
+
 const convertDbPlanToAdminPlan = (dbPlan: DbPlan): AdminPlan => {
   let parsedFeatures: any = {};
   let featureList: string[] = [];
@@ -158,8 +167,11 @@ export default function UpgradePlans() {
   const [isReducingStorage, setIsReducingStorage] = useState<boolean>(false);
   const [renewReductionAmount, setRenewReductionAmount] = useState<number>(0);
   const [renewReductionUnit, setRenewReductionUnit] = useState<string>('GB');
-  const [formData, setFormData] = useState({ mtnPhone: '', airtelPhone: '' });
-  const [selectedMethod, setSelectedMethod] = useState<'mtn' | 'airtel'>('mtn');
+  const [formData, setFormData] = useState<PaymentFormData>({
+    mtnPhone: '',
+    airtelPhone: ''
+  });
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('mtn');
 
  
   const { darkMode } = useDarkMode();
@@ -767,7 +779,7 @@ export default function UpgradePlans() {
       {renewalModalOpen && selectedPlanForRenewal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div 
-            className={`w-full max-w-md p-6 border shadow-lg ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-800'}`}
+            className={`w-full max-w-2xl p-6 border shadow-lg ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-800'}`}
             style={{ borderRadius: '2px' }}
           >
             <div className="flex justify-between items-center mb-4">
@@ -903,9 +915,16 @@ export default function UpgradePlans() {
                   const totalNewStorageMB = (selectedPlanForRenewal.base_storage_gb * 1024) + ((addonGb - reductionGb) * 1024);
                   const usedStorageMB = storageUsage ? storageUsage.usedMB : 0;
                   const isOverLimit = totalNewStorageMB < usedStorageMB;
+                  const isOverPurchasedAddon = reductionGb > addonGb;
 
                   return (
                     <div className="space-y-4">
+                      {isOverPurchasedAddon && (
+                        <div className="p-3 border border-red-500/20 bg-red-500/5 text-red-500 text-xs font-semibold leading-relaxed" style={{ borderRadius: '2px' }}>
+                          You cannot reduce storage by more than your purchased add-on storage ({formatStorage(addonGb)}).
+                        </div>
+                      )}
+
                       {isOverLimit && (
                         <div className="p-3 border border-red-500/20 bg-red-500/5 text-red-500 text-xs font-semibold leading-relaxed" style={{ borderRadius: '2px' }}>
                           ⚠️ You need to first delete the uploaded products/services occupying this storage you want to reduce to be able to reduce the storage (you can reduce the free space only)
@@ -958,7 +977,7 @@ export default function UpgradePlans() {
                               setRenewLoading(false);
                             }
                           }}
-                          disabled={renewLoading || renewReductionAmount <= 0 || isOverLimit}
+                          disabled={renewLoading || renewReductionAmount <= 0 || isOverLimit || isOverPurchasedAddon}
                           className={`flex-grow py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5`}
                           style={{ borderRadius: '2px' }}
                         >
@@ -995,6 +1014,9 @@ export default function UpgradePlans() {
                 const planFee = Number(selectedPlanForRenewal.monthly_fee);
                 const addonFee = Math.round(totalAddonGb * (storagePricing?.price_per_gb_rwf ?? 500));
                 const total = planFee + addonFee;
+                const isPaymentReady = selectedMethod === 'card'
+                  ? true
+                  : Boolean((selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone).replace(/\D/g, ''));
 
                 return (
                   <div className="space-y-4">
@@ -1008,63 +1030,77 @@ export default function UpgradePlans() {
                       </div>
                     </div>
 
-                    {/* Payment Methods */}
-                    <div className="mb-4">
-                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${subText}`}>
-                        Choose Payment Method
-                      </label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {/* MTN Option */}
-                        <button
-                          type="button"
-                          onClick={() => setSelectedMethod('mtn')}
-                          className={`p-3 border-2 rounded-lg cursor-pointer transition-colors flex items-center justify-center gap-2 ${
-                            selectedMethod === 'mtn'
-                              ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
-                              : `border-gray-200 ${darkMode ? 'border-gray-700 hover:border-gray-600' : 'hover:border-gray-300'}`
-                          }`}
-                        >
-                          <img src={MtnIcon} alt="MTN MoMo" className="w-6 h-6 object-contain" />
-                          <span className={`text-xs font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                            MTN MoMo
-                          </span>
-                        </button>
-
-                        {/* Airtel Option */}
-                        <button
-                          type="button"
-                          onClick={() => setSelectedMethod('airtel')}
-                          className={`p-3 border-2 rounded-lg cursor-pointer transition-colors flex items-center justify-center gap-2 ${
-                            selectedMethod === 'airtel'
-                              ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                              : `border-gray-200 ${darkMode ? 'border-gray-700 hover:border-gray-600' : 'hover:border-gray-300'}`
-                          }`}
-                        >
-                          <img src={AirtelIcon} alt="Airtel Money" className="w-6 h-6 object-contain" />
-                          <span className={`text-xs font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                            Airtel Money
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Phone Input for Mobile Money */}
-                    <div className="mb-4">
-                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${subText}`}>
-                        {selectedMethod === 'mtn' ? 'MTN' : 'Airtel'} Phone Number
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <span className={`text-sm ${subText}`}>+250</span>
+                    {/* Payment method selector and details */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${subText}`}>
+                          Choose Payment Method
+                        </label>
+                        <div className="space-y-2">
+                          {([
+                            { id: 'mtn' as const, label: 'MTN Mobile Money', icon: MtnIcon, active: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' },
+                            { id: 'airtel' as const, label: 'Airtel Mobile Money', icon: AirtelIcon, active: 'border-red-500 bg-red-50 dark:bg-red-900/20' }
+                          ]).map((method) => (
+                            <button
+                              key={method.id}
+                              type="button"
+                              onClick={() => setSelectedMethod(method.id)}
+                              className={`w-full p-3 border-2 rounded-lg transition-colors flex items-center gap-3 text-left ${
+                                selectedMethod === method.id
+                                  ? method.active
+                                  : `border-gray-200 ${darkMode ? 'border-gray-700 hover:border-gray-600' : 'hover:border-gray-300'}`
+                              }`}
+                            >
+                              <img src={method.icon} alt="" className="w-7 h-7 object-contain" />
+                              <span className={`text-xs font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                {method.label}
+                              </span>
+                            </button>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => setSelectedMethod('card')}
+                            className={`w-full p-3 border-2 rounded-lg transition-colors flex items-center gap-3 text-left ${
+                              selectedMethod === 'card'
+                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                : `border-gray-200 ${darkMode ? 'border-gray-700 hover:border-gray-600' : 'hover:border-gray-300'}`
+                            }`}
+                          >
+                            <div className="flex items-center gap-1 w-7">
+                              <img src={VisaIcon} alt="Visa" className="w-7 h-5 object-contain" />
+                              <img src={MastercardIcon} alt="Mastercard" className="w-7 h-5 object-contain" />
+                            </div>
+                            <span className={`text-xs font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                              Card Payment (Credit/Debit)
+                            </span>
+                          </button>
                         </div>
-                        <input
-                          type="text"
-                          placeholder={selectedMethod === 'mtn' ? '078 123 4567' : '073 123 4567'}
-                          value={selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone}
-                          onChange={(e) => handleInputChange(e, selectedMethod)}
-                          className={`w-full pl-14 pr-3 py-2 border outline-none text-sm ${inputBase}`}
-                          style={{ borderRadius: '2px' }}
-                        />
+                      </div>
+
+                      <div>
+                        <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${subText}`}>
+                          {selectedMethod === 'card' ? 'Card Details' : 'Mobile Money Details'}
+                        </label>
+                        {selectedMethod !== 'card' ? (
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <span className={`text-sm ${subText}`}>+250</span>
+                            </div>
+                            <input
+                              type="text"
+                              placeholder={selectedMethod === 'mtn' ? '078 123 4567' : '073 123 4567'}
+                              value={selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone}
+                              onChange={(e) => handleInputChange(e, selectedMethod)}
+                              className={`w-full pl-14 pr-3 py-2 border outline-none text-sm ${inputBase}`}
+                              style={{ borderRadius: '2px' }}
+                              aria-label={`${selectedMethod === 'mtn' ? 'MTN' : 'Airtel'} phone number`}
+                            />
+                          </div>
+                        ) : (
+                          <div className={`p-4 border text-xs leading-relaxed ${darkMode ? 'border-blue-800 bg-blue-900/20 text-blue-200' : 'border-blue-200 bg-blue-50 text-blue-800'}`} style={{ borderRadius: '2px' }}>
+                            You will be redirected to XentriPay's secure card page to enter the card holder's name, card number, expiration date, and CVV. HafiConnect does not collect or store your card details.
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -1087,14 +1123,17 @@ export default function UpgradePlans() {
                           setRenewLoading(true);
                           try {
                             if (!selectedPlanForRenewal.id) throw new Error('Please select a plan');
-                            const activePhone = selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone;
+                            const activePhone = selectedMethod === 'mtn' || selectedMethod === 'airtel'
+                              ? (selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone)
+                              : '';
                             const cleanPhone = activePhone.replace(/\D/g, "");
-                            if (!cleanPhone) throw new Error('Please enter a valid phone number');
+                            if (selectedMethod !== 'card' && !cleanPhone) throw new Error('Please enter a valid phone number');
 
                             const body = {
                               plan_id: selectedPlanForRenewal.id,
                               phone: cleanPhone,
                               provider: selectedMethod,
+                              payment_method: selectedMethod === 'card' ? 'card' : 'momo',
                               addon_gb: changeGb,
                               addon_gb_total: totalAddonGb,
                               price_per_gb: storagePricing?.price_per_gb_rwf ?? 500,
@@ -1112,6 +1151,10 @@ export default function UpgradePlans() {
                               throw new Error(errData.error || `HTTP ${res.status}`);
                             }
                             const data = await res.json();
+                            if (selectedMethod === 'card' && data?.data?.paymentUrl) {
+                              window.location.assign(data.data.paymentUrl);
+                              return;
+                            }
                             setRenewMessage(`✅ Payment initiated. Ref: ${data?.data?.referenceId}`);
                             // Refresh plan status after payment trigger
                             setTimeout(() => {
@@ -1127,7 +1170,7 @@ export default function UpgradePlans() {
                             setRenewLoading(false);
                           }
                         }}
-                        disabled={renewLoading || !(selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone)}
+                        disabled={renewLoading || !isPaymentReady}
                         className={`flex-grow py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5`}
                         style={{ borderRadius: '2px' }}
                       >

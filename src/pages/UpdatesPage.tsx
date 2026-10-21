@@ -396,7 +396,6 @@ export default function NotificationsPage() {
                             <h1 className="text-2xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase">
                                 Updates
                             </h1>
-                            <Sparkles className="w-4 h-4 text-emerald-500" />
                         </div>
                         <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
                             {unreadCount} unread · {allNotifications.length} total
