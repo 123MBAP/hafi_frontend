@@ -1149,7 +1149,7 @@ export default function UpgradePlans() {
 
                     {renewMessage && (
                       <div className={`p-3 border text-xs font-semibold ${
-                        renewMessage.includes('initiated') || renewMessage.startsWith('✅')
+                        renewMessage.includes('initiated') || renewMessage.startsWith('✅') || renewMessage.startsWith('⏳')
                           ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
                           : 'bg-red-500/10 border-red-500/20 text-red-500'}`} 
                         style={{ borderRadius: '2px' }}
@@ -1198,26 +1198,20 @@ export default function UpgradePlans() {
                               window.location.assign(data.data.paymentUrl);
                               return;
                             }
-                            setRenewMessage(`✅ Payment initiated. Ref: ${data?.data?.referenceId}`);
-                            // Refresh plan status after payment trigger
-                            setTimeout(() => {
-                              setRenewalModalOpen(false);
-                              setSelectedPlanForRenewal(null);
-                              setRenewMessage(null);
-                              fetchData();
-                              fetchPlanAndUsage();
-                            }, 4000);
+                            setRenewMessage(`⏳ Payment is pending. Approve the payment on your phone. Ref: ${data?.data?.referenceId}`);
+                            // Keep the modal open while XentriPay waits for the customer's approval.
+                            // The webhook will update the transaction and subscription asynchronously.
                           } catch (e: any) {
                             setRenewMessage(`❌ ${e?.message || 'Failed to initiate renewal'}`);
                           } finally {
                             setRenewLoading(false);
                           }
                         }}
-                        disabled={renewLoading || !isPaymentReady}
+                        disabled={renewLoading || !isPaymentReady || renewMessage?.startsWith('⏳') === true}
                         className={`flex-grow py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5`}
                         style={{ borderRadius: '2px' }}
                       >
-                        {renewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm & Pay'}
+                        {renewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : renewMessage?.startsWith('⏳') ? 'Payment Pending' : 'Confirm & Pay'}
                       </button>
                       }
                       <button

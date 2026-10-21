@@ -128,6 +128,7 @@ export default function SellerDashboardPage() {
   const [editUsed, setEditUsed] = useState<boolean>(false);
   const [editPricingUnit, setEditPricingUnit] = useState<string>("Per Item / Piece");
   const [editIsSaving, setEditIsSaving] = useState<boolean>(false);
+  const canUploadProducts = subscription?.subscription?.status === 'active';
 
   useEffect(() => {
     if (editingProduct) {
@@ -365,8 +366,7 @@ export default function SellerDashboardPage() {
   const handleSubmit = async (e: React.FormEvent, cid: string) => {
     e.preventDefault();
 
-    // Check if subscription is active and has an expiration date
-    if (subscription?.subscription?.status !== 'active' || !subscription?.subscription?.ends_at) {
+    if (!canUploadProducts) {
       alert("Your subscription is not active. Please upgrade your plan to upload products.");
       return;
     }
@@ -820,9 +820,9 @@ export default function SellerDashboardPage() {
                           </button>
                           <button
                             type="submit"
-                            disabled={uploadingCids[cid] || subscription?.subscription?.status !== 'active' || !subscription?.subscription?.ends_at}
+                            disabled={uploadingCids[cid] || !canUploadProducts}
                             className={`px-6 py-2 font-semibold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2
-                              ${(subscription?.subscription?.status === 'active' && subscription?.subscription?.ends_at)
+                              ${canUploadProducts
                                 ? "bg-emerald-300 text-white hover:bg-emerald-600 shadow-sm"
                                 : "bg-gray-450 cursor-not-allowed text-gray-200"
                               }`}
