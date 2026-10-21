@@ -1017,6 +1017,49 @@ export default function UpgradePlans() {
                 const isPaymentReady = selectedMethod === 'card'
                   ? true
                   : Boolean((selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone).replace(/\D/g, ''));
+                const initiatePayment = async (method: PaymentMethod) => {
+                  setRenewMessage(null);
+                  setRenewLoading(true);
+                  try {
+                    if (!selectedPlanForRenewal.id) throw new Error('Please select a plan');
+                    const activePhone = method === 'mtn' || method === 'airtel'
+                      ? (method === 'mtn' ? formData.mtnPhone : formData.airtelPhone)
+                      : '';
+                    const cleanPhone = activePhone.replace(/\D/g, '');
+                    if (method !== 'card' && !cleanPhone) throw new Error('Please enter a valid phone number');
+
+                    const res = await fetch(`${API_BASE}/api/provider/upgrade/combined/momo/initiate`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: token ? `Bearer ${token}` : ''
+                      },
+                      body: JSON.stringify({
+                        plan_id: selectedPlanForRenewal.id,
+                        phone: cleanPhone,
+                        provider: method,
+                        payment_method: method === 'card' ? 'card' : 'momo',
+                        addon_gb: changeGb,
+                        addon_gb_total: totalAddonGb,
+                        price_per_gb: storagePricing?.price_per_gb_rwf ?? 500
+                      })
+                    });
+                    if (!res.ok) {
+                      const errData = await res.json();
+                      throw new Error(errData.error || `HTTP ${res.status}`);
+                    }
+                    const data = await res.json();
+                    if (method === 'card' && data?.data?.paymentUrl) {
+                      window.location.assign(data.data.paymentUrl);
+                      return;
+                    }
+                    setRenewMessage(`✅ Payment initiated. Ref: ${data?.data?.referenceId}`);
+                  } catch (e: any) {
+                    setRenewMessage(`❌ ${e?.message || 'Failed to initiate renewal'}`);
+                  } finally {
+                    setRenewLoading(false);
+                  }
+                };
 
                 return (
                   <div className="space-y-4">
@@ -1059,7 +1102,11 @@ export default function UpgradePlans() {
                           ))}
                           <button
                             type="button"
-                            onClick={() => setSelectedMethod('card')}
+                            onClick={() => {
+                              setSelectedMethod('card');
+                              void initiatePayment('card');
+                            }}
+                            disabled={renewLoading}
                             className={`w-full p-3 border-2 rounded-lg transition-colors flex items-center gap-3 text-left ${
                               selectedMethod === 'card'
                                 ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
@@ -1077,11 +1124,11 @@ export default function UpgradePlans() {
                         </div>
                       </div>
 
-                      <div>
-                        <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${subText}`}>
-                          {selectedMethod === 'card' ? 'Card Details' : 'Mobile Money Details'}
-                        </label>
-                        {selectedMethod !== 'card' ? (
+                      {selectedMethod !== 'card' && (
+                        <div>
+                          <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${subText}`}>
+                            Mobile Money Details
+                          </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                               <span className={`text-sm ${subText}`}>+250</span>
@@ -1096,12 +1143,8 @@ export default function UpgradePlans() {
                               aria-label={`${selectedMethod === 'mtn' ? 'MTN' : 'Airtel'} phone number`}
                             />
                           </div>
-                        ) : (
-                          <div className={`p-4 border text-xs leading-relaxed ${darkMode ? 'border-blue-800 bg-blue-900/20 text-blue-200' : 'border-blue-200 bg-blue-50 text-blue-800'}`} style={{ borderRadius: '2px' }}>
-                            You will be redirected to XentriPay's secure card page to enter the card holder's name, card number, expiration date, and CVV. HafiConnect does not collect or store your card details.
-                          </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
 
                     {renewMessage && (
@@ -1117,7 +1160,7 @@ export default function UpgradePlans() {
 
                     {/* Actions */}
                     <div className="flex gap-2 pt-2">
-                      <button
+                      {selectedMethod !== 'card' && <button
                         onClick={async () => {
                           setRenewMessage(null);
                           setRenewLoading(true);
@@ -1176,6 +1219,7 @@ export default function UpgradePlans() {
                       >
                         {renewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm & Pay'}
                       </button>
+                      }
                       <button
                         type="button"
                         onClick={() => {
