@@ -12,8 +12,8 @@ import {
   Shield,
   X,
 } from "lucide-react";
-import MtnIcon from "../../pages/images/mtn.png";
-import AirtelIcon from "../../pages/images/airtel money.png";
+import MtnIcon from "../../pages/images/mtn.jpg";
+import AirtelIcon from "../../pages/images/airtel_logo.png";
 import MastercardIcon from "@/assets/images/master_card.png";
 import VisaIcon from "@/assets/images/visa.png";
 
@@ -779,7 +779,7 @@ export default function UpgradePlans() {
       {renewalModalOpen && selectedPlanForRenewal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div 
-            className={`w-full max-w-2xl p-6 border shadow-lg ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-800'}`}
+            className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 border shadow-lg ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-800'}`}
             style={{ borderRadius: '2px' }}
           >
             <div className="flex justify-between items-center mb-4">
@@ -1074,56 +1074,75 @@ export default function UpgradePlans() {
                     </div>
 
                     {/* Payment method selector and details */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${subText}`}>
-                          Choose Payment Method
-                        </label>
-                        <div className="space-y-2">
-                          {([
-                            { id: 'mtn' as const, label: 'MTN Mobile Money', icon: MtnIcon, active: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' },
-                            { id: 'airtel' as const, label: 'Airtel Mobile Money', icon: AirtelIcon, active: 'border-red-500 bg-red-50 dark:bg-red-900/20' }
-                          ]).map((method) => (
-                            <button
-                              key={method.id}
-                              type="button"
-                              onClick={() => setSelectedMethod(method.id)}
-                              className={`w-full p-3 border-2 rounded-lg transition-colors flex items-center gap-3 text-left ${
-                                selectedMethod === method.id
-                                  ? method.active
-                                  : `border-gray-200 ${darkMode ? 'border-gray-700 hover:border-gray-600' : 'hover:border-gray-300'}`
-                              }`}
-                            >
-                              <img src={method.icon} alt="" className="w-7 h-7 object-contain" />
-                              <span className={`text-xs font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                                {method.label}
-                              </span>
-                            </button>
-                          ))}
+                    <div className="mb-4">
+                      <label className={`block text-[10px] font-bold uppercase tracking-wider mb-3 ${subText}`}>
+                        Choose Payment Method
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {([
+                          { id: 'mtn' as const, label: 'MTN MoMo', icon: MtnIcon, header: 'bg-yellow-400', active: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' },
+                          { id: 'airtel' as const, label: 'Airtel Money', icon: AirtelIcon, header: 'bg-red-500', active: 'border-red-500 bg-red-50 dark:bg-red-900/20' }
+                        ]).map((method) => (
                           <button
+                            key={method.id}
                             type="button"
-                            onClick={() => {
-                              setSelectedMethod('card');
-                              void initiatePayment('card');
-                            }}
-                            disabled={renewLoading}
-                            className={`w-full p-3 border-2 rounded-lg transition-colors flex items-center gap-3 text-left ${
-                              selectedMethod === 'card'
-                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                : `border-gray-200 ${darkMode ? 'border-gray-700 hover:border-gray-600' : 'hover:border-gray-300'}`
+                            onClick={() => setSelectedMethod(method.id)}
+                            className={`w-full h-full min-w-0 overflow-hidden border text-left transition-all hover:-translate-y-0.5 hover:shadow-md ${
+                              selectedMethod === method.id
+                                ? `${method.active} ring-2 ring-offset-1 ${darkMode ? 'ring-offset-gray-800' : 'ring-offset-white'}`
+                                : `${darkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`
                             }`}
+                            style={{ borderRadius: '6px' }}
                           >
-                            <div className="flex items-center gap-1 w-7">
-                              <img src={VisaIcon} alt="Visa" className="w-7 h-5 object-contain" />
-                              <img src={MastercardIcon} alt="Mastercard" className="w-7 h-5 object-contain" />
+                            <div className={`px-4 py-3 text-center text-white font-semibold ${method.header}`}>
+                              {method.label}
                             </div>
-                            <span className={`text-xs font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                              Card Payment (Credit/Debit)
-                            </span>
+                            <div className="p-4 flex min-h-[190px] flex-1 flex-col items-center justify-between">
+                              <div className={`w-24 h-24 rounded-full flex items-center justify-center ${method.id === 'mtn' ? (darkMode ? 'bg-yellow-900/40' : 'bg-yellow-100') : (darkMode ? 'bg-red-900/40' : 'bg-red-100')}`}>
+                                <img src={method.icon} alt={method.label} className="w-16 h-16 object-contain" />
+                              </div>
+                              <span className={`px-8 py-2 border rounded-full text-sm ${
+                                selectedMethod === method.id
+                                  ? 'border-emerald-500 bg-emerald-500 text-white'
+                                  : darkMode ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'
+                              }`}>
+                                {selectedMethod === method.id ? 'Selected' : 'Select'}
+                              </span>
+                            </div>
                           </button>
-                        </div>
-                      </div>
+                        ))}
 
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedMethod('card');
+                            void initiatePayment('card');
+                          }}
+                          disabled={renewLoading}
+                          className={`w-full h-full min-w-0 overflow-hidden border text-left transition-all hover:-translate-y-0.5 hover:shadow-md ${
+                            selectedMethod === 'card'
+                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-500 ring-offset-1'
+                              : `${darkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`
+                          }`}
+                          style={{ borderRadius: '6px' }}
+                        >
+                          <div className="px-4 py-3 text-center text-white font-semibold bg-blue-600">
+                            Card Payment
+                          </div>
+                          <div className="p-4 flex min-h-[190px] flex-1 flex-col items-center justify-between">
+                            <div className={`w-24 h-24 rounded-full flex items-center justify-center gap-1 ${darkMode ? 'bg-blue-900/40' : 'bg-blue-100'}`}>
+                              <img src={VisaIcon} alt="Visa" className="w-10 h-7 object-contain" />
+                              <img src={MastercardIcon} alt="Mastercard" className="w-10 h-7 object-contain" />
+                            </div>
+                            <span className={`px-8 py-2 border rounded-full text-sm ${darkMode ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}>
+                              {renewLoading ? 'Opening...' : 'Select'}
+                            </span>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       {selectedMethod !== 'card' && (
                         <div>
                           <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${subText}`}>
