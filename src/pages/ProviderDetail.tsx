@@ -7,7 +7,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { cachedFetch } from '../utils/cachedFetch';
 import ChatBox from './ChatBox';
-import { Package, Briefcase, Heart, ShoppingBag, Calendar, ChevronRight, X, MapPin, Phone as PhoneIcon, Mail, MessageCircle, FileText } from 'lucide-react';
+import { ArrowLeft, Package, Briefcase, Heart, ShoppingBag, Calendar, ChevronRight, X, MapPin, Phone as PhoneIcon, Mail, MessageCircle, FileText } from 'lucide-react';
 
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
@@ -331,6 +331,19 @@ export default function ProviderDetail() {
   return (
     <div className={`min-h-screen ${bgColor}`}>
       <div className="max-w-7xl mx-auto px-4 py-6">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className={`mb-5 inline-flex items-center gap-2 rounded-md border px-4 py-2.5 text-sm font-semibold transition-colors ${
+            darkMode
+              ? 'border-gray-700 bg-gray-900 text-gray-200 hover:bg-gray-800'
+              : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-100'
+          }`}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </button>
+
         {/* Mobile Header */}
         <div className="flex items-center justify-between mb-4 lg:hidden">
           <button

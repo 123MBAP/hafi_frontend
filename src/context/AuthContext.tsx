@@ -10,6 +10,9 @@ interface UserInfo {
   name: string;
   email: string;
   roles: string[];
+  profile_image?: string;
+  profile_image_url?: string;
+  image_url?: string;
 }
 
 // Auth context type

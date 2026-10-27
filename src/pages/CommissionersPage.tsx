@@ -251,23 +251,23 @@ export default function CommissionersPage() {
 
     // Compact Filters Panel - Single row on desktop
     const FiltersPanel = () => (
-        <div className={`border-0 shadow-sm mb-6 overflow-x-auto ${darkMode ? 'bg-gray-950' : 'bg-white'}`} style={{ borderRadius: '2px' }}>
-            <div className="p-3 min-w-max flex items-center gap-3">
+        <div className={`border shadow-sm mb-6 overflow-x-auto ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`} style={{ borderRadius: '4px' }}>
+            <div className="p-4 min-w-max flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 flex-shrink-0">
                     <Filter className="w-4 h-4" />
-                    <span className="text-xs font-medium uppercase tracking-wider">Filters</span>
+                    <span className="text-sm font-bold uppercase tracking-wider">Filter by</span>
                 </div>
 
                 {/* Search - inline */}
-                <div className="relative flex-shrink-0">
-                    <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                <div className="relative flex-1 min-w-[220px]">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                         type="text"
-                        placeholder="Search..."
+                        placeholder="Search agents, locations, or specialties"
                         value={filters.searchQuery}
                         onChange={(e) => setFilters(prev => ({ ...prev, searchQuery: e.target.value }))}
-                        className={`pl-8 pr-3 py-1.5 text-sm border ${darkMode ? 'bg-gray-950 text-white border-gray-700 placeholder-gray-400' : 'bg-gray-100 text-gray-900 placeholder-gray-500'} focus:ring-1 focus:ring-emerald-500 w-40`}
-                        style={{ borderRadius: '2px' }}
+                        className={`pl-10 pr-3 py-2.5 text-sm border w-full ${darkMode ? 'bg-gray-950 text-white border-gray-700 placeholder-gray-400' : 'bg-gray-50 text-gray-900 border-gray-200 placeholder-gray-500'} focus:ring-2 focus:ring-emerald-500`}
+                        style={{ borderRadius: '4px' }}
                     />
                 </div>
 
@@ -316,8 +316,8 @@ export default function CommissionersPage() {
                 <select
                     value={selectedSpecialization || ''}
                     onChange={(e) => setSelectedSpecialization(e.target.value || undefined)}
-                    className={`px-3 py-1.5 text-sm border ${darkMode ? 'bg-gray-950 border-gray-700 text-white' : 'bg-gray-100 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer flex-shrink-0`}
-                    style={{ borderRadius: '2px' }}
+                    className={`px-3 py-2.5 text-sm border ${darkMode ? 'bg-gray-950 border-gray-700 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'} focus:ring-2 focus:ring-emerald-500 cursor-pointer flex-shrink-0`}
+                    style={{ borderRadius: '4px' }}
                 >
                     <option value="">All Types</option>
                     {specializationOptions.map(cat => (
@@ -333,8 +333,8 @@ export default function CommissionersPage() {
                     value={minBudget || ''}
                     onChange={(e) => setMinBudget(e.target.value ? Number(e.target.value) : undefined)}
                     placeholder="Min price"
-                    className={`w-28 px-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-gray-950 text-white placeholder-gray-400' : 'bg-gray-100 text-gray-900 placeholder-gray-500'} focus:ring-1 focus:ring-emerald-500 flex-shrink-0`}
-                    style={{ borderRadius: '2px' }}
+                    className={`w-28 px-3 py-2.5 text-sm border ${darkMode ? 'bg-gray-950 text-white border-gray-700 placeholder-gray-400' : 'bg-gray-50 text-gray-900 border-gray-200 placeholder-gray-500'} focus:ring-2 focus:ring-emerald-500 flex-shrink-0`}
+                    style={{ borderRadius: '4px' }}
                 />
 
                 {/* Max Price */}
@@ -343,15 +343,26 @@ export default function CommissionersPage() {
                     value={maxBudget || ''}
                     onChange={(e) => setMaxBudget(e.target.value ? Number(e.target.value) : undefined)}
                     placeholder="Max price"
-                    className={`w-28 px-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-gray-950 text-white placeholder-gray-400' : 'bg-gray-100 text-gray-900 placeholder-gray-500'} focus:ring-1 focus:ring-emerald-500 flex-shrink-0`}
-                    style={{ borderRadius: '2px' }}
+                    className={`w-28 px-3 py-2.5 text-sm border ${darkMode ? 'bg-gray-950 text-white border-gray-700 placeholder-gray-400' : 'bg-gray-50 text-gray-900 border-gray-200 placeholder-gray-500'} focus:ring-2 focus:ring-emerald-500 flex-shrink-0`}
+                    style={{ borderRadius: '4px' }}
                 />
+
+                <label className={`flex items-center gap-2 px-3 py-2.5 text-sm font-semibold border cursor-pointer flex-shrink-0 ${darkMode ? 'border-gray-700 text-gray-300' : 'border-gray-200 text-gray-700'}`} style={{ borderRadius: '4px' }}>
+                    <input
+                        type="checkbox"
+                        checked={filters.verifiedOnly}
+                        onChange={(e) => setFilters(prev => ({ ...prev, verifiedOnly: e.target.checked }))}
+                        className="h-4 w-4 accent-emerald-500"
+                    />
+                    <BadgeCheck className="w-4 h-4 text-emerald-500" />
+                    Verified only
+                </label>
 
                 {/* Clear button */}
                 {(selectedProvince || selectedDistrict || selectedSector || selectedSpecialization || filters.verifiedOnly || minBudget || maxBudget || filters.searchQuery) && (
                     <button
                         onClick={clearFilters}
-                        className="text-xs text-emerald-500 hover:text-emerald-600 whitespace-nowrap flex-shrink-0"
+                        className="text-sm font-semibold text-emerald-500 hover:text-emerald-600 whitespace-nowrap flex-shrink-0"
                     >
                         Clear all
                     </button>
@@ -364,8 +375,8 @@ export default function CommissionersPage() {
     const CommissionerCard = ({ commissioner }: { commissioner: Commissioner }) => (
         <div
             onClick={() => navigate(`/real-estate/commissioner/${commissioner.id}`)}
-            className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-full ${darkMode ? 'bg-gray-900' : 'bg-white'} border-0 shadow-sm`}
-            style={{ borderRadius: '2px' }}
+            className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col h-full ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} border shadow-sm`}
+            style={{ borderRadius: '6px' }}
         >
             {/* Edge-to-edge full width profile image container */}
             <div className={`w-full h-56 overflow-hidden relative ${darkMode ? 'bg-gray-950' : 'bg-gray-100'}`}>
@@ -377,18 +388,22 @@ export default function CommissionersPage() {
                         e.currentTarget.src = 'https://i.pravatar.cc/400?img=1';
                     }}
                 />
+                <div className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-emerald-700 shadow-sm">
+                    <BadgeCheck className="h-4 w-4" />
+                    Verified
+                </div>
             </div>
 
             {/* Header text */}
-            <div className="px-4 pt-3 pb-1">
-                <h3 className={`font-semibold text-base ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors truncate`}>
+            <div className="px-4 pt-4 pb-1">
+                <h3 className={`font-bold text-lg ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors truncate`}>
                     {commissioner.name}
                 </h3>
             </div>
 
             {/* Properties count badge */}
             <div className="px-4 pb-2">
-                <span className={`inline-block px-2 py-0.5 text-xs ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`} style={{ borderRadius: '2px' }}>
+                <span className={`inline-block px-2.5 py-1 text-xs font-semibold ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`} style={{ borderRadius: '999px' }}>
                     {commissioner.propertiesManaged} properties managed
                 </span>
             </div>
@@ -437,21 +452,21 @@ export default function CommissionersPage() {
             </div>
 
             {/* Price Range */}
-            <div className="px-4 py-2">
-                <div className={`text-xs font-medium mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            <div className="px-4 py-3">
+                <div className={`text-sm font-medium mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     Price range
                 </div>
-                <div className={`text-sm font-semibold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                <div className={`text-base font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
                     {formatPrice(commissioner.priceRange.min)} - {formatPrice(commissioner.priceRange.max)}
                 </div>
             </div>
 
             {/* Specialization */}
             {commissioner.specialization && commissioner.specialization.length > 0 && (
-                <div className="px-4 py-2">
+                <div className="px-4 py-3">
                     <div className="flex items-center gap-1.5 mb-1.5">
 
-                    <span className={`text-xs font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    <span className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                         Specialization
                     </span>
                 </div>  
@@ -459,8 +474,8 @@ export default function CommissionersPage() {
                         {commissioner.specialization.map((spec, idx) => (
                             <span
                                 key={idx}
-                                className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 ${darkMode ? 'bg-emerald-900/50 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`}
-                                style={{ borderRadius: '2px' }}
+                                className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 ${darkMode ? 'bg-emerald-900/50 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`}
+                                style={{ borderRadius: '999px' }}
                             >
                                 {getCategoryIcon(spec)}
                                 {spec}
@@ -469,6 +484,19 @@ export default function CommissionersPage() {
                     </div>
                 </div>
             )}
+
+            <div className="mt-auto border-t px-4 py-3" style={{ borderColor: darkMode ? '#374151' : '#e5e7eb' }}>
+                <button
+                    type="button"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/real-estate/commissioner/${commissioner.id}`);
+                    }}
+                    className="w-full rounded-md bg-emerald-500 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-emerald-600"
+                >
+                    View agent profile
+                </button>
+            </div>
         </div>
     );
 

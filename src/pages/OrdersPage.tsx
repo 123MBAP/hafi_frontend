@@ -48,17 +48,29 @@ const formatAddress = (addressStr?: string | null) => {
           return (
             <div className="flex flex-col items-end gap-0.5">
               {address && <span className="font-semibold text-right">{address}</span>}
-              {name && <span className="text-[10px] text-gray-500 text-right">{name}</span>}
+              {name && <span className="text-xs text-gray-500 text-right">{name}</span>}
               <a
                 href={`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-emerald-500 hover:underline font-bold text-[10px] inline-flex items-center gap-0.5 mt-0.5"
+                className="text-emerald-500 hover:underline font-bold text-xs inline-flex items-center gap-0.5 mt-0.5"
               >
                 Google Maps ({Number(lat).toFixed(5)}, {Number(lng).toFixed(5)})
               </a>
             </div>
           );
+        }
+
+        const locationParts = [
+          parsed.district,
+          parsed.sector,
+          parsed.cell,
+          parsed.village,
+          parsed.known_place,
+        ].filter((part): part is string => typeof part === 'string' && part.trim().length > 0);
+
+        if (locationParts.length > 0) {
+          return <span className="font-semibold">{locationParts.join(', ')}</span>;
         }
       }
     } catch {
@@ -380,13 +392,13 @@ const OrdersPage = () => {
             <FileText className="w-6 h-6 text-emerald-500" />
             <span>My Orders</span>
           </h1>
-          <p className={`text-xs uppercase tracking-wider font-semibold ${secondaryTextColor} mt-1`}>
+          <p className={`text-sm uppercase tracking-wider font-semibold ${secondaryTextColor} mt-1`}>
             Track and manage your requested products and services
           </p>
         </div>
         <Link
           to="/cart"
-          className={`inline-flex items-center justify-center border text-xs font-bold uppercase tracking-wider px-4 py-2 transition-all hover:scale-102
+          className={`inline-flex items-center justify-center border text-sm font-bold uppercase tracking-wider px-4 py-2 transition-all hover:scale-102
             ${darkMode 
               ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-850' 
               : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50 shadow-sm'}`}
@@ -399,7 +411,7 @@ const OrdersPage = () => {
 
       {/* Success Message Banner */}
       {placedOrder && (
-        <div className="mb-6 border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm font-semibold text-emerald-500 flex items-center gap-2" style={{ borderRadius: '2px' }}>
+        <div className="mb-6 border border-emerald-500/20 bg-emerald-500/5 p-4 text-base font-semibold text-emerald-500 flex items-center gap-2" style={{ borderRadius: '2px' }}>
           <CheckCircle className="w-5 h-5" />
           <span>Order #{placedOrder.orderUuid.slice(0, 8)} has been placed successfully.</span>
         </div>
@@ -414,18 +426,18 @@ const OrdersPage = () => {
         <div className={`border p-8 text-center ${cardBg}`} style={{ borderRadius: '2px' }}>
           <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-3" />
           <p className="font-bold uppercase tracking-wider text-sm text-red-500">Unable to load orders</p>
-          <p className={`text-xs mt-1 ${secondaryTextColor}`}>{error}</p>
+          <p className={`text-sm mt-1 ${secondaryTextColor}`}>{error}</p>
         </div>
       ) : orders.length === 0 ? (
         <div className={`border p-12 text-center flex flex-col items-center justify-center ${cardBg}`} style={{ borderRadius: '2px' }}>
           <Package className="w-12 h-12 text-gray-500 mb-3 opacity-30" />
           <p className="font-bold uppercase tracking-wider text-sm text-gray-500">No orders yet</p>
-          <p className={`text-xs mt-1 ${secondaryTextColor} mb-4`}>
+          <p className={`text-sm mt-1 ${secondaryTextColor} mb-4`}>
             Orders or requests you place from your cart will appear here.
           </p>
           <Link
             to="/cart"
-            className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 transition-colors"
+            className="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold uppercase tracking-wider px-5 py-2.5 transition-colors"
             style={{ borderRadius: '2px' }}
           >
             Browse Cart
@@ -446,7 +458,7 @@ const OrdersPage = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200 border flex items-center gap-2
+                className={`px-4 py-2 text-sm font-bold uppercase tracking-wider transition-all duration-200 border flex items-center gap-2
                   ${activeTab === tab.id
                     ? 'bg-emerald-500 border-emerald-500 text-white'
                     : darkMode
@@ -456,7 +468,7 @@ const OrdersPage = () => {
                 style={{ borderRadius: '2px' }}
               >
                 <span>{tab.label}</span>
-                <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold
+                <span className={`px-1.5 py-0.5 rounded-full text-xs font-mono font-bold
                   ${activeTab === tab.id
                     ? 'bg-emerald-600 text-white'
                     : darkMode
@@ -474,7 +486,7 @@ const OrdersPage = () => {
             <div className={`border p-12 text-center flex flex-col items-center justify-center ${cardBg}`} style={{ borderRadius: '2px' }}>
               <Package className="w-12 h-12 text-gray-500 mb-3 opacity-30" />
               <p className="font-bold uppercase tracking-wider text-sm text-gray-500">No orders found</p>
-              <p className={`text-xs mt-1 ${secondaryTextColor}`}>
+              <p className={`text-sm mt-1 ${secondaryTextColor}`}>
                 There are no orders matching this filter tab.
               </p>
             </div>
@@ -511,19 +523,19 @@ const OrdersPage = () => {
                 <div className={`flex flex-wrap items-center justify-between gap-4 border-b px-5 py-4 ${borderColor}`}>
                   <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`text-xs font-mono font-bold select-all ${textColor}`}>
+                      <span className={`text-sm font-mono font-bold select-all ${textColor}`}>
                         #{order.orderUuid.slice(0, 12).toUpperCase()}…
                       </span>
-                      <span className={`inline-flex items-center border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${statusConfig.color}`} style={{ borderRadius: '2px' }}>
+                      <span className={`inline-flex items-center border px-2 py-0.5 text-xs font-bold uppercase tracking-wider ${statusConfig.color}`} style={{ borderRadius: '2px' }}>
                         {statusConfig.label}
                       </span>
                       {order.notifyWhatsApp && (
-                        <span className="inline-flex items-center bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+                        <span className="inline-flex items-center bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-2 py-0.5 text-xs font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
                           WhatsApp Confirmed
                         </span>
                       )}
                     </div>
-                    <div className={`text-xs font-medium ${secondaryTextColor} flex items-center gap-1`}>
+                    <div className={`text-sm font-medium ${secondaryTextColor} flex items-center gap-1`}>
                       <Calendar className="w-3.5 h-3.5" />
                       {new Date(order.createdAt).toLocaleDateString()}
                     </div>
@@ -534,11 +546,11 @@ const OrdersPage = () => {
                       RWF {quotedTotal.toLocaleString()}
                     </div>
                     {hasQuotedServicePrice && (
-                      <div className={`text-[11px] line-through ${secondaryTextColor}`}>
+                      <div className={`text-xs line-through ${secondaryTextColor}`}>
                         Original: RWF {originalTotal.toLocaleString()}
                       </div>
                     )}
-                    <div className={`text-[10px] uppercase font-bold tracking-wider ${secondaryTextColor}`}>
+                    <div className={`text-xs uppercase font-bold tracking-wider ${secondaryTextColor}`}>
                       {order.items.length} item{order.items.length !== 1 ? 's' : ''}
                     </div>
                   </div>
@@ -558,11 +570,11 @@ const OrdersPage = () => {
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-bold uppercase tracking-tight truncate">{item.name}</p>
                                 {item.description && (
-                                  <p className={`text-xs ${secondaryTextColor} line-clamp-1 mt-0.5`}>
+                                  <p className={`text-sm ${secondaryTextColor} line-clamp-1 mt-0.5`}>
                                     {item.description}
                                   </p>
                                 )}
-                                <div className={`flex items-center gap-3 text-xs mt-1 ${secondaryTextColor}`}>
+                                <div className={`flex items-center gap-3 text-sm mt-1 ${secondaryTextColor}`}>
                                   <span>Quantity: <strong className="text-emerald-500 font-bold">{item.quantity}</strong></span>
                                   {item.size && <span>Size: <strong className={textColor}>{item.size}</strong></span>}
                                 </div>
@@ -574,15 +586,15 @@ const OrdersPage = () => {
 
                             {/* Service Details */}
                             {item.type === 'service' && item.serviceCustomization && (
-                              <div className={`ml-18 p-3 text-xs border-l-2 bg-emerald-500/5 ${darkMode ? 'border-l-emerald-500 text-gray-300' : 'border-l-emerald-600 text-gray-800'}`} style={{ borderRadius: '2px' }}>
-                                <div className="font-bold uppercase text-[9px] tracking-wider text-emerald-500 mb-1">Service Specifications:</div>
+                              <div className={`ml-18 p-3 text-sm border-l-2 bg-emerald-500/5 ${darkMode ? 'border-l-emerald-500 text-gray-300' : 'border-l-emerald-600 text-gray-800'}`} style={{ borderRadius: '2px' }}>
+                                <div className="font-bold uppercase text-xs tracking-wider text-emerald-500 mb-1">Service Specifications:</div>
                                 {item.serviceCustomization.noCustomizationNeeded ? (
                                   <span>No custom requirements requested.</span>
                                 ) : item.serviceCustomization.customizationRequest ? (
                                   <div className="whitespace-pre-wrap">{item.serviceCustomization.customizationRequest}</div>
                                 ) : null}
                                 
-                                <div className="mt-3 p-2 bg-gray-950/20 border border-gray-800 flex justify-between gap-4 text-[10px]" style={{ borderRadius: '2px' }}>
+                                <div className="mt-3 p-2 bg-gray-950/20 border border-gray-800 flex justify-between gap-4 text-xs" style={{ borderRadius: '2px' }}>
                                   <div>
                                     <span className="text-gray-400">Regular Quote:</span>{' '}
                                     <strong>RWF {Number(item.price).toLocaleString()}</strong>
@@ -601,7 +613,7 @@ const OrdersPage = () => {
                       </div>
 
                       {/* Contact metadata */}
-                      <div className={`rounded p-4 border text-xs space-y-1.5 ${borderColor} ${darkMode ? 'bg-gray-950/30' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+                      <div className={`rounded p-4 border text-sm space-y-1.5 ${borderColor} ${darkMode ? 'bg-gray-950/30' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
                         <div className="flex justify-between items-center">
                           <span className={secondaryTextColor}>Client Name:</span>
                           <span className="font-semibold">{order.customerName}</span>
@@ -642,32 +654,35 @@ const OrdersPage = () => {
                     {/* Column 3: Actions & Pay credentials */}
                     <div className="space-y-4">
                       {/* Payment credentials */}
-                      <div className={`border overflow-hidden ${borderColor}`} style={{ borderRadius: '2px' }}>
-                        <div className={`border-b px-3 py-2 bg-emerald-500/5 ${borderColor}`}>
-                          <h4 className="text-[10px] font-bold uppercase tracking-wider text-emerald-500">
+                      <div className={`border-2 border-amber-400/70 overflow-hidden shadow-sm ${darkMode ? 'bg-amber-950/20' : 'bg-amber-50'}`} style={{ borderRadius: '4px' }}>
+                        <div className={`border-b-2 border-amber-400/50 px-4 py-3 bg-amber-400/20 ${darkMode ? 'border-amber-400/40' : 'border-amber-300'}`}>
+                          <h4 className="text-sm font-black uppercase tracking-wider text-amber-700 dark:text-amber-300">
                             Pay Account Details
                           </h4>
+                          <p className={`mt-1 text-sm font-semibold ${secondaryTextColor}`}>
+                            Use one of the accounts below to complete your payment.
+                          </p>
                         </div>
-                        <div className="p-3 space-y-2">
+                        <div className="p-3 space-y-3">
                           {hasMethods ? (
                             Object.entries(methods as Record<string, any>)
                               .filter(([, val]) => val && Object.keys(val).length > 0)
                               .map(([method, val]) => (
-                                <div key={method} className={`p-2 border text-xs ${borderColor} ${darkMode ? 'bg-gray-950/20' : 'bg-white'}`} style={{ borderRadius: '2px' }}>
-                                  <div className="flex justify-between font-bold">
-                                    <span className="uppercase text-[9px] tracking-wide text-emerald-500">{getMethodDisplayName(method)}</span>
-                                    <span className="text-[9px] text-gray-500">{method === 'momoPay' ? 'CODE' : 'PHONE'}</span>
+                                <div key={method} className={`p-3 border-2 ${borderColor} ${darkMode ? 'bg-gray-950/40' : 'bg-white shadow-sm'}`} style={{ borderRadius: '4px' }}>
+                                  <div className="flex items-center justify-between gap-2 font-bold">
+                                    <span className="uppercase text-sm font-black tracking-wide text-amber-700 dark:text-amber-300">{getMethodDisplayName(method)}</span>
+                                    <span className="shrink-0 rounded-full bg-amber-400/20 px-2 py-1 text-xs font-black text-amber-700 dark:text-amber-300">{method === 'momoPay' ? 'CODE' : 'PHONE'}</span>
                                   </div>
-                                  <div className="font-mono font-semibold mt-1 text-sm select-all">
+                                  <div className="mt-2 break-all font-mono text-xl font-black tracking-wide text-amber-900 select-all dark:text-amber-100">
                                     {method === 'momoPay' ? val?.code : val?.phone}
                                   </div>
                                   {val?.registeredName && (
-                                    <div className="text-[10px] text-gray-500 mt-0.5">{val.registeredName}</div>
+                                    <div className="mt-1 text-xs font-semibold text-gray-500">{val.registeredName}</div>
                                   )}
                                 </div>
                               ))
                           ) : (
-                            <div className={`text-center text-xs py-3 text-gray-500`}>
+                            <div className={`text-center text-sm py-3 text-gray-500`}>
                               No payment accounts available
                             </div>
                           )}
@@ -679,7 +694,7 @@ const OrdersPage = () => {
                         {canShowPaymentButton && (
                           <button
                             onClick={() => markPaymentDone(order.orderUuid)}
-                            className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold uppercase tracking-wider"
+                            className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold uppercase tracking-wider"
                             style={{ borderRadius: '2px' }}
                           >
                              Confirm Payment Sent
@@ -689,7 +704,7 @@ const OrdersPage = () => {
                         {order.status === 'quoted' && (
                           <button
                             onClick={() => acceptQuote(order.orderUuid)}
-                            className="w-full py-2.5 bg-violet-600 hover:bg-violet-750 text-white text-xs font-bold uppercase tracking-wider"
+                            className="w-full py-2.5 bg-violet-600 hover:bg-violet-750 text-white text-sm font-bold uppercase tracking-wider"
                             style={{ borderRadius: '2px' }}
                           >
                             Accept Offered Quote
@@ -699,7 +714,7 @@ const OrdersPage = () => {
                         {canShowConfirmDeliveryButton && (
                           <button
                             onClick={() => confirmReceipt(order.orderUuid)}
-                            className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider"
+                            className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold uppercase tracking-wider"
                             style={{ borderRadius: '2px' }}
                           >
                             Confirm Delivery Received
@@ -710,7 +725,7 @@ const OrdersPage = () => {
                           <button
                             onClick={() => deleteOrder(order.orderUuid)}
                             disabled={deletingOrderUuid === order.orderUuid}
-                            className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wider disabled:opacity-50"
+                            className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-bold uppercase tracking-wider disabled:opacity-50"
                             style={{ borderRadius: '2px' }}
                           >
                             {deletingOrderUuid === order.orderUuid ? 'Cancelling…' : 'Cancel Request'}
@@ -736,7 +751,7 @@ const OrdersPage = () => {
                             `}</style>
                             <button
                               onClick={() => openChatForOrder(order)}
-                              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[11px] font-black uppercase tracking-widest shadow-md chat-wave-shake hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2"
+                              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-black uppercase tracking-widest shadow-md chat-wave-shake hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2"
                               style={{ borderRadius: '2px' }}
                             >
                               <MessageSquare className="w-4 h-4 animate-bounce" />
@@ -747,7 +762,7 @@ const OrdersPage = () => {
 
                         {/* Informational Alerts */}
                         {['order_received', 'quoted', 'quote_accepted', 'payment_done', 'payment_received'].includes(order.status) && (
-                          <div className={`p-3 border text-[11px] leading-relaxed ${borderColor} ${darkMode ? 'bg-gray-950/20 text-gray-400' : 'bg-gray-50 text-gray-600'}`} style={{ borderRadius: '2px' }}>
+                          <div className={`p-3 border text-sm leading-relaxed ${borderColor} ${darkMode ? 'bg-gray-950/20 text-gray-400' : 'bg-gray-50 text-gray-600'}`} style={{ borderRadius: '2px' }}>
                             {order.status === 'order_received' && 'The provider has acknowledged this order. You may now complete the payment via coordinates above and confirm.'}
                             {order.status === 'quoted' && 'The provider has updated the request quote. Please accept the quote to proceed.'}
                             {order.status === 'quote_accepted' && 'Quote accepted. Please perform the transaction transfer.'}
@@ -757,14 +772,14 @@ const OrdersPage = () => {
                         )}
 
                         {order.status === 'delivered' && (
-                          <div className="p-3 border border-emerald-500/20 bg-emerald-500/5 text-[11px] text-emerald-500 font-medium" style={{ borderRadius: '2px' }}>
+                          <div className="p-3 border border-emerald-500/20 bg-emerald-500/5 text-sm text-emerald-500 font-medium" style={{ borderRadius: '2px' }}>
                             Order fully completed! Thank you for choosing HafiConnect.
                           </div>
                         )}
 
                         {/* Seller Information Card */}
-                        <div className={`border p-4 text-xs space-y-2 ${borderColor} ${darkMode ? 'bg-gray-955 text-gray-300' : 'bg-gray-50 text-gray-850'}`} style={{ borderRadius: '2px' }}>
-                          <div className="font-bold text-[10px] uppercase tracking-widest text-emerald-500 border-b pb-1.5 dark:border-gray-850">Seller Information</div>
+                        <div className={`border p-4 text-sm space-y-2 ${borderColor} ${darkMode ? 'bg-gray-955 text-gray-300' : 'bg-gray-50 text-gray-850'}`} style={{ borderRadius: '2px' }}>
+                          <div className="font-bold text-xs uppercase tracking-widest text-emerald-500 border-b pb-1.5 dark:border-gray-850">Seller Information</div>
                           <div className="space-y-1.5 mt-2">
                             <div className="flex justify-between items-center">
                               <span className={secondaryTextColor}>Name:</span>
@@ -812,27 +827,27 @@ const OrdersPage = () => {
                           {provider?.phone_number ? (
                             <a
                               href={`tel:${provider.phone_number}`}
-                              className={`flex items-center justify-center border text-xs font-bold uppercase tracking-wider py-2 transition-all
+                              className={`flex items-center justify-center border text-sm font-bold uppercase tracking-wider py-2 transition-all
                                 ${darkMode ? 'border-gray-800 text-gray-300 hover:bg-gray-850' : 'border-gray-250 text-gray-700 hover:bg-gray-50'}`}
                               style={{ borderRadius: '2px' }}
                             >
                               Call
                             </a>
                           ) : (
-                            <div className={`p-2 border text-center text-xs text-gray-500 ${borderColor}`} style={{ borderRadius: '2px' }}>Locked</div>
+                            <div className={`p-2 border text-center text-sm text-gray-500 ${borderColor}`} style={{ borderRadius: '2px' }}>Locked</div>
                           )}
 
                           {provider?.whatsapp_number ? (
                             <button
                               onClick={() => openWhatsApp(provider.whatsapp_number)}
-                              className="flex items-center justify-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider py-2"
+                              className="flex items-center justify-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold uppercase tracking-wider py-2"
                               style={{ borderRadius: '2px' }}
                             >
                               <FaWhatsapp className="w-3.5 h-3.5" />
                               WhatsApp
                             </button>
                           ) : (
-                            <div className={`p-2 border text-center text-xs text-gray-500 ${borderColor}`} style={{ borderRadius: '2px' }}>Locked</div>
+                            <div className={`p-2 border text-center text-sm text-gray-500 ${borderColor}`} style={{ borderRadius: '2px' }}>Locked</div>
                           )}
                         </div>
 
@@ -843,7 +858,7 @@ const OrdersPage = () => {
                 </div>
 
                 {/* Delivery footer info */}
-                <div className={`px-5 py-2.5 border-t text-[10px] uppercase font-bold tracking-wider ${borderColor} ${darkMode ? 'bg-gray-950/20 text-gray-500' : 'bg-gray-50 text-gray-400'}`} style={{ borderRadius: '2px' }}>
+                <div className={`px-5 py-2.5 border-t text-xs uppercase font-bold tracking-wider ${borderColor} ${darkMode ? 'bg-gray-950/20 text-gray-500' : 'bg-gray-50 text-gray-400'}`} style={{ borderRadius: '2px' }}>
                    Negotiate dispatch and shipping specifics directly with the seller
                 </div>
               </div>

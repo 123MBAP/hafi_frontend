@@ -501,11 +501,11 @@ const HomePage = () => {
     return (
       <Link to={`/services/${service.id}`} className="block h-full group">
         <div className="h-full bg-white dark:bg-gray-900 border dark:border-gray-800/60 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden" style={{ borderRadius: '2px' }}>
-          <div className={`${cardHeight} overflow-hidden`}>
+          <div className={`${cardHeight} overflow-hidden bg-gray-100 dark:bg-gray-950 flex items-center justify-center`}>
             <img 
               src={resolveImageUrl(service.image) || 'https://via.placeholder.com/400x300?text=Service'} 
               alt={service.title} 
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
             />
           </div>
           <div className="p-3 flex-1 flex flex-col">
@@ -560,11 +560,11 @@ const HomePage = () => {
         className="w-full h-full text-left group relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900 border dark:border-gray-800/60 flex flex-col"
         style={{ borderRadius: '2px' }}
       >
-        <div className={`${cardHeight} overflow-hidden relative`}>
+        <div className={`${cardHeight} overflow-hidden relative bg-gray-100 dark:bg-gray-950 flex items-center justify-center`}>
           <img
             src={imageUrl || 'https://via.placeholder.com/400x300?text=No+Image'}
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute top-3 left-3 bg-black/70 px-2 py-1 text-white text-xs uppercase tracking-wider" style={{ borderRadius: '2px' }}>
             {item.category === 'product' ? 'Market' : item.category === 'property' ? 'Estate' : 'Fresh'}
@@ -755,9 +755,14 @@ const HomePage = () => {
       
       {/* Hero Section */}
       <section
-        className="relative text-center py-24 sm:py-32 lg:py-48 px-4 sm:px-6 text-white bg-cover bg-center transition-all duration-700"
-        style={{ backgroundImage: `url(${images[currentIndex]})` }}
+        className="relative overflow-hidden text-center py-24 sm:py-32 lg:py-48 px-4 sm:px-6 text-white bg-gray-900 transition-all duration-700"
       >
+        <img
+          src={images[currentIndex]}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 z-0 h-full w-full object-cover object-center transition-opacity duration-700"
+        />
         <div className="absolute inset-0 bg-black/60 z-0"></div>
 
         <button
@@ -812,10 +817,16 @@ const HomePage = () => {
       <section className="container mx-auto px-4 py-12">
         <div className="mb-10 flex justify-between items-end flex-wrap gap-4">
           <div>
-            <h2 className="text-3xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase">
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-emerald-500">
+              Discover trusted local providers
+            </p>
+            <h2 className="text-4xl sm:text-5xl font-black leading-tight tracking-tight text-gray-900 dark:text-white">
               Featured Services
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">Every row is different — just like real life</p>
+            <p className="mt-4 max-w-2xl text-base sm:text-lg leading-7 text-gray-600 dark:text-gray-300">
+              Explore reliable services from local providers, with options for home improvement, events, equipment, creative work, and everyday needs.
+            </p>
+            <div className="mt-5 h-1 w-16 bg-emerald-500"></div>
           </div>
         </div>
         {serviceRows.length === 0 ? (
@@ -838,11 +849,17 @@ const HomePage = () => {
 
       {/* Fresh Picks - Completely unpredictable */}
       <section className="container mx-auto px-4 py-8 bg-white dark:bg-gray-900/30">
-        <div className="mb-4">
-          <h2 className="text-3xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase">
+        <div className="mb-10">
+          <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-emerald-500">
+            New and worth discovering
+          </p>
+          <h2 className="text-4xl sm:text-5xl font-black leading-tight tracking-tight text-gray-900 dark:text-white">
             Fresh Picks
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">No categories, no filters — just what's new and unexpected</p>
+          <p className="mt-4 max-w-2xl text-base sm:text-lg leading-7 text-gray-600 dark:text-gray-300">
+            Discover the latest products, properties, and provider offerings recently added to HafiConnect, all in one place.
+          </p>
+          <div className="mt-5 h-1 w-16 bg-emerald-500"></div>
         </div>
         {updateRows.length === 0 ? (
           <div className="text-center py-20 text-gray-500">Loading fresh picks...</div>
@@ -854,61 +871,92 @@ const HomePage = () => {
       </section>
 
       {/* How it Works */}
-      <section className="container mx-auto px-4 py-2 sm:py-4">
-        <div className="text-center mb-2 sm:mb-4">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase">
-            How It Works
-          </h2>
-          <p className="mt-4 max-w-3xl mx-auto text-gray-500 dark:text-gray-400 text-sm sm:text-base leading-relaxed">
-            One platform to search, compare, chat, order, and receive what you need across services, products, and real estate.
-          </p>
-          <div className="w-12 h-0.5 bg-emerald-500 mx-auto mt-4"></div>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-0  sm:gap-4 mt-4 sm:mt-8 p-0  sm:p-4">
-          {[
-            {
-              step: '01',
-              title: 'Search what you need',
-              desc: 'Look up services, Made in Rwanda products, market items, or properties in one place.',
-            },
-            {
-              step: '02',
-              title: 'Compare nearby options',
-              desc: 'Review prices, locations, and available providers to find the best nearby match.',
-            },
-            {
-              step: '03',
-              title: 'Open details and chat',
-              desc: 'View a provider or item page, then contact the seller or service provider directly.',
-            },
-            {
-              step: '04',
-              title: 'Choose products or services',
-              desc: 'Select the right service, property, or product based on your budget and preferences.',
-            },
-            {
-              step: '05',
-              title: 'Place your order',
-              desc: 'Add items to cart, submit your order, or confirm the service request in a few taps.',
-            },
-            {
-              step: '06',
-              title: 'Receive and follow up',
-              desc: 'Track the order or service outcome and complete delivery through the same platform.',
-            },
-          ].map((item) => (
-            <div key={item.step} className="bg-white dark:bg-gray-900 border dark:border-gray-800/60 p-4 shadow-sm hover:shadow-md transition-all h-full" style={{ borderRadius: '2px' }}>
-              <div className="inline-flex items-center justify-center w-9 h-9 mb-3 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold text-xs" style={{ borderRadius: '2px' }}>
-                {item.step}
-              </div>
-              <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                {item.title}
-              </h3>
-              <p className={`text-sm leading-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                {item.desc}
+      <section className={`container mx-auto px-4 py-12 sm:py-20 ${darkMode ? 'bg-gray-950' : 'bg-white'}`}>
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] gap-10 lg:gap-16 items-stretch">
+          <div className="flex flex-col justify-center">
+            <div className="mb-8 sm:mb-10">
+              <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-emerald-500">
+                Simple from start to finish
+              </p>
+              <h2 className={`max-w-2xl text-4xl sm:text-5xl lg:text-6xl font-black leading-[0.98] tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                How It Works
+              </h2>
+              <p className={`mt-5 max-w-2xl text-base sm:text-lg leading-7 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                One platform to search, compare, chat, order, and receive what you need across services, products, and real estate.
               </p>
             </div>
-          ))}
+
+            <div>
+              {[
+                {
+                  step: '01',
+                  title: 'Search what you need',
+                  desc: 'Look up services, Made in Rwanda products, market items, or properties in one place.',
+                },
+                {
+                  step: '02',
+                  title: 'Compare nearby options',
+                  desc: 'Review prices, locations, and available providers to find the best nearby match.',
+                },
+                {
+                  step: '03',
+                  title: 'Open details and chat',
+                  desc: 'View a provider or item page, then contact the seller or service provider directly.',
+                },
+                {
+                  step: '04',
+                  title: 'Choose products or services',
+                  desc: 'Select the right service, property, or product based on your budget and preferences.',
+                },
+                {
+                  step: '05',
+                  title: 'Place your order',
+                  desc: 'Add items to cart, submit your order, or confirm the service request in a few taps.',
+                },
+                {
+                  step: '06',
+                  title: 'Receive and follow up',
+                  desc: 'Track the order or service outcome and complete delivery through the same platform.',
+                },
+              ].map((item) => (
+                <div
+                  key={item.step}
+                  className={`grid grid-cols-[72px_minmax(0,1fr)] gap-4 sm:gap-7 border-t py-5 sm:py-6 ${
+                    darkMode ? 'border-gray-800' : 'border-gray-200'
+                  }`}
+                >
+                  <div className={`text-2xl sm:text-3xl font-black tracking-tight ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                    {item.step}
+                  </div>
+                  <div>
+                    <h3 className={`text-xl sm:text-2xl font-bold leading-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {item.title}
+                    </h3>
+                    <p className={`mt-2 max-w-xl text-sm sm:text-base leading-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      {item.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className={`relative h-[500px] overflow-hidden ${darkMode ? 'bg-gray-900' : 'bg-gray-100'} lg:h-auto lg:min-h-[720px]`} style={{ borderRadius: '18px' }}>
+            <img
+              src={madeInRwandaImage}
+              alt="Discover products and services on HafiConnect"
+              className="absolute inset-0 z-0 h-full w-full object-cover object-center"
+            />
+            <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 z-20 p-6 sm:p-8">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-300">
+                Discover locally
+              </p>
+              <p className="mt-2 max-w-sm text-xl font-bold leading-tight text-white sm:text-2xl">
+                Find trusted people, products, and opportunities in one place.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
     </div>

@@ -1,6 +1,7 @@
 import { useDarkMode } from "@/context/DarkMode";
 import { FaEnvelope, FaPhone, FaWhatsapp } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
 
@@ -70,6 +71,7 @@ interface ProductOrServiceDetailProps {
   providerPhone?: string;
   providerWhatsapp?: string;
   providerProfileImage?: string;
+  onBack?: () => void;
   madeInRwanda?: boolean;
   used?: boolean;
   pricingUnit?: string;
@@ -108,6 +110,7 @@ export default function ProductOrServiceDetail({
   providerPhone,
   providerWhatsapp,
   providerProfileImage,
+  onBack,
   madeInRwanda,
   used,
   pricingUnit,
@@ -128,6 +131,7 @@ export default function ProductOrServiceDetail({
   const location = useLocation();
 
   const isOutOfStock = inStock === false || String(inStock) === 'false';
+  const handleBack = onBack || (() => navigate(-1));
 
   const descriptionLines = description ? description.split('\n') : [];
   const hasLongDescription = descriptionLines.length > 15 || (description && description.length > 500);
@@ -197,6 +201,19 @@ export default function ProductOrServiceDetail({
 
   return (
     <div className={`w-full px-4 py-10 mx-auto ${darkMode ? "bg-gray-950 text-gray-100" : "bg-gray-50 text-gray-900"}`}>
+      <button
+        type="button"
+        onClick={handleBack}
+        className={`mb-6 inline-flex items-center gap-2 rounded-md border px-4 py-2.5 text-sm font-semibold transition-colors ${
+          darkMode
+            ? 'border-gray-700 bg-gray-900 text-gray-200 hover:bg-gray-800'
+            : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-100'
+        }`}
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back
+      </button>
+
       {(providerId || providerName || providerEmail || providerPhone || providerWhatsapp) && (
         <div className={`mb-6 p-4 border ${darkMode ? "border-gray-700 bg-gray-900/40" : "border-gray-200 bg-gray-50"}`} style={{ borderRadius: '2px' }}>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

@@ -18,8 +18,25 @@ interface NavbarProps {
 
 const NAVBAR_HEIGHT = 64; // px
 
+const getInitials = (name?: string | null, email?: string | null) => {
+  const value = (name || email || 'User').trim();
+  const parts = value.split(/\s+/).filter(Boolean);
+
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+
+  return value.slice(0, 2).toUpperCase();
+};
+
+const toProfileImageUrl = (imageUrl?: string | null) => {
+  if (!imageUrl) return '';
+  if (/^(https?:|data:|blob:)/i.test(imageUrl)) return imageUrl;
+  return `${API_BASE}/${imageUrl.replace(/^\/+/, '')}`;
+};
+
 const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
-  const { isLoggedIn, logout, token, user } = useAuth();
+  const { isLoggedIn, logout, token, user, updateUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,10 +47,45 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [profileImageError, setProfileImageError] = useState(false);
 
   // Statements is a Phase 2 feature — hide it when phase_2 is not yet enabled.
   // It is also hidden while only phase_1 is active (phase_1 = core-only launch).
   const showStatements = isPhaseEnabled('phase_2');
+  const profileImage = toProfileImageUrl(
+    user?.profile_image || user?.profile_image_url || user?.image_url
+  );
+  const profileInitials = getInitials(user?.name, user?.email);
+
+  useEffect(() => {
+    setProfileImageError(false);
+  }, [profileImage]);
+
+  useEffect(() => {
+    if (!isLoggedIn || !token) return;
+
+    const fetchProfileImage = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/api/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Profile API HTTP ${response.status}`);
+        }
+
+        const profile = await response.json();
+        const image = profile?.profile_image || profile?.profile_image_url || profile?.image_url;
+        if (image && image !== profileImage) {
+          updateUser({ profile_image: image });
+        }
+      } catch (error) {
+        console.error('Failed to load profile image:', error);
+      }
+    };
+
+    fetchProfileImage();
+  }, [isLoggedIn, token]);
 
   const closeMenu = () => setIsMenuOpen(false);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -226,11 +278,21 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
               to="/profile"
               className="flex items-center space-x-2 focus:outline-none"
             >
-              <img
-                src="https://ui-avatars.com/api/?name=User&background=10B981&color=fff"
-                alt="Profile"
-                className="w-8 h-8 rounded-full border border-emerald-500"
-              />
+              {profileImage && !profileImageError ? (
+                <img
+                  src={profileImage}
+                  alt={`${user?.name || 'User'} profile`}
+                  onError={() => setProfileImageError(true)}
+                  className="w-8 h-8 rounded-full border border-emerald-500 object-cover"
+                />
+              ) : (
+                <span
+                  aria-label={`${user?.name || 'User'} initials`}
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald-500 bg-emerald-500 text-xs font-bold text-white"
+                >
+                  {profileInitials}
+                </span>
+              )}
             </Link>
           ) : (
             <div className="flex items-center space-x-4">

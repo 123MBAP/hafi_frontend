@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { CartItem, useCart } from '../context/CartContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { cachedFetch } from '../utils/cachedFetch';
@@ -66,6 +66,7 @@ interface ProviderImage {
 
 export default function ProductOrServicesDetailPage() {
   const { providerId, imageIndex } = useParams<{ providerId: string; imageIndex: string }>();
+  const navigate = useNavigate();
   const [imageData, setImageData] = useState<ProviderImage | null>(null);
   const [provider, setProvider] = useState<ProviderProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -234,6 +235,7 @@ export default function ProductOrServicesDetailPage() {
       providerPhone={provider?.phone_number}
       providerWhatsapp={provider?.whatsapp_number}
       providerProfileImage={toAbsoluteMediaUrl(provider?.profile_image || provider?.profile_image_url)}
+      onBack={() => navigate(-1)}
       madeInRwanda={imageData.madeInRwanda}
       used={imageData.used}
       pricingUnit={imageData.pricingUnit}
