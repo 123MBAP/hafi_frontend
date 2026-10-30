@@ -9,7 +9,10 @@ import ProductUploadCard from '../components/DashboardParts/ProductUploadCard';
 import ServiceUploadCard from '../components/DashboardParts/ServiceUploadCard';
 import ServicePromptBanner from '../components/DashboardParts/ServicePromptBanner';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+const API_BASE = (
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? "https://hafi-backend.onrender.com" : "http://localhost:5000")
+).replace(/\/$/, "");
 type MediaType = "product" | "service";
 type FileType = "image" | "video" | "mixed";
 
@@ -290,7 +293,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetchWithAutoLogout('http://localhost:5000/api/me');
+        const res = await fetchWithAutoLogout(`${API_BASE}/api/me`);
         await res.json(); // Data fetched but not stored for now
       } catch (err: any) {
         console.error(err.message);
@@ -303,7 +306,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchSubscription = async () => {
       try {
-        const res = await fetchWithAutoLogout('http://localhost:5000/api/provider/restrict/features');
+        const res = await fetchWithAutoLogout(`${API_BASE}/api/provider/restrict/features`);
         if (!res.ok) {
           console.error('Failed to load subscription status', res.status, res.statusText);
           setSubscription(null);
