@@ -125,6 +125,7 @@ export default function Dashboard() {
 
   // Subscription info used to control access/restrictions
   const [subscription, setSubscription] = useState<any>(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
 
   const [service, setService] = useState<{ id?: string; title?: string; custom_type?: string; specific_features?: boolean; features?: ServiceFeature[] } | null>(null);
   const [featureValues, setFeatureValues] = useState<Record<string, any>>({});
@@ -322,6 +323,8 @@ export default function Dashboard() {
       } catch (err) {
         console.error('Error fetching subscription status', err);
         setSubscription(null);
+      } finally {
+        setSubscriptionLoading(false);
       }
     };
 
@@ -1076,6 +1079,7 @@ export default function Dashboard() {
         <ProductUploadCard
           darkMode={darkMode}
           subscription={subscription}
+          subscriptionLoading={subscriptionLoading}
           service={service}
           productImages={productImages}
           productVideos={productVideos}
@@ -1106,6 +1110,7 @@ export default function Dashboard() {
         <ServiceUploadCard
           darkMode={darkMode}
           subscription={subscription}
+          subscriptionLoading={subscriptionLoading}
           service={service}
           extraFieldsData={extraFieldsData}
           serviceImages={serviceImages}

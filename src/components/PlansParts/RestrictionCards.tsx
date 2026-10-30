@@ -7,16 +7,22 @@ import { useDarkMode } from "@/context/DarkMode";
 
 interface RestrictionCardProps {
   subscription: Subscription | null;
+  loading?: boolean;
   requiredPlan?: string;
   requiredFeature?: string;
 }
 
 const RestrictionCard: React.FC<RestrictionCardProps> = ({
   subscription,
+  loading = false,
   requiredPlan,
 }) => {
   const navigate = useNavigate();
   const { darkMode } = useDarkMode();
+
+  if (loading) {
+    return null;
+  }
 
   // Color schemes for different restriction types
   const restrictionStyles = {

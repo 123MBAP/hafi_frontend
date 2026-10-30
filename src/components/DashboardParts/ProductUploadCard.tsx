@@ -18,6 +18,7 @@ const PRICING_UNITS = [
 type Props = {
   darkMode: boolean;
   subscription?: any;
+  subscriptionLoading: boolean;
   service?: { specific_features?: boolean; features?: ServiceFeature[] } | null;
   productImages: File[];
   productVideos: File[];
@@ -47,6 +48,7 @@ type Props = {
 export default function ProductUploadCard({
   darkMode,
   subscription,
+  subscriptionLoading,
   service,
   productImages,
   productVideos,
@@ -391,6 +393,7 @@ export default function ProductUploadCard({
         <div className='mt-4'>
             <RestrictionCard
           subscription={subscription?.subscription}
+          loading={subscriptionLoading}
           requiredFeature="upload_products"
         />
         {uploadProgress !== null && uploadProgress !== undefined && (
@@ -433,9 +436,9 @@ export default function ProductUploadCard({
           </button>
           <button
             type="submit"
-            disabled={subscription?.subscription?.status !== 'active' || isUploading}
+            disabled={(!subscriptionLoading && subscription?.subscription?.status !== 'active') || isUploading}
             className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider
-              ${subscription?.subscription?.status === 'active'
+              ${subscriptionLoading || subscription?.subscription?.status === 'active'
                 ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm'
                 : 'bg-gray-450 text-gray-200 cursor-not-allowed'
               }`}

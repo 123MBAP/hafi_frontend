@@ -16,6 +16,7 @@ type ExtraFields = {
 type Props = {
   darkMode: boolean;
   subscription?: any;
+  subscriptionLoading: boolean;
   service: { specific_features?: boolean; features?: ServiceFeature[] } | null;
   extraFieldsData: ExtraFields;
   serviceImages: File[];
@@ -41,6 +42,7 @@ type Props = {
 export default function ServiceUploadCard({
   darkMode,
   subscription,
+  subscriptionLoading,
   service,
   extraFieldsData,
   serviceImages,
@@ -421,6 +423,7 @@ export default function ServiceUploadCard({
         <div className="mt-4">
           <RestrictionCard
             subscription={subscription?.subscription}
+            loading={subscriptionLoading}
             requiredFeature="upload_products"
           />
         </div>
@@ -443,10 +446,10 @@ export default function ServiceUploadCard({
           <button
             type="submit"
             disabled={
-              subscription?.subscription?.status !== 'active' || !serviceImages.length || isUploading
+              (!subscriptionLoading && subscription?.subscription?.status !== 'active') || !serviceImages.length || isUploading
             }
             className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider
-              ${subscription?.subscription?.status === 'active' && serviceImages.length
+              ${(subscriptionLoading || subscription?.subscription?.status === 'active') && serviceImages.length
                 ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm'
                 : 'bg-gray-450 text-gray-200 cursor-not-allowed'
               }`}
