@@ -9,7 +9,12 @@ interface Message {
   timestamp: Date;
 }
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+const API_BASE = (
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? "https://hafi-backend.onrender.com" : "http://localhost:5000")
+).replace(/\/$/, "");
+const TRANSIENT_STATUS_CODES = new Set([502, 503, 504]);
+const MAX_CHAT_REQUEST_ATTEMPTS = 3;
 
 const SUGGESTIONS = [
   { text: "Find house rentals", prompt: "I am looking for a house or apartment to rent. Can you recommend some real estate options?" },
@@ -99,16 +104,33 @@ export default function Hafibot() {
           content: m.content
         }));
 
-      const res = await fetch(`${API_BASE}/api/hafibot/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ messages: history })
-      });
+      let res: Response | undefined;
 
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+      for (let attempt = 1; attempt <= MAX_CHAT_REQUEST_ATTEMPTS; attempt += 1) {
+        res = await fetch(`${API_BASE}/api/hafibot/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ messages: history })
+        });
+
+        if (!TRANSIENT_STATUS_CODES.has(res.status) || attempt === MAX_CHAT_REQUEST_ATTEMPTS) {
+          break;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, attempt * 2000));
+      }
+
+      if (!res || !res.ok) {
+        let serverError = '';
+        try {
+          const errorData = await res?.json();
+          serverError = typeof errorData?.error === 'string' ? errorData.error : '';
+        } catch {
+          // The server may return an empty or non-JSON error response.
+        }
+        throw new Error(serverError || `HTTP ${res?.status ?? 'unknown'}`);
       }
 
       const data = await res.json();
@@ -122,10 +144,12 @@ export default function Hafibot() {
         throw new Error('Invalid response format');
       }
     } catch (e) {
-      console.error(e);
+      console.error('Hafibot request failed:', e);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: "Sorry, I am having trouble connecting to the assistant. Please try again in a moment.",
+        content: e instanceof Error && e.message.includes('AI service')
+          ? "The assistant service is temporarily unavailable. Please try again in a moment."
+          : "Sorry, I am having trouble connecting to the assistant. Please try again in a moment.",
         timestamp: new Date()
       }]);
     } finally {
