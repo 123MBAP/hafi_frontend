@@ -10,8 +10,6 @@
  * 2. The interceptor will automatically wrap all fetch calls
  */
 
-console.log('[FETCH INTERCEPTOR] Authentication interceptor loaded');
-
 // Store the original fetch
 const originalFetch = window.fetch;
 
@@ -20,8 +18,6 @@ const originalFetch = window.fetch;
  * @param message - Message to display to user (optional)
  */
 function handleLogout(message?: string) {
-    console.log('[FETCH INTERCEPTOR] Logging out user:', message);
-
     // Clear all authentication data from localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
@@ -34,7 +30,6 @@ function handleLogout(message?: string) {
 
     // Display message to user (optional - you can use toast notifications here)
     if (message) {
-        console.log('[FETCH INTERCEPTOR] Logout message:', message);
         // TODO: Replace with toast notification
         // toast.error(message);
     }
@@ -96,21 +91,9 @@ window.fetch = async function (...args: Parameters<typeof fetch>): Promise<Respo
             try {
                 const data = await clonedResponse.json();
 
-                console.log('[FETCH INTERCEPTOR] 401 Response:', {
-                    status: response.status,
-                    url: url,
-                    data
-                });
-
                 // Check if backend wants us to redirect to login
                 if (data?.redirectToLogin) {
                     const errorCode = data.code;
-                    const errorMessage = data.error;
-
-                    console.log('[FETCH INTERCEPTOR] Authentication failed - REDIRECTING TO LOGIN:', {
-                        code: errorCode,
-                        message: errorMessage
-                    });
 
                     // Handle specific error codes
                     const messages: Record<string, string> = {
@@ -122,11 +105,10 @@ window.fetch = async function (...args: Parameters<typeof fetch>): Promise<Respo
                         AUTH_FAILED: 'Authentication failed. Please login again.'
                     };
 
-                    const message = messages[errorCode] || errorMessage || 'Please login to continue.';
+                    const message = messages[errorCode] || data.error || 'Please login to continue.';
                     handleLogout(message);
                 }
-            } catch (parseError) {
-                console.error('[FETCH INTERCEPTOR] Error parsing 401 response:', parseError);
+            } catch (_parseError) {
                 // If we can't parse the response, still logout on 401
                 handleLogout('Authentication failed. Please login again.');
             }
@@ -138,24 +120,17 @@ window.fetch = async function (...args: Parameters<typeof fetch>): Promise<Respo
             try {
                 const data = await clonedResponse.json();
 
-                console.log('[FETCH INTERCEPTOR] 403 Response:', {
-                    status: response.status,
-                    url: typeof resource === 'string' ? resource : (resource instanceof Request ? resource.url : resource.href),
-                    data
-                });
-
                 // If forbidden also wants redirect to login
                 if (data?.redirectToLogin) {
                     handleLogout('Access forbidden. Please login again.');
                 }
-            } catch (parseError) {
-                console.error('[FETCH INTERCEPTOR] Error parsing 403 response:', parseError);
+            } catch (_parseError) {
+                // Silently handle parse errors
             }
         }
 
         return response;
     } catch (error) {
-        console.error('[FETCH INTERCEPTOR] Network error:', error);
         throw error;
     }
 };

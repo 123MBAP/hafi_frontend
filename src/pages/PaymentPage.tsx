@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { cachedFetch } from '../utils/cachedFetch';
 import Pay from "./Pay";
 import { PaymentOptions } from "./PaymentOptions";
+import { API_BASE } from '../api/apiClient';
 
 // Define strict types
 type ProductServiceType = "product" | "service";
@@ -27,7 +28,6 @@ interface Provider {
   contactNumber: string;
 }
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 interface PaymentPageProps {
   onPaymentSuccess?: () => void;

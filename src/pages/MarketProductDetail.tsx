@@ -3,8 +3,8 @@ import { useParams } from "react-router-dom";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useCart } from '../context/CartContext'; // adjust path
 import ProductOrServiceDetail from "./ProductOrServiceDetail";
+import { API_BASE } from '../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 const toAbsoluteMediaUrl = (rawUrl?: string | null) => {
   if (!rawUrl) return '';
@@ -69,13 +69,10 @@ export default function ProductDetail() {
       try {
         const res = await fetch(`${API_BASE}/api/products/${productId}`);
         const data = await res.json();
-        console.log("Fetching product from:", `${API_BASE}/api/products/${productId}`);
-        console.log("Product object:", data.product);
-
         setProduct(data.product);
         setRelatedProducts(data.related || []);
-      } catch (err) {
-        console.error("Error fetching product:", err);
+      } catch {
+        // Handled silently
       } finally {
         setLoading(false);
       }

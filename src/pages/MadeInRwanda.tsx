@@ -4,8 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import MapComponent from "@/components/MapComponent";
 import { Search, Filter, MapPin } from "lucide-react";
+import { API_BASE } from '../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 const toAbsoluteMediaUrl = (rawUrl?: string | null) => {
   if (!rawUrl) return '';

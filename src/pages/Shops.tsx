@@ -15,8 +15,8 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
+import { API_BASE } from '../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 export interface ShopCategory {
   id: string;

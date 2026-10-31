@@ -27,8 +27,8 @@ import {
 import { mockCommissioners } from "../api/mockRealEstateData";
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { ServiceFeature } from "@/types/features";
+import { API_BASE } from '../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 export default function PropertyDetailPage() {
     const { propertyId } = useParams<{ propertyId: string }>();

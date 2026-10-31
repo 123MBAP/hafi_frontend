@@ -12,6 +12,15 @@ import { HafibotProvider } from "./context/HafibotContext";
 import "./tailwind.css";
 
 
+// SECURITY: Prevent leaking internal routes, state, and tokens to browser console in production
+if (import.meta.env.PROD) {
+  console.log = () => {};
+  console.debug = () => {};
+  console.info = () => {};
+  console.warn = () => {};
+  console.error = () => {};
+}
+
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
 createRoot(document.getElementById("root")!).render(

@@ -13,6 +13,7 @@ import {
   TrendingUp,
   DollarSign
 } from 'lucide-react';
+import { API_BASE as DEFAULT_API_BASE } from '@/api/apiClient';
 
 interface SubscriptionReport {
   subscription_id: number | null;
@@ -45,7 +46,7 @@ export default function AdminSubscriptionReports({
   const [monthFilter, setMonthFilter] = useState("all"); // 'all', '0' (Jan) - '11' (Dec)
   const [yearFilter, setYearFilter] = useState("all"); // 'all', '2026', '2027', ...
 
-  const API_BASE = apiBaseUrl || (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+  const API_BASE = apiBaseUrl ?? DEFAULT_API_BASE;
 
   // Months listing
   const months = [

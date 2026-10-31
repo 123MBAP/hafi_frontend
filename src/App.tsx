@@ -63,6 +63,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
 import Hafibot from './components/Hafibot';
+import Seo from './components/Seo';
 
 
 
@@ -109,6 +110,7 @@ const App: React.FC = () => {
 
   return (
     <div className={darkMode ? 'dark bg-gray-950 text-white overflow-x-hidden' : 'bg-white text-black overflow-x-hidden'}>
+      <Seo />
       <div className={`flex w-full ${isBotOpen ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
 
         {/* Page area remains available beside Hafibot on desktop. */}

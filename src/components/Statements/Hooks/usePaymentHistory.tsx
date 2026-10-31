@@ -1,6 +1,7 @@
 // hooks/usePaymentHistory.ts
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { API_BASE } from "@/api/apiClient";
 
 interface Payment {
   id: string;
@@ -51,8 +52,6 @@ interface PaymentItem {
   type: string;
   image: string | null;
 }
-
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 // export or declare the filter union including pending_bookings
 export type PaymentFilter =

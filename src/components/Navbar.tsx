@@ -9,8 +9,8 @@ import { isOnlyCustomer, isTokenExpired } from '../utils/tokenUtils';
 import CartIconWithCount from "./CartIcon";
 import SearchResults from './ui/SearchPage';
 import UpdatesIcon from "./UpdatesIcon";
+import { API_BASE } from '../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 interface NavbarProps {
   notificationCount: number;

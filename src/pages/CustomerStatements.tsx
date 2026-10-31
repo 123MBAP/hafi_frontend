@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PaymentPage from "./PaymentPage";
 import PaymentHistory from "@/components/Statements/PaymentsHistory";
+import { API_BASE } from '../api/apiClient';
 
 interface CustomServiceRequest {
   id: string;
@@ -22,7 +23,6 @@ interface CustomServiceRequest {
   payment_id?: string;
 }
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 type StatusFilter = 'all' | 'pending' | 'quoted' | 'accepted' | 'rejected' | 'completed';
 

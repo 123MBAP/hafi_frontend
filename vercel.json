@@ -11,6 +11,33 @@
     ],
     "routes": [
         {
+            "src": "/api/(.*)",
+            "dest": "https://hafi-backend.onrender.com/api/$1",
+            "headers": {
+                "X-Forwarded-Host": "$host"
+            }
+        },
+        {
+            "src": "/uploads/(.*)",
+            "dest": "https://hafi-backend.onrender.com/uploads/$1"
+        },
+        {
+            "src": "/productsUploads/(.*)",
+            "dest": "https://hafi-backend.onrender.com/productsUploads/$1"
+        },
+        {
+            "src": "/servicesUploads/(.*)",
+            "dest": "https://hafi-backend.onrender.com/servicesUploads/$1"
+        },
+        {
+            "src": "/sellerUploads/(.*)",
+            "dest": "https://hafi-backend.onrender.com/sellerUploads/$1"
+        },
+        {
+            "src": "/profileImages/(.*)",
+            "dest": "https://hafi-backend.onrender.com/profileImages/$1"
+        },
+        {
             "handle": "filesystem"
         },
         {

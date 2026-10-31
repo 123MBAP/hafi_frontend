@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useDarkMode } from '@/context/DarkMode';
-import { 
+import { API_BASE } from '../api/apiClient';
+import {
   Lock, 
   Mail, 
   Key, 
@@ -12,7 +13,6 @@ import {
   ArrowLeft 
 } from 'lucide-react';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 const ResetPassword = () => {
   const { darkMode } = useDarkMode();

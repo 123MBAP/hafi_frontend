@@ -23,8 +23,7 @@ import {
   TrendingUp,
   Upload
 } from 'lucide-react';
-
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+import { API_BASE } from '../api/apiClient';
 
 // Types for the dashboard data
 type StorageUsage = {

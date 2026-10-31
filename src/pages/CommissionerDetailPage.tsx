@@ -1,4 +1,5 @@
 import { useDarkMode } from "@/context/DarkMode";
+import { API_BASE } from "@/api/apiClient";
 import {
     ArrowLeft,
     BadgeCheck,
@@ -30,7 +31,6 @@ export default function CommissionerDetailPage() {
     const [managedProperties, setManagedProperties] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
     const profileFallbackUrl = `${API_BASE}/services/profile-image/${commissionerId ?? ''}`;
 
     useEffect(() => {

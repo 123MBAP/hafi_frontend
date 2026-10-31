@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import UpdatesIcon from "./UpdatesIcon";
+import { API_BASE } from '../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 function Layout() {
   const [notificationCount, setNotificationCount] = useState(0);
 

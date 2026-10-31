@@ -1,4 +1,5 @@
 import type { CartItem } from '../context/CartContext';
+import { API_BASE } from '../api/apiClient';
 
 export interface OrderCustomer {
   id: string;
@@ -25,7 +26,6 @@ export interface OrderRecord {
   status: 'placed' | 'order_received' | 'quoted' | 'quote_accepted' | 'payment_done' | 'payment_received' | 'delivery_pending' | 'delivered';
 }
 
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 const getHeaders = (token: string | null) => ({
   'Content-Type': 'application/json',

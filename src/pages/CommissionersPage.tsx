@@ -1,4 +1,5 @@
 import { useDarkMode } from "@/context/DarkMode";
+import { API_BASE } from "@/api/apiClient";
 import {
     BadgeCheck,
     Building2,
@@ -62,7 +63,6 @@ export default function CommissionersPage() {
     const [maxBudget, setMaxBudget] = useState<number | undefined>();
     const [showFilters, setShowFilters] = useState(false);
     const [specializationOptions, setSpecializationOptions] = useState<string[]>(['Land', 'Residential', 'Commercial']);
-    const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
     useEffect(() => {
         const fetchSpecializations = async () => {

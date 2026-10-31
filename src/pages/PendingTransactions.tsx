@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDarkMode } from '@/context/DarkMode';
+import { API_BASE } from '../api/apiClient';
 
 type PendingTx = {
   id: number;
@@ -28,7 +29,6 @@ type StoragePendingTx = {
   created_at: string;
 };
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export default function PendingTransactionsPage() {
   const { darkMode } = useDarkMode();

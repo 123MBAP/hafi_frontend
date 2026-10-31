@@ -7,8 +7,8 @@ import { FaReply,  FaThumbsUp } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MessageCircle, Heart, Send } from "lucide-react";
 import defaultProfile from "./images/profile_image.png";
+import { API_BASE } from '../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 interface Reply {
   id: number;

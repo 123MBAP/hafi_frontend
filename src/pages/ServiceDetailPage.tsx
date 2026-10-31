@@ -10,10 +10,10 @@ import { useDarkMode } from '../context/DarkMode';
 import { cachedFetch } from '../utils/cachedFetch';
 import blankProfileImage from './images/blankProfileImage.png';
 import { ChevronRight, MapPin, Package, Users } from 'lucide-react';
+import { API_BASE } from '../api/apiClient';
 
 L.Icon.Default.mergeOptions({ iconUrl: markerIcon, shadowUrl: markerShadow });
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 const IMAGE_BASE = API_BASE.replace(/\/api$/, "");
 
 interface Provider {

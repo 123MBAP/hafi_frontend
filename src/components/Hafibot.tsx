@@ -4,6 +4,7 @@ import { MessageSquare, X, Send, Trash2, Sparkles, ChevronRight, CornerDownLeft 
 import { useDarkMode } from '../context/DarkMode';
 import { useHafibot } from '../context/HafibotContext';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE } from '../api/apiClient';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -17,10 +18,6 @@ interface HafibotProps {
   onChatWidthChange: (width: number) => void;
 }
 
-const API_BASE = (
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? "https://hafi-backend.onrender.com" : "http://localhost:5000")
-).replace(/\/$/, "");
 const TRANSIENT_STATUS_CODES = new Set([502, 503, 504]);
 const MAX_CHAT_REQUEST_ATTEMPTS = 3;
 

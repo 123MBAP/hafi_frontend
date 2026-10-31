@@ -24,8 +24,8 @@ import {
   Building2
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
+import { API_BASE } from '../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 type Address = {
   province?: string;

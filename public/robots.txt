@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /cart
+Disallow: /checkout
+Disallow: /storage-checkout
+Disallow: /profile
+Disallow: /chat
+Disallow: /verify
+Disallow: /reset-password
+Disallow: /book/payment
+Disallow: /booking/service
+Disallow: /orders
+Disallow: /statements
+Disallow: /account-dashboard
+
+Sitemap: https://haficonnect.voltaleltd.com/sitemap.xml

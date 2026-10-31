@@ -5,6 +5,7 @@
 
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { API_BASE } from '../../api/apiClient';
 
 interface Service {
     id: number;
@@ -29,7 +30,6 @@ interface FieldDefinition {
     validation_rules?: any;
 }
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 export const AdminServiceManager: React.FC = () => {
     const [services, setServices] = useState<Service[]>([]);

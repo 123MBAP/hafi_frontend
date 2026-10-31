@@ -20,13 +20,13 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { getNavigationPath } from '../utils/navigationUtils';
 import { cachedFetch } from '../utils/cachedFetch';
 import VerifyEmailForm from './VerifyEmailForm';
+import { API_BASE } from '../api/apiClient';
 
 type Service = {
   id: string;
   title: string;
 };
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 export default function RegisterPage() {
   const [step, setStep] = useState<'register' | 'verify' | 'google-role-select'>('register');

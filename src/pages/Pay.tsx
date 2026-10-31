@@ -2,8 +2,8 @@ import { useDarkMode } from '@/context/DarkMode';
 import { useEffect, useState } from 'react';
 import AirtelIcon from './images/airtel money.png';
 import MtnIcon from './images/mtn.png';
+import { API_BASE } from '../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 interface PayProps {
   totalAmount: number;

@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AirtelIcon from '../pages/images/airtel money.png';
 import MtnIcon from '../pages/images/mtn.png';
+import { API_BASE } from '../api/apiClient';
 
 type PaymentMethod = 'mtn' | 'airtel' | 'wallet';
 
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 export default function StorageCheckout() {
   const location = useLocation();

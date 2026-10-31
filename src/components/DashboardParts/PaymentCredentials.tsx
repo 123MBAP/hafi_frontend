@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
-// filepath: src/components/DashboardParts/PaymentCredentials.tsx
+import { API_BASE } from '../../api/apiClient';
 import {
   AlertCircle,
   Building,
@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 type MethodsShape = {
   mtn?: { phone?: string; registeredName?: string };

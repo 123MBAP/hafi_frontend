@@ -8,8 +8,8 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { cachedFetch } from '../utils/cachedFetch';
 import ChatBox from './ChatBox';
 import { ArrowLeft, Package, Briefcase, Heart, ShoppingBag, Calendar, ChevronRight, X, MapPin, Phone as PhoneIcon, Mail, MessageCircle, FileText } from 'lucide-react';
+import { API_BASE } from '../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 const isVideoUrl = (url: string) => {
   const lowerUrl = url.toLowerCase();

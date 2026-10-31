@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDarkMode } from "@/context/DarkMode";
 import { useAuth } from "@/context/AuthContext";
+import { API_BASE } from '../../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 export default function CompleteEscrowPaymentPage() {
   const { darkMode } = useDarkMode();

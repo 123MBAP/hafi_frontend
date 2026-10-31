@@ -12,8 +12,8 @@ import { usePhases } from '@/context/PhaseContext';
 import { PhoneCall, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { clearFetchCache } from '../../utils/cachedFetch';
+import { API_BASE } from '../../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 interface Props {
     /** The logged-in provider's ID (from localStorage or AuthContext) */

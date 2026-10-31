@@ -3,8 +3,8 @@ import { AlertCircle, ArrowLeft, Lock, Mail, MapPin, User, CheckCircle, Phone, E
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import RwandaLocationSelector from '@/components/RwandaLocationSelector';
+import { API_BASE } from '../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 export default function AgentRegister() {
   const { darkMode } = useDarkMode();

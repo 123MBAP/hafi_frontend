@@ -10,8 +10,8 @@ import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Filter, X } from 'lucide-react';
 import ServiceCard from './ServiceCard';
+import { API_BASE } from '../../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 export default function Services() {
   const { darkMode } = useDarkMode();

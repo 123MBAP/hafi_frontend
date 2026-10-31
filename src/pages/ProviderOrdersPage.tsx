@@ -4,7 +4,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useDarkMode } from '@/context/DarkMode';
 import ChatBox from './ChatBox';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { 
+import { API_BASE } from '../api/apiClient';
+import {
   FileText, 
   RefreshCw, 
   ArrowLeft, 
@@ -19,7 +20,6 @@ import {
   Info
 } from 'lucide-react';
 
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 // ===== Types =====
 type ProviderOrderItem = {

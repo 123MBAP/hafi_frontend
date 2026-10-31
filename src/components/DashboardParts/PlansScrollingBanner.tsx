@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useDarkMode } from '@/context/DarkMode';
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+import { API_BASE } from '../../api/apiClient';
 
 export default function SubscriptionBanner() {
   const [subscriptions, setSubscriptions] = useState<any[]>([]);

@@ -7,6 +7,7 @@ import SubscriptionBanner from '../components/DashboardParts/PlansScrollingBanne
 import RestrictionCard from '../components/PlansParts/RestrictionCards';
 import { cachedFetch } from '../utils/cachedFetch';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { API_BASE } from '../api/apiClient';
 
 // Types (unchanged)
 interface Category { id: string; name: string; description: string; }
@@ -34,7 +35,6 @@ const PRICING_UNITS = [
   { value: 'Per Pack / Dozen', label: 'Per Pack / Dozen (e.g., box bundles, multipacks)' }
 ];
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 const getUrl = (path: string | undefined | null) => {
   if (!path) return '';

@@ -12,10 +12,10 @@ import equipmrntRentalImage from "./images/bg_images/equipment_rental.jpg"
 import realEstateImage from "./images/bg_images/real_estate.jpg"
 import photoStudioImage from "./images/bg_images/photo_studio.jpg"
 import kidsOutdoorImage from "./images/bg_images/kids_outdoor.png"
+import { API_BASE } from '../api/apiClient';
 
 
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 interface Service {
   id: string;

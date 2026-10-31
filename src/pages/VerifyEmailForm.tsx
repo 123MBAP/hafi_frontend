@@ -12,6 +12,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { getNavigationPath } from '../utils/navigationUtils';
+import { API_BASE } from '@/api/apiClient';
 
 const VERIFY_EMAIL_KEY = 'verify_email';
 const VERIFY_CODE_KEY = 'verify_code';
@@ -48,7 +49,7 @@ const VerifyEmailForm = ({ email: propEmail }: { email: string }) => {
     setSubmitting(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/verify-email', {
+      const res = await fetch(`${API_BASE}/api/verify-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code }),
@@ -89,7 +90,7 @@ const VerifyEmailForm = ({ email: propEmail }: { email: string }) => {
     setNotification('');
     setSubmitting(true);
     try {
-      const res = await fetch('http://localhost:5000/api/update-email-and-resend', {
+      const res = await fetch(`${API_BASE}/api/update-email-and-resend`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ oldEmail, newEmail: email }),
@@ -114,7 +115,7 @@ const VerifyEmailForm = ({ email: propEmail }: { email: string }) => {
     setNotification('');
     setSubmitting(true);
     try {
-      const res = await fetch('http://localhost:5000/api/resend-verification', {
+      const res = await fetch(`${API_BASE}/api/resend-verification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),

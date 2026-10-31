@@ -8,11 +8,7 @@ import SubscriptionBanner from '../components/DashboardParts/PlansScrollingBanne
 import ProductUploadCard from '../components/DashboardParts/ProductUploadCard';
 import ServiceUploadCard from '../components/DashboardParts/ServiceUploadCard';
 import ServicePromptBanner from '../components/DashboardParts/ServicePromptBanner';
-
-const API_BASE = (
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? "https://hafi-backend.onrender.com" : "http://localhost:5000")
-).replace(/\/$/, "");
+import { API_BASE } from '../api/apiClient';
 type MediaType = "product" | "service";
 type FileType = "image" | "video" | "mixed";
 
@@ -435,9 +431,6 @@ export default function Dashboard() {
       productViews.flat().forEach(viewImage => formData.append('viewImages', viewImage));
 
       const uploadUrl = `${API_BASE}/api/upload/products/unified`;
-      console.log('Upload URL:', uploadUrl);
-      console.log('API_BASE:', API_BASE);
-
       setProductUploadProgress(0);
       const data = await uploadWithProgress(
         "POST",
@@ -774,114 +767,47 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    console.log('🚀 [DASHBOARD] useEffect triggered');
-    console.log('🆔 Provider ID:', providerId);
-
     if (!providerId) {
-      console.warn('⚠️ [DASHBOARD] No providerId found, skipping service fetch');
       return;
     }
 
-    // Add timestamp to bust cache and ensure fresh data
     const cacheBuster = Date.now();
     const fetchUrl = `${API_BASE}/api/providers/${providerId}/service?t=${cacheBuster}`;
 
-    console.log('🌐 [DASHBOARD] Starting service fetch...');
-    console.log('📍 Fetch URL:', fetchUrl);
-    console.log('🔧 API_BASE:', API_BASE);
-
     fetch(fetchUrl, {
-      cache: 'no-store' // Prevent browser from caching this request
+      cache: 'no-store'
     })
       .then(res => {
-        console.log('📥 [DASHBOARD] Fetch response received');
-        console.log('   Status:', res.status);
-        console.log('   Status Text:', res.statusText);
-        console.log('   OK:', res.ok);
-
         if (!res.ok) {
           if (res.status === 404) {
-            console.warn('⚠️ Provider is not linked to any service. Please contact admin to assign a service.');
             return null;
           }
-          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+          throw new Error(`HTTP ${res.status}`);
         }
-        console.log('✅ [DASHBOARD] Response OK, parsing JSON...');
         return res.json();
       })
       .then(async data => {
-        console.log('📦 [DASHBOARD] JSON parsed, data received');
-        console.log('   Data is null?', data === null);
-        console.log('   Data is undefined?', data === undefined);
-
         if (!data) {
-          // Provider not linked to service
-          console.log('ℹ️ [DASHBOARD] No data returned (provider not linked to service)');
           setService(null);
           return;
         }
-        console.log('🔍 Service data loaded:', data);
-        console.log('📝 Has specific_features:', data.specific_features);
-        console.log('📋 Features array:', data.features);
-
-        // Enhanced debugging - print exact data structure
-        console.log('═══════════════════════════════════════════════════════');
-        console.log('🐛 DETAILED SERVICE DATA DEBUG:');
-        console.log('═══════════════════════════════════════════════════════');
-        console.log('📦 Full Service Object (JSON):');
-        console.log(JSON.stringify(data, null, 2));
-        console.log('───────────────────────────────────────────────────────');
-        console.log('🔑 Service Properties:');
-        console.log('  - ID:', data.id);
-        console.log('  - Title:', data.title);
-        console.log('  - Specific Features Enabled:', data.specific_features);
-        console.log('  - Features Type:', typeof data.features);
-        console.log('  - Features Is Array:', Array.isArray(data.features));
-        console.log('  - Features Length:', data.features?.length || 0);
-        console.log('───────────────────────────────────────────────────────');
-
-        if (data.features && Array.isArray(data.features)) {
-          console.log('📋 FEATURES BREAKDOWN:');
-          data.features.forEach((feature: any, index: number) => {
-            console.log(`\n  Feature #${index + 1}:`);
-            console.log('    - Type:', feature.type);
-            console.log('    - Name:', feature.name);
-            if (feature.type === 'object' && feature.schema) {
-              console.log('    - Schema Fields:', Object.keys(feature.schema));
-              console.log('    - Full Schema:', JSON.stringify(feature.schema, null, 6));
-            }
-            console.log('    - Full Feature Object:', JSON.stringify(feature, null, 6));
-          });
-        } else {
-          console.log('⚠️ Features is not an array or is undefined/null');
-        }
-        console.log('═══════════════════════════════════════════════════════');
 
         setService(data);
-        // Initialize feature values with empty strings or empty objects
         if (data.specific_features && data.features) {
           const initialValues: Record<string, any> = {};
           data.features.forEach((feature: any) => {
             if (feature.type === 'simple') {
               initialValues[feature.name] = '';
             } else if (feature.type === 'object') {
-              // Initialize nested object with empty values for each field
               initialValues[feature.name] = {};
             }
           });
           setFeatureValues(initialValues);
-          console.log('✅ Feature values initialized:', initialValues);
-        } else {
-          console.log('ℹ️ Service does not have custom features enabled');
-          if (!data.specific_features) {
-            console.log('   Reason: specific_features is', data.specific_features);
-          }
-          if (!data.features) {
-            console.log('   Reason: features is', data.features);
-          }
         }
       })
-      .catch(err => console.error("❌ Error loading service data:", err));
+      .catch(() => {
+        // Handled silently
+      });
   }, [providerId]);
 
   useEffect(() => {

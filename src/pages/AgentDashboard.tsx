@@ -23,8 +23,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+import { API_BASE } from '../api/apiClient';
 
 export default function AgentDashboard() {
   const { darkMode } = useDarkMode();

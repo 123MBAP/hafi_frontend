@@ -16,8 +16,8 @@ import MtnIcon from "../../pages/images/mtn.jpg";
 import AirtelIcon from "../../pages/images/airtel_logo.png";
 import MastercardIcon from "@/assets/images/master_card.png";
 import VisaIcon from "@/assets/images/visa.png";
+import { API_BASE } from '../../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 type DbPlan = {
   id: number;
@@ -1017,6 +1017,29 @@ export default function UpgradePlans() {
                 const isPaymentReady = selectedMethod === 'card'
                   ? true
                   : Boolean((selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone).replace(/\D/g, ''));
+                const paymentDashboard = user?.roles?.includes('service_provider')
+                  ? '/dashboard/provider'
+                  : '/dashboard/seller';
+                const waitForPaymentCompletion = async (referenceId: string) => {
+                  for (let attempt = 0; attempt < 30; attempt += 1) {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    const statusRes = await fetch(
+                      `${API_BASE}/api/provider/upgrade/transactions/${encodeURIComponent(referenceId)}/status`,
+                      { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+                    );
+                    if (!statusRes.ok) continue;
+                    const statusData = await statusRes.json();
+                    if (statusData.status === 'completed') {
+                      window.location.assign(`${paymentDashboard}?payment=success`);
+                      return;
+                    }
+                    if (['failed', 'cancelled'].includes(statusData.status)) {
+                      setRenewMessage('❌ Payment was not completed.');
+                      return;
+                    }
+                  }
+                  setRenewMessage('⏳ Payment is still pending. You can check its status from Pending Transactions.');
+                };
                 const initiatePayment = async (method: PaymentMethod) => {
                   setRenewMessage(null);
                   setRenewLoading(true);
@@ -1053,7 +1076,9 @@ export default function UpgradePlans() {
                       window.location.assign(data.data.paymentUrl);
                       return;
                     }
-                    setRenewMessage(`✅ Payment initiated. Ref: ${data?.data?.referenceId}`);
+                    const referenceId = data?.data?.referenceId;
+                    setRenewMessage(`⏳ Payment is pending. Approve the payment on your phone. Ref: ${referenceId}`);
+                    if (referenceId) void waitForPaymentCompletion(referenceId);
                   } catch (e: any) {
                     setRenewMessage(`❌ ${e?.message || 'Failed to initiate renewal'}`);
                   } finally {
@@ -1213,11 +1238,9 @@ export default function UpgradePlans() {
                               throw new Error(errData.error || `HTTP ${res.status}`);
                             }
                             const data = await res.json();
-                            if (selectedMethod === 'card' && data?.data?.paymentUrl) {
-                              window.location.assign(data.data.paymentUrl);
-                              return;
-                            }
-                            setRenewMessage(`⏳ Payment is pending. Approve the payment on your phone. Ref: ${data?.data?.referenceId}`);
+                            const referenceId = data?.data?.referenceId;
+                            setRenewMessage(`⏳ Payment is pending. Approve the payment on your phone. Ref: ${referenceId}`);
+                            if (referenceId) void waitForPaymentCompletion(referenceId);
                             // Keep the modal open while XentriPay waits for the customer's approval.
                             // The webhook will update the transaction and subscription asynchronously.
                           } catch (e: any) {

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { API_BASE_URL } from '@/api/apiClient';
 
 interface LocationOption {
     id?: number;
@@ -25,8 +26,6 @@ const RwandaLocationSelector: React.FC = () => {
 
     const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
     const [error, setError] = useState<string>('');
-
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
     // Fetch provinces on mount
     useEffect(() => {

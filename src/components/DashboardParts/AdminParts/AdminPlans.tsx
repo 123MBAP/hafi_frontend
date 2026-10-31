@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_BASE } from "@/api/apiClient";
 import { useDarkMode } from "@/context/DarkMode";
 import { 
   Package, 
@@ -84,7 +85,7 @@ export default function AdminPlansPage() {
   async function fetchStoragePricing() {
     if (!token) return;
     try {
-      const res = await fetch("http://localhost:5000/api/admin/storage-pricing", {
+      const res = await fetch(`${API_BASE}/api/admin/storage-pricing`, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
@@ -96,8 +97,8 @@ export default function AdminPlansPage() {
           price_per_gb_yearly: data.price_per_gb_yearly,
         });
       }
-    } catch (err) {
-      console.error("Error fetching storage pricing:", err);
+    } catch {
+      // Handled silently
     }
   }
 
@@ -106,7 +107,7 @@ export default function AdminPlansPage() {
     if (!token) return;
     setIsSubmitting(true);
     try {
-      const res = await fetch("http://localhost:5000/api/admin/storage-pricing", {
+      const res = await fetch(`${API_BASE}/api/admin/storage-pricing`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -139,7 +140,7 @@ export default function AdminPlansPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/admin/plans", {
+      const res = await fetch(`${API_BASE}/api/admin/plans`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -153,8 +154,8 @@ export default function AdminPlansPage() {
 
       const data = await res.json();
       setPlans(data);
-    } catch (err) {
-      console.error("Error fetching plans:", err);
+    } catch {
+      // Handled silently
     }
   }
 
@@ -164,8 +165,8 @@ export default function AdminPlansPage() {
     setIsSubmitting(true);
     try {
       const url = editingId
-        ? `http://localhost:5000/api/admin/update_plans/${editingId}`
-        : "http://localhost:5000/api/admin/create_plans";
+        ? `${API_BASE}/api/admin/update_plans/${editingId}`
+        : `${API_BASE}/api/admin/create_plans`;
 
       const method = editingId ? "PUT" : "POST";
 
@@ -208,8 +209,8 @@ export default function AdminPlansPage() {
         button.classList.add('animate-success');
         setTimeout(() => button.classList.remove('animate-success'), 2000);
       }
-    } catch (err) {
-      console.error("Error saving plan:", err);
+    } catch {
+      // Handled silently
     } finally {
       setIsSubmitting(false);
     }
@@ -239,13 +240,13 @@ export default function AdminPlansPage() {
   async function deletePlan(id: number) {
     if (!window.confirm("Are you sure you want to delete this plan?")) return;
     try {
-      await fetch(`http://localhost:5000/api/admin/delete_plan/${id}`, {
+      await fetch(`${API_BASE}/api/admin/delete_plan/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
       fetchPlans();
-    } catch (err) {
-      console.error("Error deleting plan:", err);
+    } catch {
+      // Handled silently
     }
   }
 

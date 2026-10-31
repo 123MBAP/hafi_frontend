@@ -1,4 +1,5 @@
 import { useDarkMode } from "@/context/DarkMode";
+import { API_BASE } from "@/api/apiClient";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
@@ -77,8 +78,6 @@ export default function NotificationsPage() {
     const [shuffledNotifications, setShuffledNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
     const [rows, setRows] = useState<Array<{ layout: string; items: Notification[] }>>([]);
-
-    const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
     const normalizeImageField = (imgField: unknown): string | null => {
         if (!imgField) return null;

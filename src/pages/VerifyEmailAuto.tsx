@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { API_BASE } from '@/api/apiClient';
 
 export default function VerifyEmailAuto() {
   const [searchParams] = useSearchParams();
@@ -15,7 +16,7 @@ export default function VerifyEmailAuto() {
       setMessage('Invalid verification link.');
       return;
     }
-    fetch('http://localhost:5000/api/verify-email', {
+    fetch(`${API_BASE}/api/verify-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, code }),

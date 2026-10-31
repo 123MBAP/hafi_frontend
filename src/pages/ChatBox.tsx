@@ -3,8 +3,8 @@ import { useDarkMode } from "@/context/DarkMode";
 import { useEffect, useRef, useState } from 'react';
 import { FaEllipsisV, FaMicrophone, FaPaperclip, FaPaperPlane, FaSearch, FaSmile } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
+import { API_BASE } from '../api/apiClient';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 interface ChatMessage {
   sender: string; // 'provider' or 'customer'

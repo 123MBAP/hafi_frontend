@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { usePhases } from '@/context/PhaseContext';
 import SubscriptionBanner from '@/components/DashboardParts/PlansScrollingBanner';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { API_BASE } from '../api/apiClient';
 import {
   User,
   Store,
@@ -24,7 +25,6 @@ import {
   TrendingUp
 } from 'lucide-react';
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 export default function DashboardOverviewPage() {
   const { darkMode } = useDarkMode();

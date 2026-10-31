@@ -4,7 +4,7 @@ import { CartItem, useCart } from '../context/CartContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { cachedFetch } from '../utils/cachedFetch';
 import ProductOrServiceDetail from './ProductOrServiceDetail';
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+import { API_BASE } from '../api/apiClient';
 
 const toAbsoluteMediaUrl = (rawUrl?: string | null) => {
   if (!rawUrl) return '';
