@@ -631,7 +631,7 @@ export default function ProviderDetail() {
                           {img.type === 'product' && img.inStock === false ? (
                             <button
                               disabled
-                              className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium bg-gray-450 dark:bg-gray-700 text-gray-200 dark:text-gray-400 cursor-not-allowed"
+                              className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium bg-gray-400 dark:bg-gray-700 text-gray-200 dark:text-gray-400 cursor-not-allowed"
                               style={{ borderRadius: '2px' }}
                             >
                               Out of Stock

@@ -438,7 +438,7 @@ export default function ProviderUpgradePaymentPage() {
               disabled={submitting}
               className={`flex-1 py-2.5 px-4 font-bold text-xs uppercase tracking-wider transition-colors ${
                 submitting
-                  ? 'bg-gray-450 cursor-not-allowed text-white'
+                  ? 'bg-gray-400 cursor-not-allowed text-white'
                   : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm'
               }`}
               style={{ borderRadius: '2px' }}

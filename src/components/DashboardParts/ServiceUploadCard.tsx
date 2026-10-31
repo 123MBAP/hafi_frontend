@@ -451,7 +451,7 @@ export default function ServiceUploadCard({
             className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider
               ${(subscriptionLoading || subscription?.subscription?.status === 'active') && serviceImages.length
                 ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm'
-                : 'bg-gray-450 text-gray-200 cursor-not-allowed'
+                : 'bg-gray-400 text-gray-200 cursor-not-allowed'
               }`}
             style={{ borderRadius: '2px' }}
           >
