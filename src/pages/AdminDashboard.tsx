@@ -1450,7 +1450,7 @@ export default function AdminDashboard() {
                     disabled={isSubmitting}
                     className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border flex items-center gap-2 ${
                       isSubmitting
-                        ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                        ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
                         : 'bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500 shadow-sm'
                     }`}
                     style={{ borderRadius: '2px' }}
@@ -1674,7 +1674,7 @@ export default function AdminDashboard() {
                         disabled={isSubmitting}
                         className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border flex items-center gap-2 ${
                           isSubmitting
-                            ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                            ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
                             : 'bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500 shadow-sm'
                         }`}
                         style={{ borderRadius: '2px' }}
@@ -1933,7 +1933,7 @@ export default function AdminDashboard() {
                     disabled={isSubmitting}
                     className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border flex items-center gap-2 ${
                       isSubmitting
-                        ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                        ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
                         : 'bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500 shadow-sm'
                     }`}
                     style={{ borderRadius: '2px' }}
@@ -2131,7 +2131,7 @@ export default function AdminDashboard() {
                     disabled={isSubmitting}
                     className={`px-6 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border flex items-center gap-2 ${
                       isSubmitting
-                        ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                        ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
                         : 'bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500 shadow-sm'
                     }`}
                     style={{ borderRadius: '2px' }}
@@ -2765,7 +2765,7 @@ if (!isPhaseEnabled('phase_1')) return null; // 👈 feature hidden until enable
                         disabled={savingSettings}
                         className={`py-2 px-6 text-white font-bold text-xs uppercase tracking-wider transition-colors border
                           ${savingSettings
-                            ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                            ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
                             : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500'}`}
                         style={{ borderRadius: '2px' }}
                       >

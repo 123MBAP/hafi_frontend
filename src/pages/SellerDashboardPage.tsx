@@ -824,7 +824,7 @@ export default function SellerDashboardPage() {
                             className={`px-6 py-2 font-semibold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2
                               ${canUploadProducts
                                 ? "bg-emerald-300 text-white hover:bg-emerald-600 shadow-sm"
-                                : "bg-gray-450 cursor-not-allowed text-gray-200"
+                                : "bg-gray-400 cursor-not-allowed text-gray-200"
                               }`}
                             style={{ borderRadius: '2px' }}
                           >
