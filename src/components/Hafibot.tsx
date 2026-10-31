@@ -13,6 +13,8 @@ interface Message {
 
 interface HafibotProps {
   onBeforeOpen?: () => void;
+  chatWidth: number;
+  onChatWidthChange: (width: number) => void;
 }
 
 const API_BASE = (
@@ -29,7 +31,7 @@ const SUGGESTIONS = [
   { text: "Best restaurants", prompt: "Recommend some restaurants or catering services in Kigali." }
 ];
 
-export default function Hafibot({ onBeforeOpen }: HafibotProps) {
+export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: HafibotProps) {
   const { darkMode } = useDarkMode();
   const { user } = useAuth();
   const { isOpen, openHafibot, closeHafibot, toggleHafibot } = useHafibot();
@@ -40,6 +42,38 @@ export default function Hafibot({ onBeforeOpen }: HafibotProps) {
   const [showTooltip, setShowTooltip] = useState(true);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const resizeStartRef = useRef<{ x: number; width: number } | null>(null);
+
+  useEffect(() => {
+    const handlePointerMove = (event: PointerEvent) => {
+      if (!resizeStartRef.current) return;
+
+      const widthChange = resizeStartRef.current.x - event.clientX;
+      const width = ((resizeStartRef.current.width * window.innerWidth) / 100 + widthChange)
+        / window.innerWidth * 100;
+      onChatWidthChange(Math.min(75, Math.max(25, width)));
+    };
+
+    const handlePointerUp = () => {
+      resizeStartRef.current = null;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.addEventListener('pointermove', handlePointerMove);
+    document.addEventListener('pointerup', handlePointerUp);
+    return () => {
+      document.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('pointerup', handlePointerUp);
+    };
+  }, [onChatWidthChange]);
+
+  const handleResizeStart = (event: React.PointerEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    resizeStartRef.current = { x: event.clientX, width: chatWidth };
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
 
   // Focus input when opened
   useEffect(() => {
@@ -416,8 +450,18 @@ export default function Hafibot({ onBeforeOpen }: HafibotProps) {
       {isOpen && (
         <aside
           aria-label="Hafibot AI Search Assistant"
-          className="w-full md:w-1/2 h-screen flex flex-col border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shadow-2xl shrink-0 z-40 transition-all duration-300 ease-in-out fixed inset-0 md:relative md:inset-auto overflow-hidden font-sans"
+          className="w-full md:w-[var(--hafibot-width)] h-screen flex flex-col border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shadow-2xl shrink-0 z-[60] transition-all duration-300 ease-in-out fixed inset-0 md:relative md:inset-auto overflow-hidden font-sans"
+          style={{ '--hafibot-width': `${chatWidth}%` } as React.CSSProperties}
         >
+          <div
+            role="separator"
+            aria-label="Resize Hafibot panel"
+            aria-orientation="vertical"
+            onPointerDown={handleResizeStart}
+            className="hidden md:flex absolute left-0 top-0 bottom-0 w-2 -translate-x-1/2 cursor-col-resize items-center justify-center z-10 group"
+          >
+            <span className="h-16 w-1 rounded-full bg-gray-300/0 group-hover:bg-emerald-400/80 transition-colors dark:bg-gray-600/0 dark:group-hover:bg-emerald-400/80" />
+          </div>
           {/* Header Bar */}
           <div className="bg-[#0a7e6e] dark:bg-gray-900/95 px-5 py-3.5 flex items-center justify-between text-white border-b border-emerald-600/30 dark:border-gray-800 shadow-sm shrink-0">
             <div className="flex items-center gap-3">

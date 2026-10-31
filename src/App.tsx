@@ -76,6 +76,7 @@ function VerifyPageWrapper() {
 const App: React.FC = () => {
 
   const [chatCustomerId, setChatCustomerId] = useState<string | null>(null);
+  const [chatWidth, setChatWidth] = useState(50);
   const { darkMode } = useDarkMode();
   const { isOpen: isBotOpen } = useHafibot();
   const leftPageRef = useRef<HTMLDivElement>(null);
@@ -91,12 +92,12 @@ const App: React.FC = () => {
     scrollPosRef.current = window.scrollY || document.documentElement.scrollTop || 0;
   };
 
-  // Preserve scroll position when transitioning between window scroll and container scroll
+  // Start the split view at the page content and restore the original page position on close.
   useEffect(() => {
     if (isBotOpen) {
       requestAnimationFrame(() => {
         if (leftPageRef.current) {
-          leftPageRef.current.scrollTop = scrollPosRef.current;
+          leftPageRef.current.scrollTop = 0;
         }
       });
     } else {
@@ -110,7 +111,7 @@ const App: React.FC = () => {
     <div className={darkMode ? 'dark bg-gray-950 text-white overflow-x-hidden' : 'bg-white text-black overflow-x-hidden'}>
       <div className={`flex w-full ${isBotOpen ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
 
-        {/* Collapsible Page Area (Fits 1/2 of width on desktop when Hafibot opens) */}
+        {/* Page area remains available beside Hafibot on desktop. */}
         <div
           ref={leftPageRef}
           onScroll={(e) => {
@@ -120,7 +121,7 @@ const App: React.FC = () => {
           }}
           className={`flex flex-col transition-all duration-300 ease-in-out min-w-0 ${
             isBotOpen
-              ? 'w-full md:w-1/2 h-screen overflow-y-auto'
+              ? 'w-full md:flex-1 h-screen overflow-y-auto'
               : 'w-full min-h-screen'
           }`}
         >
@@ -270,6 +271,7 @@ const App: React.FC = () => {
         </main>
 
 
+        {!isBotOpen && (
         <footer className={`py-12 mt-auto border-t transition-colors duration-300
           ${darkMode
             ? 'bg-gray-900 text-gray-300 border-gray-800'
@@ -412,11 +414,16 @@ const App: React.FC = () => {
             <a href="/privacy" className="hover:text-emerald-300 transition-colors">Privacy Policy</a>
           </div>
         </footer>
+        )}
       </div>
     </div>
 
     {/* Hafibot AI Assistant Side Panel */}
-    <Hafibot onBeforeOpen={handleBeforeOpen} />
+    <Hafibot
+      chatWidth={chatWidth}
+      onChatWidthChange={setChatWidth}
+      onBeforeOpen={handleBeforeOpen}
+    />
 
   </div>
 </div>
