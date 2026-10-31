@@ -782,11 +782,11 @@ const HomePage = () => {
         </button>
 
         <div className="relative z-10 max-w-4xl mx-auto">
-          <h2 className="text-3xl sm:text-5xl lg:text-7xl font-bold mb-4 uppercase tracking-tighter text-white drop-shadow-md">
-            Services, Products & Real Estate
-          </h2>
-          <p className="text-sm sm:text-lg lg:text-xl text-white/90 max-w-3xl mx-auto mb-8 sm:mb-10 drop-shadow-sm">
-            Find local services, shop Rwanda-made products, browse global market listings, and explore real estate opportunities near you.
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold mb-4 uppercase tracking-tighter text-white drop-shadow-md">
+            Everything You Need, Connected in One Place
+          </h1>
+          <p className="text-sm sm:text-base lg:text-lg text-white/90 max-w-3xl mx-auto mb-8 sm:mb-10 drop-shadow-sm leading-relaxed">
+            HafiConnect brings services, products, businesses, shops, and real estate opportunities together on one convenient platform. Discover service providers, browse new and second-hand products, explore premium shops, find properties to rent or buy, and support local businesses through Made in Rwanda products. Whether you are searching for a service, looking to buy something, or connecting with a seller or property professional, HafiConnect makes it easier to discover opportunities and connect directly.
           </p>
         </div>
       </section>

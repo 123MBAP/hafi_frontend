@@ -19,10 +19,10 @@ export default function About() {
             About HafiConnect
           </p>
           <h1 className={`mt-2 text-3xl sm:text-4xl font-bold tracking-tight ${textTitle}`}>
-            Connecting Communities, Empowering Livelihoods.
+            Discover, Connect, and Shop in One Place.
           </h1>
           <p className="mt-4 max-w-3xl text-sm sm:text-base leading-6">
-            HafiConnect is a practical, unified digital platform built to bring local service providers, authentic Made-in-Rwanda products, global market listings, and real estate opportunities into one accessible place.
+            HafiConnect is an online platform that brings services, products, shops, and real estate opportunities together in one place. Users can find and contact service providers, buy and sell new and used products, explore premium shops, discover Made in Rwanda products, and find properties to rent or buy. HafiConnect makes it easier for individuals and businesses to showcase their offerings, connect with customers, and discover opportunities.
           </p>
         </div>
 

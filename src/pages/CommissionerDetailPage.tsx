@@ -145,7 +145,7 @@ export default function CommissionerDetailPage() {
                         <span className="text-sm">Back</span>
                     </button>
                     <div className="py-16">
-                        <LoadingSpinner size="lg" message="Loading agent details..." />
+                        <LoadingSpinner size="lg" message="Loading agent details..." variant="dots" />
                     </div>
                 </div>
             </div>

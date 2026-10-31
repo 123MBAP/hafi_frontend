@@ -447,7 +447,7 @@ export default function RealEstatePage() {
                     </span>
                 </div>
 
-                <p className={`text-xs line-clamp-2 mb-3 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <p className={`text-xs sm:text-sm leading-6 line-clamp-2 mb-3 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                     {descriptionValuesOnlyFromUnknown((property as any)?.description) || 'No description available'}
                 </p>
 
@@ -520,7 +520,7 @@ export default function RealEstatePage() {
                             {property.location.sector}, {property.location.district}
                         </span>
                     </div>
-                    <p className={`text-xs line-clamp-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p className={`text-xs sm:text-sm leading-6 line-clamp-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         {descriptionValuesOnlyFromUnknown((property as any)?.description) || 'No description'}
                     </p>
                 </div>
@@ -554,12 +554,17 @@ export default function RealEstatePage() {
             <div className="max-w-7xl mx-auto px-4 py-6">
                 {/* Header */}
                 <div className="mb-6">
-                    <h1 className={`text-2xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
-                        Real Estate
+                    <h1 className={`text-2xl sm:text-3xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
+                        Find Property to Rent, Buy, or Invest In
                     </h1>
-                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
-                        {filteredProperties.length} properties available
+                    <p className={`text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2 leading-relaxed max-w-4xl`}>
+                        Discover real estate opportunities on HafiConnect. Explore houses, apartments, land, commercial buildings, rental spaces, and other properties available for sale or rent. Browse property listings, review details, and connect directly with property owners, landlords, or real estate agents to ask questions, arrange viewings, and find a property that suits your location, budget, and requirements.
                     </p>
+                    <div className="mt-3 flex items-center gap-2">
+                        <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold ${darkMode ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}`} style={{ borderRadius: '2px' }}>
+                            {filteredProperties.length} properties available
+                        </span>
+                    </div>
                 </div>
 
                 {/* Search and View Controls - Compact row */}

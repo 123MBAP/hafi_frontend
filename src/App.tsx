@@ -187,6 +187,7 @@ const App: React.FC = () => {
               {/* Real Estate Routes */}
               <Route path="/real-estate" element={<RealEstatePage />} />
               <Route path="/real-estate/commissioners" element={<CommissionersPage />} />
+              <Route path="/commissioners" element={<CommissionersPage />} />
               <Route path="/real-estate/property/:propertyId" element={<PropertyDetailPage />} />
               <Route path="/real-estate/commissioner/:commissionerId" element={<CommissionerDetailPage />} />
 

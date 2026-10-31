@@ -112,12 +112,17 @@ export default function Services() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className={`text-2xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
-            Available Services
+          <h1 className={`text-2xl sm:text-3xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
+            Find Services and Connect with Service Providers
           </h1>
-          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
-            {filteredServices.length} services available.  Compare options, make your choice, and connect with service providers instantly.
+          <p className={`text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2 leading-relaxed max-w-4xl`}>
+            Find the services you need, all in one place. HafiConnect helps you discover service providers across different industries, explore their offerings, view available products, and connect with providers directly. Whether you need professional assistance, everyday services, or specialized expertise, find the right provider, make enquiries, book services, and purchase available products through one convenient platform.
           </p>
+          <div className="mt-3 flex items-center gap-2">
+            <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold ${darkMode ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}`} style={{ borderRadius: '2px' }}>
+              {filteredServices.length} services available
+            </span>
+          </div>
         </div>
 
         {/* Search and Filter Controls - Compact row */}

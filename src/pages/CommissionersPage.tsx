@@ -504,17 +504,18 @@ export default function CommissionersPage() {
         <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
             <div className="max-w-7xl mx-auto px-4 py-6">
                 {/* Header */}
-                <div className="mb-4">
-                    <h1 className={`text-2xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
-                        Real Estate Agents
+                <div className="mb-6">
+                    <h1 className={`text-2xl sm:text-3xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
+                        Find the Right Property with a Real Estate Professional
                     </h1>
-                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
-                    Discover top-rated local real estate agents for any property type, including residential, commercial, and land.
-                    </p>    
-
-                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
-                        {filteredCommissioners.length} verified agents available
+                    <p className={`text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2 leading-relaxed max-w-4xl`}>
+                        Looking for a property but not sure where to start? HafiConnect connects you with real estate agents and property commissioners who can help you explore available properties based on your needs. Browse professional profiles, discover the areas they serve, and contact them directly for assistance finding houses, apartments, land, rental spaces, or commercial properties. Share your preferred location, budget, and property requirements to make your search easier.
                     </p>
+                    <div className="mt-3 flex items-center gap-2">
+                        <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold ${darkMode ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}`} style={{ borderRadius: '2px' }}>
+                            {filteredCommissioners.length} verified property professionals available
+                        </span>
+                    </div>
                 </div>
 
                 {/* Search and View Controls */}
@@ -550,7 +551,7 @@ export default function CommissionersPage() {
                 {/* Agents Grid */}
                 {loading ? (
                     <div className="py-16">
-                        <LoadingSpinner size="lg" message="Loading agents..." />
+                        <LoadingSpinner size="lg" message="Loading agents..." variant="dots" />
                     </div>
                 ) : loadError ? (
                     <div className={`text-center py-16 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>

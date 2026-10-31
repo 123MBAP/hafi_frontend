@@ -529,12 +529,17 @@ export default function MarketWithCategoryProducts() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className={`text-2xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
-            Market
+          <h1 className={`text-2xl sm:text-3xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
+            Discover Products. Buy and Sell with Ease.
           </h1>
-          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
-            {filteredAndSortedProducts.length} products available
+          <p className={`text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2 leading-relaxed max-w-4xl`}>
+            Welcome to the HafiConnect marketplace, where individuals and businesses can discover, buy, and sell products in one convenient place. Explore new and second-hand items across categories such as electronics, furniture, fashion, home essentials, and more. Browse available listings, find products that match your needs and budget, and connect directly with sellers to ask questions and arrange your purchase.
           </p>
+          <div className="mt-3 flex items-center gap-2">
+            <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold ${darkMode ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}`} style={{ borderRadius: '2px' }}>
+              {filteredAndSortedProducts.length} products available
+            </span>
+          </div>
         </div>
 
         {/* Provider Filter Banner */}

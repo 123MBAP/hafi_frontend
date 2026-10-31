@@ -1,23 +1,56 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://haficonnect.voltaleltd.com').replace(/\/$/, '');
+const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://haficonnect.vercel.app').replace(/\/$/, '');
 const DEFAULT_IMAGE = `${SITE_URL}/image.png`;
 
 type SeoDetails = {
   title: string;
   description: string;
   type?: 'website' | 'article' | 'product';
+  keywords?: string;
 };
 
 const publicSeo: Record<string, SeoDetails> = {
   '/': {
-    title: 'Local Services, Products and Real Estate in Rwanda | HafiConnect',
-    description: 'Discover trusted services, Made in Rwanda products, marketplace listings and real estate opportunities across Rwanda.'
+    title: 'HafiConnect | Discover Services, Products, Shops and Property in Rwanda',
+    description: 'Discover services, buy and sell new and used products, explore premium shops, find real estate, and shop Made in Rwanda products on HafiConnect. Connect directly with providers and sellers across Rwanda.',
+    keywords: 'services Rwanda, marketplace Rwanda, real estate Rwanda, Made in Rwanda, shops Rwanda, buy and sell Kigali'
   },
   '/services': {
-    title: 'Find Trusted Service Providers in Rwanda | HafiConnect',
-    description: 'Find trusted photographers, designers, repair experts, caterers, event providers and other local services across Rwanda.'
+    title: 'HafiConnect Services | Find and Book Services in Rwanda',
+    description: 'Discover services in Rwanda on HafiConnect. Find trusted service providers, explore their offerings, contact them directly, book services, and purchase products with ease.',
+    keywords: 'services in Rwanda, local service providers, book services online, Kigali services, Rwandan professionals'
+  },
+  '/market': {
+    title: 'Online Marketplace Rwanda | Buy and Sell on HafiConnect',
+    description: 'Buy and sell new and used products in Rwanda on HafiConnect. Explore listings from businesses and individuals, compare products, and contact sellers directly.',
+    keywords: 'online marketplace Rwanda, buy and sell products, second-hand products, electronics Rwanda, home essentials Kigali'
+  },
+  '/real-estate': {
+    title: 'Real Estate Rwanda | Houses, Land and Property on HafiConnect',
+    description: 'Find houses, apartments, land, commercial buildings, and other properties for rent or sale in Rwanda. Explore property listings and contact owners or agents on HafiConnect.',
+    keywords: 'property for sale Rwanda, houses for rent, land for sale, commercial property Kigali, real estate Rwanda'
+  },
+  '/commissioners': {
+    title: 'Real Estate Agents in Rwanda | HafiConnect Property Experts',
+    description: 'Find real estate agents and property commissioners in Rwanda on HafiConnect. Connect with professionals who can help you find houses, land, rentals, and commercial properties.',
+    keywords: 'real estate agents Rwanda, property agents, find a property agent, Kigali commissioners, real estate experts'
+  },
+  '/real-estate/commissioners': {
+    title: 'Real Estate Agents in Rwanda | HafiConnect Property Experts',
+    description: 'Find real estate agents and property commissioners in Rwanda on HafiConnect. Connect with professionals who can help you find houses, land, rentals, and commercial properties.',
+    keywords: 'real estate agents Rwanda, property agents, find a property agent, Kigali commissioners, real estate experts'
+  },
+  '/shops': {
+    title: 'Premium Shops in Rwanda | Fashion and Lifestyle on HafiConnect',
+    description: 'Explore premium shops on HafiConnect. Discover quality clothing, shoes, jewelry, accessories, fashion, and lifestyle products from selected shops and retailers in Rwanda.',
+    keywords: 'fashion shops Rwanda, premium clothing, shoes, jewelry, luxury shopping Kigali, boutiques Rwanda'
+  },
+  '/made-in-rwanda': {
+    title: 'Made in Rwanda Products | Local Crafts and Goods on HafiConnect',
+    description: 'Discover Made in Rwanda products on HafiConnect, including locally made clothing, handmade crafts, woven baskets, pottery, art, accessories, and products from Rwandan creators and businesses.',
+    keywords: 'Made in Rwanda products, Rwandan crafts, locally made products, handmade crafts Rwanda, Agaseke baskets, Rwandan fashion'
   },
   '/about-haficonnect': {
     title: 'About HafiConnect | Connecting Rwanda with Local Opportunities',
@@ -26,26 +59,6 @@ const publicSeo: Record<string, SeoDetails> = {
   '/contact': {
     title: 'Contact HafiConnect | Get Help in Rwanda',
     description: 'Contact the HafiConnect team for support, partnership enquiries, service listings and marketplace assistance in Rwanda.'
-  },
-  '/market': {
-    title: 'Shop Products from Rwanda and Around the World | HafiConnect Market',
-    description: 'Browse marketplace products, compare offers and discover goods available from sellers in Rwanda and beyond.'
-  },
-  '/shops': {
-    title: 'Discover Shops and Sellers in Rwanda | HafiConnect',
-    description: 'Explore verified shops and sellers offering products, services and local goods throughout Rwanda.'
-  },
-  '/made-in-rwanda': {
-    title: 'Made in Rwanda Products | Shop Local Products on HafiConnect',
-    description: 'Discover and support Made in Rwanda products, crafts, fashion, food and locally produced goods from Rwandan sellers.'
-  },
-  '/real-estate': {
-    title: 'Find Houses, Land and Real Estate in Rwanda | HafiConnect',
-    description: 'Explore houses, land, buildings and real estate opportunities for rent or sale across Rwanda.'
-  },
-  '/real-estate/commissioners': {
-    title: 'Find Real Estate Agents in Rwanda | HafiConnect',
-    description: 'Connect with real estate commissioners and property professionals who can help you find opportunities across Rwanda.'
   },
   '/search': {
     title: 'Search Services, Products and Properties in Rwanda | HafiConnect',
@@ -178,6 +191,9 @@ export default function Seo() {
     document.title = details.title;
     setMeta('name', 'robots', isPrivateRoute(pathname) ? 'noindex, nofollow' : 'index, follow');
     setMeta('name', 'description', details.description);
+    if (details.keywords) {
+      setMeta('name', 'keywords', details.keywords);
+    }
     setMeta('property', 'og:title', details.title);
     setMeta('property', 'og:description', details.description);
     setMeta('property', 'og:type', details.type || 'website');
@@ -195,6 +211,51 @@ export default function Seo() {
       document.head.appendChild(canonical);
     }
     canonical.href = canonicalUrl;
+
+    // Structured Data (JSON-LD)
+    let jsonLdScript = document.head.querySelector<HTMLScriptElement>('script[data-seo="json-ld"]');
+    if (!jsonLdScript) {
+      jsonLdScript = document.createElement('script');
+      jsonLdScript.type = 'application/ld+json';
+      jsonLdScript.setAttribute('data-seo', 'json-ld');
+      document.head.appendChild(jsonLdScript);
+    }
+
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Organization',
+          '@id': `${SITE_URL}/#organization`,
+          'name': 'HafiConnect',
+          'url': SITE_URL,
+          'logo': DEFAULT_IMAGE,
+          'description': 'Connecting Rwanda with local services, marketplace products, premium shops, and real estate opportunities.'
+        },
+        {
+          '@type': 'WebSite',
+          '@id': `${SITE_URL}/#website`,
+          'url': SITE_URL,
+          'name': 'HafiConnect',
+          'publisher': { '@id': `${SITE_URL}/#organization` },
+          'potentialAction': {
+            '@type': 'SearchAction',
+            'target': `${SITE_URL}/search?q={search_term_string}`,
+            'query-input': 'required name=search_term_string'
+          }
+        },
+        {
+          '@type': 'WebPage',
+          '@id': `${canonicalUrl}#webpage`,
+          'url': canonicalUrl,
+          'name': details.title,
+          'description': details.description,
+          'isPartOf': { '@id': `${SITE_URL}/#website` }
+        }
+      ]
+    };
+
+    jsonLdScript.textContent = JSON.stringify(structuredData);
   }, [pathname]);
 
   return null;

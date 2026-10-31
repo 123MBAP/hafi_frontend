@@ -349,14 +349,14 @@ export default function ShopsPage() {
     <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-55'}`}>
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
-        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="mb-6 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
           <div>
-            <h1 className={`text-2xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase flex items-center gap-2`}>
-              <Store className="w-6 h-6 text-emerald-500" />
-              Shops
+            <h1 className={`text-2xl sm:text-3xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase flex items-center gap-2`}>
+              <Store className="w-6 h-6 text-emerald-500 flex-shrink-0" />
+              Explore Premium Shops and Exceptional Products
             </h1>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
-              Explore products direct from registered seller shops
+            <p className={`text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2 leading-relaxed max-w-4xl`}>
+              Discover a curated shopping experience through HafiConnect Premium Shops. Explore shops offering quality fashion, clothing, shoes, jewelry, handbags, accessories, beauty products, and lifestyle items. Browse shop collections, discover products that match your style, and connect directly with retailers to ask questions or make purchases. Whether you are looking for everyday elegance or something special, find shops and products that meet your preferences.
             </p>
           </div>
 

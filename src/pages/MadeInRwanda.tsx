@@ -520,12 +520,17 @@ export default function MadeInRwanda() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className={`text-2xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
-            Made in Rwanda
+          <h1 className={`text-2xl sm:text-3xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
+            Discover and Support Made in Rwanda Products
           </h1>
-          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
-            {visibleProducts.length} products proudly made in Rwanda
+          <p className={`text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2 leading-relaxed max-w-4xl`}>
+            Celebrate local creativity, craftsmanship, and entrepreneurship with HafiConnect's Made in Rwanda collection. Discover locally produced goods, handmade crafts, traditional Rwandan art, woven baskets, pottery, clothing, accessories, home décor, and other products made by local artisans, creators, and businesses. Explore unique products, connect directly with sellers, and support Rwandan businesses while discovering the creativity and quality of locally made goods.
           </p>
+          <div className="mt-3 flex items-center gap-2">
+            <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold ${darkMode ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}`} style={{ borderRadius: '2px' }}>
+              {visibleProducts.length} products proudly made in Rwanda
+            </span>
+          </div>
         </div>
 
         {/* Provider Filter Banner */}

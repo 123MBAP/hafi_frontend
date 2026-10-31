@@ -28,11 +28,15 @@ export default function ServiceCard({ service, darkMode }: ServiceCardProps) {
 
       {/* Content - compact */}
       <div className="p-3 flex-1 flex flex-col">
-        <h3 className={`text-sm font-semibold line-clamp-1 mb-1 ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors`}>
+        <div className={`text-xs font-semibold uppercase tracking-[0.22em] mb-3 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+          Services
+        </div>
+
+        <h3 className={`text-base font-semibold line-clamp-1 mb-2 ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors`}>
           {service.title}
         </h3>
         
-        <p className={`text-xs mb-1 ${isDescriptionExpanded ? '' : 'line-clamp-2'} ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+        <p className={`text-xs sm:text-sm leading-6 mb-1 ${isDescriptionExpanded ? '' : 'line-clamp-2'} ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
           {service.description}
         </p>
 
@@ -44,7 +48,7 @@ export default function ServiceCard({ service, darkMode }: ServiceCardProps) {
               event.stopPropagation();
               setIsDescriptionExpanded((prev) => !prev);
             }}
-            className={`self-start text-[11px] font-medium mb-2 transition-colors ${darkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'}`}
+            className={`self-start text-xs font-semibold uppercase tracking-wider mb-2 transition-colors ${darkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'}`}
           >
             {isDescriptionExpanded ? 'View less' : 'View more'}
           </button>
@@ -52,10 +56,10 @@ export default function ServiceCard({ service, darkMode }: ServiceCardProps) {
 
         <div className="mt-auto">
           <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
-            <div className="flex items-center gap-0.5 text-xs text-gray-400">
+            <div className="flex items-center gap-0.5 text-sm text-gray-400">
   
             </div>
-            <span className="text-xs font-medium text-emerald-500 group-hover:text-emerald-600 transition-colors">
+            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-500 group-hover:text-emerald-600 transition-colors">
               Browse service providers →
             </span>
           </div>

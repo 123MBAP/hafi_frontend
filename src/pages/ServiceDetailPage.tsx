@@ -95,6 +95,7 @@ export default function ServiceDetailPage() {
   const [filteredListings, setFilteredListings] = useState<ProviderListingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'listings' | 'providers'>('listings');
+  const [showMap, setShowMap] = useState(false);
   const [showNearby, setShowNearby] = useState(false);
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -272,6 +273,14 @@ export default function ServiceDetailPage() {
 
   // Map initialization
   useEffect(() => {
+    if (!showMap) {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+      return;
+    }
+
     // Small delay to ensure DOM is ready
     const timer = setTimeout(() => {
       const mapContainer = document.getElementById('providers-map');
@@ -341,7 +350,7 @@ export default function ServiceDetailPage() {
         mapRef.current = null;
       }
     };
-  }, [mapProviders, showNearby, userCoords]);
+  }, [mapProviders, showMap, showNearby, userCoords]);
 
   function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
     const R = 6371;
@@ -470,6 +479,17 @@ export default function ServiceDetailPage() {
 
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setShowMap(prev => !prev)}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors shadow-sm ${showMap
+                  ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
+                  : darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+              style={{ borderRadius: '2px' }}
+            >
+              <MapPin className="w-4 h-4" />
+              {showMap ? 'Hide Map' : 'Show Map'}
+            </button>
+            <button
               onClick={() => setViewMode('listings')}
               className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors shadow-sm ${viewMode === 'listings'
                   ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
@@ -508,8 +528,8 @@ export default function ServiceDetailPage() {
           </div>
         </div>
 
-        {/* Map Section - FIXED */}
-        {mapProviders.filter(p => p.location && typeof p.location.lat === 'number' && typeof p.location.lng === 'number').length > 0 ? (
+        {/* Map Section */}
+        {showMap && mapProviders.filter(p => p.location && typeof p.location.lat === 'number' && typeof p.location.lng === 'number').length > 0 ? (
           <div className="mb-8">
             <div 
               id="providers-map" 
@@ -517,12 +537,12 @@ export default function ServiceDetailPage() {
               style={{ height: "320px", borderRadius: '2px' }} 
             />
           </div>
-        ) : (
+        ) : showMap ? (
           <div className={`mb-8 text-center py-8 text-sm ${mutedText} border border-dashed ${darkMode ? 'border-gray-700' : 'border-gray-200'}`} style={{ borderRadius: '2px' }}>
             <MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" />
             No provider locations to display on map
           </div>
-        )}
+        ) : null}
 
         {/* Providers Count */}
         <div className="mb-4 flex items-center justify-between">
@@ -584,14 +604,14 @@ export default function ServiceDetailPage() {
 
                   {/* Content */}
                   <div className="p-2.5 flex-1 flex flex-col">
-                    <h3 className={`text-sm font-semibold truncate ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors`}>
+                    <h3 className={`text-base font-semibold truncate ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors`}>
                       {provider.email.split('@')[0]}
                     </h3>
 
                     {locationText && (
                       <div className="flex items-start gap-1 mt-1">
                         <MapPin className="w-3 h-3 text-gray-400 flex-shrink-0 mt-0.5" />
-                        <p className={`text-xs ${mutedText} line-clamp-1`}>
+                        <p className={`text-xs sm:text-sm leading-6 ${mutedText} line-clamp-1`}>
                           {locationText}
                         </p>
                       </div>
@@ -644,11 +664,11 @@ export default function ServiceDetailPage() {
                   </div>
 
                   <div className="p-2.5 flex-1 flex flex-col">
-                    <h3 className={`text-sm font-semibold truncate ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors`}>
+                    <h3 className={`text-base font-semibold truncate ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors`}>
                       {item.title || 'Untitled'}
                     </h3>
 
-                    <p className={`text-xs ${mutedText} line-clamp-1 mt-1`}>
+                    <p className={`text-xs sm:text-sm leading-6 ${mutedText} line-clamp-1 mt-1`}>
                       by {providerLabel}
                     </p>
 
