@@ -509,14 +509,14 @@ const HomePage = () => {
             />
           </div>
           <div className="p-3 flex-1 flex flex-col">
-            <h3 className="font-bold text-gray-900 dark:text-white text-sm sm:text-base leading-tight line-clamp-2">
+            <h3 className="font-bold text-gray-900 dark:text-white text-base sm:text-lg leading-tight line-clamp-2">
               {service.title}
             </h3>
-            <p className="mt-1.5 text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 line-clamp-2 flex-1">
+            <p className="mt-1.5 text-sm sm:text-base text-gray-500 dark:text-gray-400 line-clamp-2 flex-1">
               {service.description}
             </p>
             <div className="mt-2 flex items-center justify-between">
-              <span className="text-[10px] text-gray-400">
+              <span className="text-xs text-gray-400">
                 {formatUpdatedTime(service.created_at) || 'New'}
               </span>
             </div>
@@ -576,16 +576,16 @@ const HomePage = () => {
           )}
         </div>
         <div className="p-3 flex-1 flex flex-col">
-          <h3 className="font-bold text-gray-900 dark:text-white text-sm sm:text-base leading-tight line-clamp-2">
+          <h3 className="font-bold text-gray-900 dark:text-white text-base sm:text-lg leading-tight line-clamp-2">
             {title}
           </h3>
           {isLarge && item.description && (
-            <p className="mt-1.5 text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+            <p className="mt-1.5 text-sm sm:text-base text-gray-500 dark:text-gray-400 line-clamp-2">
               {item.description}
             </p>
           )}
           <div className="mt-2 flex items-center justify-between">
-            <span className="text-[10px] text-gray-400">
+            <span className="text-xs text-gray-400">
               {formatUpdatedTime(item.createdAt || item.updatedAt) || 'Just added'}
             </span>
             <ArrowRight className="w-3.5 h-3.5 text-gray-400 group-hover:text-emerald-500 transition-colors" />

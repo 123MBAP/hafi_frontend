@@ -8,6 +8,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { DarkModeProvider } from "./context/DarkMode";
 import { PhaseProvider } from "./context/PhaseContext";
+import { HafibotProvider } from "./context/HafibotContext";
 import "./tailwind.css";
 
 
@@ -21,7 +22,9 @@ createRoot(document.getElementById("root")!).render(
           <PhaseProvider>
             <CartProvider>
               <AuthProvider>
-                <App />
+                <HafibotProvider>
+                  <App />
+                </HafibotProvider>
               </AuthProvider>
             </CartProvider>
           </PhaseProvider>

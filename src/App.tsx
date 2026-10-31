@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useHafibot } from './context/HafibotContext';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import UpgradePlansPage from './components/DashboardParts/AdminParts/AdminPlans';
 import ChatWrapper, { getProviderIdFromToken } from './components/DashboardParts/ChatBotWrapper';
@@ -76,7 +77,9 @@ const App: React.FC = () => {
 
   const [chatCustomerId, setChatCustomerId] = useState<string | null>(null);
   const { darkMode } = useDarkMode();
-
+  const { isOpen: isBotOpen } = useHafibot();
+  const leftPageRef = useRef<HTMLDivElement>(null);
+  const scrollPosRef = useRef<number>(0);
 
   const providerId = getProviderIdFromToken();
 
@@ -84,12 +87,46 @@ const App: React.FC = () => {
     setChatCustomerId(null);
   };
 
+  const handleBeforeOpen = () => {
+    scrollPosRef.current = window.scrollY || document.documentElement.scrollTop || 0;
+  };
+
+  // Preserve scroll position when transitioning between window scroll and container scroll
+  useEffect(() => {
+    if (isBotOpen) {
+      requestAnimationFrame(() => {
+        if (leftPageRef.current) {
+          leftPageRef.current.scrollTop = scrollPosRef.current;
+        }
+      });
+    } else {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPosRef.current);
+      });
+    }
+  }, [isBotOpen]);
 
   return (
     <div className={darkMode ? 'dark bg-gray-950 text-white overflow-x-hidden' : 'bg-white text-black overflow-x-hidden'}>
-      <div className="flex flex-col min-h-screen bg-white text-hafi-teal dark:bg-gray-950 dark:text-white overflow-x-hidden">
+      <div className={`flex w-full ${isBotOpen ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
 
-        <main className="flex-grow px-4 py-6 overflow-x-hidden">
+        {/* Collapsible Page Area (Fits 1/2 of width on desktop when Hafibot opens) */}
+        <div
+          ref={leftPageRef}
+          onScroll={(e) => {
+            if (isBotOpen) {
+              scrollPosRef.current = e.currentTarget.scrollTop;
+            }
+          }}
+          className={`flex flex-col transition-all duration-300 ease-in-out min-w-0 ${
+            isBotOpen
+              ? 'w-full md:w-1/2 h-screen overflow-y-auto'
+              : 'w-full min-h-screen'
+          }`}
+        >
+          <div className="flex flex-col min-h-screen bg-white text-hafi-teal dark:bg-gray-950 dark:text-white overflow-x-hidden">
+
+            <main className="flex-grow px-4 py-6 overflow-x-hidden">
 
           <Routes>
             <Route path="/" element={<Layout />}>
@@ -229,10 +266,6 @@ const App: React.FC = () => {
               onClose={closeChat}
             />
           )}
-
-          <Hafibot />
-
-
 
         </main>
 
@@ -381,6 +414,12 @@ const App: React.FC = () => {
         </footer>
       </div>
     </div>
+
+    {/* Hafibot AI Assistant Side Panel */}
+    <Hafibot onBeforeOpen={handleBeforeOpen} />
+
+  </div>
+</div>
   );
 };
 
