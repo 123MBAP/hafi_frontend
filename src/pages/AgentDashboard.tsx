@@ -441,7 +441,7 @@ export default function AgentDashboard() {
                       disabled={claiming || !claimCode.trim()}
                       className={`px-6 py-2 text-white text-xs font-bold uppercase tracking-wider transition-colors border
                         ${claiming || !claimCode.trim()
-                          ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                          ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
                           : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500'}`}
                       style={{ borderRadius: '2px' }}
                     >
@@ -767,7 +767,7 @@ export default function AgentDashboard() {
                         disabled={updatingProfile}
                         className={`flex-1 py-2.5 text-white font-bold text-xs uppercase tracking-wider transition-colors border
                           ${updatingProfile
-                            ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                            ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
                             : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500'}`}
                         style={{ borderRadius: '2px' }}
                       >
@@ -924,7 +924,7 @@ export default function AgentDashboard() {
                   disabled={withdrawing || !withdrawAmount || !withdrawPhone || !withdrawName}
                   className={`flex-1 py-2 text-white font-bold text-xs uppercase tracking-wider transition-colors border
                     ${withdrawing || !withdrawAmount || !withdrawPhone || !withdrawName
-                      ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                      ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
                       : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500'}`}
                   style={{ borderRadius: '2px' }}
                 >

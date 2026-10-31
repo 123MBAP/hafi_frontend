@@ -662,7 +662,7 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                     <button
                       onClick={handleCreatePasswordAndSave}
                       disabled={!Object.values(rules).every(Boolean) || newPassword !== confirmPassword}
-                      className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-450 disabled:hover:bg-gray-450 disabled:cursor-not-allowed text-white font-semibold text-xs transition-all duration-200 flex items-center justify-center uppercase tracking-wider"
+                      className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold text-xs transition-all duration-200 flex items-center justify-center uppercase tracking-wider"
                       style={{ borderRadius: '2px' }}
                     >
                       <Lock className="w-3.5 h-3.5 mr-1.5" />
@@ -807,7 +807,7 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
                     <button
                       onClick={handleChangePassword}
                       disabled={!oldPassword || !newPassword || newPassword !== confirmPassword}
-                      className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-450 disabled:hover:bg-gray-450 disabled:cursor-not-allowed text-white font-semibold text-xs transition-all duration-200 flex items-center justify-center uppercase tracking-wider"
+                      className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold text-xs transition-all duration-200 flex items-center justify-center uppercase tracking-wider"
                       style={{ borderRadius: '2px' }}
                     >
                       <Shield className="w-3.5 h-3.5 mr-1.5" />

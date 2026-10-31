@@ -278,7 +278,7 @@ const VerifyEmailForm = ({ email: propEmail }: { email: string }) => {
             disabled={submitting}
             className={`w-full py-2.5 px-4 mt-2 text-white text-xs font-bold uppercase tracking-wider transition-colors border ${
               submitting
-                ? 'bg-gray-450 border-gray-455 text-gray-200 cursor-not-allowed'
+                ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
                 : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm'
             }`}
             style={{ borderRadius: '2px' }}

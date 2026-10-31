@@ -223,7 +223,7 @@ export default function ProviderCustomizationRequests() {
                         disabled={!customPrice || isNaN(parseFloat(customPrice))}
                         className={`px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-colors ${
                           !customPrice || isNaN(parseFloat(customPrice))
-                            ? "bg-gray-450 text-gray-200 cursor-not-allowed"
+                            ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                             : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm"
                         }`}
                         style={{ borderRadius: '2px' }}
