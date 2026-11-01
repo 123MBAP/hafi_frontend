@@ -11,6 +11,22 @@
     ],
     "routes": [
         {
+            "src": "/sitemap.xml",
+            "dest": "/sitemap.xml",
+            "headers": {
+                "Content-Type": "application/xml; charset=utf-8",
+                "Cache-Control": "public, max-age=0, must-revalidate"
+            }
+        },
+        {
+            "src": "/robots.txt",
+            "dest": "/robots.txt",
+            "headers": {
+                "Content-Type": "text/plain; charset=utf-8",
+                "Cache-Control": "public, max-age=0, must-revalidate"
+            }
+        },
+        {
             "src": "/api/(.*)",
             "dest": "https://hafi-backend.onrender.com/api/$1",
             "headers": {

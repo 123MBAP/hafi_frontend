@@ -1,55 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://haficonnect.vercel.app/</loc>
+    <loc>https://haficonnect.voltaleltd.com/</loc>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://haficonnect.vercel.app/services</loc>
+    <loc>https://haficonnect.voltaleltd.com/services</loc>
+    <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://haficonnect.vercel.app/market</loc>
+    <loc>https://haficonnect.voltaleltd.com/market</loc>
+    <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://haficonnect.vercel.app/real-estate</loc>
+    <loc>https://haficonnect.voltaleltd.com/real-estate</loc>
+    <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://haficonnect.vercel.app/commissioners</loc>
+    <loc>https://haficonnect.voltaleltd.com/shops</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://haficonnect.voltaleltd.com/made-in-rwanda</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://haficonnect.voltaleltd.com/commissioners</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://haficonnect.vercel.app/real-estate/commissioners</loc>
+    <loc>https://haficonnect.voltaleltd.com/real-estate/commissioners</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://haficonnect.vercel.app/shops</loc>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://haficonnect.vercel.app/made-in-rwanda</loc>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://haficonnect.vercel.app/about-haficonnect</loc>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://haficonnect.vercel.app/contact</loc>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://haficonnect.vercel.app/search</loc>
+    <loc>https://haficonnect.voltaleltd.com/search</loc>
+    <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://haficonnect.vercel.app/customer-feedbacks</loc>
+    <loc>https://haficonnect.voltaleltd.com/updates</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://haficonnect.voltaleltd.com/map</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://haficonnect.voltaleltd.com/about-haficonnect</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://haficonnect.voltaleltd.com/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://haficonnect.voltaleltd.com/customer-feedbacks</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://haficonnect.vercel.app/updates</loc>
-    <priority>0.7</priority>
   </url>
 </urlset>

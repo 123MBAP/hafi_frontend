@@ -430,8 +430,7 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
               onClick={handleOpenClick}
               className="bg-white/95 dark:bg-gray-900/95 border-2 border-black dark:border-gray-700 text-black dark:text-white hover:text-red-600 hover:border-red-600 px-4 py-2.5 shadow-xl font-black text-xs tracking-wider uppercase transition-all duration-300 hover:scale-105 active:scale-95 rounded-full flex items-center gap-2"
             >
-              <Sparkles className="w-3.5 h-3.5 text-red-600" />
-              <span>Search with Hafibot AI</span>
+            <span>Search with Hafibot AI</span>
             </button>
 
             <button

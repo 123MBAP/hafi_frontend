@@ -171,7 +171,7 @@ export default function MarketWithCategoryProducts() {
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high' | 'newest'>('popular');
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [conditionFilter, setConditionFilter] = useState<'all' | 'new' | 'used'>('all');
 
   // Auto-scroll refs
@@ -413,22 +413,22 @@ export default function MarketWithCategoryProducts() {
 
   // Compact Filters Panel - Single row
   const FiltersPanel = () => (
-    <div className={`shadow-sm mb-4 overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-800 ${darkMode ? 'bg-gray-950' : 'bg-white'}`}>
+    <div className={`shadow-sm mb-4 overflow-x-auto rounded-xl border border-black dark:border-white ${darkMode ? 'bg-black' : 'bg-white'}`}>
       <div className="p-3 min-w-max flex items-center gap-3">
-        <div className="flex items-center gap-1.5 text-black dark:text-gray-200 flex-shrink-0">
-          <Filter className="w-4 h-4 text-black dark:text-gray-200" />
-          <span className="text-xs font-bold uppercase tracking-wider text-black dark:text-gray-200">Filters</span>
+        <div className="flex items-center gap-1.5 text-black dark:text-white flex-shrink-0">
+          <Filter className="w-4 h-4 text-black dark:text-white" />
+          <span className="text-xs font-bold uppercase tracking-wider text-black dark:text-white">Filters</span>
         </div>
 
         {/* Search inline */}
-        <div className={`border relative flex-shrink-0 rounded-lg ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-300'}`}>
-          <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-black/60 dark:text-gray-400" />
+        <div className={`border relative flex-shrink-0 rounded-lg ${darkMode ? 'bg-black border-white' : 'bg-white border-black'}`}>
+          <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-black dark:text-white" />
           <input
             type="text"
             placeholder="Search products..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`pl-8 pr-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-gray-950 text-white placeholder-gray-400' : 'bg-gray-50 text-black placeholder-black/50 font-medium'} focus:ring-1 focus:ring-red-600 w-44 rounded-lg`}
+            className={`pl-8 pr-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-black text-white placeholder-white' : 'bg-white text-black placeholder-black font-medium'} focus:ring-1 focus:ring-red-600 w-44 rounded-lg`}
           />
         </div>
 
@@ -436,7 +436,7 @@ export default function MarketWithCategoryProducts() {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as any)}
-          className={`border outline-0 px-3 py-1.5 text-sm font-semibold ${darkMode ? 'bg-gray-950 text-white border-gray-700' : 'bg-gray-50 text-black border-gray-300'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0 rounded-lg`}
+          className={`border outline-0 px-3 py-1.5 text-sm font-semibold ${darkMode ? 'bg-black text-white border-white' : 'bg-white text-black border-black'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0 rounded-lg`}
         >
           <option value="popular">Most Popular</option>
           <option value="newest">Newest</option>
@@ -452,7 +452,7 @@ export default function MarketWithCategoryProducts() {
             const cat = categories.find(c => String(c.id) === catId);
             setSelectedCategory(cat || null);
           }}
-          className={`border outline-0 px-3 py-1.5 text-sm font-semibold ${darkMode ? 'bg-gray-950 text-white border-gray-700' : 'bg-gray-50 text-black border-gray-300'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0 rounded-lg`}
+          className={`border outline-0 px-3 py-1.5 text-sm font-semibold ${darkMode ? 'bg-black text-white border-white' : 'bg-white text-black border-black'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0 rounded-lg`}
         >
           <option value="">All Categories</option>
           {categories.map(cat => (
@@ -466,7 +466,7 @@ export default function MarketWithCategoryProducts() {
         <select
           value={conditionFilter}
           onChange={(e) => setConditionFilter(e.target.value as any)}
-          className={`border outline-0 px-3 py-1.5 text-sm font-semibold ${darkMode ? 'bg-gray-950 text-white border-gray-700' : 'bg-gray-50 text-black border-gray-300'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0 rounded-lg`}
+          className={`border outline-0 px-3 py-1.5 text-sm font-semibold ${darkMode ? 'bg-black text-white border-white' : 'bg-white text-black border-black'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0 rounded-lg`}
         >
           <option value="all">All Conditions</option>
           <option value="new">New Only</option>
@@ -497,7 +497,7 @@ export default function MarketWithCategoryProducts() {
           onClick={() => handleCategorySelect(null)}
           className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${!selectedCategory
               ? 'bg-red-600 text-white'
-              : darkMode ? 'border border-gray-700 bg-gray-950 text-gray-200 hover:bg-gray-800' : 'bg-white border border-gray-300 text-black hover:bg-gray-100'
+              : darkMode ? 'border border-white bg-black text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
             }`}
         >
           All
@@ -510,11 +510,11 @@ export default function MarketWithCategoryProducts() {
             onClick={() => handleCategorySelect(cat)}
             className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${selectedCategory?.id === cat.id
                 ? 'bg-red-600 text-white'
-                : darkMode ? 'border border-gray-700 bg-gray-950 text-gray-200 hover:bg-gray-800' : 'bg-white border border-gray-300 text-black hover:bg-gray-100'
+                : darkMode ? 'border border-white bg-black text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
               }`}
           >
             {cat.name}
-            <span className="text-xs opacity-90 text-black dark:text-gray-200">({categoryCounts[cat.id] || 0})</span>
+            <span className="text-xs opacity-90 text-white">({categoryCounts[cat.id] || 0})</span>
           </button>
         ))}
       </div>
@@ -579,7 +579,7 @@ export default function MarketWithCategoryProducts() {
         <div className="flex items-center gap-3 mb-4 lg:hidden">
           <button
             onClick={() => setShowMobileSidebar(true)}
-            className={`flex items-center gap-1.5 px-3 py-2 text-sm ${darkMode ? 'bg-gray-900 text-gray-300' : 'bg-white text-gray-700'} shadow-sm`}
+            className={`flex items-center gap-1.5 px-3 py-2 text-sm ${darkMode ? 'bg-black text-white border border-white' : 'bg-white text-black border border-black'} shadow-sm hover:bg-red-600 hover:text-white`}
             style={{ borderRadius: '2px' }}
           >
             <Menu className="w-4 h-4" />
@@ -587,7 +587,7 @@ export default function MarketWithCategoryProducts() {
           </button>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-1.5 px-3 py-2 text-sm ${darkMode ? 'bg-gray-900 text-gray-300' : 'bg-white text-gray-700'} shadow-sm`}
+            className={`flex items-center gap-1.5 px-3 py-2 text-sm ${darkMode ? 'bg-black text-white border border-white' : 'bg-white text-black border border-black'} shadow-sm hover:bg-red-600 hover:text-white`}
             style={{ borderRadius: '2px' }}
           >
             <Filter className="w-4 h-4" />
@@ -646,9 +646,9 @@ export default function MarketWithCategoryProducts() {
       {showMobileSidebar && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowMobileSidebar(false)} />
-          <div className={`absolute left-0 top-0 bottom-0 w-72 overflow-y-auto ${darkMode ? 'bg-gray-900' : 'bg-white'} shadow-xl`}>
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-              <h2 className="font-semibold text-base">Categories</h2>
+          <div className={`absolute left-0 top-0 bottom-0 w-72 overflow-y-auto ${darkMode ? 'bg-black' : 'bg-white'} border-r border-black dark:border-white shadow-xl`}>
+            <div className="p-4 border-b border-black dark:border-white flex justify-between items-center">
+              <h2 className="font-bold text-base text-black dark:text-white">Categories</h2>
               <button onClick={() => setShowMobileSidebar(false)} className="p-1">
                 <X className="w-5 h-5" />
               </button>
@@ -658,7 +658,7 @@ export default function MarketWithCategoryProducts() {
                 onClick={() => handleCategorySelect(null)}
                 className={`w-full text-left px-3 py-2 text-sm font-bold transition-colors rounded-lg ${!selectedCategory
                     ? 'bg-red-600 text-white'
-                    : darkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-black hover:bg-gray-100'
+                    : darkMode ? 'text-white hover:bg-red-600' : 'text-black hover:bg-red-600 hover:text-white'
                   }`}
               >
                 All Products ({products.length})
@@ -669,7 +669,7 @@ export default function MarketWithCategoryProducts() {
                   onClick={() => handleCategorySelect(cat)}
                   className={`w-full text-left px-3 py-2 text-sm font-bold transition-colors rounded-lg ${selectedCategory?.id === cat.id
                       ? 'bg-red-600 text-white'
-                      : darkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-black hover:bg-gray-100'
+                      : darkMode ? 'text-white hover:bg-red-600' : 'text-black hover:bg-red-600 hover:text-white'
                     }`}
                 >
                   {cat.name} ({categoryCounts[cat.id] || 0})

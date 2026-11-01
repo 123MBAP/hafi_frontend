@@ -16,4 +16,4 @@ Disallow: /orders
 Disallow: /statements
 Disallow: /account-dashboard
 
-Sitemap: https://haficonnect.vercel.app/sitemap.xml
+Sitemap: https://haficonnect.voltaleltd.com/sitemap.xml

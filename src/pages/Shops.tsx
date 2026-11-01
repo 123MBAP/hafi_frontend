@@ -7,12 +7,10 @@ import {
   Menu,
   Search,
   ShoppingCart,
-  Star,
   X,
   ChevronDown,
+  Filter,
   Store,
-  Truck,
-  Flame
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -60,13 +58,11 @@ function ShopProductCard({
   onView: (id: string) => void;
 }) {
   const mainImage = getUrl(product.image_url);
-  const ratingValue = product.rating || 4.9;
-  const originalPrice = Math.round(product.price * 1.22);
 
   return (
     <div
       className={`group cursor-pointer overflow-hidden rounded-xl transition-all duration-200 hover:shadow-lg flex flex-col h-full ${
-        darkMode ? 'bg-gray-900 border border-gray-800 hover:border-gray-700' : 'bg-white border border-gray-100 hover:border-gray-200'
+        darkMode ? 'bg-black border border-white/20 hover:border-red-600' : 'bg-white border border-black hover:border-red-600'
       } shadow-sm`}
       onClick={(e) => {
         e.stopPropagation();
@@ -74,7 +70,7 @@ function ShopProductCard({
       }}
     >
       {/* Image section with 1:1 Aspect Ratio */}
-      <div className="relative aspect-square w-full overflow-hidden bg-gray-50 dark:bg-gray-800/60 rounded-t-xl flex items-center justify-center">
+      <div className="relative aspect-square w-full overflow-hidden bg-white dark:bg-black rounded-t-xl flex items-center justify-center">
         {mainImage ? (
           <img
             src={mainImage}
@@ -83,7 +79,7 @@ function ShopProductCard({
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+          <div className="w-full h-full flex items-center justify-center text-black dark:text-white text-xs">
             No image
           </div>
         )}
@@ -95,23 +91,10 @@ function ShopProductCard({
             onView(product.id);
           }}
           title="View product details"
-          className="absolute bottom-2 right-2 z-10 w-8 h-8 rounded-full bg-white/95 dark:bg-gray-800 text-gray-800 dark:text-gray-100 shadow-md hover:bg-orange-500 hover:text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+          className="absolute bottom-2 right-2 z-10 w-8 h-8 rounded-full bg-white dark:bg-black text-black dark:text-white shadow-md hover:bg-red-600 hover:text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
         >
           <ShoppingCart className="w-4 h-4" />
         </button>
-
-        {/* Top Badges */}
-        {product.shopping_type_name ? (
-          <div className="absolute top-2 left-2 z-10 bg-black/80 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow-sm flex items-center gap-1">
-            <Store className="w-2.5 h-2.5 text-amber-400" />
-            <span>{product.shopping_type_name}</span>
-          </div>
-        ) : (
-          <div className="absolute top-2 left-2 z-10 bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 uppercase tracking-wider rounded flex items-center gap-0.5 shadow-sm">
-            <Flame className="w-2.5 h-2.5" />
-            PREMIUM
-          </div>
-        )}
 
         {product.fileType === 'video' && (
           <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[9px] font-medium bg-black/60 text-white rounded">
@@ -123,43 +106,31 @@ function ShopProductCard({
       {/* Content */}
       <div className="p-3 flex-1 flex flex-col justify-between">
         <div>
-          {/* Choice Tag + Title */}
-          <div className="flex items-start gap-1.5">
-            <h3 className={`text-xs sm:text-sm font-semibold text-black dark:text-white line-clamp-2 h-9 leading-snug group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors`}>
-              <span className="inline-block bg-amber-100 text-black dark:bg-amber-950 dark:text-amber-200 text-[9px] font-bold px-1.5 py-0.2 mr-1 rounded align-middle">
-                Top Brand
-              </span>
-              {product.title}
-            </h3>
-          </div>
-
-          {/* Rating & Sold count */}
-          <div className="flex items-center gap-1.5 text-[11px] font-medium text-black/85 dark:text-gray-200 mt-1.5">
-            <span className="flex items-center gap-0.5 text-amber-500 font-bold">
-              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-              {ratingValue}
-            </span>
-            <span className="text-gray-400 dark:text-gray-600">|</span>
-            <span className="text-black/85 dark:text-gray-200">Verified Shop</span>
-          </div>
+          <h3 className="text-xs sm:text-sm font-semibold text-black dark:text-white line-clamp-2 h-9 leading-snug group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+            {product.title}
+          </h3>
+          <p className="mt-1 text-xs sm:text-sm leading-5 text-black dark:text-white line-clamp-3 min-h-[3.75rem]">
+            {product.description || 'No description available'}
+          </p>
         </div>
 
-        {/* Pricing & Trust Perks (Red Deal Price + Green Free Delivery) */}
-        <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-gray-800">
+        <div className="mt-2.5 pt-2 border-t border-black dark:border-white/30">
           <div className="flex items-baseline gap-1.5 flex-wrap">
             <span className="text-base sm:text-lg font-black text-red-600 dark:text-red-500 tracking-tight font-sans">
               FRw {product.price.toLocaleString()}
             </span>
-            <span className="text-[11px] font-normal text-gray-500 dark:text-gray-400 line-through">
-              FRw {originalPrice.toLocaleString()}
-            </span>
           </div>
 
-          {/* Trust Incentive Perk */}
-          <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 mt-1">
-            <Truck className="w-3 h-3 flex-shrink-0" />
-            <span>Fast Dispatch</span>
-          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onView(product.id);
+            }}
+            className="mt-2 text-xs font-bold uppercase tracking-wider text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
+          >
+            View more →
+          </button>
         </div>
       </div>
     </div>
@@ -380,16 +351,15 @@ export default function ShopsPage() {
   };
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-55'}`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-black' : 'bg-white'}`}>
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
           <div>
             <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-black'} uppercase flex items-center gap-2`}>
-              <Store className="w-6 h-6 text-emerald-600 flex-shrink-0" />
-              Explore Premium Shops and Exceptional Products
+             Explore Premium Shops and Exceptional Products
             </h1>
-            <p className={`text-sm sm:text-base font-normal ${darkMode ? 'text-gray-200' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
+            <p className={`text-sm sm:text-base font-normal ${darkMode ? 'text-white' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
               Discover a curated shopping experience through HafiConnect Premium Shops. Explore shops offering quality fashion, clothing, shoes, jewelry, handbags, accessories, beauty products, and lifestyle items. Browse shop collections, discover products that match your style, and connect directly with retailers to ask questions or make purchases. Whether you are looking for everyday elegance or something special, find shops and products that meet your preferences.
             </p>
           </div>
@@ -397,7 +367,7 @@ export default function ShopsPage() {
           <div className="flex gap-2">
             <button
               onClick={handleFilterToggle}
-              className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider ${darkMode ? 'bg-gray-900 text-gray-300' : 'bg-white text-gray-700'} border border-transparent shadow-sm`}
+              className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider ${darkMode ? 'bg-black text-white' : 'bg-white text-black'} border border-black dark:border-white shadow-sm hover:bg-red-600 hover:text-white`}
               style={{ borderRadius: '2px' }}
             >
               <Filter className="w-4 h-4" />
@@ -408,16 +378,16 @@ export default function ShopsPage() {
 
         {/* Filters Panel */}
         {showFilters && (
-          <div className={` p-4 mb-6 shadow-sm ${darkMode ? 'bg-gray-950' : 'bg-white'}`} style={{ borderRadius: '2px' }}>
+          <div className={`p-4 mb-6 shadow-sm ${darkMode ? 'bg-black' : 'bg-white'}`} style={{ borderRadius: '2px' }}>
             <div className="flex flex-col md:flex-row md:items-center gap-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-black dark:text-white" />
                 <input
                   type="text"
                   placeholder="Search products..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full pl-9 pr-4 py-2 text-sm border ${darkMode ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-500' : 'bg-gray-50 border-gray-250 text-gray-900 placeholder-gray-400'} focus:ring-1 focus:ring-emerald-500`}
+                  className={`w-full pl-9 pr-4 py-2 text-sm border ${darkMode ? 'bg-black border-white text-white placeholder-white' : 'bg-white border-black text-black placeholder-black'} focus:ring-1 focus:ring-red-600`}
                   style={{ borderRadius: '2px' }}
                 />
               </div>
@@ -426,7 +396,7 @@ export default function ShopsPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-gray-950 border-gray-700 text-white' : 'bg-gray-50 border-gray-250 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer`}
+                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-black border-white text-white' : 'bg-white border-black text-black'} focus:ring-1 focus:ring-red-600 cursor-pointer`}
                   style={{ borderRadius: '2px' }}
                 >
                   <option value="popular">Most Popular</option>
@@ -442,7 +412,7 @@ export default function ShopsPage() {
                     const cat = categories.find(c => String(c.id) === catId);
                     setSelectedCategory(cat || null);
                   }}
-                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-gray-950 border-gray-700 text-white' : 'bg-gray-50 border-gray-250 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer`}
+                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-black border-white text-white' : 'bg-white border-black text-black'} focus:ring-1 focus:ring-red-600 cursor-pointer`}
                   style={{ borderRadius: '2px' }}
                 >
                   <option value="">All Shop Types</option>
@@ -458,7 +428,7 @@ export default function ShopsPage() {
                   onChange={(e) => {
                     setSelectedProductCategory(e.target.value || null);
                   }}
-                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-gray-950 border-gray-700 text-white' : 'bg-gray-50 border-gray-250 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer`}
+                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-black border-white text-white' : 'bg-white border-black text-black'} focus:ring-1 focus:ring-red-600 cursor-pointer`}
                   style={{ borderRadius: '2px' }}
                 >
                   <option value="">All Product Categories</option>
@@ -473,7 +443,7 @@ export default function ShopsPage() {
                 {(selectedCategory || selectedProductCategory || searchQuery || sortBy !== 'popular') && (
                   <button
                     onClick={clearFilters}
-                    className="text-xs font-bold uppercase tracking-wider text-emerald-500 hover:text-emerald-600 whitespace-nowrap"
+                    className="text-xs font-bold uppercase tracking-wider text-red-600 hover:text-black whitespace-nowrap"
                   >
                     Clear All
                   </button>
@@ -492,8 +462,8 @@ export default function ShopsPage() {
             <button
               onClick={() => handleCategorySelect(null)}
               className={`flex shrink-0 items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors border shadow-sm ${!selectedCategory
-                  ? darkMode ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-emerald-500 border-emerald-500 text-white'
-                  : darkMode ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ? 'bg-red-600 border-red-600 text-white'
+                  : darkMode ? 'bg-black border-white text-white hover:bg-red-600' : 'bg-white border-black text-black hover:bg-red-600 hover:text-white'
                 }`}
               style={{ borderRadius: '2px' }}
             >
@@ -506,8 +476,8 @@ export default function ShopsPage() {
                 key={cat.id}
                 onClick={() => handleCategorySelect(cat)}
                 className={`flex shrink-0 items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors border shadow-sm ${selectedCategory?.id === cat.id
-                    ? darkMode ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-emerald-500 border-emerald-500 text-white'
-                    : darkMode ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-55'
+                    ? 'bg-red-600 border-red-600 text-white'
+                    : darkMode ? 'bg-black border-white text-white hover:bg-red-600' : 'bg-white border-black text-black hover:bg-red-600 hover:text-white'
                   }`}
                 style={{ borderRadius: '2px' }}
               >
@@ -524,20 +494,20 @@ export default function ShopsPage() {
             <LoadingSpinner size="lg" message="Loading shop products..." variant="dots" />
           </div>
         ) : filteredAndSortedProducts.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-gray-900 border dark:border-gray-700" style={{ borderRadius: '2px' }}>
-            <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
-              <Store className="w-6 h-6 text-gray-400" />
+          <div className="text-center py-16 bg-white dark:bg-black border border-black dark:border-white" style={{ borderRadius: '2px' }}>
+            <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-black' : 'bg-white'}`} style={{ borderRadius: '2px' }}>
+              <Store className="w-6 h-6 text-red-600" />
             </div>
-            <h3 className={`text-base font-semibold mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <h3 className={`text-base font-bold mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
               No products available
             </h3>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            <p className={`text-sm ${darkMode ? 'text-white' : 'text-black'}`}>
               There are no products listed under this shop category.
             </p>
             {(selectedCategory || searchQuery) && (
               <button
                 onClick={clearFilters}
-                className="mt-4 bg-emerald-500 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider hover:bg-emerald-600 transition-colors"
+                className="mt-4 bg-red-600 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider hover:bg-black transition-colors"
                 style={{ borderRadius: '2px' }}
               >
                 Clear filters
@@ -568,7 +538,7 @@ export default function ShopsPage() {
           <div className="relative max-w-5xl max-h-[95vh] w-full h-full flex items-center justify-center" onClick={e => e.stopPropagation()}>
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 z-10 p-2 transition-all bg-white hover:bg-gray-100 shadow-lg"
+              className="absolute top-4 right-4 z-10 p-2 transition-all bg-white hover:bg-red-600 hover:text-white shadow-lg"
               style={{ borderRadius: '2px' }}
             >
               <X className="w-5 h-5" />
@@ -623,7 +593,7 @@ export default function ShopsPage() {
               <div className="flex items-center gap-3 text-xs">
                 <span className="font-medium">{selectedProduct.title}</span>
                 {modalViews.length > 1 && (
-                  <span className="text-gray-300">
+                  <span className="text-white">
                     {modalViewIndex + 1} / {modalViews.length}
                   </span>
                 )}

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://haficonnect.vercel.app').replace(/\/$/, '');
+const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://haficonnect.voltaleltd.com').replace(/\/$/, '');
 const DEFAULT_IMAGE = `${SITE_URL}/image.png`;
 
 type SeoDetails = {

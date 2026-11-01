@@ -13,10 +13,10 @@ export default function ServiceCard({ service, darkMode }: ServiceCardProps) {
 
   return (
     <div
-      className={`group cursor-pointer rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 flex flex-col h-full ${darkMode ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-100 shadow-sm'}`}
+      className={`group cursor-pointer rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 flex flex-col h-full ${darkMode ? 'bg-black border border-white/30 hover:border-red-600' : 'bg-white border border-black hover:border-red-600 shadow-sm'}`}
     >
       {/* Image section with 1:1 Aspect Ratio */}
-      <div className="relative aspect-square w-full overflow-hidden bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
+      <div className="relative aspect-square w-full overflow-hidden bg-white dark:bg-black flex items-center justify-center">
         <img
           src={service.image}
           alt={service.title}
@@ -31,11 +31,11 @@ export default function ServiceCard({ service, darkMode }: ServiceCardProps) {
       {/* Content - compact */}
       <div className="p-3 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className={`text-sm font-semibold line-clamp-2 leading-snug mb-1.5 ${darkMode ? 'text-white group-hover:text-red-400' : 'text-black group-hover:text-red-600'} transition-colors`}>
+          <h3 className={`text-sm font-bold line-clamp-2 leading-snug mb-1.5 ${darkMode ? 'text-white group-hover:text-red-400' : 'text-black group-hover:text-red-600'} transition-colors`}>
             {service.title}
           </h3>
           
-          <p className={`text-xs leading-relaxed mb-2 ${isDescriptionExpanded ? '' : 'line-clamp-2'} ${darkMode ? 'text-gray-300' : 'text-black/80'}`}>
+          <p className={`text-xs font-medium leading-relaxed mb-2 ${isDescriptionExpanded ? '' : 'line-clamp-2'} ${darkMode ? 'text-white' : 'text-black'}`}>
             {service.description}
           </p>
 
@@ -54,7 +54,7 @@ export default function ServiceCard({ service, darkMode }: ServiceCardProps) {
           )}
         </div>
 
-        <div className="mt-auto pt-2 border-t border-gray-100 dark:border-gray-800">
+        <div className="mt-auto pt-2 border-t border-black dark:border-white/30">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold uppercase tracking-wider text-red-600 group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
               Browse Providers →

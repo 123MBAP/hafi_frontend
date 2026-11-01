@@ -4,7 +4,7 @@ import { Menu } from '@headlessui/react';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import logo from '../pages/images/connect.jpg';
+import logo from '../pages/images/connect.png';
 import { isOnlyCustomer, isTokenExpired } from '../utils/tokenUtils';
 import CartIconWithCount from "./CartIcon";
 import SearchResults from './ui/SearchPage';

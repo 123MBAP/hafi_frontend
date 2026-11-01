@@ -81,13 +81,13 @@ function ProductCard({ product, darkMode, onView }: {
 }) {
   return (
     <div
-      className={`group cursor-pointer rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 flex flex-col h-full ${darkMode ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-100 shadow-sm'}`}
+      className={`group cursor-pointer rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 flex flex-col h-full ${darkMode ? 'bg-black border border-white/30 hover:border-red-600' : 'bg-white border border-black hover:border-red-600 shadow-sm'}`}
       onClick={(e) => {
         e.stopPropagation();
         onView(product.id);
       }}
     >
-      <div className="relative aspect-square w-full overflow-hidden bg-gray-50 dark:bg-gray-800">
+      <div className="relative aspect-square w-full overflow-hidden bg-white dark:bg-black">
         <img
           src={product.image_url}
           alt={product.title}
@@ -101,7 +101,7 @@ function ProductCard({ product, darkMode, onView }: {
             </span>
           </div>
         )}
-        <div className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold bg-gradient-to-r from-emerald-600 to-teal-600 text-white z-10 rounded-full shadow-sm flex items-center gap-1">
+        <div className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold bg-red-600 text-white z-10 rounded-full shadow-sm flex items-center gap-1">
           🇷🇼 Made in Rwanda
         </div>
         {product.fileType === 'video' && (
@@ -113,34 +113,34 @@ function ProductCard({ product, darkMode, onView }: {
 
       <div className="p-3 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className={`text-[13px] font-semibold leading-snug line-clamp-2 mb-1.5 ${darkMode ? 'text-white group-hover:text-amber-400' : 'text-black group-hover:text-red-600'} transition-colors`}>
+          <h3 className={`text-[13px] font-semibold leading-snug line-clamp-2 mb-1.5 ${darkMode ? 'text-white group-hover:text-red-400' : 'text-black group-hover:text-red-600'} transition-colors`}>
             {product.title}
           </h3>
           
           {product.description && (
-            <p className={`text-[11px] font-normal line-clamp-1 mb-2 ${darkMode ? 'text-gray-300' : 'text-black/80'}`}>
+            <p className={`text-[11px] font-normal line-clamp-3 mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>
               {product.description}
             </p>
           )}
         </div>
 
-        <div className="mt-1 pt-1.5 border-t border-gray-100 dark:border-gray-800">
+        <div className="mt-1 pt-1.5 border-t border-black dark:border-white/30">
           <div className="flex items-baseline gap-1.5 flex-wrap">
             <span className="text-[11px] font-bold text-red-600 dark:text-red-400">FRw</span>
             <span className="text-lg font-black text-red-600 dark:text-red-400 tracking-tight">
               {product.price.toLocaleString()}
             </span>
-            <span className={`text-[10px] font-medium ${darkMode ? 'text-gray-300' : 'text-black/75'}`}>
+            <span className={`text-[10px] font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
               / {product.pricingUnit || product.pricing_unit || 'Piece'}
             </span>
           </div>
 
           <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-            <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-bold text-red-600 dark:text-red-400 bg-white dark:bg-black border border-red-600 px-1.5 py-0.5 rounded">
               Verified Origin
             </span>
             {product.used && (
-              <span className="text-[9px] bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 px-1.5 py-0.5 font-bold uppercase rounded">
+              <span className="text-[9px] bg-white dark:bg-black text-black dark:text-white border border-black dark:border-white px-1.5 py-0.5 font-bold uppercase rounded">
                 USED
               </span>
             )}
@@ -404,21 +404,21 @@ export default function MadeInRwanda() {
 
   // Compact Filters Panel
   const FiltersPanel = () => (
-    <div className={`border-0 shadow-sm mb-4 overflow-x-auto ${darkMode ? 'bg-gray-950 border border-gray-700' : 'bg-white border border-gray-200'}`} style={{ borderRadius: '2px' }}>
+    <div className={`border shadow-sm mb-4 overflow-x-auto ${darkMode ? 'bg-black border-white' : 'bg-white border-black'}`} style={{ borderRadius: '2px' }}>
       <div className="p-3 min-w-max flex items-center gap-3">
-        <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 flex-shrink-0">
+        <div className="flex items-center gap-1.5 text-black dark:text-white flex-shrink-0">
           <Filter className="w-4 h-4" />
           <span className="text-xs font-medium uppercase tracking-wider">Filters</span>
         </div>
 
-        <div className="relative flex-shrink-0 outline-0 border border-gray-700 dark:border-gray-700">
-          <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+        <div className="relative flex-shrink-0 outline-0 border border-black dark:border-white">
+          <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-black dark:text-white" />
           <input
             type="text"
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`pl-8 pr-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-gray-950 text-white placeholder-gray-400' : 'bg-gray-100 text-gray-900 placeholder-gray-500'} focus:ring-1 focus:ring-emerald-500 w-40`}
+            className={`pl-8 pr-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-black text-white placeholder-white' : 'bg-white text-black placeholder-black'} focus:ring-1 focus:ring-red-600 w-40`}
             style={{ borderRadius: '2px' }}
           />
         </div>
@@ -426,7 +426,7 @@ export default function MadeInRwanda() {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as any)}
-          className={`px-3 py-1.5 text-sm ${darkMode ? 'bg-gray-950 border border-gray-700 text-white outline-0 border border-gray-700 dark:border-gray-700' : 'bg-gray-100 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer flex-shrink-0`}
+          className={`px-3 py-1.5 text-sm ${darkMode ? 'bg-black border border-white text-white' : 'bg-white border border-black text-black'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0`}
           style={{ borderRadius: '2px' }}
         >
           <option value="popular">Most Popular</option>
@@ -438,7 +438,7 @@ export default function MadeInRwanda() {
         <select
           value={conditionFilter}
           onChange={(e) => setConditionFilter(e.target.value as any)}
-          className={`px-3 py-1.5 text-sm ${darkMode ? 'bg-gray-950 border border-gray-700 text-white outline-0 border border-gray-700 dark:border-gray-700' : 'bg-gray-100 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer flex-shrink-0`}
+          className={`px-3 py-1.5 text-sm ${darkMode ? 'bg-black border border-white text-white' : 'bg-white border border-black text-black'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0`}
           style={{ borderRadius: '2px' }}
         >
           <option value="all">All Conditions</option>
@@ -451,7 +451,7 @@ export default function MadeInRwanda() {
             setNearbyOnly(!nearbyOnly);
             if (!nearbyOnly) handleUseMyLocation();
           }}
-          className={`px-3 py-1.5 text-sm transition-colors flex-shrink-0 ${nearbyOnly ? 'bg-emerald-600 text-white' : darkMode ? 'bg-gray-950 border border-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'}`}
+          className={`px-3 py-1.5 text-sm transition-colors flex-shrink-0 ${nearbyOnly ? 'bg-red-600 text-white' : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'}`}
           style={{ borderRadius: '2px' }}
         >
           <MapPin className="w-3.5 h-3.5 inline mr-1" />
@@ -464,7 +464,7 @@ export default function MadeInRwanda() {
             min={1}
             value={nearbyRadiusKm}
             onChange={(e) => setNearbyRadiusKm(Math.max(1, Number(e.target.value || 1)))}
-            className={`w-16 px-2 py-1.5 text-sm border-0 ${darkMode ? 'bg-gray-950 text-white border border-gray-700' : 'bg-gray-100 text-gray-900'} focus:ring-1 focus:ring-emerald-500 flex-shrink-0`}
+            className={`w-16 px-2 py-1.5 text-sm ${darkMode ? 'bg-black text-white border border-white' : 'bg-white text-black border border-black'} focus:ring-1 focus:ring-red-600 flex-shrink-0`}
             style={{ borderRadius: '2px' }}
           />
         )}
@@ -474,13 +474,13 @@ export default function MadeInRwanda() {
             type="checkbox"
             checked={showMap}
             onChange={(e) => setShowMap(e.target.checked)}
-            className="w-3.5 h-3.5 rounded focus:ring-1 focus:ring-emerald-500"
+            className="w-3.5 h-3.5 rounded focus:ring-1 focus:ring-red-600"
           />
-          <span className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Show Map</span>
+          <span className={`text-xs ${darkMode ? 'text-white' : 'text-black'}`}>Show Map</span>
         </label>
 
         {(searchQuery || selectedCategory !== "All" || sortBy !== "popular" || nearbyOnly || conditionFilter !== "all") && (
-          <button onClick={clearFilters} className="text-xs text-emerald-500 hover:text-emerald-600 whitespace-nowrap flex-shrink-0">
+          <button onClick={clearFilters} className="text-xs text-red-600 hover:text-black whitespace-nowrap flex-shrink-0">
             Clear all
           </button>
         )}
@@ -498,12 +498,12 @@ export default function MadeInRwanda() {
         <button
           onClick={() => setSelectedCategory("All")}
           className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${selectedCategory === "All"
-              ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-600 text-white'
-              : darkMode ? 'bg-gray-950 border border-gray-700 text-gray-200 hover:bg-gray-800' : 'bg-white border border-gray-300 text-black hover:bg-gray-100'
+              ? 'bg-red-600 text-white'
+              : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
             }`}
         >
           All
-          <span className="text-xs opacity-90 text-black dark:text-gray-200">({products.length})</span>
+          <span className="text-xs opacity-90 text-white">({products.length})</span>
         </button>
 
         {categories.map((cat) => (
@@ -511,8 +511,8 @@ export default function MadeInRwanda() {
             key={cat.id}
             onClick={() => setSelectedCategory(cat.name)}
             className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${selectedCategory === cat.name
-                ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-600 text-white'
-                : darkMode ? 'bg-gray-950 border border-gray-700 text-gray-200 hover:bg-gray-800' : 'bg-white border border-gray-300 text-black hover:bg-gray-100'
+                ? 'bg-red-600 text-white'
+                : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
               }`}
           >
             {cat.name}
@@ -523,18 +523,18 @@ export default function MadeInRwanda() {
   );
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-black' : 'bg-white'}`}>
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
           <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-black'} uppercase`}>
             Discover and Support Made in Rwanda Products
           </h1>
-          <p className={`text-sm sm:text-base font-normal ${darkMode ? 'text-gray-200' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
+          <p className={`text-sm sm:text-base font-normal ${darkMode ? 'text-white' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
             Celebrate local creativity, craftsmanship, and entrepreneurship with HafiConnect's Made in Rwanda collection. Discover locally produced goods, handmade crafts, traditional Rwandan art, woven baskets, pottery, clothing, accessories, home décor, and other products made by local artisans, creators, and businesses. Explore unique products, connect directly with sellers, and support Rwandan businesses while discovering the creativity and quality of locally made goods.
           </p>
           <div className="mt-3 flex items-center gap-2">
-            <span className={`inline-block px-2.5 py-0.5 text-xs font-bold ${darkMode ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-900 border border-emerald-300'} rounded-md`}>
+            <span className={`inline-block px-2.5 py-0.5 text-xs font-bold ${darkMode ? 'bg-black text-white border border-red-600' : 'bg-white text-black border border-red-600'} rounded-md`}>
               {visibleProducts.length} products proudly made in Rwanda
             </span>
           </div>
@@ -544,12 +544,12 @@ export default function MadeInRwanda() {
         {filterProviderId && (
           <div className={`mb-6 p-4 border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
             darkMode 
-              ? 'bg-emerald-950/20 border-emerald-800/60 text-emerald-200' 
-              : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              ? 'bg-black border-white text-white' 
+              : 'bg-white border-black text-black'
           }`} style={{ borderRadius: '2px' }}>
             <div className="flex items-center gap-2 text-sm">
               <span className="font-semibold">Showing products by:</span>
-              <span className="font-bold underline text-emerald-600 dark:text-emerald-400">
+              <span className="font-bold underline text-red-600">
                 {filterProviderName || 'Loading...'}
               </span>
             </div>
@@ -557,8 +557,8 @@ export default function MadeInRwanda() {
               onClick={() => setSearchParams({})}
               className={`text-xs px-3 py-1.5 font-bold transition-all border ${
                 darkMode
-                  ? 'border-emerald-700 bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-200'
-                  : 'border-emerald-300 bg-emerald-100 hover:bg-emerald-200/80 text-emerald-800'
+                  ? 'border-white bg-black hover:bg-red-600 text-white'
+                  : 'border-black bg-white hover:bg-red-600 text-black hover:text-white'
               }`}
               style={{ borderRadius: '2px' }}
             >
@@ -571,7 +571,7 @@ export default function MadeInRwanda() {
         <div className="flex items-center gap-3 mb-4 lg:hidden">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-1.5 px-3 py-2 text-sm ${darkMode ? 'bg-gray-900 text-gray-300' : 'bg-white text-gray-700'} shadow-sm`}
+            className={`flex items-center gap-1.5 px-3 py-2 text-sm ${darkMode ? 'bg-black text-white border border-white' : 'bg-white text-black border border-black'} shadow-sm hover:bg-red-600 hover:text-white`}
             style={{ borderRadius: '2px' }}
           >
             <Filter className="w-4 h-4" />
@@ -613,18 +613,18 @@ export default function MadeInRwanda() {
         {/* Empty state */}
         {!loading && !error && visibleProducts.length === 0 && (
           <div className="text-center py-16">
-            <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`} style={{ borderRadius: '2px' }}>
-              <Search className="w-6 h-6 text-gray-400" />
+            <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-black' : 'bg-white'} border border-black dark:border-white`} style={{ borderRadius: '2px' }}>
+              <Search className="w-6 h-6 text-red-600" />
             </div>
-            <h3 className={`text-base font-semibold mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <h3 className={`text-base font-bold mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
               No products found
             </h3>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            <p className={`text-sm ${darkMode ? 'text-white' : 'text-black'}`}>
               Try adjusting your search or category filter
             </p>
             <button
               onClick={clearFilters}
-              className={`mt-4 px-4 py-2 text-sm ${darkMode ? 'bg-gray-900 text-white hover:bg-gray-800' : 'bg-white text-gray-700 hover:bg-gray-50'} shadow-sm`}
+              className={`mt-4 px-4 py-2 text-sm ${darkMode ? 'bg-black text-white hover:bg-red-600' : 'bg-white text-black hover:bg-red-600 hover:text-white'} border border-black dark:border-white shadow-sm`}
               style={{ borderRadius: '2px' }}
             >
               Clear all filters
