@@ -3,19 +3,28 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 interface HafibotContextType {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  openHafibot: () => void;
+  openHafibot: (prompt?: string) => void;
   closeHafibot: () => void;
   toggleHafibot: () => void;
+  pendingPrompt: string | null;
+  clearPendingPrompt: () => void;
 }
 
 const HafibotContext = createContext<HafibotContextType | undefined>(undefined);
 
 export const HafibotProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
 
-  const openHafibot = () => setIsOpen(true);
+  const openHafibot = (prompt?: string) => {
+    if (prompt) {
+      setPendingPrompt(prompt);
+    }
+    setIsOpen(true);
+  };
   const closeHafibot = () => setIsOpen(false);
   const toggleHafibot = () => setIsOpen(prev => !prev);
+  const clearPendingPrompt = () => setPendingPrompt(null);
 
   return (
     <HafibotContext.Provider
@@ -25,6 +34,8 @@ export const HafibotProvider: React.FC<{ children: ReactNode }> = ({ children })
         openHafibot,
         closeHafibot,
         toggleHafibot,
+        pendingPrompt,
+        clearPendingPrompt,
       }}
     >
       {children}
@@ -42,6 +53,8 @@ export const useHafibot = (): HafibotContextType => {
       openHafibot: () => {},
       closeHafibot: () => {},
       toggleHafibot: () => {},
+      pendingPrompt: null,
+      clearPendingPrompt: () => {},
     };
   }
   return context;

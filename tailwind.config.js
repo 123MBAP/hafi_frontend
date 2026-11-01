@@ -8,6 +8,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
         playfair: ['Playfair Display', 'serif'],
       },
       colors: {
@@ -15,12 +16,24 @@ module.exports = {
         gray: {
           850: '#182030',
         },
+        ecom: {
+          price: '#E11D48',
+          deal: '#FF4747',
+          cta: '#FF6000',
+          ctaHover: '#E55600',
+          trust: '#059669',
+          star: '#F59E0B',
+          bg: '#F8F9FA',
+          card: '#FFFFFF',
+          darkCard: '#111827',
+          darkBg: '#0B0F17',
+        },
         hafi: {
           green: '#43A047',
           greenLight: '#66BB6A',
-          orange: '#F57C00',
+          orange: '#FF6000',
           teal: '#00838F',
-          black: '#222',
+          black: '#111827',
           white: '#ffffff',
           navy: '#000080',
         },

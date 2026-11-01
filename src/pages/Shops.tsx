@@ -9,9 +9,10 @@ import {
   ShoppingCart,
   Star,
   X,
-  Filter,
   ChevronDown,
-  Store
+  Store,
+  Truck,
+  Flame
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -46,6 +47,7 @@ const getUrl = (path: string | undefined) => {
   return `${API_BASE}/${path.replace(/^\/+/, '')}`;
 };
 
+// Modern AliExpress / Amazon style Shop Product Card
 function ShopProductCard({
   product,
   darkMode,
@@ -58,73 +60,105 @@ function ShopProductCard({
   onView: (id: string) => void;
 }) {
   const mainImage = getUrl(product.image_url);
+  const ratingValue = product.rating || 4.9;
+  const originalPrice = Math.round(product.price * 1.22);
 
   return (
     <div
-      className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-full ${darkMode ? 'bg-gray-900' : 'bg-white'} border-0 shadow-sm`}
-      style={{ borderRadius: '2px' }}
-       onClick={(e) => {
-                e.stopPropagation();
-                onView(product.id);
-              }}
-      
+      className={`group cursor-pointer overflow-hidden rounded-xl transition-all duration-200 hover:shadow-lg flex flex-col h-full ${
+        darkMode ? 'bg-gray-900 border border-gray-800 hover:border-gray-700' : 'bg-white border border-gray-100 hover:border-gray-200'
+      } shadow-sm`}
+      onClick={(e) => {
+        e.stopPropagation();
+        onView(product.id);
+      }}
     >
-      {/* Image section */}
-      <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-800">
+      {/* Image section with 1:1 Aspect Ratio */}
+      <div className="relative aspect-square w-full overflow-hidden bg-gray-50 dark:bg-gray-800/60 rounded-t-xl flex items-center justify-center">
         {mainImage ? (
           <img
             src={mainImage}
             alt={product.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
             No image
           </div>
         )}
-        {product.fileType === 'video' && (
-          <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-medium bg-black/60 text-white" style={{ borderRadius: '2px' }}>
-            🎥 Video
+
+        {/* Floating Quick Add-To-Cart Action Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onView(product.id);
+          }}
+          title="View product details"
+          className="absolute bottom-2 right-2 z-10 w-8 h-8 rounded-full bg-white/95 dark:bg-gray-800 text-gray-800 dark:text-gray-100 shadow-md hover:bg-orange-500 hover:text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+        >
+          <ShoppingCart className="w-4 h-4" />
+        </button>
+
+        {/* Top Badges */}
+        {product.shopping_type_name ? (
+          <div className="absolute top-2 left-2 z-10 bg-black/80 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow-sm flex items-center gap-1">
+            <Store className="w-2.5 h-2.5 text-amber-400" />
+            <span>{product.shopping_type_name}</span>
+          </div>
+        ) : (
+          <div className="absolute top-2 left-2 z-10 bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 uppercase tracking-wider rounded flex items-center gap-0.5 shadow-sm">
+            <Flame className="w-2.5 h-2.5" />
+            PREMIUM
           </div>
         )}
-        {/* Shop Category Label badge */}
-        {product.shopping_type_name && (
-          <div className="absolute bottom-2 left-2 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-emerald-600/90 text-white shadow-sm flex items-center gap-1" style={{ borderRadius: '2px' }}>
-            {/* <Store className="w-2.5 h-2.5" />
-            <span>{product.shopping_type_name}</span> */}
+
+        {product.fileType === 'video' && (
+          <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[9px] font-medium bg-black/60 text-white rounded">
+            🎥 Video
           </div>
         )}
       </div>
 
       {/* Content */}
-      <div className="p-3 flex-1 flex flex-col">
-        <h3 className={`text-sm font-semibold line-clamp-1 mb-1 ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors`}>
-          {product.title}
-        </h3>
-        
-        <p className={`text-xs line-clamp-2 mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          {product.description}
-        </p>
-
-        <div className="mt-auto">
-          <div className={`text-lg font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
-            RWF {product.price.toLocaleString()}
+      <div className="p-3 flex-1 flex flex-col justify-between">
+        <div>
+          {/* Choice Tag + Title */}
+          <div className="flex items-start gap-1.5">
+            <h3 className={`text-xs sm:text-sm font-semibold text-black dark:text-white line-clamp-2 h-9 leading-snug group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors`}>
+              <span className="inline-block bg-amber-100 text-black dark:bg-amber-950 dark:text-amber-200 text-[9px] font-bold px-1.5 py-0.2 mr-1 rounded align-middle">
+                Top Brand
+              </span>
+              {product.title}
+            </h3>
           </div>
-          
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-            <div className="flex items-center gap-2 text-xs text-gray-400">
-           
-    
-              {product.rating && (
-                <span className="flex items-center gap-0.5 ml-1">
-                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                  {product.rating}
-                </span>
-              )}
-            
-            </div>
-      
+
+          {/* Rating & Sold count */}
+          <div className="flex items-center gap-1.5 text-[11px] font-medium text-black/85 dark:text-gray-200 mt-1.5">
+            <span className="flex items-center gap-0.5 text-amber-500 font-bold">
+              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+              {ratingValue}
+            </span>
+            <span className="text-gray-400 dark:text-gray-600">|</span>
+            <span className="text-black/85 dark:text-gray-200">Verified Shop</span>
+          </div>
+        </div>
+
+        {/* Pricing & Trust Perks (Red Deal Price + Green Free Delivery) */}
+        <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-gray-800">
+          <div className="flex items-baseline gap-1.5 flex-wrap">
+            <span className="text-base sm:text-lg font-black text-red-600 dark:text-red-500 tracking-tight font-sans">
+              FRw {product.price.toLocaleString()}
+            </span>
+            <span className="text-[11px] font-normal text-gray-500 dark:text-gray-400 line-through">
+              FRw {originalPrice.toLocaleString()}
+            </span>
+          </div>
+
+          {/* Trust Incentive Perk */}
+          <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 mt-1">
+            <Truck className="w-3 h-3 flex-shrink-0" />
+            <span>Fast Dispatch</span>
           </div>
         </div>
       </div>
@@ -351,11 +385,11 @@ export default function ShopsPage() {
         {/* Header */}
         <div className="mb-6 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
           <div>
-            <h1 className={`text-2xl sm:text-3xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase flex items-center gap-2`}>
-              <Store className="w-6 h-6 text-emerald-500 flex-shrink-0" />
+            <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-black'} uppercase flex items-center gap-2`}>
+              <Store className="w-6 h-6 text-emerald-600 flex-shrink-0" />
               Explore Premium Shops and Exceptional Products
             </h1>
-            <p className={`text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2 leading-relaxed max-w-4xl`}>
+            <p className={`text-sm sm:text-base font-normal ${darkMode ? 'text-gray-200' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
               Discover a curated shopping experience through HafiConnect Premium Shops. Explore shops offering quality fashion, clothing, shoes, jewelry, handbags, accessories, beauty products, and lifestyle items. Browse shop collections, discover products that match your style, and connect directly with retailers to ask questions or make purchases. Whether you are looking for everyday elegance or something special, find shops and products that meet your preferences.
             </p>
           </div>

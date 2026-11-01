@@ -73,7 +73,7 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   return R * c;
 }
 
-// Small width product card component
+// Modernized product card component (AliExpress/Amazon style)
 function ProductCard({ product, darkMode, onView }: {
   product: MadeInRwandaProduct;
   darkMode: boolean;
@@ -81,14 +81,13 @@ function ProductCard({ product, darkMode, onView }: {
 }) {
   return (
     <div
-      className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-full ${darkMode ? 'bg-gray-900' : 'bg-white'} border-0 shadow-sm`}
-      style={{ borderRadius: '2px' }}
+      className={`group cursor-pointer rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 flex flex-col h-full ${darkMode ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-100 shadow-sm'}`}
       onClick={(e) => {
         e.stopPropagation();
         onView(product.id);
       }}
     >
-      <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-800">
+      <div className="relative aspect-square w-full overflow-hidden bg-gray-50 dark:bg-gray-800">
         <img
           src={product.image_url}
           alt={product.title}
@@ -96,46 +95,56 @@ function ProductCard({ product, darkMode, onView }: {
           loading="lazy"
         />
         {product.inStock === false && (
-          <div className="absolute inset-0 bg-black/45 z-10 flex items-center justify-center">
-            <span className="bg-red-600 text-white text-[11px] font-black px-2.5 py-1.5 uppercase tracking-wider shadow-lg" style={{ borderRadius: '2px' }}>
+          <div className="absolute inset-0 bg-black/50 z-10 flex items-center justify-center backdrop-blur-[1px]">
+            <span className="bg-red-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md uppercase tracking-wider shadow-lg">
               OUT OF STOCK
             </span>
           </div>
         )}
-        <div className="absolute top-2 left-2 px-1.5 py-0.5 text-[10px] font-medium bg-emerald-600 text-white z-10" style={{ borderRadius: '2px' }}>
-          Made in Rwanda
+        <div className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold bg-gradient-to-r from-emerald-600 to-teal-600 text-white z-10 rounded-full shadow-sm flex items-center gap-1">
+          🇷🇼 Made in Rwanda
         </div>
         {product.fileType === 'video' && (
-          <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-medium bg-black/60 text-white z-10" style={{ borderRadius: '2px' }}>
-            Video
+          <div className="absolute top-2 right-2 px-2 py-0.5 text-[10px] font-semibold bg-black/70 backdrop-blur-sm text-white z-10 rounded-full">
+            ▶ Video
           </div>
         )}
       </div>
 
-      <div className="p-3 flex-1 flex flex-col">
-        <h3 className={`text-sm font-semibold line-clamp-1 mb-1 ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors`}>
-          {product.title}
-        </h3>
-        
-        <p className={`text-xs line-clamp-2 mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          {product.description}
-        </p>
+      <div className="p-3 flex-1 flex flex-col justify-between">
+        <div>
+          <h3 className={`text-[13px] font-semibold leading-snug line-clamp-2 mb-1.5 ${darkMode ? 'text-white group-hover:text-amber-400' : 'text-black group-hover:text-red-600'} transition-colors`}>
+            {product.title}
+          </h3>
+          
+          {product.description && (
+            <p className={`text-[11px] font-normal line-clamp-1 mb-2 ${darkMode ? 'text-gray-300' : 'text-black/80'}`}>
+              {product.description}
+            </p>
+          )}
+        </div>
 
-        <div className="mt-auto">
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className={`text-lg font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
-              RWF {product.price.toLocaleString()}
-              <span className={`text-[10px] font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} ml-1`}>
-                / {product.pricingUnit || product.pricing_unit || 'Per Item / Piece'}
-              </span>
-            </div>
+        <div className="mt-1 pt-1.5 border-t border-gray-100 dark:border-gray-800">
+          <div className="flex items-baseline gap-1.5 flex-wrap">
+            <span className="text-[11px] font-bold text-red-600 dark:text-red-400">FRw</span>
+            <span className="text-lg font-black text-red-600 dark:text-red-400 tracking-tight">
+              {product.price.toLocaleString()}
+            </span>
+            <span className={`text-[10px] font-medium ${darkMode ? 'text-gray-300' : 'text-black/75'}`}>
+              / {product.pricingUnit || product.pricing_unit || 'Piece'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+            <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded">
+              Verified Origin
+            </span>
             {product.used && (
-              <span className="text-[9px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 py-0.5 font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+              <span className="text-[9px] bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 px-1.5 py-0.5 font-bold uppercase rounded">
                 USED
               </span>
             )}
           </div>
-   
         </div>
       </div>
     </div>
@@ -488,25 +497,23 @@ export default function MadeInRwanda() {
       >
         <button
           onClick={() => setSelectedCategory("All")}
-          className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors shadow-sm ${selectedCategory === "All"
-              ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-              : darkMode ? 'bg-gray-950 border border-gray-700 text-gray-400 hover:bg-gray-800' : 'bg-white text-gray-600 hover:bg-gray-50'
+          className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${selectedCategory === "All"
+              ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-600 text-white'
+              : darkMode ? 'bg-gray-950 border border-gray-700 text-gray-200 hover:bg-gray-800' : 'bg-white border border-gray-300 text-black hover:bg-gray-100'
             }`}
-          style={{ borderRadius: '2px' }}
         >
           All
-          <span className="text-xs opacity-80">({products.length})</span>
+          <span className="text-xs opacity-90 text-black dark:text-gray-200">({products.length})</span>
         </button>
 
         {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => setSelectedCategory(cat.name)}
-            className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors shadow-sm ${selectedCategory === cat.name
-                ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                : darkMode ? 'bg-gray-950 border border-gray-700 text-gray-400 hover:bg-gray-800' : 'bg-white text-gray-600 hover:bg-gray-50'
+            className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${selectedCategory === cat.name
+                ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-600 text-white'
+                : darkMode ? 'bg-gray-950 border border-gray-700 text-gray-200 hover:bg-gray-800' : 'bg-white border border-gray-300 text-black hover:bg-gray-100'
               }`}
-            style={{ borderRadius: '2px' }}
           >
             {cat.name}
           </button>
@@ -520,14 +527,14 @@ export default function MadeInRwanda() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className={`text-2xl sm:text-3xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
+          <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-black'} uppercase`}>
             Discover and Support Made in Rwanda Products
           </h1>
-          <p className={`text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2 leading-relaxed max-w-4xl`}>
+          <p className={`text-sm sm:text-base font-normal ${darkMode ? 'text-gray-200' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
             Celebrate local creativity, craftsmanship, and entrepreneurship with HafiConnect's Made in Rwanda collection. Discover locally produced goods, handmade crafts, traditional Rwandan art, woven baskets, pottery, clothing, accessories, home décor, and other products made by local artisans, creators, and businesses. Explore unique products, connect directly with sellers, and support Rwandan businesses while discovering the creativity and quality of locally made goods.
           </p>
           <div className="mt-3 flex items-center gap-2">
-            <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold ${darkMode ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}`} style={{ borderRadius: '2px' }}>
+            <span className={`inline-block px-2.5 py-0.5 text-xs font-bold ${darkMode ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-900 border border-emerald-300'} rounded-md`}>
               {visibleProducts.length} products proudly made in Rwanda
             </span>
           </div>

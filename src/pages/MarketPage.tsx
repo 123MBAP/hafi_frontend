@@ -8,7 +8,6 @@ import {
   Menu,
   Search,
   ShoppingCart,
-  Star,
   X,
   Filter,
   ChevronDown
@@ -50,7 +49,7 @@ const getUrl = (path: string | undefined) => {
   return `${API_BASE}/${path.replace(/^\/+/, '')}`;
 };
 
-// Small width product card component
+// Modern AliExpress / Amazon style product card
 function MarketProductCard({
   product,
   darkMode,
@@ -66,78 +65,92 @@ function MarketProductCard({
 
   return (
     <div
-      className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-full ${darkMode ? 'bg-gray-900' : 'bg-white'} border-0 shadow-sm`}
-      style={{ borderRadius: '2px' }}
-        onClick={(e) => {
-                e.stopPropagation();
-                onView(product.id);
-              }}
+      className={`group cursor-pointer overflow-hidden rounded-xl transition-all duration-200 hover:shadow-lg flex flex-col h-full ${
+        darkMode ? 'bg-gray-900 border border-gray-800 hover:border-gray-700' : 'bg-white border border-gray-100 hover:border-gray-200'
+      } shadow-sm`}
+      onClick={(e) => {
+        e.stopPropagation();
+        onView(product.id);
+      }}
     >
-      {/* Image section - fixed height for consistency */}
-      <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-800">
+      {/* Image section with 1:1 Aspect Ratio */}
+      <div className="relative aspect-square w-full overflow-hidden bg-gray-50 dark:bg-gray-800/60 rounded-t-xl flex items-center justify-center">
         {mainImage ? (
           <img
             src={mainImage}
             alt={product.title}
-            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${product.inStock === false ? 'opacity-60' : ''}`}
+            className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${
+              product.inStock === false ? 'opacity-60' : ''
+            }`}
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
             No image
           </div>
         )}
-        {product.inStock === false && (
-          <div className="absolute inset-0 bg-black/45 z-10 flex items-center justify-center">
-            <span className="bg-red-600 text-white text-[11px] font-black px-2.5 py-1.5 uppercase tracking-wider shadow-lg" style={{ borderRadius: '2px' }}>
+
+        {/* Floating Quick Add-To-Cart Action Button (AliExpress style) */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onView(product.id);
+          }}
+          title="View product details"
+          className="absolute bottom-2 right-2 z-10 w-8 h-8 rounded-full bg-white/95 dark:bg-gray-800 text-black dark:text-white shadow-md hover:bg-red-600 hover:text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+        >
+          <ShoppingCart className="w-4 h-4" />
+        </button>
+
+        {/* Badges on Image */}
+        {product.inStock === false ? (
+          <div className="absolute inset-0 bg-black/50 z-10 flex items-center justify-center">
+            <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded">
               OUT OF STOCK
             </span>
           </div>
-        )}
+        ) : product.used ? (
+          <div className="absolute top-2 left-2 z-10 bg-black/80 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+            USED
+          </div>
+        ) : null}
+
         {product.fileType === 'video' && (
-          <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-medium bg-black/60 text-white z-10" style={{ borderRadius: '2px' }}>
+          <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[9px] font-medium bg-black/60 text-white z-10 rounded">
             🎥 Video
           </div>
         )}
       </div>
 
-      {/* Content - compact */}
-      <div className="p-3 flex-1 flex flex-col">
-        <h3 className={`text-sm font-semibold line-clamp-1 mb-1 ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors`}>
-          {product.title}
-        </h3>
-        
-        <p className={`text-xs line-clamp-2 mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          {product.description}
-        </p>
+      {/* Content */}
+      <div className="p-3 flex-1 flex flex-col justify-between">
+        <div>
+          <h3 className={`text-xs sm:text-sm font-semibold text-black dark:text-white line-clamp-2 h-9 leading-snug group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors`}>
+            {product.title}
+          </h3>
+          <p className="mt-1 text-xs sm:text-sm leading-5 text-black/80 dark:text-gray-300 line-clamp-3 min-h-[3.75rem]">
+            {product.description || 'No description available'}
+          </p>
+        </div>
 
-        <div className="mt-auto">
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className={`text-lg font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
-              RWF {product.price.toLocaleString()}
-              <span className={`text-[10px] font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} ml-1`}>
-                / {product.pricingUnit || product.pricing_unit || 'Per Item / Piece'}
-              </span>
-            </div>
-            {product.used && (
-              <span className="text-[9px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 py-0.5 font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
-                USED
-              </span>
-            )}
+        {/* Pricing and product details link */}
+        <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-gray-800">
+          <div className="flex items-baseline gap-1.5 flex-wrap">
+            <span className="text-base sm:text-lg font-black text-red-600 dark:text-red-500 tracking-tight font-sans">
+              FRw {product.price.toLocaleString()}
+            </span>
           </div>
-          
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-            <div className="flex items-center gap-2 text-xs text-gray-400">
-            
-              {product.rating && (
-                <span className="flex items-center gap-0.5 ml-1">
-                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                  {product.rating}
-                </span>
-              )}
-            </div>
-       
-          </div>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onView(product.id);
+            }}
+            className="mt-2 text-xs font-bold uppercase tracking-wider text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
+          >
+            View more →
+          </button>
         </div>
       </div>
     </div>
@@ -400,23 +413,22 @@ export default function MarketWithCategoryProducts() {
 
   // Compact Filters Panel - Single row
   const FiltersPanel = () => (
-    <div className={` shadow-sm mb-4 overflow-x-auto ${darkMode ? 'bg-gray-950' : 'bg-white'}`} style={{ borderRadius: '2px' }}>
+    <div className={`shadow-sm mb-4 overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-800 ${darkMode ? 'bg-gray-950' : 'bg-white'}`}>
       <div className="p-3 min-w-max flex items-center gap-3">
-        <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 flex-shrink-0">
-          <Filter className="w-4 h-4" />
-          <span className="text-xs font-medium uppercase tracking-wider">Filters</span>
+        <div className="flex items-center gap-1.5 text-black dark:text-gray-200 flex-shrink-0">
+          <Filter className="w-4 h-4 text-black dark:text-gray-200" />
+          <span className="text-xs font-bold uppercase tracking-wider text-black dark:text-gray-200">Filters</span>
         </div>
 
         {/* Search inline */}
-        <div className={`border relative flex-shrink-0 ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-100 border-gray-200'}`}>
-          <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+        <div className={`border relative flex-shrink-0 rounded-lg ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-300'}`}>
+          <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-black/60 dark:text-gray-400" />
           <input
             type="text"
             placeholder="Search products..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`pl-8 pr-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-gray-950 text-white placeholder-gray-400' : 'bg-gray-100 text-gray-900 placeholder-gray-500'} focus:ring-1 focus:ring-emerald-500 w-44`}
-            style={{ borderRadius: '2px' }}
+            className={`pl-8 pr-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-gray-950 text-white placeholder-gray-400' : 'bg-gray-50 text-black placeholder-black/50 font-medium'} focus:ring-1 focus:ring-red-600 w-44 rounded-lg`}
           />
         </div>
 
@@ -424,8 +436,7 @@ export default function MarketWithCategoryProducts() {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as any)}
-          className={`border outline-0 px-3 py-1.5 text-sm  ${darkMode ? 'bg-gray-950 text-white border-gray-700' : 'bg-gray-100 text-gray-900 border-gray-200'} focus:ring-1 focus:ring-emerald-500 cursor-pointer flex-shrink-0`}
-          style={{ borderRadius: '2px' }}
+          className={`border outline-0 px-3 py-1.5 text-sm font-semibold ${darkMode ? 'bg-gray-950 text-white border-gray-700' : 'bg-gray-50 text-black border-gray-300'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0 rounded-lg`}
         >
           <option value="popular">Most Popular</option>
           <option value="newest">Newest</option>
@@ -441,8 +452,7 @@ export default function MarketWithCategoryProducts() {
             const cat = categories.find(c => String(c.id) === catId);
             setSelectedCategory(cat || null);
           }}
-          className={`border outline-0 px-3 py-1.5 text-sm  ${darkMode ? 'bg-gray-950 text-white border-gray-700' : 'bg-gray-100 text-gray-900 border-gray-200'} focus:ring-1 focus:ring-emerald-500 cursor-pointer flex-shrink-0`}
-          style={{ borderRadius: '2px' }}
+          className={`border outline-0 px-3 py-1.5 text-sm font-semibold ${darkMode ? 'bg-gray-950 text-white border-gray-700' : 'bg-gray-50 text-black border-gray-300'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0 rounded-lg`}
         >
           <option value="">All Categories</option>
           {categories.map(cat => (
@@ -456,8 +466,7 @@ export default function MarketWithCategoryProducts() {
         <select
           value={conditionFilter}
           onChange={(e) => setConditionFilter(e.target.value as any)}
-          className={`border outline-0 px-3 py-1.5 text-sm  ${darkMode ? 'bg-gray-950 text-white border-gray-700' : 'bg-gray-100 text-gray-900 border-gray-200'} focus:ring-1 focus:ring-emerald-500 cursor-pointer flex-shrink-0`}
-          style={{ borderRadius: '2px' }}
+          className={`border outline-0 px-3 py-1.5 text-sm font-semibold ${darkMode ? 'bg-gray-950 text-white border-gray-700' : 'bg-gray-50 text-black border-gray-300'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0 rounded-lg`}
         >
           <option value="all">All Conditions</option>
           <option value="new">New Only</option>
@@ -468,7 +477,7 @@ export default function MarketWithCategoryProducts() {
         {(selectedCategory || searchQuery || sortBy !== 'popular' || conditionFilter !== 'all') && (
           <button
             onClick={clearFilters}
-            className="text-xs text-emerald-500 hover:text-emerald-600 whitespace-nowrap flex-shrink-0"
+            className="text-xs font-bold text-red-600 hover:text-red-700 whitespace-nowrap flex-shrink-0"
           >
             Clear all
           </button>
@@ -486,28 +495,26 @@ export default function MarketWithCategoryProducts() {
       >
         <button
           onClick={() => handleCategorySelect(null)}
-          className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors shadow-sm ${!selectedCategory
-              ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-              : darkMode ? 'border border-gray-700 bg-gray-950 text-gray-400 hover:bg-gray-800' : 'bg-white text-gray-600 hover:bg-gray-50'
+          className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${!selectedCategory
+              ? 'bg-red-600 text-white'
+              : darkMode ? 'border border-gray-700 bg-gray-950 text-gray-200 hover:bg-gray-800' : 'bg-white border border-gray-300 text-black hover:bg-gray-100'
             }`}
-          style={{ borderRadius: '2px' }}
         >
           All
-          <span className="text-xs opacity-80">({products.length})</span>
+          <span className="text-xs opacity-90 text-white">({products.length})</span>
         </button>
 
         {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => handleCategorySelect(cat)}
-            className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors shadow-sm ${selectedCategory?.id === cat.id
-                ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                : darkMode ? 'border border-gray-700 bg-gray-950 text-gray-400 hover:bg-gray-800' : 'bg-white text-gray-600 hover:bg-gray-50'
+            className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${selectedCategory?.id === cat.id
+                ? 'bg-red-600 text-white'
+                : darkMode ? 'border border-gray-700 bg-gray-950 text-gray-200 hover:bg-gray-800' : 'bg-white border border-gray-300 text-black hover:bg-gray-100'
               }`}
-            style={{ borderRadius: '2px' }}
           >
             {cat.name}
-            <span className="text-xs opacity-80">({categoryCounts[cat.id] || 0})</span>
+            <span className="text-xs opacity-90 text-black dark:text-gray-200">({categoryCounts[cat.id] || 0})</span>
           </button>
         ))}
       </div>
@@ -529,14 +536,14 @@ export default function MarketWithCategoryProducts() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className={`text-2xl sm:text-3xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
+          <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-black'} uppercase`}>
             Discover Products. Buy and Sell with Ease.
           </h1>
-          <p className={`text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2 leading-relaxed max-w-4xl`}>
+          <p className={`text-sm sm:text-base font-normal ${darkMode ? 'text-gray-200' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
             Welcome to the HafiConnect marketplace, where individuals and businesses can discover, buy, and sell products in one convenient place. Explore new and second-hand items across categories such as electronics, furniture, fashion, home essentials, and more. Browse available listings, find products that match your needs and budget, and connect directly with sellers to ask questions and arrange your purchase.
           </p>
           <div className="mt-3 flex items-center gap-2">
-            <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold ${darkMode ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}`} style={{ borderRadius: '2px' }}>
+            <span className={`inline-block px-2.5 py-0.5 text-xs font-bold ${darkMode ? 'bg-red-950/60 text-red-300 border border-red-800/60' : 'bg-red-50 text-red-700 border border-red-200'} rounded-md`}>
               {filteredAndSortedProducts.length} products available
             </span>
           </div>
@@ -544,25 +551,24 @@ export default function MarketWithCategoryProducts() {
 
         {/* Provider Filter Banner */}
         {filterProviderId && (
-          <div className={`mb-6 p-4 border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+          <div className={`mb-6 p-4 border rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
             darkMode 
-              ? 'bg-emerald-950/20 border-emerald-800/60 text-emerald-200' 
-              : 'bg-emerald-50 border-emerald-200 text-emerald-800'
-          }`} style={{ borderRadius: '2px' }}>
+              ? 'bg-red-950/20 border-red-800/60 text-red-200' 
+              : 'bg-red-50 border-red-200 text-red-800'
+          }`}>
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-semibold">Showing products by:</span>
-              <span className="font-bold underline text-emerald-600 dark:text-emerald-400">
+              <span className="font-semibold text-black dark:text-white">Showing products by:</span>
+              <span className="font-bold underline text-red-600 dark:text-red-400">
                 {filterProviderName || 'Loading...'}
               </span>
             </div>
             <button
               onClick={() => setSearchParams({})}
-              className={`text-xs px-3 py-1.5 font-bold transition-all border ${
+              className={`text-xs px-3 py-1.5 font-bold transition-all border rounded-lg ${
                 darkMode
-                  ? 'border-emerald-700 bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-200'
-                  : 'border-emerald-300 bg-emerald-100 hover:bg-emerald-200/80 text-emerald-800'
+                  ? 'border-red-700 bg-red-900/40 hover:bg-red-800/60 text-red-200'
+                  : 'border-red-300 bg-red-100 hover:bg-red-200/80 text-red-800'
               }`}
-              style={{ borderRadius: '2px' }}
             >
               Clear Filter / Show All
             </button>
@@ -650,11 +656,10 @@ export default function MarketWithCategoryProducts() {
             <div className="p-3 space-y-1">
               <button
                 onClick={() => handleCategorySelect(null)}
-                className={`w-full text-left px-3 py-2 text-sm transition-colors ${!selectedCategory
-                    ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                    : darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+                className={`w-full text-left px-3 py-2 text-sm font-bold transition-colors rounded-lg ${!selectedCategory
+                    ? 'bg-red-600 text-white'
+                    : darkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-black hover:bg-gray-100'
                   }`}
-                style={{ borderRadius: '2px' }}
               >
                 All Products ({products.length})
               </button>
@@ -662,11 +667,10 @@ export default function MarketWithCategoryProducts() {
                 <button
                   key={cat.id}
                   onClick={() => handleCategorySelect(cat)}
-                  className={`w-full text-left px-3 py-2 text-sm transition-colors ${selectedCategory?.id === cat.id
-                      ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                      : darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+                  className={`w-full text-left px-3 py-2 text-sm font-bold transition-colors rounded-lg ${selectedCategory?.id === cat.id
+                      ? 'bg-red-600 text-white'
+                      : darkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-black hover:bg-gray-100'
                     }`}
-                  style={{ borderRadius: '2px' }}
                 >
                   {cat.name} ({categoryCounts[cat.id] || 0})
                 </button>

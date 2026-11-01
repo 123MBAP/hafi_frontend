@@ -500,24 +500,32 @@ const HomePage = () => {
     
     return (
       <Link to={`/services/${service.id}`} className="block h-full group">
-        <div className="h-full bg-white dark:bg-gray-900 border dark:border-gray-800/60 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden" style={{ borderRadius: '2px' }}>
-          <div className={`${cardHeight} overflow-hidden bg-gray-100 dark:bg-gray-950 flex items-center justify-center`}>
+        <div className="h-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex flex-col overflow-hidden">
+          <div className={`${cardHeight} overflow-hidden bg-gray-50 dark:bg-gray-950 flex items-center justify-center relative`}>
             <img 
               src={resolveImageUrl(service.image) || 'https://via.placeholder.com/400x300?text=Service'} 
               alt={service.title} 
-              className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
+            <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-sm px-2 py-0.5 text-white text-[10px] font-bold rounded-full uppercase tracking-wider shadow-sm">
+              Service
+            </div>
           </div>
-          <div className="p-3 flex-1 flex flex-col">
-            <h3 className="font-bold text-gray-900 dark:text-white text-base sm:text-lg leading-tight line-clamp-2">
-              {service.title}
-            </h3>
-            <p className="mt-1.5 text-sm sm:text-base text-gray-500 dark:text-gray-400 line-clamp-2 flex-1">
-              {service.description}
-            </p>
-            <div className="mt-2 flex items-center justify-between">
-              <span className="text-xs text-gray-400">
-                {formatUpdatedTime(service.created_at) || 'New'}
+          <div className="p-3 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 className="font-semibold text-black dark:text-white text-sm sm:text-base leading-snug line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                {service.title}
+              </h3>
+              <p className="mt-1 text-xs text-black/80 dark:text-gray-300 line-clamp-2">
+                {service.description}
+              </p>
+            </div>
+            <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+              <span className="text-[11px] font-medium text-black/70 dark:text-gray-400">
+                {formatUpdatedTime(service.created_at) || 'Verified Service'}
+              </span>
+              <span className="text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                Explore <ArrowRight className="w-3 h-3" />
               </span>
             </div>
           </div>
@@ -557,38 +565,39 @@ const HomePage = () => {
     return (
       <button
         onClick={handleClick}
-        className="w-full h-full text-left group relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900 border dark:border-gray-800/60 flex flex-col"
-        style={{ borderRadius: '2px' }}
+        className="w-full h-full text-left group relative overflow-hidden rounded-xl shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 flex flex-col"
       >
-        <div className={`${cardHeight} overflow-hidden relative bg-gray-100 dark:bg-gray-950 flex items-center justify-center`}>
+        <div className={`${cardHeight} overflow-hidden relative bg-gray-50 dark:bg-gray-950 flex items-center justify-center`}>
           <img
             src={imageUrl || 'https://via.placeholder.com/400x300?text=No+Image'}
             alt={title}
-            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          <div className="absolute top-3 left-3 bg-black/70 px-2 py-1 text-white text-xs uppercase tracking-wider" style={{ borderRadius: '2px' }}>
-            {item.category === 'product' ? 'Market' : item.category === 'property' ? 'Estate' : 'Fresh'}
+          <div className="absolute top-2 left-2 bg-black/85 backdrop-blur-sm px-2 py-0.5 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+            {item.category === 'product' ? 'Market' : item.category === 'property' ? 'Real Estate' : 'Fresh'}
           </div>
           {price && (
-            <div className="absolute bottom-3 right-3 bg-black/70 px-2 py-1 text-white text-sm font-bold">
-              RWF {price.toLocaleString()}
+            <div className="absolute bottom-2 right-2 bg-red-600 text-white px-2 py-0.5 text-xs font-black rounded-md shadow-md">
+              FRw {price.toLocaleString()}
             </div>
           )}
         </div>
-        <div className="p-3 flex-1 flex flex-col">
-          <h3 className="font-bold text-gray-900 dark:text-white text-base sm:text-lg leading-tight line-clamp-2">
-            {title}
-          </h3>
-          {isLarge && item.description && (
-            <p className="mt-1.5 text-sm sm:text-base text-gray-500 dark:text-gray-400 line-clamp-2">
-              {item.description}
-            </p>
-          )}
-          <div className="mt-2 flex items-center justify-between">
-            <span className="text-xs text-gray-400">
+        <div className="p-3 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 className="font-semibold text-black dark:text-white text-sm sm:text-base leading-snug line-clamp-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+              {title}
+            </h3>
+            {isLarge && item.description && (
+              <p className="mt-1 text-xs text-black/80 dark:text-gray-300 line-clamp-2">
+                {item.description}
+              </p>
+            )}
+          </div>
+          <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <span className="text-[11px] font-medium text-black/70 dark:text-gray-400">
               {formatUpdatedTime(item.createdAt || item.updatedAt) || 'Just added'}
             </span>
-            <ArrowRight className="w-3.5 h-3.5 text-gray-400 group-hover:text-emerald-500 transition-colors" />
+            <ArrowRight className="w-3.5 h-3.5 text-black/70 group-hover:text-red-600 transition-colors" />
           </div>
         </div>
       </button>
@@ -751,53 +760,83 @@ const HomePage = () => {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-55 text-gray-800'}`}>
+    <div className={`min-h-screen transition-colors duration-500 ${darkMode ? 'bg-gray-950 text-white' : 'bg-white text-black'}`}>
       
-      {/* Hero Section */}
+      {/* Hero Section - Bold Black & Red Typography */}
       <section
-        className="relative overflow-hidden text-center py-24 sm:py-32 lg:py-48 px-4 sm:px-6 text-white bg-gray-900 transition-all duration-700"
+        className="relative overflow-hidden text-center pt-10 pb-16 sm:pt-16 sm:pb-20 lg:pt-20 lg:pb-24 px-4 sm:px-6 transition-all duration-700 bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:bg-white text-black"
       >
         <img
           src={images[currentIndex]}
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 z-0 h-full w-full object-cover object-center transition-opacity duration-700"
+          className="absolute inset-0 z-0 h-full w-full object-cover object-center transition-opacity duration-700 opacity-20"
         />
-        <div className="absolute inset-0 bg-black/60 z-0"></div>
+        {/* Soft vignette to blend image cleanly behind black text */}
+        <div className="absolute inset-0 bg-white/85 dark:bg-white/90 z-0 backdrop-blur-[1px]"></div>
 
-        <button
+        {/* <button
           onClick={prevImage}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/40 hover:bg-black/60 text-white p-2 transition-all"
-          style={{ borderRadius: '2px' }}
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 p-2.5 rounded-full transition-all shadow-md hover:scale-110 active:scale-95 bg-white/95 text-black hover:bg-red-600 hover:text-white border border-gray-200"
+          aria-label="Previous slide"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
 
         <button
           onClick={nextImage}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black/40 hover:bg-black/60 text-white p-2 transition-all"
-          style={{ borderRadius: '2px' }}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 p-2.5 rounded-full transition-all shadow-md hover:scale-110 active:scale-95 bg-white/95 text-black hover:bg-red-600 hover:text-white border border-gray-200"
+          aria-label="Next slide"
         >
           <ChevronRight className="w-6 h-6" />
-        </button>
+        </button> */}
 
         <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold mb-4 uppercase tracking-tighter text-white drop-shadow-md">
-            Everything You Need, Connected in One Place
+          <div className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1 mb-4 text-xs font-black uppercase tracking-wider">
+            <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+            <span className="text-black">Discover</span>
+            <span className="text-red-600" aria-hidden="true">·</span>
+            <span className="text-red-600">Compare</span>
+            <span className="text-black" aria-hidden="true">·</span>
+            <span className="text-black">Connect</span>
+            <span className="text-red-600" aria-hidden="true">·</span>
+            <span className="text-red-600">Get What You Need</span>
+          </div>
+
+          {/* Headline in pure Black with Red highlight */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black mb-4 uppercase tracking-tight leading-tight text-black">
+            Everything You Need, <span className="text-red-600">Connected</span> in One Place
           </h1>
-          <p className="text-sm sm:text-base lg:text-lg text-white/90 max-w-3xl mx-auto mb-8 sm:mb-10 drop-shadow-sm leading-relaxed">
-            HafiConnect brings services, products, businesses, shops, and real estate opportunities together on one convenient platform. Discover service providers, browse new and second-hand products, explore premium shops, find properties to rent or buy, and support local businesses through Made in Rwanda products. Whether you are searching for a service, looking to buy something, or connecting with a seller or property professional, HafiConnect makes it easier to discover opportunities and connect directly.
+
+          {/* Subtitle in solid Black - high contrast, no white or gray */}
+          <p className="text-sm sm:text-base lg:text-lg max-w-3xl mx-auto mb-8 sm:mb-10 font-bold leading-relaxed text-black">
+            HafiConnect brings services, products, businesses, shops, and real estate opportunities together on one convenient platform. Discover service providers, browse new and second-hand products, explore premium shops, find properties to rent or buy, and support local businesses through Made in Rwanda products.
           </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              to="/market"
+              className="px-7 py-3.5 bg-red-600 hover:bg-black text-white text-sm font-bold uppercase tracking-wider rounded-xl shadow-md transition-all hover:scale-105 active:scale-95"
+            >
+              Explore Market
+            </Link>
+            <Link
+              to="/services"
+              className="px-7 py-3.5 bg-white hover:bg-red-50 text-black hover:text-red-600 border-2 border-black hover:border-red-600 text-sm font-bold uppercase tracking-wider rounded-xl transition-all hover:scale-105 active:scale-95 shadow-sm"
+            >
+              Find Services
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Why HafiConnect */}
       <section className="container mx-auto px-4 py-12 sm:py-16">
         <div className="text-center mb-8 sm:mb-10">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase">
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-black dark:text-white uppercase">
             Why HafiConnect?
           </h2>
-          <div className="w-12 h-0.5 bg-emerald-500 mx-auto mt-4"></div>
+          <div className="w-12 h-1 bg-red-600 mx-auto mt-4 rounded-full"></div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[
@@ -805,9 +844,9 @@ const HomePage = () => {
             { title: 'Contact Instantly', desc: 'Message or call providers directly. Get quick answers without leaving.' },
             { title: 'Review & Trust', desc: 'Read authentic reviews and make informed decisions.' }
           ].map((item, i) => (
-            <div key={i} className="bg-white dark:bg-gray-900 border dark:border-gray-800/60 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all" style={{ borderRadius: '2px' }}>
-              <h3 className="text-base sm:text-lg font-bold mb-2 text-gray-900 dark:text-white">{item.title}</h3>
-              <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
+            <div key={i} className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-5 sm:p-6 shadow-sm hover:shadow-md transition-all rounded-xl">
+              <h3 className="text-base sm:text-lg font-bold mb-2 text-black dark:text-white">{item.title}</h3>
+              <p className="text-black/80 dark:text-gray-300 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -817,20 +856,20 @@ const HomePage = () => {
       <section className="container mx-auto px-4 py-12">
         <div className="mb-10 flex justify-between items-end flex-wrap gap-4">
           <div>
-            <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-emerald-500">
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-red-600">
               Discover trusted local providers
             </p>
-            <h2 className="text-4xl sm:text-5xl font-black leading-tight tracking-tight text-gray-900 dark:text-white">
+            <h2 className="text-4xl sm:text-5xl font-black leading-tight tracking-tight text-black dark:text-white">
               Featured Services
             </h2>
-            <p className="mt-4 max-w-2xl text-base sm:text-lg leading-7 text-gray-600 dark:text-gray-300">
+            <p className="mt-4 max-w-2xl text-base sm:text-lg leading-7 text-black dark:text-gray-200">
               Explore reliable services from local providers, with options for home improvement, events, equipment, creative work, and everyday needs.
             </p>
-            <div className="mt-5 h-1 w-16 bg-emerald-500"></div>
+            <div className="mt-5 h-1 w-16 bg-red-600 rounded-full"></div>
           </div>
         </div>
         {serviceRows.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">Loading services...</div>
+          <div className="text-center py-20 text-black/70">Loading services...</div>
         ) : (
           <div>
             {serviceRows.map(row => renderRow(row, 'service'))}
@@ -839,8 +878,7 @@ const HomePage = () => {
         <div className="flex justify-center mt-12">
           <Link
             to="/services"
-            className="px-8 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
-            style={{ borderRadius: '2px' }}
+            className="px-8 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-black dark:text-white font-bold hover:bg-red-600 hover:text-white transition-all rounded-xl shadow-sm"
           >
             Browse All Services →
           </Link>
@@ -850,19 +888,19 @@ const HomePage = () => {
       {/* Fresh Picks - Completely unpredictable */}
       <section className="container mx-auto px-4 py-8 bg-white dark:bg-gray-900/30">
         <div className="mb-10">
-          <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-emerald-500">
+          <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-red-600">
             New and worth discovering
           </p>
-          <h2 className="text-4xl sm:text-5xl font-black leading-tight tracking-tight text-gray-900 dark:text-white">
+          <h2 className="text-4xl sm:text-5xl font-black leading-tight tracking-tight text-black dark:text-white">
             Fresh Picks
           </h2>
-          <p className="mt-4 max-w-2xl text-base sm:text-lg leading-7 text-gray-600 dark:text-gray-300">
+          <p className="mt-4 max-w-2xl text-base sm:text-lg leading-7 text-black dark:text-gray-200">
             Discover the latest products, properties, and provider offerings recently added to HafiConnect, all in one place.
           </p>
-          <div className="mt-5 h-1 w-16 bg-emerald-500"></div>
+          <div className="mt-5 h-1 w-16 bg-red-600 rounded-full"></div>
         </div>
         {updateRows.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">Loading fresh picks...</div>
+          <div className="text-center py-20 text-black/70">Loading fresh picks...</div>
         ) : (
           <div>
             {updateRows.map(row => renderRow(row, 'update'))}
@@ -875,13 +913,13 @@ const HomePage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] gap-10 lg:gap-16 items-stretch">
           <div className="flex flex-col justify-center">
             <div className="mb-8 sm:mb-10">
-              <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-emerald-500">
+              <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-red-600">
                 Simple from start to finish
               </p>
-              <h2 className={`max-w-2xl text-4xl sm:text-5xl lg:text-6xl font-black leading-[0.98] tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              <h2 className={`max-w-2xl text-4xl sm:text-5xl lg:text-6xl font-black leading-[0.98] tracking-tight ${darkMode ? 'text-white' : 'text-black'}`}>
                 How It Works
               </h2>
-              <p className={`mt-5 max-w-2xl text-base sm:text-lg leading-7 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <p className={`mt-5 max-w-2xl text-base sm:text-lg leading-7 ${darkMode ? 'text-gray-300' : 'text-black'}`}>
                 One platform to search, compare, chat, order, and receive what you need across services, products, and real estate.
               </p>
             </div>
@@ -925,14 +963,14 @@ const HomePage = () => {
                     darkMode ? 'border-gray-800' : 'border-gray-200'
                   }`}
                 >
-                  <div className={`text-2xl sm:text-3xl font-black tracking-tight ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                  <div className={`text-2xl sm:text-3xl font-black tracking-tight ${darkMode ? 'text-red-400' : 'text-red-600'}`}>
                     {item.step}
                   </div>
                   <div>
-                    <h3 className={`text-xl sm:text-2xl font-bold leading-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <h3 className={`text-xl sm:text-2xl font-bold leading-tight ${darkMode ? 'text-white' : 'text-black'}`}>
                       {item.title}
                     </h3>
-                    <p className={`mt-2 max-w-xl text-sm sm:text-base leading-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p className={`mt-2 max-w-xl text-sm sm:text-base leading-6 ${darkMode ? 'text-gray-300' : 'text-black/85'}`}>
                       {item.desc}
                     </p>
                   </div>
@@ -949,7 +987,7 @@ const HomePage = () => {
             />
             <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 z-20 p-6 sm:p-8">
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-300">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-red-400">
                 Discover locally
               </p>
               <p className="mt-2 max-w-sm text-xl font-bold leading-tight text-white sm:text-2xl">

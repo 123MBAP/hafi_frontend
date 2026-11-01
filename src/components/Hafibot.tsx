@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageSquare, X, Send, Trash2, Sparkles, ChevronRight, CornerDownLeft } from 'lucide-react';
+import { X, Send, Trash2, Sparkles, ChevronRight, CornerDownLeft } from 'lucide-react';
 import { useDarkMode } from '../context/DarkMode';
 import { useHafibot } from '../context/HafibotContext';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE } from '../api/apiClient';
+import hafiBotImage from '../pages/images/HafiBot.png';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -31,7 +32,7 @@ const SUGGESTIONS = [
 export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: HafibotProps) {
   const { darkMode } = useDarkMode();
   const { user } = useAuth();
-  const { isOpen, openHafibot, closeHafibot, toggleHafibot } = useHafibot();
+  const { isOpen, openHafibot, closeHafibot, toggleHafibot, pendingPrompt, clearPendingPrompt } = useHafibot();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -223,6 +224,13 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
     }
   };
 
+  useEffect(() => {
+    if (isOpen && pendingPrompt) {
+      handleSend(pendingPrompt);
+      clearPendingPrompt();
+    }
+  }, [isOpen, pendingPrompt]);
+
   const clearHistory = () => {
     if (window.confirm("Are you sure you want to clear your chat history?")) {
       localStorage.removeItem('hafibot_messages');
@@ -268,7 +276,7 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
         parts.push(
           <div
             key={matchIndex}
-            className="my-2.5 overflow-hidden rounded-lg border border-gray-200/80 dark:border-gray-800 shadow-sm bg-white dark:bg-gray-900 flex flex-col group max-w-full"
+            className="my-2.5 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm bg-white dark:bg-gray-900 flex flex-col group max-w-full"
           >
             <img
               src={resolvedImgUrl}
@@ -292,11 +300,7 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
                 key={matchIndex}
                 to={urlVal}
                 onClick={handleLinkClick}
-                className={`mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold shadow-sm transition-all duration-200 ${
-                  darkMode
-                    ? 'bg-emerald-950/70 border border-emerald-700/60 text-emerald-300 hover:bg-emerald-900 hover:text-emerald-200'
-                    : 'bg-emerald-50 border border-emerald-200 text-[#008069] hover:bg-emerald-100 hover:text-emerald-800'
-                }`}
+                className="mt-2.5 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-all duration-200 bg-red-50 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white dark:bg-red-950/40 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-600 dark:hover:text-white"
               >
                 <span>{textVal}</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -308,7 +312,7 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
                 key={matchIndex}
                 to={urlVal}
                 onClick={handleLinkClick}
-                className="text-[#0a7e6e] dark:text-emerald-400 font-semibold underline decoration-emerald-500/50 hover:decoration-emerald-500 transition-colors inline-flex items-center gap-0.5"
+                className="text-red-600 dark:text-red-400 font-bold underline decoration-red-600/50 hover:decoration-red-600 transition-colors inline-flex items-center gap-0.5"
               >
                 {textVal}
               </Link>
@@ -321,7 +325,7 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
               href={urlVal}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#0a7e6e] dark:text-emerald-400 font-semibold underline decoration-emerald-500/50 hover:decoration-emerald-500 transition-colors inline-flex items-center gap-0.5"
+              className="text-red-600 dark:text-red-400 font-bold underline decoration-red-600/50 hover:decoration-red-600 transition-colors inline-flex items-center gap-0.5"
             >
               {textVal}
             </a>
@@ -348,7 +352,7 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
           if (subMatchIndex > subLastIndex) {
             subParts.push(part.substring(subLastIndex, subMatchIndex));
           }
-          subParts.push(<strong key={subMatchIndex} className="font-bold text-gray-900 dark:text-white">{subMatch[1]}</strong>);
+          subParts.push(<strong key={subMatchIndex} className="font-bold text-black dark:text-white">{subMatch[1]}</strong>);
           subLastIndex = boldRegex.lastIndex;
         }
         if (subLastIndex < part.length) {
@@ -408,13 +412,13 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
           {/* Welcome Tooltip */}
           {showTooltip && (
             <div
-              className="mb-3 bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-4 py-2.5 shadow-2xl border border-gray-150 dark:border-gray-800 text-xs font-medium max-w-xs animate-bounce flex items-center gap-2 rounded-xl"
+              className="mb-3 bg-white dark:bg-gray-900 text-black dark:text-white px-4 py-2.5 shadow-2xl border border-gray-200 dark:border-gray-800 text-xs font-bold max-w-xs animate-bounce flex items-center gap-2 rounded-xl"
             >
-              <Sparkles className="w-4 h-4 text-emerald-500 shrink-0" />
+              <Sparkles className="w-4 h-4 text-red-600 shrink-0" />
               <span>Need help searching services, products, or rentals? Ask Hafibot!</span>
               <button
                 onClick={() => setShowTooltip(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                className="text-black/60 hover:text-black dark:text-gray-400 dark:hover:text-white p-0.5"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -424,20 +428,24 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
           <div className="flex items-center gap-3">
             <button
               onClick={handleOpenClick}
-              className="bg-white/95 dark:bg-gray-900/95 border border-gray-200 dark:border-gray-800 text-[#0a7e6e] dark:text-emerald-400 px-4 py-2.5 shadow-xl font-bold text-xs tracking-wider uppercase transition-all duration-300 hover:scale-105 hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-95 rounded-full flex items-center gap-2"
+              className="bg-white/95 dark:bg-gray-900/95 border-2 border-black dark:border-gray-700 text-black dark:text-white hover:text-red-600 hover:border-red-600 px-4 py-2.5 shadow-xl font-black text-xs tracking-wider uppercase transition-all duration-300 hover:scale-105 active:scale-95 rounded-full flex items-center gap-2"
             >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+              <Sparkles className="w-3.5 h-3.5 text-red-600" />
               <span>Search with Hafibot AI</span>
             </button>
 
             <button
               onClick={handleOpenClick}
-              className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#0a7e6e] to-teal-400 text-white flex items-center justify-center shadow-xl hover:shadow-2xl hover:shadow-emerald-500/30 transition-all duration-300 hover:scale-105 active:scale-95 group relative overflow-hidden animate-hafibot-shake"
+              className="w-20 h-20 rounded-full bg-gradient-to-tr from-black via-red-600 to-black text-white flex items-center justify-center shadow-xl hover:shadow-2xl hover:shadow-red-600/40 border-2 border-black dark:border-red-600 transition-all duration-300 hover:scale-105 active:scale-95 group relative overflow-hidden animate-hafibot-shake"
               title="Open Hafibot AI Assistant"
             >
               {/* Pulse Ring */}
-              <span className="absolute inset-0 rounded-full bg-emerald-400/30 animate-ping" style={{ animationDuration: '3s' }}></span>
-              <MessageSquare className="w-6 h-6 transition-transform duration-300 group-hover:scale-110 relative z-10" />
+              <span className="absolute inset-0 rounded-full bg-red-600/30 animate-ping" style={{ animationDuration: '3s' }}></span>
+              <img
+                src={hafiBotImage}
+                alt="Open Hafibot AI Assistant"
+                className="relative z-10 w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+              />
             </button>
           </div>
         </div>
@@ -457,25 +465,29 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
             onPointerDown={handleResizeStart}
             className="hidden md:flex absolute left-0 top-0 bottom-0 w-2 -translate-x-1/2 cursor-col-resize items-center justify-center z-10 group"
           >
-            <span className="h-16 w-1 rounded-full bg-gray-300/0 group-hover:bg-emerald-400/80 transition-colors dark:bg-gray-600/0 dark:group-hover:bg-emerald-400/80" />
+            <span className="h-16 w-1 rounded-full bg-gray-300/0 group-hover:bg-red-600 transition-colors dark:bg-gray-600/0 dark:group-hover:bg-red-600" />
           </div>
           {/* Header Bar */}
-          <div className="bg-[#0a7e6e] dark:bg-gray-900/95 px-5 py-3.5 flex items-center justify-between text-white border-b border-emerald-600/30 dark:border-gray-800 shadow-sm shrink-0">
+          <div className="bg-black dark:bg-black px-5 py-3.5 flex items-center justify-between text-white border-b-2 border-red-600 shadow-md shrink-0">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-9 h-9 rounded-xl bg-white/20 dark:bg-emerald-500/20 flex items-center justify-center font-bold text-xs tracking-tight text-white border border-white/20">
-                  <Sparkles className="w-4 h-4 text-emerald-300" />
+                <div className="w-10 h-10 rounded-xl bg-white/10 dark:bg-white/10 flex items-center justify-center overflow-hidden border border-white/20">
+                  <img
+                    src={hafiBotImage}
+                    alt="Hafibot"
+                    className="w-full h-full object-contain"
+                  />
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 border-2 border-[#0a7e6e] dark:border-gray-900 rounded-full animate-pulse"></div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-red-600 border-2 border-black rounded-full animate-pulse"></div>
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-bold text-sm tracking-tight text-white">Hafibot AI</h3>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-100 font-medium">
+                  <h3 className="font-black text-sm tracking-tight text-white">Hafibot AI</h3>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-600 text-white font-extrabold uppercase tracking-wider">
                     Assistant
                   </span>
                 </div>
-                <span className="text-[11px] text-emerald-100/80 block">
+                <span className="text-[11px] text-white/90 font-medium block">
                   Online • Searches Services, Market & Properties
                 </span>
               </div>
@@ -485,16 +497,16 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
               <button
                 onClick={clearHistory}
                 title="Clear Chat History"
-                className="p-2 hover:bg-white/10 dark:hover:bg-gray-800 rounded-lg text-white/90 hover:text-white transition-colors"
+                className="p-2 hover:bg-red-600 rounded-lg text-white transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
               <button
                 onClick={closeHafibot}
                 title="Collapse Assistant (Esc)"
-                className="p-2 hover:bg-white/10 dark:hover:bg-gray-800 rounded-lg text-white/90 hover:text-white transition-colors flex items-center gap-1 group"
+                className="p-2 hover:bg-red-600 rounded-lg text-white transition-colors flex items-center gap-1 group"
               >
-                <span className="text-xs text-white/70 hidden sm:inline mr-1 group-hover:text-white">Esc</span>
+                <span className="text-xs text-white/80 hidden sm:inline mr-1 group-hover:text-white font-bold">Esc</span>
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -505,19 +517,19 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
             {/* Gemini-inspired Hero Welcome (when few messages) */}
             {messages.length <= 1 && (
               <div className="py-6 px-2 text-center flex flex-col items-center">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-4 animate-pulse">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-black to-red-600 flex items-center justify-center shadow-lg shadow-red-600/25 mb-4 animate-pulse">
                   <Sparkles className="w-7 h-7 text-white" />
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+                <h2 className="text-xl md:text-2xl font-black text-black dark:text-white tracking-tight">
                   {userName ? `Hi ${userName}, what's the plan?` : "Hi! What can I help you find today?"}
                 </h2>
-                <p className="mt-2 text-xs md:text-sm text-gray-500 dark:text-gray-400 max-w-md leading-relaxed">
+                <p className="mt-2 text-xs md:text-sm text-black dark:text-gray-200 max-w-md font-semibold leading-relaxed">
                   Search across verified Rwandan services, local Made in Rwanda products, global marketplace listings, and real estate rentals.
                 </p>
 
                 {/* Suggestions Pills */}
                 <div className="mt-6 w-full max-w-md">
-                  <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-2 text-left">
+                  <span className="text-[11px] font-black text-black dark:text-white uppercase tracking-wider block mb-2 text-left">
                     Suggestions
                   </span>
                   <div className="flex flex-col gap-2">
@@ -525,10 +537,10 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
                       <button
                         key={idx}
                         onClick={() => handleSend(item.prompt)}
-                        className="w-full text-left text-xs md:text-sm bg-white dark:bg-gray-900 hover:bg-emerald-50/70 dark:hover:bg-gray-850 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 transition-all duration-200 hover:border-emerald-500/50 hover:shadow-sm flex items-center justify-between group"
+                        className="w-full text-left text-xs md:text-sm bg-white dark:bg-gray-900 hover:bg-red-50/80 dark:hover:bg-gray-850 text-black dark:text-white hover:text-red-600 hover:border-red-600 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 transition-all duration-200 hover:shadow-sm flex items-center justify-between group font-bold"
                       >
-                        <span className="font-medium">{item.text}</span>
-                        <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all" />
+                        <span className="font-bold">{item.text}</span>
+                        <ChevronRight className="w-4 h-4 text-black/60 dark:text-gray-400 group-hover:text-red-600 group-hover:translate-x-0.5 transition-all" />
                       </button>
                     ))}
                   </div>
@@ -545,16 +557,16 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
                 <div
                   className={`max-w-[88%] md:max-w-[80%] px-4 py-3 shadow-sm text-sm rounded-2xl ${
                     msg.role === 'user'
-                      ? 'bg-gradient-to-tr from-[#0a7e6e] to-[#008069] text-white rounded-br-none'
-                      : 'bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100 border border-gray-200/80 dark:border-gray-800 rounded-bl-none'
+                      ? 'bg-red-600 text-white rounded-br-none font-medium'
+                      : 'bg-white text-black dark:bg-gray-900 dark:text-white border border-gray-200 dark:border-gray-800 rounded-bl-none font-medium'
                   }`}
                 >
                   <div className="leading-relaxed whitespace-pre-wrap">
                     {parseMessageContent(msg.content)}
                   </div>
                   <span
-                    className={`block text-[10px] mt-2 text-right ${
-                      msg.role === 'user' ? 'text-emerald-200' : 'text-gray-400'
+                    className={`block text-[10px] mt-2 text-right font-medium ${
+                      msg.role === 'user' ? 'text-white/85' : 'text-black/70 dark:text-gray-400'
                     }`}
                   >
                     {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -567,9 +579,9 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
             {isTyping && (
               <div className="flex justify-start">
                 <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 px-4 py-3 shadow-sm rounded-2xl rounded-bl-none flex items-center gap-1.5">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  <div className="w-2 h-2 bg-red-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-red-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-red-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                 </div>
               </div>
             )}
@@ -579,13 +591,13 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
 
           {/* Quick Suggestions Chips (when conversation is active) */}
           {messages.length > 1 && !isTyping && (
-            <div className="px-4 py-2 bg-gray-50/80 dark:bg-gray-950/80 border-t border-gray-200/60 dark:border-gray-800/80 shrink-0">
+            <div className="px-4 py-2 bg-gray-50/80 dark:bg-gray-950/80 border-t border-gray-200 dark:border-gray-800 shrink-0">
               <div className="flex gap-2 overflow-x-auto hafibot-scrollbar pb-1">
                 {SUGGESTIONS.map((item, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleSend(item.prompt)}
-                    className="shrink-0 text-xs bg-white dark:bg-gray-900 hover:bg-emerald-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-800 transition-colors shadow-2xs font-medium"
+                    className="shrink-0 text-xs bg-white dark:bg-gray-900 hover:bg-red-50 dark:hover:bg-gray-800 hover:text-red-600 hover:border-red-600 text-black dark:text-white px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-800 transition-colors shadow-sm font-bold"
                   >
                     {item.text}
                   </button>
@@ -596,12 +608,12 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
 
           {/* Input Panel (Docked at bottom of right column) */}
           <div className="p-3 md:p-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shrink-0">
-            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-3 py-1.5 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
+            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-3 py-1.5 focus-within:border-red-600 focus-within:ring-2 focus-within:ring-red-600/20 transition-all">
               <input
                 ref={inputRef}
                 type="text"
                 placeholder="Ask Hafibot anything (e.g. rental house, photography, sneakers)..."
-                className="flex-1 bg-transparent text-sm py-2 px-1 outline-none text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                className="flex-1 bg-transparent text-sm py-2 px-1 outline-none text-black dark:text-white font-medium placeholder-black/50 dark:placeholder-gray-400"
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
@@ -610,14 +622,14 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
               <button
                 onClick={() => handleSend()}
                 disabled={isTyping || !input.trim()}
-                className="bg-[#0a7e6e] hover:bg-emerald-700 text-white p-2.5 rounded-xl disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:text-gray-400 transition-all duration-200 shadow-sm active:scale-95 shrink-0"
+                className="bg-red-600 hover:bg-black text-white p-2.5 rounded-xl disabled:bg-gray-200 dark:disabled:bg-gray-800 disabled:text-gray-400 transition-all duration-200 shadow-sm active:scale-95 shrink-0"
                 title="Send message (Enter)"
               >
                 <Send className="w-4 h-4" />
               </button>
             </div>
             <div className="mt-2 text-center">
-              <span className="text-[10px] text-gray-400 dark:text-gray-500">
+              <span className="text-[10px] text-black/70 dark:text-gray-400 font-bold">
                 Hafibot AI Search Assistant • Powered by HafiConnect Rwanda
               </span>
             </div>

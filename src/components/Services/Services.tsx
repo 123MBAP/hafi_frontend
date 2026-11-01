@@ -112,14 +112,14 @@ export default function Services() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className={`text-2xl sm:text-3xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
+          <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-black'} uppercase`}>
             Find Services and Connect with Service Providers
           </h1>
-          <p className={`text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2 leading-relaxed max-w-4xl`}>
+          <p className={`text-sm sm:text-base font-normal ${darkMode ? 'text-gray-200' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
             Find the services you need, all in one place. HafiConnect helps you discover service providers across different industries, explore their offerings, view available products, and connect with providers directly. Whether you need professional assistance, everyday services, or specialized expertise, find the right provider, make enquiries, book services, and purchase available products through one convenient platform.
           </p>
           <div className="mt-3 flex items-center gap-2">
-            <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold ${darkMode ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}`} style={{ borderRadius: '2px' }}>
+            <span className={`inline-block px-2.5 py-0.5 text-xs font-bold ${darkMode ? 'bg-red-950/60 text-red-300 border border-red-800/60' : 'bg-red-50 text-red-700 border border-red-200'} rounded-md`}>
               {filteredServices.length} services available
             </span>
           </div>
@@ -139,9 +139,8 @@ export default function Services() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`lg:hidden flex items-center gap-1.5 px-3 py-2 text-sm 
-                ${darkMode ? 'bg-gray-950 border border-gray-800 text-gray-300' : 'bg-white text-gray-700'} shadow-sm`}
-              style={{ borderRadius: '2px' }}
+              className={`lg:hidden flex items-center gap-1.5 px-3 py-2 text-sm font-bold
+                ${darkMode ? 'bg-gray-950 border border-gray-800 text-gray-300' : 'bg-white border border-gray-300 text-black'} rounded-lg shadow-sm`}
             >
               <Filter className="w-4 h-4" />
               {showFilters ? 'Hide' : 'Categories'}
@@ -150,8 +149,7 @@ export default function Services() {
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className={`flex items-center gap-1 px-3 py-2 text-sm ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-700'}`}
-                style={{ borderRadius: '2px' }}
+                className={`flex items-center gap-1 px-3 py-2 text-sm font-bold ${darkMode ? 'text-red-400 hover:text-white' : 'text-red-600 hover:text-red-700'}`}
               >
                 <X className="w-3.5 h-3.5" />
                 Clear
@@ -169,24 +167,22 @@ export default function Services() {
             >
               <button
                 onClick={() => handleCategoryChange(undefined)}
-                className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors shadow-sm ${!selectedCategory
-                    ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                    : darkMode ? 'bg-gray-950 border border-gray-800 text-gray-400 hover:bg-gray-800' : 'bg-white text-gray-600 hover:bg-gray-50'
+                className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${!selectedCategory
+                    ? 'bg-red-600 text-white'
+                    : darkMode ? 'bg-gray-950 border border-gray-800 text-gray-200 hover:bg-gray-800' : 'bg-white border border-gray-300 text-black hover:bg-gray-100'
                   }`}
-                style={{ borderRadius: '2px' }}
               >
                 All
-                <span className="text-xs opacity-80">({services.length})</span>
+                <span className="text-xs opacity-90 text-white">({services.length})</span>
               </button>
               {categories.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => handleCategoryChange(cat.id)}
-                  className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors shadow-sm ${selectedCategory === cat.id
-                      ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                      : darkMode ? 'bg-gray-950 border border-gray-800 text-gray-400 hover:bg-gray-800' : 'bg-white text-gray-600 hover:bg-gray-50'
+                  className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${selectedCategory === cat.id
+                      ? 'bg-red-600 text-white'
+                      : darkMode ? 'bg-gray-950 border border-gray-800 text-gray-200 hover:bg-gray-800' : 'bg-white border border-gray-300 text-black hover:bg-gray-100'
                     }`}
-                  style={{ borderRadius: '2px' }}
                 >
                   {cat.name}
                 </button>
