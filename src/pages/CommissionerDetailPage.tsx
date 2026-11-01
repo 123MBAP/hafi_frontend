@@ -33,6 +33,12 @@ export default function CommissionerDetailPage() {
 
     const profileFallbackUrl = `${API_BASE}/services/profile-image/${commissionerId ?? ''}`;
 
+    const cardBg = darkMode ? "bg-zinc-900 text-white" : "bg-zinc-100 text-black";
+    const dividerCol = darkMode ? "border-white/10" : "border-black/10";
+    const textTitle = darkMode ? "text-white" : "text-black";
+    const textMuted = darkMode ? "text-white/60" : "text-black/60";
+    const tagBg = darkMode ? "bg-black text-white" : "bg-white text-black";
+
     useEffect(() => {
         const controller = new AbortController();
         let didCancel = false;
@@ -124,25 +130,27 @@ export default function CommissionerDetailPage() {
     const getCategoryIcon = (category: PropertyCategory) => {
         switch (category) {
             case PropertyCategory.Land:
-                return <LandPlot className="w-4 h-4" />;
+                return <LandPlot className="w-4 h-4 text-red-600" />;
             case PropertyCategory.Residential:
-                return <Home className="w-4 h-4" />;
+                return <Home className="w-4 h-4 text-red-600" />;
             case PropertyCategory.Commercial:
-                return <Building2 className="w-4 h-4" />;
+                return <Building2 className="w-4 h-4 text-red-600" />;
         }
     };
 
     if (loading) {
         return (
-            <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
+            <div className={`min-h-screen ${darkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
                 <div className="max-w-7xl mx-auto px-4 py-6">
                     <button
                         onClick={() => navigate('/real-estate/commissioners')}
-                        className={`flex items-center gap-2 mb-6 px-3 py-1.5 transition-colors ${darkMode ? 'text-gray-400 hover:text-white hover:' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
+                        className={`flex items-center gap-2 mb-6 px-3 py-1.5 transition-all text-xs font-bold uppercase tracking-wider ${
+                            darkMode ? 'text-white/80 hover:text-red-500 bg-zinc-900 hover:bg-zinc-800' : 'text-black/80 hover:text-red-600 bg-zinc-100 hover:bg-zinc-200'
+                        }`}
                         style={{ borderRadius: '2px' }}
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        <span className="text-sm">Back</span>
+                        <span>Back</span>
                     </button>
                     <div className="py-16">
                         <LoadingSpinner size="lg" message="Loading agent details..." variant="dots" />
@@ -154,13 +162,13 @@ export default function CommissionerDetailPage() {
 
     if (!commissioner) {
         return (
-            <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
+            <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-4">Agent Not Found</h2>
+                    <h2 className="text-2xl font-extrabold mb-4">Agent Not Found</h2>
                     <button
                         onClick={() => navigate('/real-estate/commissioners')}
-                        className={`px-6 py-2 bg-emerald-600 text-white transition-colors ${darkMode ? ' border border-gray-800' : ''}
-                        style={{ borderRadius: '2px' }}`}
+                        className="px-6 py-2.5 bg-red-600 hover:bg-black dark:hover:bg-white dark:hover:text-black text-white font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-sm"
+                        style={{ borderRadius: '2px' }}
                     >
                         Back to Agents
                     </button>
@@ -170,23 +178,25 @@ export default function CommissionerDetailPage() {
     }
 
     return (
-        <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
+        <div className={`min-h-screen ${darkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
             <div className="max-w-7xl mx-auto px-4 py-6">
                 {/* Back Button */}
                 <button
                     onClick={() => navigate('/real-estate/commissioners')}
-                    className={`flex items-center gap-2 mb-6 px-3 py-1.5 transition-colors ${darkMode ? 'text-gray-400 hover:text-white border border-gray-800 hover:' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
+                    className={`flex items-center gap-2 mb-6 px-3 py-1.5 transition-all text-xs font-bold uppercase tracking-wider ${
+                        darkMode ? 'text-white/80 hover:text-red-500 bg-zinc-900 hover:bg-zinc-800' : 'text-black/80 hover:text-red-600 bg-zinc-100 hover:bg-zinc-200'
+                    }`}
                     style={{ borderRadius: '2px' }}
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    <span className="text-sm">Back to Agents</span>
+                    <span>Back to Agents</span>
                 </button>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Content - Left Column */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Agent Profile Card */}
-                        <div className={`p-5 ${darkMode ? 'bg-gray-950' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
+                        {/* Agent Profile Card - Borderless */}
+                        <div className={`p-6 ${cardBg} shadow-sm`} style={{ borderRadius: '2px' }}>
                             <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-5">
                                 <div className="relative flex-shrink-0">
                                     <img
@@ -201,41 +211,46 @@ export default function CommissionerDetailPage() {
                                     />
                                 </div>
                                 <div className="flex-1">
-                                    <h1 className={`text-2xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight mb-1 ${textTitle}`}>
                                         {commissioner.name}
                                     </h1>
                                     <div className="flex flex-wrap items-center gap-3 mb-2">
                                         {commissioner.verified && (
-                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium ${darkMode ? 'bg-emerald-900/50 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`} style={{ borderRadius: '2px' }}>
-
+                                            <span
+                                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider ${
+                                                    darkMode ? 'bg-black text-red-500' : 'bg-white text-red-600 shadow-xs'
+                                                }`}
+                                                style={{ borderRadius: '2px' }}
+                                            >
+                                                <BadgeCheck className="w-3.5 h-3.5 text-red-600" />
                                                 Verified Agent
                                             </span>
                                         )}
                                     </div>
                                     {commissioner.email && (
                                         <div className="flex items-center gap-1.5">
-                                            <Mail className="w-3.5 h-3.5 text-gray-400" />
-                                            <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{commissioner.email}</span>
+                                            <Mail className="w-3.5 h-3.5 text-red-600" />
+                                            <span className={`text-xs ${textMuted}`}>{commissioner.email}</span>
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-                            {/* Stats Grid - 3 equal columns */}
-                            <div className="grid grid-cols-3 gap-3 mb-5 pt-4 border-t border-gray-100 dark:border-gray-700">
+                            {/* Stats Grid - Borderless */}
+                            <div className={`grid grid-cols-3 gap-3 mb-5 pt-4 border-t ${dividerCol}`}>
                                 <div className="text-center">
-                                    <div className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    <div className={`text-xl sm:text-2xl font-extrabold ${textTitle}`}>
                                         {commissioner.propertiesManaged || 0}
                                     </div>
-                                    <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    <div className={`text-xs font-bold uppercase tracking-wider mt-1 ${textMuted}`}>
                                         Properties
                                     </div>
                                 </div>
-                                <div className="text-center">
-                                    <div className={`text-xl font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                                <div className="text-center col-span-2">
+                                    <div className="text-xl sm:text-2xl font-extrabold text-red-600">
                                         {formatPrice(commissioner.priceRange.min)} - {formatPrice(commissioner.priceRange.max)}
                                     </div>
-                                    <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    <div className={`text-xs font-bold uppercase tracking-wider mt-1 ${textMuted}`}>
                                         Price range
                                     </div>
                                 </div>
@@ -244,10 +259,10 @@ export default function CommissionerDetailPage() {
                             {/* Bio */}
                             {commissioner.bio && (
                                 <div className="mb-5">
-                                    <h3 className={`text-sm font-semibold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-red-600 mb-2">
                                         About
                                     </h3>
-                                    <p className={`text-sm leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    <p className="text-sm leading-relaxed font-medium">
                                         {commissioner.bio}
                                     </p>
                                 </div>
@@ -255,17 +270,16 @@ export default function CommissionerDetailPage() {
 
                             {/* Operating Locations */}
                             <div className="mb-5">
-                                <h3 className={`text-sm font-semibold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-red-600 mb-2">
                                     Operating Areas
                                 </h3>
                                 <div className="space-y-3">
                                     <div>
-                                       
                                         <div className="flex flex-wrap gap-1.5">
                                             {commissioner.operatingLocations.districts.map((district, idx) => (
                                                 <span
                                                     key={idx}
-                                                    className={`text-sm px-2 py-0.5 ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`}
+                                                    className={`text-xs font-bold px-2.5 py-1 ${tagBg} shadow-xs`}
                                                     style={{ borderRadius: '2px' }}
                                                 >
                                                     {district}
@@ -278,14 +292,17 @@ export default function CommissionerDetailPage() {
                                             {commissioner.operatingLocations.sectors.slice(0, 6).map((sector, idx) => (
                                                 <span
                                                     key={idx}
-                                                    className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`}
+                                                    className={`text-xs font-medium px-2 py-0.5 ${tagBg} shadow-xs`}
                                                     style={{ borderRadius: '2px' }}
                                                 >
                                                     {sector}
                                                 </span>
                                             ))}
                                             {commissioner.operatingLocations.sectors.length > 6 && (
-                                                <span className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`} style={{ borderRadius: '2px' }}>
+                                                <span
+                                                    className={`text-xs font-bold px-2 py-0.5 ${tagBg} shadow-xs`}
+                                                    style={{ borderRadius: '2px' }}
+                                                >
                                                     +{commissioner.operatingLocations.sectors.length - 6} more
                                                 </span>
                                             )}
@@ -297,14 +314,14 @@ export default function CommissionerDetailPage() {
                             {/* Specialization */}
                             {commissioner.specialization && commissioner.specialization.length > 0 && (
                                 <div>
-                                    <h3 className={`text-sm font-semibold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-red-600 mb-2">
                                         Specialization
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
                                         {commissioner.specialization.map((spec, idx) => (
                                             <span
                                                 key={idx}
-                                                className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 ${darkMode ? 'bg-emerald-900/50 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`}
+                                                className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1 ${tagBg} shadow-xs`}
                                                 style={{ borderRadius: '2px' }}
                                             >
                                                 {getCategoryIcon(spec)}
@@ -316,42 +333,50 @@ export default function CommissionerDetailPage() {
                             )}
                         </div>
 
-                        {/* Managed Properties */}
+                        {/* Managed Properties - Borderless */}
                         {managedProperties.length > 0 && (
-                            <div className={`p-5 ${darkMode ? '' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
+                            <div className={`p-6 ${cardBg} shadow-sm`} style={{ borderRadius: '2px' }}>
                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className={`text-base font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    <h3 className={`text-base font-extrabold tracking-tight ${textTitle}`}>
                                         Properties Managed
                                     </h3>
-                                    <span className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-500'}`} style={{ borderRadius: '2px' }}>
+                                    <span
+                                        className={`text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 ${tagBg} shadow-xs`}
+                                        style={{ borderRadius: '2px' }}
+                                    >
                                         {managedProperties.length} properties
                                     </span>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {managedProperties.map(property => (
                                         <div
                                             key={property.id}
                                             onClick={() => navigate(`/real-estate/property/${property.id}`)}
                                             className="group cursor-pointer"
                                         >
-                                            <div className={`overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`} style={{ borderRadius: '2px' }}>
+                                            <div
+                                                className={`overflow-hidden ${darkMode ? 'bg-black' : 'bg-white'}`}
+                                                style={{ borderRadius: '2px' }}
+                                            >
                                                 <img
                                                     src={property.images[0]}
                                                     alt={property.title}
-                                                    className="w-full h-36 object-cover transition-transform duration-300 group-hover:scale-105"
+                                                    className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
                                                 />
                                             </div>
-                                            <div className="mt-2">
-                                                <h4 className={`text-sm font-medium line-clamp-1 ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'}`}>
+                                            <div className="mt-2.5">
+                                                <h4 className={`text-sm font-bold line-clamp-1 transition-colors ${
+                                                    darkMode ? 'text-white group-hover:text-red-500' : 'text-black group-hover:text-red-600'
+                                                }`}>
                                                     {property.title}
                                                 </h4>
                                                 <div className="flex items-center gap-1 mt-1">
-                                                    <MapPin className="w-3 h-3 text-gray-400" />
-                                                    <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                    <MapPin className="w-3 h-3 text-red-600" />
+                                                    <span className={`text-xs font-medium ${textMuted}`}>
                                                         {property.location.district}
                                                     </span>
                                                 </div>
-                                                <div className={`text-sm font-bold mt-1 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                                                <div className="text-sm font-extrabold text-red-600 mt-1">
                                                     {formatPrice(property.price)}
                                                 </div>
                                             </div>
@@ -364,63 +389,63 @@ export default function CommissionerDetailPage() {
 
                     {/* Sidebar - Right Column */}
                     <div className="lg:col-span-1 space-y-6">
-                        {/* Contact Card */}
-                        <div className={`p-5 ${darkMode ? '' : 'bg-white'} shadow-sm sticky top-6`} style={{ borderRadius: '2px' }}>
-                            <h3 className={`text-sm font-semibold uppercase tracking-wider mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {/* Contact Card - Borderless */}
+                        <div className={`p-6 ${cardBg} shadow-sm sticky top-6`} style={{ borderRadius: '2px' }}>
+                            <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-red-600 mb-4">
                                 Contact Agent
                             </h3>
 
                             <button
                                 onClick={() => window.location.href = `tel:${commissioner.phone}`}
-                                className={`w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors mb-3 ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
+                                className="w-full flex items-center justify-center gap-2 py-3 text-xs font-bold uppercase tracking-wider bg-red-600 hover:bg-black dark:hover:bg-white dark:hover:text-black text-white transition-all duration-300 shadow-sm mb-4"
                                 style={{ borderRadius: '2px' }}
                             >
                                 <Phone className="w-4 h-4" />
-                                Call {commissioner.phone}
+                                <span>Call {commissioner.phone}</span>
                             </button>
 
-                            <div className={`pt-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-100'}`}>
-                                <h4 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            <div className={`pt-4 border-t ${dividerCol}`}>
+                                <h4 className="text-xs font-bold uppercase tracking-[0.22em] text-red-600 mb-3">
                                     Why Choose This Agent?
                                 </h4>
-                                <ul className="space-y-2">
+                                <ul className="space-y-2.5">
                                     <li className="flex items-center gap-2">
-                                        <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                                        <span className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Verified professional</span>
+                                        <CheckCircle className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />
+                                        <span className="text-xs font-medium">Verified professional</span>
                                     </li>
                                     <li className="flex items-center gap-2">
-                                        <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                                        <span className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{commissioner.yearsOfExperience}+ years experience</span>
+                                        <CheckCircle className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />
+                                        <span className="text-xs font-medium">{commissioner.yearsOfExperience}+ years experience</span>
                                     </li>
                                     <li className="flex items-center gap-2">
-                                        <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                                        <span className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Manages {commissioner.propertiesManaged} properties</span>
+                                        <CheckCircle className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />
+                                        <span className="text-xs font-medium">Manages {commissioner.propertiesManaged} properties</span>
                                     </li>
                                     <li className="flex items-center gap-2">
-                                        <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                                        <span className={`text-xs ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Customer feedback available</span>
+                                        <CheckCircle className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />
+                                        <span className="text-xs font-medium">Customer feedback available</span>
                                     </li>
                                 </ul>
                             </div>
                         </div>
 
-                        {/* Quick Info Card */}
-                        <div className={`p-5 ${darkMode ? '' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
-                            <h3 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {/* Quick Info Card - Borderless */}
+                        <div className={`p-6 ${cardBg} shadow-sm`} style={{ borderRadius: '2px' }}>
+                            <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-red-600 mb-4">
                                 Quick Info
                             </h3>
-                            <div className="space-y-2">
+                            <div className="space-y-3">
                                 <div className="flex justify-between items-center">
-                                    <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Response Time</span>
-                                    <span className={`text-xs font-medium ${darkMode ? 'text-white' : 'text-gray-700'}`}>Within 24h</span>
+                                    <span className={`text-xs font-medium ${textMuted}`}>Response Time</span>
+                                    <span className={`text-xs font-bold ${textTitle}`}>Within 24h</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Languages</span>
-                                    <span className={`text-xs font-medium ${darkMode ? 'text-white' : 'text-gray-700'}`}>English, Kinyarwanda</span>
+                                    <span className={`text-xs font-medium ${textMuted}`}>Languages</span>
+                                    <span className={`text-xs font-bold ${textTitle}`}>English, Kinyarwanda</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>License</span>
-                                    <span className={`text-xs font-medium ${darkMode ? 'text-white' : 'text-gray-700'}`}>RWA-{commissioner.id.slice(0, 6)}</span>
+                                    <span className={`text-xs font-medium ${textMuted}`}>License</span>
+                                    <span className={`text-xs font-bold ${textTitle}`}>RWA-{commissioner.id.slice(0, 6)}</span>
                                 </div>
                             </div>
                         </div>

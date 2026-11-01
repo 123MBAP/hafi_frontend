@@ -75,9 +75,9 @@ export default function LoadingSpinner({
         xl: 'text-lg'
     };
 
-    const bgColor = darkMode ? 'bg-gray-900' : 'bg-white';
-    const textColor = darkMode ? 'text-gray-200' : 'text-gray-700';
-    const mutedTextColor = darkMode ? 'text-gray-400' : 'text-gray-500';
+    const bgColor = darkMode ? 'bg-black' : 'bg-white';
+    const textColor = darkMode ? 'text-white' : 'text-black';
+    const mutedTextColor = darkMode ? 'text-white' : 'text-black';
 
     // Default spinner (circular)
     const DefaultSpinner = () => (
@@ -85,9 +85,9 @@ export default function LoadingSpinner({
             <div
                 className={`${sizeClasses[size]} ${borderSizes[size]} rounded-full animate-spin`}
                 style={{
-                    borderColor: darkMode ? '#2d3748' : '#e5e7eb',
-                    borderTopColor: '#10b981',
-                    borderRightColor: '#10b981',
+                    borderColor: darkMode ? '#ffffff' : '#000000',
+                    borderTopColor: '#dc2626',
+                    borderRightColor: '#dc2626',
                 }}
             />
             {showProgress && (
@@ -103,15 +103,15 @@ export default function LoadingSpinner({
         <div className="flex gap-2 items-center">
             <div
                 className={`${sizeClasses[size].replace('w-', 'w-3 ').replace('h-', 'h-3 ')} rounded-full animate-bounce`}
-                style={{ backgroundColor: '#10b981', animationDelay: '0ms' }}
+                style={{ backgroundColor: '#dc2626', animationDelay: '0ms' }}
             />
             <div
                 className={`${sizeClasses[size].replace('w-', 'w-3 ').replace('h-', 'h-3 ')} rounded-full animate-bounce`}
-                style={{ backgroundColor: '#10b981', animationDelay: '150ms' }}
+                style={{ backgroundColor: '#dc2626', animationDelay: '150ms' }}
             />
             <div
                 className={`${sizeClasses[size].replace('w-', 'w-3 ').replace('h-', 'h-3 ')} rounded-full animate-bounce`}
-                style={{ backgroundColor: '#10b981', animationDelay: '300ms' }}
+                style={{ backgroundColor: '#dc2626', animationDelay: '300ms' }}
             />
         </div>
     );
@@ -124,7 +124,7 @@ export default function LoadingSpinner({
                     key={i}
                     className={`${size === 'sm' ? 'w-1.5 h-1.5' : size === 'md' ? 'w-2 h-2' : size === 'lg' ? 'w-2.5 h-2.5' : 'w-3 h-3'} rounded-full animate-pulse`}
                     style={{
-                        backgroundColor: '#10b981',
+                        backgroundColor: '#dc2626',
                         animationDelay: `${i * 200}ms`,
                         animationDuration: '1s'
                     }}
@@ -137,7 +137,7 @@ export default function LoadingSpinner({
     const SkeletonSpinner = () => (
         <div className="space-y-3 w-full max-w-md">
             <div
-                className={`rounded-sm bg-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700 animate-shimmer`}
+                className="rounded-sm bg-gradient-to-r from-transparent via-red-200 to-transparent dark:via-red-900 animate-shimmer"
                 style={{
                     height: size === 'sm' ? '40px' : size === 'md' ? '60px' : size === 'lg' ? '80px' : '100px',
                     width: '100%',
@@ -145,9 +145,9 @@ export default function LoadingSpinner({
                 }}
             />
             <div className="space-y-2">
-                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-sm w-3/4 animate-pulse" />
-                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-sm w-1/2 animate-pulse" />
-                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-sm w-5/6 animate-pulse" />
+                <div className="h-2 bg-red-200 dark:bg-red-900 rounded-sm w-3/4 animate-pulse" />
+                <div className="h-2 bg-red-200 dark:bg-red-900 rounded-sm w-1/2 animate-pulse" />
+                <div className="h-2 bg-red-200 dark:bg-red-900 rounded-sm w-5/6 animate-pulse" />
             </div>
         </div>
     );
@@ -155,9 +155,9 @@ export default function LoadingSpinner({
     // Progress bar spinner
     const ProgressBarSpinner = () => (
         <div className="w-full max-w-xs">
-            <div className="h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-1 bg-black dark:bg-white rounded-full overflow-hidden">
                 <div
-                    className="h-full bg-emerald-500 rounded-full transition-all duration-300 ease-out"
+                    className="h-full bg-red-600 rounded-full transition-all duration-300 ease-out"
                     style={{ width: `${Math.min(progress, 100)}%` }}
                 />
             </div>
@@ -217,9 +217,9 @@ export default function LoadingSpinner({
                     background: linear-gradient(
                         90deg,
                         transparent 0%,
-                        rgba(156, 163, 175, 0.2) 25%,
-                        rgba(156, 163, 175, 0.4) 50%,
-                        rgba(156, 163, 175, 0.2) 75%,
+                        rgba(220, 38, 38, 0.2) 25%,
+                        rgba(220, 38, 38, 0.4) 50%,
+                        rgba(220, 38, 38, 0.2) 75%,
                         transparent 100%
                     );
                 }
@@ -227,9 +227,9 @@ export default function LoadingSpinner({
                     background: linear-gradient(
                         90deg,
                         transparent 0%,
-                        rgba(75, 85, 99, 0.3) 25%,
-                        rgba(75, 85, 99, 0.5) 50%,
-                        rgba(75, 85, 99, 0.3) 75%,
+                        rgba(220, 38, 38, 0.3) 25%,
+                        rgba(220, 38, 38, 0.5) 50%,
+                        rgba(220, 38, 38, 0.3) 75%,
                         transparent 100%
                     );
                 }

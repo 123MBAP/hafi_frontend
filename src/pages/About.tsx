@@ -1,13 +1,16 @@
+import { Link } from "react-router-dom";
 import { useDarkMode } from "@/context/DarkMode";
 
 export default function About() {
   const { darkMode } = useDarkMode();
 
-  const containerBg = darkMode ? "bg-gray-950 text-gray-400" : "bg-gray-50 text-gray-600";
-  const borderCol = darkMode ? "border-gray-800" : "border-gray-200";
-  const cardBg = darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
-  const textTitle = darkMode ? "text-white" : "text-gray-900";
-  const labelColor = darkMode ? "text-emerald-400" : "text-emerald-600";
+  const containerBg = darkMode ? "bg-black text-white/90" : "bg-white text-black/90";
+  const borderCol = darkMode ? "border-white/15" : "border-black/10";
+  const cardBg = darkMode
+    ? "bg-zinc-900 text-white"
+    : "bg-zinc-100 text-black";
+  const textTitle = darkMode ? "text-white" : "text-black";
+  const labelColor = "text-red-600";
 
   return (
     <div className={`py-12 ${containerBg} transition-colors duration-300`}>
@@ -15,13 +18,13 @@ export default function About() {
         
         {/* Header Section */}
         <div className={`pb-8 border-b ${borderCol}`}>
-          <p className={`text-xs uppercase tracking-[0.28em] ${labelColor}`}>
+          <p className={`text-xs uppercase tracking-[0.28em] font-bold ${labelColor}`}>
             About HafiConnect
           </p>
-          <h1 className={`mt-2 text-3xl sm:text-4xl font-bold tracking-tight ${textTitle}`}>
+          <h1 className={`mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight ${textTitle}`}>
             Discover, Connect, and Shop in One Place.
           </h1>
-          <p className="mt-4 max-w-3xl text-sm sm:text-base leading-6">
+          <p className="mt-4 max-w-3xl text-sm sm:text-base leading-relaxed font-medium">
             HafiConnect is an online platform that brings services, products, shops, and real estate opportunities together in one place. Users can find and contact service providers, buy and sell new and used products, explore premium shops, discover Made in Rwanda products, and find properties to rent or buy. HafiConnect makes it easier for individuals and businesses to showcase their offerings, connect with customers, and discover opportunities.
           </p>
         </div>
@@ -36,11 +39,11 @@ export default function About() {
           ].map((stat, i) => (
             <div
               key={i}
-              className={`p-5 border shadow-sm text-center ${cardBg}`}
+              className={`p-5 text-center transition-all duration-300 shadow-sm ${cardBg}`}
               style={{ borderRadius: '2px' }}
             >
-              <span className={`text-2xl sm:text-3xl font-bold tracking-tight ${textTitle}`}>{stat.value}</span>
-              <div className={`text-xs font-semibold uppercase tracking-[0.22em] mt-2 ${labelColor}`}>{stat.label}</div>
+              <span className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${textTitle}`}>{stat.value}</span>
+              <div className={`text-xs font-bold uppercase tracking-[0.22em] mt-2 ${labelColor}`}>{stat.label}</div>
             </div>
           ))}
         </div>
@@ -48,10 +51,10 @@ export default function About() {
         {/* The Four Pillars */}
         <div className="space-y-6">
           <div>
-            <p className={`text-xs uppercase tracking-[0.28em] ${labelColor}`}>
+            <p className={`text-xs uppercase tracking-[0.28em] font-bold ${labelColor}`}>
               Our Core Offerings
             </p>
-            <h3 className={`mt-2 text-xl sm:text-2xl font-bold tracking-tight ${textTitle}`}>
+            <h3 className={`mt-2 text-xl sm:text-2xl font-extrabold tracking-tight ${textTitle}`}>
               The Four Ways People Use HafiConnect
             </h3>
           </div>
@@ -87,25 +90,27 @@ export default function About() {
                 link: "/real-estate"
               }
             ].map((pillar, i) => (
-              <a
+              <Link
                 key={i}
-                href={pillar.link}
-                className={`group p-5 border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${cardBg}`}
+                to={pillar.link}
+                className={`group p-5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${cardBg} ${
+                  darkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-200/70'
+                }`}
                 style={{ borderRadius: '2px' }}
               >
-                <div className={`text-xs font-semibold uppercase tracking-[0.22em] mb-3 ${labelColor}`}>
+                <div className={`text-xs font-bold uppercase tracking-[0.22em] mb-3 ${labelColor}`}>
                   {pillar.label}
                 </div>
-                <h4 className={`text-base font-semibold mb-2 ${textTitle}`}>
+                <h4 className={`text-base font-bold mb-2 ${textTitle} group-hover:text-red-600 transition-colors`}>
                   {pillar.title}
                 </h4>
-                <p className="text-xs sm:text-sm leading-6">
+                <p className="text-xs sm:text-sm leading-relaxed">
                   {pillar.desc}
                 </p>
-                <span className={`mt-4 inline-flex text-xs font-semibold uppercase tracking-wider transition-colors ${darkMode ? 'text-emerald-400 group-hover:text-emerald-300' : 'text-emerald-600 group-hover:text-emerald-700'}`}>
+                <span className="mt-4 inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-red-600 group-hover:translate-x-1 transition-all">
                   {pillar.action} &rarr;
                 </span>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -113,16 +118,16 @@ export default function About() {
         {/* Mission & Vision Section */}
         <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t ${borderCol}`}>
           <div className="space-y-3">
-            <div className={`text-xs font-semibold uppercase tracking-[0.22em] ${labelColor}`}>Our Mission</div>
+            <div className={`text-xs font-bold uppercase tracking-[0.22em] ${labelColor}`}>Our Mission</div>
             <h4 className={`text-xl font-bold tracking-tight ${textTitle}`}>Fostering Local Trade Resilience</h4>
-            <p className="text-sm leading-6">
+            <p className="text-sm leading-relaxed font-medium">
               We bridge the digital gap for local merchants and service providers by offering ecommerce tools, direct connection interfaces (calls, messages, WhatsApp), and scalable storage. We build a sustainable local economy where business discovery is instantaneous.
             </p>
           </div>
           <div className="space-y-3">
-            <div className={`text-xs font-semibold uppercase tracking-[0.22em] ${labelColor}`}>Our Vision</div>
+            <div className={`text-xs font-bold uppercase tracking-[0.22em] ${labelColor}`}>Our Vision</div>
             <h4 className={`text-xl font-bold tracking-tight ${textTitle}`}>The Leading African Business Hub</h4>
-            <p className="text-sm leading-6">
+            <p className="text-sm leading-relaxed font-medium">
               To become the ultimate, most secure, and user-centric hub across East Africa and beyond. We are establishing a borderless ecosystem where high-quality services, local items, properties, and global logistics intersect seamlessly under a transparent, trustworthy framework.
             </p>
           </div>
@@ -131,8 +136,8 @@ export default function About() {
         {/* Core Values Section */}
         <div className="space-y-6">
           <div>
-            <p className={`text-xs uppercase tracking-[0.28em] ${labelColor}`}>Why HafiConnect?</p>
-            <h3 className={`mt-2 text-xl sm:text-2xl font-bold tracking-tight ${textTitle}`}>Built on Trust and Accessibility</h3>
+            <p className={`text-xs uppercase tracking-[0.28em] font-bold ${labelColor}`}>Why HafiConnect?</p>
+            <h3 className={`mt-2 text-xl sm:text-2xl font-extrabold tracking-tight ${textTitle}`}>Built on Trust and Accessibility</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -152,37 +157,41 @@ export default function About() {
             ].map((value, i) => (
               <div
                 key={i}
-                className={`p-5 border shadow-sm ${cardBg}`}
+                className={`p-5 transition-all duration-300 shadow-sm ${cardBg}`}
                 style={{ borderRadius: '2px' }}
               >
-                <h4 className={`text-base font-semibold mb-2 ${textTitle}`}>{value.title}</h4>
-                <p className="text-xs sm:text-sm leading-6">{value.desc}</p>
+                <h4 className={`text-base font-bold mb-2 ${textTitle}`}>{value.title}</h4>
+                <p className="text-xs sm:text-sm leading-relaxed font-medium">{value.desc}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* CTA Banner */}
-        <div className={`p-8 border shadow-xs text-center ${cardBg}`} style={{ borderRadius: '2px' }}>
-          <h3 className={`text-xl sm:text-2xl font-bold tracking-tight ${textTitle}`}>Ready to Grow Your Business?</h3>
-          <p className="mt-2 text-sm leading-6 max-w-2xl mx-auto">
+        <div className={`p-8 sm:p-10 shadow-sm text-center ${cardBg}`} style={{ borderRadius: '2px' }}>
+          <h3 className={`text-xl sm:text-2xl font-extrabold tracking-tight ${textTitle}`}>Ready to Grow Your Business?</h3>
+          <p className="mt-2 text-sm leading-relaxed max-w-2xl mx-auto font-medium">
             Join HafiConnect today! Start listing your products or services to reach thousands of buyers, or discover and hire premium local service providers near you.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
-            <a
-              href="/register"
-              className="px-6 py-2.5 text-xs font-semibold uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shadow-sm"
+            <Link
+              to="/register"
+              className="px-6 py-2.5 text-xs font-bold uppercase tracking-wider bg-red-600 hover:bg-black dark:hover:bg-white dark:hover:text-black text-white transition-all duration-300 shadow-sm"
               style={{ borderRadius: '2px' }}
             >
               Create Account
-            </a>
-            <a
-              href="/"
-              className={`px-6 py-2.5 text-xs font-semibold uppercase tracking-wider border transition-colors ${darkMode ? 'border-gray-700 hover:bg-gray-800 text-emerald-400' : 'border-gray-300 hover:bg-gray-50 text-emerald-600'}`}
+            </Link>
+            <Link
+              to="/"
+              className={`px-6 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+                darkMode
+                  ? 'bg-zinc-800 text-white hover:bg-red-600 hover:text-white'
+                  : 'bg-zinc-200 text-black hover:bg-red-600 hover:text-white'
+              }`}
               style={{ borderRadius: '2px' }}
             >
               Explore Marketplace
-            </a>
+            </Link>
           </div>
         </div>
 

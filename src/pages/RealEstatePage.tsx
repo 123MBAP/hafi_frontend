@@ -131,7 +131,7 @@ export default function RealEstatePage() {
     const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
 
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-    const [showFilters, setShowFilters] = useState(false);
+    const [showFilters, setShowFilters] = useState(true);
 
     const [filters, setFilters] = useState<PropertyFilters>({
         searchQuery: '',
@@ -296,10 +296,10 @@ export default function RealEstatePage() {
 
     const getStatusColor = (status: PropertyStatus): string => {
         switch (status) {
-            case PropertyStatus.Available: return 'bg-emerald-500';
-            case PropertyStatus.Rented: return 'bg-amber-500';
+            case PropertyStatus.Available: return 'bg-red-600';
+            case PropertyStatus.Rented: return 'bg-black';
             case PropertyStatus.Sold: return 'bg-red-500';
-            default: return 'bg-gray-500';
+            default: return 'bg-black';
         }
     };
 
@@ -318,9 +318,9 @@ export default function RealEstatePage() {
 
     // Filters Panel - Compact single row on desktop
     const FiltersPanel = () => (
-        <div className={`shadow-sm mb-6 overflow-x-auto ${darkMode ? 'bg-gray-950' : 'bg-white'}`} style={{ borderRadius: '2px' }}>
+        <div className={`shadow-sm mb-6 overflow-x-auto rounded-xl border ${darkMode ? 'bg-black border-white' : 'bg-white border-black'}`}>
             <div className="p-4 min-w-max flex items-center gap-4">
-                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 flex-shrink-0">
+                <div className="flex items-center gap-2 text-black dark:text-white flex-shrink-0">
                     <Filter className="w-4 h-4" />
                     <span className="text-sm font-medium">Filters</span>
                 </div>
@@ -332,10 +332,10 @@ export default function RealEstatePage() {
                             key={cat}
                             onClick={() => handleCategorySelect(cat)}
                             className={`px-3 py-1.5 text-sm whitespace-nowrap transition-all ${norm(selectedCategory) === norm(cat)
-                                    ? 'bg-emerald-500 text-white'
-                                    : darkMode ? 'bg-gray-950 border border-gray-700 text-gray-300 hover:bg-gray-750' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    ? 'bg-red-600 text-white'
+                                    : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
                                 }`}
-                            style={{ borderRadius: '2px' }}
+                            style={{ borderRadius: '0.5rem' }}
                         >
                             {cat}
                         </button>
@@ -346,8 +346,8 @@ export default function RealEstatePage() {
                 <select
                     value={selectedTransactionType || ''}
                     onChange={(e) => setSelectedTransactionType(e.target.value as TransactionType || undefined)}
-                    className={`px-3 py-1.5 text-sm ${darkMode ? 'bg-gray-950 border border-gray-700 text-white' : 'bg-gray-100 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer`}
-                    style={{ borderRadius: '2px' }}
+                    className={`px-3 py-1.5 text-sm border ${darkMode ? 'bg-black border-white text-white' : 'bg-white border-black text-black'} focus:ring-1 focus:ring-red-600 cursor-pointer`}
+                    style={{ borderRadius: '0.5rem' }}
                 >
                     <option value="">All: Rent & Sale</option>
                     <option value={TransactionType.ForLetting}>For Rent</option>
@@ -358,8 +358,8 @@ export default function RealEstatePage() {
                 <select
                     value={selectedDistrict}
                     onChange={(e) => setSelectedDistrict(e.target.value)}
-                    className={`px-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-100 text-gray-900'} focus:ring-1 focus:ring-emerald-500 cursor-pointer`}
-                    style={{ borderRadius: '2px' }}
+                    className={`px-3 py-1.5 text-sm border ${darkMode ? 'bg-black border-white text-white' : 'bg-white border-black text-black'} focus:ring-1 focus:ring-red-600 cursor-pointer`}
+                    style={{ borderRadius: '0.5rem' }}
                 >
                     <option value="">All Districts</option>
                     {districts.map(d => <option key={d} value={d}>{d}</option>)}
@@ -370,8 +370,8 @@ export default function RealEstatePage() {
                     value={selectedSector}
                     onChange={(e) => setSelectedSector(e.target.value)}
                     disabled={!selectedDistrict}
-                    className={`px-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-100 text-gray-900'} disabled:opacity-50 cursor-pointer`}
-                    style={{ borderRadius: '2px' }}
+                    className={`px-3 py-1.5 text-sm border ${darkMode ? 'bg-black border-white text-white' : 'bg-white border-black text-black'} disabled:opacity-50 cursor-pointer`}
+                    style={{ borderRadius: '0.5rem' }}
                 >
                     <option value="">All Sectors</option>
                     {sectors.map(s => <option key={s} value={s}>{s}</option>)}
@@ -383,8 +383,8 @@ export default function RealEstatePage() {
                     value={filters.minPrice || ''}
                     onChange={(e) => handlePriceChange(e.target.value ? Number(e.target.value) : undefined, filters.maxPrice)}
                     placeholder="Min Price"
-                    className={`w-28 px-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-gray-950 text-white placeholder-gray-400' : 'bg-gray-100 text-gray-900 placeholder-gray-500'} focus:ring-1 focus:ring-emerald-500`}
-                    style={{ borderRadius: '2px' }}
+                    className={`w-28 px-3 py-1.5 text-sm border ${darkMode ? 'bg-black border-white text-white placeholder-white' : 'bg-white border-black text-black placeholder-black'} focus:ring-1 focus:ring-red-600`}
+                    style={{ borderRadius: '0.5rem' }}
                 />
 
                 {/* Max Price */}
@@ -393,14 +393,14 @@ export default function RealEstatePage() {
                     value={filters.maxPrice || ''}
                     onChange={(e) => handlePriceChange(filters.minPrice, e.target.value ? Number(e.target.value) : undefined)}
                     placeholder="Max Price"
-                    className={`w-28 px-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-gray-950 text-white placeholder-gray-400' : 'bg-gray-100 text-gray-900 placeholder-gray-500'} focus:ring-1 focus:ring-emerald-500`}
-                    style={{ borderRadius: '2px' }}
+                    className={`w-28 px-3 py-1.5 text-sm border ${darkMode ? 'bg-black border-white text-white placeholder-white' : 'bg-white border-black text-black placeholder-black'} focus:ring-1 focus:ring-red-600`}
+                    style={{ borderRadius: '0.5rem' }}
                 />
 
                 {/* Clear button */}
                 <button
                     onClick={clearFilters}
-                    className="text-sm text-emerald-500 hover:text-emerald-600 whitespace-nowrap flex-shrink-0"
+                    className="text-sm text-red-600 hover:text-black whitespace-nowrap flex-shrink-0"
                 >
                     Clear all
                 </button>
@@ -412,11 +412,10 @@ export default function RealEstatePage() {
     const PropertyCard = ({ property, index }: { property: Property; index: number }) => (
         <div
             onClick={() => navigate(`/real-estate/property/${property.id}`)}
-            className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg flex flex-col h-full ${darkMode ? 'bg-gray-900' : 'bg-white'} border-0 shadow-sm`}
-            style={{ borderRadius: '2px' }}
+            className={`group cursor-pointer overflow-hidden rounded-xl transition-all duration-300 hover:shadow-lg flex flex-col h-full ${darkMode ? 'bg-black border border-white/30 hover:border-red-600' : 'bg-white border border-black hover:border-red-600'} shadow-sm`}
         >
             {/* Image - fixed aspect ratio */}
-            <div className="relative h-52 overflow-hidden bg-gray-100 dark:bg-gray-700">
+            <div className="relative aspect-square w-full overflow-hidden rounded-t-xl bg-white dark:bg-black">
                 <img
                     src={property.images[0]}
                     alt={property.title}
@@ -435,19 +434,19 @@ export default function RealEstatePage() {
             </div>
 
             {/* Content - fixed padding, consistent spacing */}
-            <div className="p-4 flex-1 flex flex-col">
-                <h3 className={`font-semibold text-base line-clamp-1 mb-1 ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors`}>
+            <div className="p-3 flex-1 flex flex-col">
+                <h3 className={`font-bold text-sm line-clamp-2 mb-1.5 ${darkMode ? 'text-white group-hover:text-red-400' : 'text-black group-hover:text-red-600'} transition-colors`}>
                     {property.title}
                 </h3>
 
                 <div className="flex items-center gap-1 mb-2">
-                    <MapPin className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                    <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} truncate`}>
+                    <MapPin className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />
+                    <span className={`text-xs ${darkMode ? 'text-white' : 'text-black'} truncate`}>
                         {property.location.sector}, {property.location.district}
                     </span>
                 </div>
 
-                <p className={`text-xs sm:text-sm leading-6 line-clamp-2 mb-3 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <p className={`text-xs sm:text-sm leading-5 line-clamp-3 mb-3 ${darkMode ? 'text-white' : 'text-black'}`}>
                     {descriptionValuesOnlyFromUnknown((property as any)?.description) || 'No description available'}
                 </p>
 
@@ -457,8 +456,8 @@ export default function RealEstatePage() {
                         {property.features.slice(0, 3).map((feature, idx) => (
                             <span
                                 key={idx}
-                                className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`}
-                                style={{ borderRadius: '2px' }}
+                                className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-black border border-white text-white' : 'bg-white border border-black text-black'}`}
+                                style={{ borderRadius: '0.5rem' }}
                             >
                                 {roomsFeatureValuesOnly(feature)}
                             </span>
@@ -467,12 +466,12 @@ export default function RealEstatePage() {
                 )}
 
                 {/* Price and action - at bottom */}
-                <div className="mt-auto flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
+                <div className="mt-auto flex items-center justify-between pt-2 border-t border-black dark:border-white">
                     <div>
-                        <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <span className={`text-xs ${darkMode ? 'text-white' : 'text-black'}`}>
                             {property.transactionType === TransactionType.ForLetting ? 'Monthly' : 'Price'}
                         </span>
-                        <div className={`font-bold text-lg ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                        <div className="font-bold text-lg text-red-600">
                             {formatPrice(property.price)}
                         </div>
                     </div>
@@ -481,7 +480,7 @@ export default function RealEstatePage() {
                             e.stopPropagation();
                             window.location.href = `tel:${property.contactPhone}`;
                         }}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${darkMode ? 'bg-gray-800 text-white hover:bg-emerald-600' : 'bg-gray-100 text-gray-700 hover:bg-emerald-500 hover:text-white'}`}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors ${darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'}`}
                         style={{ borderRadius: '2px' }}
                     >
                         <Phone className="w-3.5 h-3.5" />
@@ -496,8 +495,7 @@ export default function RealEstatePage() {
     const PropertyListItem = ({ property }: { property: Property }) => (
         <div
             onClick={() => navigate(`/real-estate/property/${property.id}`)}
-            className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-md ${darkMode ? 'bg-gray-900' : 'bg-white'} border-0 shadow-sm flex flex-col sm:flex-row`}
-            style={{ borderRadius: '2px' }}
+            className={`group cursor-pointer overflow-hidden rounded-xl transition-all duration-300 hover:shadow-md ${darkMode ? 'bg-black border border-white/30 hover:border-red-600' : 'bg-white border border-black hover:border-red-600'} shadow-sm flex flex-col sm:flex-row`}
         >
             <div className="relative h-48 sm:h-auto sm:w-56 flex-shrink-0 overflow-hidden">
                 <img
@@ -511,25 +509,25 @@ export default function RealEstatePage() {
             </div>
             <div className="p-4 flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex-1">
-                    <h3 className={`font-semibold text-base mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <h3 className={`font-semibold text-base mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
                         {property.title}
                     </h3>
                     <div className="flex items-center gap-1 mb-2">
-                        <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                        <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <MapPin className="w-3.5 h-3.5 text-red-600" />
+                        <span className={`text-xs ${darkMode ? 'text-white' : 'text-black'}`}>
                             {property.location.sector}, {property.location.district}
                         </span>
                     </div>
-                    <p className={`text-xs sm:text-sm leading-6 line-clamp-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p className={`text-xs sm:text-sm leading-6 line-clamp-2 ${darkMode ? 'text-white' : 'text-black'}`}>
                         {descriptionValuesOnlyFromUnknown((property as any)?.description) || 'No description'}
                     </p>
                 </div>
                 <div className="flex items-center justify-between sm:flex-col sm:items-end gap-3">
                     <div>
-                        <div className={`font-bold text-lg ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                        <div className="font-bold text-lg text-red-600">
                             {formatPrice(property.price)}
                         </div>
-                        <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <span className={`text-xs ${darkMode ? 'text-white' : 'text-black'}`}>
                             {property.transactionType === TransactionType.ForLetting ? 'per month' : 'total'}
                         </span>
                     </div>
@@ -538,8 +536,8 @@ export default function RealEstatePage() {
                             e.stopPropagation();
                             window.location.href = `tel:${property.contactPhone}`;
                         }}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${darkMode ? 'bg-gray-800 text-white hover:bg-emerald-600' : 'bg-gray-100 text-gray-700 hover:bg-emerald-500 hover:text-white'}`}
-                        style={{ borderRadius: '2px' }}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'}`}
+                        style={{ borderRadius: '0.5rem' }}
                     >
                         <Phone className="w-3.5 h-3.5" />
                         Call
@@ -550,33 +548,45 @@ export default function RealEstatePage() {
     );
 
     return (
-        <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
+        <div className={`min-h-screen ${darkMode ? 'bg-black' : 'bg-white'}`}>
             <div className="max-w-7xl mx-auto px-4 py-6">
                 {/* Header */}
-                <div className="mb-6">
-                    <h1 className={`text-2xl sm:text-3xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
+                <div className="mb-6 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                    <div>
+                    <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-black'} uppercase`}>
                         Find Property to Rent, Buy, or Invest In
                     </h1>
-                    <p className={`text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2 leading-relaxed max-w-4xl`}>
+                    <p className={`text-sm sm:text-base font-normal ${darkMode ? 'text-white' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
                         Discover real estate opportunities on HafiConnect. Explore houses, apartments, land, commercial buildings, rental spaces, and other properties available for sale or rent. Browse property listings, review details, and connect directly with property owners, landlords, or real estate agents to ask questions, arrange viewings, and find a property that suits your location, budget, and requirements.
                     </p>
                     <div className="mt-3 flex items-center gap-2">
-                        <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold ${darkMode ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}`} style={{ borderRadius: '2px' }}>
+                        <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold ${darkMode ? 'bg-black text-white border border-red-600' : 'bg-white text-black border border-red-600'}`} style={{ borderRadius: '2px' }}>
                             {filteredProperties.length} properties available
                         </span>
+                    </div>
+                    </div>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setShowFilters(!showFilters)}
+                            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider ${darkMode ? 'bg-black text-white' : 'bg-white text-black'} border border-black dark:border-white shadow-sm hover:bg-red-600 hover:text-white`}
+                            style={{ borderRadius: '2px' }}
+                        >
+                            <Filter className="w-4 h-4" />
+                            {showFilters ? 'Hide Filters' : 'Show Filters'}
+                        </button>
                     </div>
                 </div>
 
                 {/* Search and View Controls - Compact row */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <div className="relative flex-1 max-w-md">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-black dark:text-white" />
                         <input
                             type="text"
                             placeholder="Search by title, location, or description..."
                             value={filters.searchQuery}
                             onChange={(e) => setFilters(prev => ({ ...prev, searchQuery: e.target.value }))}
-                            className={`w-full pl-9 pr-4 py-2 text-sm ${darkMode ? 'bg-gray-950 text-white placeholder-gray-400 border border-gray-700' : 'bg-white text-gray-900 placeholder-gray-500'} focus:ring-1 focus:ring-emerald-500`}
+                            className={`w-full pl-9 pr-4 py-2 text-sm border ${darkMode ? 'bg-black text-white placeholder-white border-white' : 'bg-white text-black placeholder-black border-black'} focus:ring-1 focus:ring-red-600`}
                             style={{ borderRadius: '2px' }}
                         />
                     </div>
@@ -586,7 +596,7 @@ export default function RealEstatePage() {
                         <select
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value as any)}
-                            className={`px-3 py-2 text-sm border ${darkMode ? 'bg-gray-950 text-white border-gray-700' : 'bg-white text-gray-900'} shadow-sm cursor-pointer`}
+                            className={`px-3 py-2 text-sm border ${darkMode ? 'bg-black text-white border-white' : 'bg-white text-black border-black'} shadow-sm cursor-pointer focus:ring-1 focus:ring-red-600`}
                             style={{ borderRadius: '2px' }}
                         >
                             <option value="popular">Most Popular</option>
@@ -600,8 +610,8 @@ export default function RealEstatePage() {
                             <button
                                 onClick={() => setViewMode('grid')}
                                 className={`p-2 transition-all ${viewMode === 'grid'
-                                        ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                                        : darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-white text-gray-500 hover:bg-gray-50'
+                                        ? 'bg-red-600 text-white'
+                                        : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
                                     }`}
                             >
                                 <Grid3X3 className="w-4 h-4" />
@@ -609,8 +619,8 @@ export default function RealEstatePage() {
                             <button
                                 onClick={() => setViewMode('list')}
                                 className={`p-2 transition-all ${viewMode === 'list'
-                                        ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                                        : darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-white text-gray-500 hover:bg-gray-50'
+                                        ? 'bg-red-600 text-white'
+                                        : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
                                     }`}
                             >
                                 <List className="w-4 h-4" />
@@ -620,7 +630,7 @@ export default function RealEstatePage() {
                         {/* Mobile filter toggle */}
                         <button
                             onClick={() => setShowFilters(!showFilters)}
-                            className={`lg:hidden flex items-center gap-1 px-3 py-2 text-sm shadow-sm ${darkMode ? 'bg-gray-900 text-gray-300' : 'bg-white text-gray-700'}`}
+                            className={`lg:hidden flex items-center gap-1 px-3 py-2 text-sm shadow-sm border ${darkMode ? 'bg-black text-white border-white' : 'bg-white text-black border-black'} hover:bg-red-600 hover:text-white`}
                             style={{ borderRadius: '2px' }}
                         >
                             <Filter className="w-4 h-4" />
@@ -642,25 +652,25 @@ export default function RealEstatePage() {
                     </div>
                 ) : filteredProperties.length === 0 ? (
                     <div className="text-center py-16">
-                        <div className={`w-20 h-20 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-gray-900 border border-gray-700' : 'bg-gray-100'}`} style={{ borderRadius: '2px' }}>
-                            <Search className="w-8 h-8 text-gray-400" />
+                        <div className={`w-20 h-20 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-black border border-white' : 'bg-white border border-black'}`} style={{ borderRadius: '2px' }}>
+                            <Search className="w-8 h-8 text-red-600" />
                         </div>
-                        <h3 className={`text-lg font-semibold mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <h3 className={`text-lg font-bold mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
                             No properties found
                         </h3>
-                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <p className={`text-sm ${darkMode ? 'text-white' : 'text-black'}`}>
                             Try adjusting your filters
                         </p>
                         <button
                             onClick={clearFilters}
-                            className={`mt-4 px-4 py-2 text-sm font-medium ${darkMode ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-50'} shadow-sm`}
+                            className={`mt-4 px-4 py-2 text-sm font-medium ${darkMode ? 'bg-black text-white hover:bg-red-600' : 'bg-white text-black hover:bg-red-600 hover:text-white'} border border-black dark:border-white shadow-sm`}
                             style={{ borderRadius: '2px' }}
                         >
                             Clear all filters
                         </button>
                     </div>
                 ) : viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-3">
                         {filteredProperties.map((property, idx) => (
                             <PropertyCard key={property.id} property={property} index={idx} />
                         ))}

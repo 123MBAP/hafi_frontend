@@ -61,7 +61,7 @@ export default function CommissionersPage() {
     const [selectedSpecialization, setSelectedSpecialization] = useState<string | undefined>();
     const [minBudget, setMinBudget] = useState<number | undefined>();
     const [maxBudget, setMaxBudget] = useState<number | undefined>();
-    const [showFilters, setShowFilters] = useState(false);
+    const [showFilters, setShowFilters] = useState(true);
     const [specializationOptions, setSpecializationOptions] = useState<string[]>(['Land', 'Residential', 'Commercial']);
 
     useEffect(() => {
@@ -251,23 +251,22 @@ export default function CommissionersPage() {
 
     // Compact Filters Panel - Single row on desktop
     const FiltersPanel = () => (
-        <div className={`border shadow-sm mb-6 overflow-x-auto ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`} style={{ borderRadius: '4px' }}>
+        <div className={`rounded-xl border shadow-sm mb-6 overflow-x-auto ${darkMode ? 'bg-black border-white' : 'bg-white border-black'}`}>
             <div className="p-4 min-w-max flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 flex-shrink-0">
+                <div className="flex items-center gap-1.5 text-black dark:text-white flex-shrink-0">
                     <Filter className="w-4 h-4" />
                     <span className="text-sm font-bold uppercase tracking-wider">Filter by</span>
                 </div>
 
                 {/* Search - inline */}
                 <div className="relative flex-1 min-w-[220px]">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-black dark:text-white" />
                     <input
                         type="text"
                         placeholder="Search agents, locations, or specialties"
                         value={filters.searchQuery}
                         onChange={(e) => setFilters(prev => ({ ...prev, searchQuery: e.target.value }))}
-                        className={`pl-10 pr-3 py-2.5 text-sm border w-full ${darkMode ? 'bg-gray-950 text-white border-gray-700 placeholder-gray-400' : 'bg-gray-50 text-gray-900 border-gray-200 placeholder-gray-500'} focus:ring-2 focus:ring-emerald-500`}
-                        style={{ borderRadius: '4px' }}
+                        className={`pl-10 pr-3 py-2.5 text-sm border rounded-lg w-full ${darkMode ? 'bg-black text-white border-white placeholder-white' : 'bg-white text-black border-black placeholder-black'} focus:ring-2 focus:ring-red-600`}
                     />
                 </div>
 
@@ -281,7 +280,7 @@ export default function CommissionersPage() {
                             setSelectedDistrict("");
                             setSelectedSector("");
                         }}
-                        className={darkMode ? "border border-gray-800 bg-gray-950 text-white" : "border border-gray-700 bg-white text-gray-900"}
+                        className={darkMode ? "border border-white bg-black text-white rounded-lg" : "border border-black bg-white text-black rounded-lg"}
                     />
                 </div>
 
@@ -295,7 +294,7 @@ export default function CommissionersPage() {
                             setSelectedDistrict(val);
                             setSelectedSector("");
                         }}
-                        className={darkMode ? "border border-gray-800 bg-gray-950 text-white" : "border border-gray-700 bg-white text-gray-900"}
+                        className={darkMode ? "border border-white bg-black text-white rounded-lg" : "border border-black bg-white text-black rounded-lg"}
                     />
                 </div>
 
@@ -308,7 +307,7 @@ export default function CommissionersPage() {
                         onChange={(val) => {
                             setSelectedSector(val);
                         }}
-                        className={darkMode ? "border border-gray-800 bg-gray-950 text-white" : "border border-gray-700 bg-white text-gray-900"}
+                        className={darkMode ? "border border-white bg-black text-white rounded-lg" : "border border-black bg-white text-black rounded-lg"}
                     />
                 </div>
 
@@ -316,8 +315,7 @@ export default function CommissionersPage() {
                 <select
                     value={selectedSpecialization || ''}
                     onChange={(e) => setSelectedSpecialization(e.target.value || undefined)}
-                    className={`px-3 py-2.5 text-sm border ${darkMode ? 'bg-gray-950 border-gray-700 text-white' : 'bg-gray-50 border-gray-200 text-gray-900'} focus:ring-2 focus:ring-emerald-500 cursor-pointer flex-shrink-0`}
-                    style={{ borderRadius: '4px' }}
+                    className={`px-3 py-2.5 text-sm border rounded-lg ${darkMode ? 'bg-black border-white text-white' : 'bg-white border-black text-black'} focus:ring-2 focus:ring-red-600 cursor-pointer flex-shrink-0`}
                 >
                     <option value="">All Types</option>
                     {specializationOptions.map(cat => (
@@ -333,8 +331,7 @@ export default function CommissionersPage() {
                     value={minBudget || ''}
                     onChange={(e) => setMinBudget(e.target.value ? Number(e.target.value) : undefined)}
                     placeholder="Min price"
-                    className={`w-28 px-3 py-2.5 text-sm border ${darkMode ? 'bg-gray-950 text-white border-gray-700 placeholder-gray-400' : 'bg-gray-50 text-gray-900 border-gray-200 placeholder-gray-500'} focus:ring-2 focus:ring-emerald-500 flex-shrink-0`}
-                    style={{ borderRadius: '4px' }}
+                    className={`w-28 px-3 py-2.5 text-sm border rounded-lg ${darkMode ? 'bg-black text-white border-white placeholder-white' : 'bg-white text-black border-black placeholder-black'} focus:ring-2 focus:ring-red-600 flex-shrink-0`}
                 />
 
                 {/* Max Price */}
@@ -343,18 +340,17 @@ export default function CommissionersPage() {
                     value={maxBudget || ''}
                     onChange={(e) => setMaxBudget(e.target.value ? Number(e.target.value) : undefined)}
                     placeholder="Max price"
-                    className={`w-28 px-3 py-2.5 text-sm border ${darkMode ? 'bg-gray-950 text-white border-gray-700 placeholder-gray-400' : 'bg-gray-50 text-gray-900 border-gray-200 placeholder-gray-500'} focus:ring-2 focus:ring-emerald-500 flex-shrink-0`}
-                    style={{ borderRadius: '4px' }}
+                    className={`w-28 px-3 py-2.5 text-sm border rounded-lg ${darkMode ? 'bg-black text-white border-white placeholder-white' : 'bg-white text-black border-black placeholder-black'} focus:ring-2 focus:ring-red-600 flex-shrink-0`}
                 />
 
-                <label className={`flex items-center gap-2 px-3 py-2.5 text-sm font-semibold border cursor-pointer flex-shrink-0 ${darkMode ? 'border-gray-700 text-gray-300' : 'border-gray-200 text-gray-700'}`} style={{ borderRadius: '4px' }}>
+                <label className={`flex items-center gap-2 px-3 py-2.5 text-sm font-semibold border rounded-lg cursor-pointer flex-shrink-0 ${darkMode ? 'border-white text-white' : 'border-black text-black'}`}>
                     <input
                         type="checkbox"
                         checked={filters.verifiedOnly}
                         onChange={(e) => setFilters(prev => ({ ...prev, verifiedOnly: e.target.checked }))}
-                        className="h-4 w-4 accent-emerald-500"
+                        className="h-4 w-4 accent-red-600"
                     />
-                    <BadgeCheck className="w-4 h-4 text-emerald-500" />
+                    <BadgeCheck className="w-4 h-4 text-red-600" />
                     Verified only
                 </label>
 
@@ -362,7 +358,7 @@ export default function CommissionersPage() {
                 {(selectedProvince || selectedDistrict || selectedSector || selectedSpecialization || filters.verifiedOnly || minBudget || maxBudget || filters.searchQuery) && (
                     <button
                         onClick={clearFilters}
-                        className="text-sm font-semibold text-emerald-500 hover:text-emerald-600 whitespace-nowrap flex-shrink-0"
+                        className="text-sm font-semibold text-red-600 hover:text-black whitespace-nowrap flex-shrink-0"
                     >
                         Clear all
                     </button>
@@ -375,11 +371,10 @@ export default function CommissionersPage() {
     const CommissionerCard = ({ commissioner }: { commissioner: Commissioner }) => (
         <div
             onClick={() => navigate(`/real-estate/commissioner/${commissioner.id}`)}
-            className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col h-full ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} border shadow-sm`}
-            style={{ borderRadius: '6px' }}
+            className={`group cursor-pointer overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col h-full ${darkMode ? 'bg-black border-white' : 'bg-white border-black'} border shadow-sm`}
         >
             {/* Edge-to-edge full width profile image container */}
-            <div className={`w-full h-56 overflow-hidden relative ${darkMode ? 'bg-gray-950' : 'bg-gray-100'}`}>
+            <div className={`relative aspect-square w-full overflow-hidden rounded-t-xl ${darkMode ? 'bg-black' : 'bg-white'}`}>
                 <img
                     src={commissioner.photo || 'https://i.pravatar.cc/400?img=1'}
                     alt={commissioner.name}
@@ -388,7 +383,7 @@ export default function CommissionersPage() {
                         e.currentTarget.src = 'https://i.pravatar.cc/400?img=1';
                     }}
                 />
-                <div className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold text-emerald-700 shadow-sm">
+                <div className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-red-600 shadow-sm">
                     <BadgeCheck className="h-4 w-4" />
                     Verified
                 </div>
@@ -396,14 +391,14 @@ export default function CommissionersPage() {
 
             {/* Header text */}
             <div className="px-4 pt-4 pb-1">
-                <h3 className={`font-bold text-lg ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors truncate`}>
+                <h3 className={`font-bold text-base ${darkMode ? 'text-white group-hover:text-red-400' : 'text-black group-hover:text-red-600'} transition-colors truncate`}>
                     {commissioner.name}
                 </h3>
             </div>
 
             {/* Properties count badge */}
             <div className="px-4 pb-2">
-                <span className={`inline-block px-2.5 py-1 text-xs font-semibold ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`} style={{ borderRadius: '999px' }}>
+                <span className={`inline-block px-2.5 py-1 text-xs font-semibold rounded-full ${darkMode ? 'bg-black border border-white text-white' : 'bg-white border border-black text-black'}`}>
                     {commissioner.propertiesManaged} properties managed
                 </span>
             </div>
@@ -413,12 +408,12 @@ export default function CommissionersPage() {
                 <div className="px-4 py-1 text-xs leading-relaxed">
                     <p className={`${
                         expandedBios[commissioner.id] ? '' : 'line-clamp-4'
-                    } ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    } ${darkMode ? 'text-white' : 'text-black'}`}>
                         {commissioner.bio}
                     </p>
                     <button
                         onClick={(e) => toggleBioExpanded(commissioner.id, e)}
-                        className="text-emerald-500 hover:text-emerald-600 font-bold mt-1 text-[10px] uppercase tracking-wider block"
+                        className="text-red-600 hover:text-black font-bold mt-1 text-[10px] uppercase tracking-wider block"
                     >
                         {expandedBios[commissioner.id] ? 'View Less' : 'View More'}
                     </button>
@@ -428,8 +423,8 @@ export default function CommissionersPage() {
             {/* Operating Locations */}
             <div className="px-4 py-2">
                 <div className="flex items-center gap-1.5 mb-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                    <span className={`text-xs font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    <MapPin className="w-3.5 h-3.5 text-red-600" />
+                    <span className={`text-xs font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
                         Operating in
                     </span>
                 </div>
@@ -437,14 +432,14 @@ export default function CommissionersPage() {
                     {commissioner.operatingLocations.districts.slice(0, 3).map((district, idx) => (
                         <span
                             key={idx}
-                            className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`}
+                            className={`text-xs px-2 py-0.5 rounded ${darkMode ? 'bg-black border border-white text-white' : 'bg-white border border-black text-black'}`}
                             style={{ borderRadius: '2px' }}
                         >
                             {district}
                         </span>
                     ))}
                     {commissioner.operatingLocations.districts.length > 3 && (
-                        <span className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'}`} style={{ borderRadius: '2px' }}>
+                        <span className={`text-xs px-2 py-0.5 rounded ${darkMode ? 'bg-black border border-white text-white' : 'bg-white border border-black text-black'}`}>
                             +{commissioner.operatingLocations.districts.length - 3}
                         </span>
                     )}
@@ -453,10 +448,10 @@ export default function CommissionersPage() {
 
             {/* Price Range */}
             <div className="px-4 py-3">
-                <div className={`text-sm font-medium mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                <div className={`text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
                     Price range
                 </div>
-                <div className={`text-base font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                <div className="text-base font-black text-red-600">
                     {formatPrice(commissioner.priceRange.min)} - {formatPrice(commissioner.priceRange.max)}
                 </div>
             </div>
@@ -466,7 +461,7 @@ export default function CommissionersPage() {
                 <div className="px-4 py-3">
                     <div className="flex items-center gap-1.5 mb-1.5">
 
-                    <span className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
                         Specialization
                     </span>
                 </div>  
@@ -474,7 +469,7 @@ export default function CommissionersPage() {
                         {commissioner.specialization.map((spec, idx) => (
                             <span
                                 key={idx}
-                                className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 ${darkMode ? 'bg-emerald-900/50 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`}
+                                className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${darkMode ? 'bg-black border border-red-600 text-red-400' : 'bg-white border border-red-600 text-red-600'}`}
                                 style={{ borderRadius: '999px' }}
                             >
                                 {getCategoryIcon(spec)}
@@ -492,7 +487,7 @@ export default function CommissionersPage() {
                         e.stopPropagation();
                         navigate(`/real-estate/commissioner/${commissioner.id}`);
                     }}
-                    className="w-full rounded-md bg-emerald-500 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-emerald-600"
+                    className="w-full rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-black"
                 >
                     View agent profile
                 </button>
@@ -501,18 +496,18 @@ export default function CommissionersPage() {
     );
 
     return (
-        <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
+        <div className={`min-h-screen ${darkMode ? 'bg-black' : 'bg-white'}`}>
             <div className="max-w-7xl mx-auto px-4 py-6">
                 {/* Header */}
                 <div className="mb-6">
-                    <h1 className={`text-2xl sm:text-3xl font-bold tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'} uppercase`}>
+                    <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-black'} uppercase`}>
                         Find the Right Property with a Real Estate Professional
                     </h1>
-                    <p className={`text-sm sm:text-base ${darkMode ? 'text-gray-300' : 'text-gray-600'} mt-2 leading-relaxed max-w-4xl`}>
+                    <p className={`text-sm sm:text-base ${darkMode ? 'text-white' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
                         Looking for a property but not sure where to start? HafiConnect connects you with real estate agents and property commissioners who can help you explore available properties based on your needs. Browse professional profiles, discover the areas they serve, and contact them directly for assistance finding houses, apartments, land, rental spaces, or commercial properties. Share your preferred location, budget, and property requirements to make your search easier.
                     </p>
                     <div className="mt-3 flex items-center gap-2">
-                        <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold ${darkMode ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}`} style={{ borderRadius: '2px' }}>
+                        <span className={`inline-block px-2.5 py-0.5 text-xs font-semibold rounded-md ${darkMode ? 'bg-black text-white border border-red-600' : 'bg-white text-black border border-red-600'}`}>
                             {filteredCommissioners.length} verified property professionals available
                         </span>
                     </div>
@@ -525,8 +520,7 @@ export default function CommissionersPage() {
                         {/* Mobile filter toggle */}
                         <button
                             onClick={() => setShowFilters(!showFilters)}
-                            className={`lg:hidden flex items-center gap-1.5 px-3 py-2 text-sm ${darkMode ? 'bg-gray-900 text-gray-300' : 'bg-white text-gray-700'} shadow-sm`}
-                            style={{ borderRadius: '2px' }}
+                            className={`lg:hidden flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg border ${darkMode ? 'bg-black text-white border-white' : 'bg-white text-black border-black'} shadow-sm hover:bg-red-600 hover:text-white`}
                         >
                             <Filter className="w-4 h-4" />
                             {showFilters ? 'Hide' : 'Filters'}
@@ -535,8 +529,7 @@ export default function CommissionersPage() {
                         {/* Browse Properties Button */}
                         <button
                             onClick={() => navigate('/real-estate')}
-                            className={`px-4 py-2 text-sm font-medium transition-colors ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-emerald-500 text-white hover:bg-emerald-600'} shadow-sm`}
-                            style={{ borderRadius: '2px' }}
+                            className="px-4 py-2 text-sm font-bold uppercase tracking-wider rounded-xl bg-red-600 text-white transition-colors hover:bg-black shadow-sm"
                         >
                             Browse Properties
                         </button>
@@ -554,38 +547,36 @@ export default function CommissionersPage() {
                         <LoadingSpinner size="lg" message="Loading agents..." variant="dots" />
                     </div>
                 ) : loadError ? (
-                    <div className={`text-center py-16 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                    <div className={`text-center py-16 ${darkMode ? 'text-white' : 'text-black'}`}>
                         <h3 className="text-lg font-semibold mb-2">Unable to load agents</h3>
-                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-6`}>{loadError}</p>
+                        <p className={`text-sm ${darkMode ? 'text-white' : 'text-black'} mb-6`}>{loadError}</p>
                         <button
                             onClick={() => setReloadToken(t => t + 1)}
-                            className="px-4 py-2 bg-emerald-500 text-white transition-colors text-sm"
-                            style={{ borderRadius: '2px' }}
+                            className="px-4 py-2 rounded-xl bg-red-600 text-white transition-colors text-sm hover:bg-black"
                         >
                             Try Again
                         </button>
                     </div>
                 ) : filteredCommissioners.length === 0 ? (
                     <div className="text-center py-16">
-                        <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`} style={{ borderRadius: '2px' }}>
-                            <Search className="w-6 h-6 text-gray-400" />
+                        <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-xl ${darkMode ? 'bg-black border border-white' : 'bg-white border border-black'}`}>
+                            <Search className="w-6 h-6 text-red-600" />
                         </div>
-                        <h3 className={`text-base font-semibold mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <h3 className={`text-base font-bold mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
                             No agents found
                         </h3>
-                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <p className={`text-sm ${darkMode ? 'text-white' : 'text-black'}`}>
                             Try adjusting your filters
                         </p>
                         <button
                             onClick={clearFilters}
-                            className={`mt-4 px-4 py-2 text-sm ${darkMode ? 'bg-gray-900 text-white hover:bg-gray-800' : 'bg-white text-gray-700 hover:bg-gray-50'} shadow-sm`}
-                            style={{ borderRadius: '2px' }}
+                            className={`mt-4 px-4 py-2 rounded-xl text-sm ${darkMode ? 'bg-black text-white border border-white hover:bg-red-600' : 'bg-white text-black border border-black hover:bg-red-600 hover:text-white'} shadow-sm`}
                         >
                             Clear all filters
                         </button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-3">
                         {filteredCommissioners.map((commissioner) => (
                             <CommissionerCard key={commissioner.id} commissioner={commissioner} />
                         ))}
