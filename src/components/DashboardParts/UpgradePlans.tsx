@@ -1074,6 +1074,7 @@ export default function UpgradePlans() {
                 const initiatePayment = async (method: PaymentMethod) => {
                   setRenewMessage(null);
                   setRenewLoading(true);
+                  setRenewMessage('⏳ Initiating payment...');
                   try {
                     if (!selectedPlanForRenewal.id) throw new Error('Please select a plan');
                     const activePhone = method === 'mtn' || method === 'airtel'
@@ -1108,7 +1109,7 @@ export default function UpgradePlans() {
                       return;
                     }
                     const referenceId = data?.data?.referenceId;
-                    setRenewMessage(`⏳ Payment is pending. Approve the payment on your phone. Ref: ${referenceId}`);
+                    setRenewMessage(`⏳ Payment is pending. Approve the payment on your phone. Phone: +250 ${cleanPhone}`);
                     if (referenceId) void waitForPaymentCompletion(referenceId);
                   } catch (e: any) {
                     setRenewMessage(`❌ ${e?.message || 'Failed to initiate renewal'}`);
@@ -1237,6 +1238,7 @@ export default function UpgradePlans() {
                         onClick={async () => {
                           setRenewMessage(null);
                           setRenewLoading(true);
+                          setRenewMessage('⏳ Initiating payment...');
                           try {
                             if (!selectedPlanForRenewal.id) throw new Error('Please select a plan');
                             const activePhone = selectedMethod === 'mtn' || selectedMethod === 'airtel'
@@ -1268,7 +1270,7 @@ export default function UpgradePlans() {
                             }
                             const data = await res.json();
                             const referenceId = data?.data?.referenceId;
-                            setRenewMessage(`⏳ Payment is pending. Approve the payment on your phone. Ref: ${referenceId}`);
+                            setRenewMessage(`⏳ Payment is pending. Approve the payment on your phone. Phone: +250 ${cleanPhone}`);
                             if (referenceId) void waitForPaymentCompletion(referenceId);
                             // Keep the modal open while XentriPay waits for the customer's approval.
                             // The webhook will update the transaction and subscription asynchronously.

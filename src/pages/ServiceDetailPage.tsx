@@ -134,7 +134,7 @@ export default function ServiceDetailPage() {
         const serviceData = await cachedFetch<Service>(`${API_BASE}/api/services/${id}`);
         setService(serviceData);
 
-        const providerData = await cachedFetch<Provider[]>(`${API_BASE}/services/${id}/providers`);
+        const providerData = await cachedFetch<Provider[]>(`${API_BASE}/api/providers/${id}/providers`);
         const normalized = normalizeProviders(providerData);
         setProviders(normalized);
         setFilteredProviders(normalized);
@@ -387,28 +387,31 @@ export default function ServiceDetailPage() {
       ? 'Search providers by district, sector, or cell...'
       : 'Search products or services...';
 
-  const mainContainerClasses = darkMode ? 'bg-black text-white' : 'bg-white text-black';
-  const cardBgClasses = darkMode ? 'bg-black border border-white/30' : 'bg-white border border-black';
-  const mutedText = darkMode ? 'text-white' : 'text-black';
+  const mainContainerClasses = darkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900';
+  const cardBgClasses = darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200';
+  const mutedText = darkMode ? 'text-gray-400' : 'text-gray-600';
 
   const visibleCount = viewMode === 'providers' ? filteredProviders.length : filteredListings.length;
   // render page header + inline spinner while loading so header/navigation remains visible
   if (loading) {
     return (
       <div className={`min-h-screen ${mainContainerClasses}`}>
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
           {/* Header Section */}
           <div className="mb-6">
             <button
               onClick={() => navigate('/services')}
-              className={`text-sm ${mutedText} hover:text-red-600 transition-colors mb-3 inline-flex items-center gap-1`}
+              className={`text-xs font-semibold uppercase tracking-wider ${mutedText} hover:text-red-600 transition-colors mb-4 inline-flex items-center gap-1`}
             >
               ← Back to Services
             </button>
-            <h1 className={`text-2xl font-bold tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-black'}`}>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-red-600/30 bg-red-600/10 text-red-600 text-[10px] font-bold uppercase tracking-wider mb-3">
+              Service marketplace
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase">
               {service?.title || 'Service'}
             </h1>
-            <p className={`text-sm ${mutedText} mt-2 max-w-2xl`}>
+            <p className={`text-sm leading-6 ${mutedText} mt-2 max-w-2xl`}>
               {service?.description}
             </p>
           </div>
@@ -455,7 +458,7 @@ export default function ServiceDetailPage() {
         </div>
 
         {/* Search and Controls - Compact row */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+        <div className={`flex flex-col sm:flex-row sm:items-center gap-3 mb-8 p-4 border rounded-2xl ${cardBgClasses}`}>
           <div className="relative flex-1 max-w-md">
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-red-600" />
             <input
@@ -464,15 +467,13 @@ export default function ServiceDetailPage() {
               onChange={(e) => handleSearchTermChange(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={activeSearchPlaceholder}
-              className={`w-full pl-9 pr-4 py-2 text-sm border ${darkMode ? 'bg-black border-white text-white placeholder-white' : 'bg-white border-black text-black placeholder-black'} shadow-sm focus:ring-1 focus:ring-red-600`}
-              style={{ borderRadius: '2px' }}
+              className={`w-full pl-9 pr-4 py-2.5 text-sm border rounded-xl ${darkMode ? 'bg-gray-950 border-gray-700 text-white placeholder:text-gray-500' : 'bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'} shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600/20 focus:border-red-600`}
             />
           </div>
           
           <button
             onClick={handleSearch}
-            className="px-4 py-2 text-sm font-bold transition-colors bg-red-600 text-white hover:bg-red-700 shadow-sm"
-            style={{ borderRadius: '2px' }}
+            className="px-4 py-2.5 text-sm font-bold transition-colors bg-red-600 text-white hover:bg-red-700 shadow-sm rounded-xl"
           >
             Search
           </button>
@@ -480,33 +481,30 @@ export default function ServiceDetailPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowMap(prev => !prev)}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors shadow-sm ${showMap
+              className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors shadow-sm rounded-xl ${showMap
                   ? 'bg-red-600 text-white'
                   : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
                 }`}
-              style={{ borderRadius: '2px' }}
             >
               <MapPin className="w-4 h-4" />
               {showMap ? 'Hide Map' : 'Show Map'}
             </button>
             <button
               onClick={() => setViewMode('listings')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors shadow-sm ${viewMode === 'listings'
+              className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors shadow-sm rounded-xl ${viewMode === 'listings'
                   ? 'bg-red-600 text-white'
                   : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
                 }`}
-              style={{ borderRadius: '2px' }}
             >
               <Package className="w-4 h-4" />
               Products & Services
             </button>
             <button
               onClick={() => setViewMode('providers')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors shadow-sm ${viewMode === 'providers'
+              className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors shadow-sm rounded-xl ${viewMode === 'providers'
                   ? 'bg-red-600 text-white'
                   : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
                 }`}
-              style={{ borderRadius: '2px' }}
             >
               <Users className="w-4 h-4" />
               Service Providers
@@ -546,10 +544,10 @@ export default function ServiceDetailPage() {
 
         {/* Providers Count */}
         <div className="mb-4 flex items-center justify-between">
-          <h2 className={`text-base font-bold uppercase ${darkMode ? 'text-white' : 'text-black'}`}>
+          <h2 className="text-base font-bold uppercase tracking-wider">
             {viewMode === 'providers' ? 'Service Providers' : 'Products & Services'}
           </h2>
-          <span className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-white text-black' : 'bg-black text-white'}`} style={{ borderRadius: '2px' }}>
+          <span className="text-xs px-2.5 py-1 rounded-full bg-red-600/10 text-red-600 font-bold">
             {visibleCount} {viewMode === 'providers' ? (visibleCount === 1 ? 'provider' : 'providers') : (visibleCount === 1 ? 'item' : 'items')}
           </span>
         </div>
@@ -582,11 +580,10 @@ export default function ServiceDetailPage() {
                   <div
                     key={provider.id}
                     onClick={() => navigate(`/provider/${provider.id}/uploads`)}
-                    className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-md hover:border-red-600 flex flex-col h-full ${cardBgClasses} shadow-sm`}
-                    style={{ borderRadius: '2px' }}
+                    className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-red-500 flex flex-col h-full ${cardBgClasses} border rounded-2xl shadow-sm`}
                   >
                   {/* Image */}
-                  <div className="relative h-44 overflow-hidden bg-white dark:bg-black">
+                  <div className="relative h-48 overflow-hidden bg-white dark:bg-black">
                     <img
                       src={imagePath}
                       alt={provider.email.split('@')[0]}
@@ -596,7 +593,7 @@ export default function ServiceDetailPage() {
                       }}
                     />
                     {isNearby && (
-                      <div className="absolute top-1 right-1 px-1.5 py-0.5 text-[9px] font-bold bg-red-600 text-white" style={{ borderRadius: '2px' }}>
+                      <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-[9px] font-bold bg-red-600 text-white">
                         Nearby
                       </div>
                     )}
@@ -645,11 +642,10 @@ export default function ServiceDetailPage() {
               return (
                 <div
                   key={`${item.providerId}-${item.productId}`}
-                  className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-md flex flex-col h-full ${cardBgClasses} border-0 shadow-sm`}
-                  style={{ borderRadius: '2px' }}
+                  className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-red-500 flex flex-col h-full ${cardBgClasses} border rounded-2xl shadow-sm`}
                   onClick={() => navigate(`/product-or-service-detail/${item.providerId}/${item.productId}`)}
                 >
-                  <div className="relative h-44 overflow-hidden bg-white dark:bg-black">
+                  <div className="relative h-48 overflow-hidden bg-white dark:bg-black">
                     <img
                       src={imagePath}
                       alt={item.title || 'Item'}
@@ -658,7 +654,7 @@ export default function ServiceDetailPage() {
                         (e.currentTarget as HTMLImageElement).src = blankProfileImage;
                       }}
                     />
-                    <div className="absolute top-1 right-1 px-1.5 py-0.5 text-[9px] font-bold text-white bg-red-600" style={{ borderRadius: '2px' }}>
+                    <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-[9px] font-bold text-white bg-red-600">
                       {item.type === 'product' ? 'Product' : 'Service'}
                     </div>
                   </div>
@@ -683,8 +679,7 @@ export default function ServiceDetailPage() {
                             e.stopPropagation();
                             navigate(`/provider/${item.providerId}/uploads`);
                           }}
-                          className={`text-xs font-bold px-2 py-1 transition-colors ${darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'}`}
-                          style={{ borderRadius: '2px' }}
+                          className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${darkMode ? 'bg-gray-950 border border-gray-700 text-white hover:bg-red-600' : 'bg-white border border-gray-200 text-gray-900 hover:bg-red-600 hover:text-white'}`}
                         >
                           Provider
                         </button>

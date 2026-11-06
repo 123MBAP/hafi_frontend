@@ -497,9 +497,18 @@ const HomePage = () => {
   // Render service card with random height
   const renderServiceCard = (service: Service, isLarge: boolean = false, isWide: boolean = false) => {
     const cardHeight = isLarge ? 'h-64 sm:h-72' : isWide ? 'h-44 sm:h-52 md:h-60' : 'h-36 sm:h-44 md:h-52';
+    const canNavigate = !service.id.startsWith('fallback-');
     
     return (
-      <Link to={`/services/${service.id}`} className="block h-full group">
+      <Link
+        to={canNavigate ? `/services/${service.id}` : '#'}
+        onClick={(event) => {
+          if (!canNavigate) event.preventDefault();
+        }}
+        aria-disabled={!canNavigate}
+        tabIndex={canNavigate ? 0 : -1}
+        className={`block h-full group ${canNavigate ? '' : 'cursor-default'}`}
+      >
         <div className="h-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex flex-col overflow-hidden">
           <div className={`${cardHeight} overflow-hidden bg-gray-50 dark:bg-gray-950 flex items-center justify-center relative`}>
             <img 
@@ -524,9 +533,11 @@ const HomePage = () => {
               <span className="text-[11px] font-medium text-black/70 dark:text-gray-400">
                 {formatUpdatedTime(service.created_at) || 'Verified Service'}
               </span>
-              <span className="text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                Explore <ArrowRight className="w-3 h-3" />
-              </span>
+              {canNavigate && (
+                <span className="text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                  Explore <ArrowRight className="w-3 h-3" />
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -555,8 +566,10 @@ const HomePage = () => {
     const imageUrl = getImage();
     const title = getTitle();
     const cardHeight = isLarge ? 'h-64 sm:h-80' : isWide ? 'h-44 sm:h-56 md:h-64' : 'h-36 sm:h-44 md:h-52';
+    const canNavigate = !String(item.id).startsWith('fallback-');
     
     const handleClick = () => {
+      if (!canNavigate) return;
       if (item.category === 'product') navigate(`/product/${item.id}`);
       else if (item.category === 'property') navigate(`/real-estate/property/${item.id}`);
       else if (item.category === 'upload' && item.providerId) navigate(`/provider/${item.providerId}/uploads`);
@@ -565,7 +578,8 @@ const HomePage = () => {
     return (
       <button
         onClick={handleClick}
-        className="w-full h-full text-left group relative overflow-hidden rounded-xl shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 flex flex-col"
+        disabled={!canNavigate}
+        className={`w-full h-full text-left group relative overflow-hidden rounded-xl shadow-sm transition-all duration-300 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 flex flex-col ${canNavigate ? 'hover:shadow-xl hover:-translate-y-0.5 cursor-pointer' : 'cursor-default'}`}
       >
         <div className={`${cardHeight} overflow-hidden relative bg-gray-50 dark:bg-gray-950 flex items-center justify-center`}>
           <img

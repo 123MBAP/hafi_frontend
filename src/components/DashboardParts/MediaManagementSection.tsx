@@ -145,7 +145,7 @@ export default function MediaManagementSection({
   return (
     <>
       {/* Uploaded Images Cards */}
-      <div className={`${hideProducts ? 'grid grid-cols-1' : 'grid grid-cols-1 md:grid-cols-2'} gap-8 px-2 mx-5 mt-12`}>
+      <div className={`${hideProducts ? 'grid grid-cols-1' : 'grid grid-cols-1 md:grid-cols-2'} gap-6 md:gap-8 px-0 sm:px-2 mx-0 sm:mx-5 mt-8 sm:mt-12 min-w-0`}>
         {/* Products Section */}
         {!hideProducts && (
           <div>

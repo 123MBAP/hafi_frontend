@@ -1281,7 +1281,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className={`w-full mt-0 -mx-4 sm:mx-0 px-0 sm:px-2 overflow-x-hidden ${darkMode ? "bg-black text-white/90" : "bg-white text-black"}`}>
+    <div className={`w-full min-w-0 mt-0 -mx-4 px-3 sm:mx-0 sm:px-2 overflow-x-hidden ${darkMode ? "bg-black text-white/90" : "bg-white text-black"}`}>
       <div
         className="sticky z-40 w-full overflow-x-hidden overflow-y-visible bg-red-50 border-b border-red-300 mb-2"
         style={{ top: 'var(--navbar-height)' }}
@@ -1297,10 +1297,10 @@ export default function Dashboard() {
       )}
     
       {!serviceOnlyMode && (
-        <div className="flex justify-center space-x-3 mb-6">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6 px-1">
           <button
             onClick={() => setSelectedCard('product')}
-            className={`px-5 py-2.5 font-bold text-xs transition-all uppercase tracking-wider rounded-lg border shadow-sm
+            className={`flex-1 sm:flex-none min-w-[145px] px-4 sm:px-5 py-2.5 font-bold text-xs transition-all uppercase tracking-wider rounded-lg border shadow-sm
               ${selectedCard === 'product'
                 ? 'bg-[#E5252A] border-[#E5252A] text-white'
                 : darkMode
@@ -1312,7 +1312,7 @@ export default function Dashboard() {
           </button>
           <button
             onClick={() => setSelectedCard('service')}
-            className={`px-5 py-2.5 font-bold text-xs transition-all uppercase tracking-wider rounded-lg border shadow-sm
+            className={`flex-1 sm:flex-none min-w-[145px] px-4 sm:px-5 py-2.5 font-bold text-xs transition-all uppercase tracking-wider rounded-lg border shadow-sm
               ${selectedCard === 'service'
                 ? 'bg-[#E5252A] border-[#E5252A] text-white'
                 : darkMode
