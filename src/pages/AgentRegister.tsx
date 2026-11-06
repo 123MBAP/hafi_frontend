@@ -1,10 +1,9 @@
 import { useDarkMode } from '@/context/DarkMode';
-import { AlertCircle, ArrowLeft, Lock, Mail, MapPin, User, CheckCircle, Phone, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Lock, Mail, User, CheckCircle, Phone, Eye, EyeOff } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import RwandaLocationSelector from '@/components/RwandaLocationSelector';
 import { API_BASE } from '../api/apiClient';
-
 
 export default function AgentRegister() {
   const { darkMode } = useDarkMode();
@@ -79,13 +78,13 @@ export default function AgentRegister() {
   };
 
   return (
-    <div className={`min-h-screen pt-4 pb-12 transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-55 text-gray-900'}`}>
-      <div className="w-full max-w-lg mx-auto px-0">
+    <div className={`min-h-screen pt-6 pb-16 px-4 transition-colors duration-200 ${darkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
+      <div className="w-full max-w-lg mx-auto">
         {/* Back link */}
         <Link
           to="/register"
-          className={`mb-4 inline-flex items-center text-sm font-medium transition-colors ${
-            darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-650 hover:text-gray-900'
+          className={`mb-4 inline-flex items-center text-xs font-bold uppercase tracking-wider transition-colors ${
+            darkMode ? 'text-white/70 hover:text-red-600' : 'text-black/70 hover:text-red-600'
           }`}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -94,18 +93,21 @@ export default function AgentRegister() {
 
         {/* Card container */}
         <div
-          className={`p-0 sm:p-8 border-0 sm:border transition-all duration-300 ${
-            darkMode ? 'bg-gray-950 sm:bg-gray-800 sm:border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
+          className={`p-6 sm:p-8 border transition-all duration-200 ${
+            darkMode ? 'bg-black border-white/20 shadow-2xl' : 'bg-white border-black shadow-lg'
           }`}
           style={{ borderRadius: '2px' }}
         >
           {/* Header */}
           <div className="mb-6">
-            <h1 className={`text-2xl font-bold uppercase tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Agent Registration
+            <div className="inline-block px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-red-600 text-white rounded-sm mb-2.5">
+              Agent Program
+            </div>
+            <h1 className={`text-2xl sm:text-3xl font-extrabold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-black'}`}>
+              Agent Registration<span className="text-red-600">.</span>
             </h1>
-            <p className={`text-xs font-bold uppercase tracking-wider mt-1 ${darkMode ? 'text-emerald-455' : 'text-emerald-600'}`}>
-              Register as a HafiConnect Agent in your region
+            <p className={`text-xs font-bold uppercase tracking-wider mt-1.5 ${darkMode ? 'text-white/70' : 'text-black/60'}`}>
+              Register as a certified HafiConnect Agent in your region
             </p>
           </div>
 
@@ -113,11 +115,11 @@ export default function AgentRegister() {
           {success && (
             <div
               className={`flex items-start gap-3 p-3 border mb-6 ${
-                darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-450' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                darkMode ? 'bg-zinc-900 border-white/30 text-white' : 'bg-zinc-50 border-black text-black'
               }`}
               style={{ borderRadius: '2px' }}
             >
-              <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <span className="text-sm font-semibold">{success}</span>
             </div>
           )}
@@ -125,12 +127,10 @@ export default function AgentRegister() {
           {/* Error message */}
           {error && (
             <div
-              className={`flex items-start gap-3 p-3 border mb-6 ${
-                darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-655'
-              }`}
+              className="flex items-start gap-3 p-3 border border-red-600/30 bg-red-600/10 text-red-600 dark:text-red-400 mb-6"
               style={{ borderRadius: '2px' }}
             >
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
               <span className="text-sm font-semibold">{error}</span>
             </div>
           )}
@@ -139,22 +139,22 @@ export default function AgentRegister() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Full Name */}
             <div>
-              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-white/80' : 'text-black/70'}`}>
                 Full Name
               </label>
               <div className="relative">
-                <User className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                <User className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-white/50' : 'text-black/50'}`} />
                 <input
                   name="name"
-                  placeholder="e.g. John Doe"
+                  placeholder="E.G. JOHN DOE"
                   value={form.name}
                   onChange={handleChange}
                   required
                   className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
                     darkMode
-                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
-                      : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                  } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                      ? 'bg-black border-white/30 text-white placeholder-white/40'
+                      : 'bg-white border-black text-black placeholder-black/40'
+                  } focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600`}
                   style={{ borderRadius: '2px' }}
                 />
               </div>
@@ -162,22 +162,22 @@ export default function AgentRegister() {
 
             {/* Phone Number */}
             <div>
-              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-white/80' : 'text-black/70'}`}>
                 Phone Number
               </label>
               <div className="relative">
-                <Phone className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                <Phone className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-white/50' : 'text-black/50'}`} />
                 <input
                   name="phoneNumber"
-                  placeholder="e.g. 078XXXXXXX"
+                  placeholder="E.G. 078XXXXXXX"
                   value={form.phoneNumber}
                   onChange={handleChange}
                   required
                   className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
                     darkMode
-                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
-                      : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                  } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                      ? 'bg-black border-white/30 text-white placeholder-white/40'
+                      : 'bg-white border-black text-black placeholder-black/40'
+                  } focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600`}
                   style={{ borderRadius: '2px' }}
                 />
               </div>
@@ -185,22 +185,22 @@ export default function AgentRegister() {
 
             {/* Username */}
             <div>
-              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-white/80' : 'text-black/70'}`}>
                 Agent Username
               </label>
               <div className="relative">
-                <User className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                <User className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-white/50' : 'text-black/50'}`} />
                 <input
                   name="username"
-                  placeholder="Choose an agent username"
+                  placeholder="CHOOSE AN AGENT USERNAME..."
                   value={form.username}
                   onChange={handleChange}
                   required
                   className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
                     darkMode
-                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
-                      : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                  } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                      ? 'bg-black border-white/30 text-white placeholder-white/40'
+                      : 'bg-white border-black text-black placeholder-black/40'
+                  } focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600`}
                   style={{ borderRadius: '2px' }}
                 />
               </div>
@@ -208,23 +208,23 @@ export default function AgentRegister() {
 
             {/* Email Address */}
             <div>
-              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-white/80' : 'text-black/70'}`}>
                 Email Address
               </label>
               <div className="relative">
-                <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-white/50' : 'text-black/50'}`} />
                 <input
                   name="email"
                   type="email"
-                  placeholder="agent@haficonnect.com"
+                  placeholder="AGENT@HAFICONNECT.COM"
                   value={form.email}
                   onChange={handleChange}
                   required
                   className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
                     darkMode
-                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-555'
-                      : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                  } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                      ? 'bg-black border-white/30 text-white placeholder-white/40'
+                      : 'bg-white border-black text-black placeholder-black/40'
+                  } focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600`}
                   style={{ borderRadius: '2px' }}
                 />
               </div>
@@ -232,29 +232,31 @@ export default function AgentRegister() {
 
             {/* Password */}
             <div>
-              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-white/80' : 'text-black/70'}`}>
                 Password
               </label>
               <div className="relative">
-                <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-white/50' : 'text-black/50'}`} />
                 <input
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Create password"
+                  placeholder="CREATE PASSWORD..."
                   value={form.password}
                   onChange={handleChange}
                   required
                   className={`w-full pl-10 pr-10 py-2.5 border text-sm transition-colors ${
                     darkMode
-                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-555'
-                      : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                  } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                      ? 'bg-black border-white/30 text-white placeholder-white/40'
+                      : 'bg-white border-black text-black placeholder-black/40'
+                  } focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600`}
                   style={{ borderRadius: '2px' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-650"
+                  className={`absolute right-3 top-3 transition-colors ${
+                    darkMode ? 'text-white/60 hover:text-red-600' : 'text-black/60 hover:text-red-600'
+                  }`}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -263,29 +265,31 @@ export default function AgentRegister() {
 
             {/* Confirm Password */}
             <div>
-              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-white/80' : 'text-black/70'}`}>
                 Confirm Password
               </label>
               <div className="relative">
-                <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-white/50' : 'text-black/50'}`} />
                 <input
                   name="passwordConfirm"
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Re-type password"
+                  placeholder="RE-TYPE PASSWORD..."
                   value={form.passwordConfirm}
                   onChange={handleChange}
                   required
                   className={`w-full pl-10 pr-10 py-2.5 border text-sm transition-colors ${
                     darkMode
-                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-555'
-                      : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                  } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                      ? 'bg-black border-white/30 text-white placeholder-white/40'
+                      : 'bg-white border-black text-black placeholder-black/40'
+                  } focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600`}
                   style={{ borderRadius: '2px' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-650"
+                  className={`absolute right-3 top-3 transition-colors ${
+                    darkMode ? 'text-white/60 hover:text-red-600' : 'text-black/60 hover:text-red-600'
+                  }`}
                 >
                   {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -294,13 +298,13 @@ export default function AgentRegister() {
 
             {/* Location Select (Province, District, Sector) */}
             <div className="space-y-3.5">
-              <label className={`block text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
-                Location details
+              <label className={`block text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-white/80' : 'text-black/70'}`}>
+                Location Details
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {/* Province */}
                 <div>
-                  <label className="block text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1">Province</label>
+                  <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1 ${darkMode ? 'text-white/60' : 'text-black/60'}`}>Province</label>
                   <RwandaLocationSelector
                     level="province"
                     value={selectedProvince}
@@ -315,7 +319,7 @@ export default function AgentRegister() {
 
                 {/* District */}
                 <div>
-                  <label className="block text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1">District</label>
+                  <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1 ${darkMode ? 'text-white/60' : 'text-black/60'}`}>District</label>
                   <RwandaLocationSelector
                     level="district"
                     value={selectedDistrict}
@@ -330,7 +334,7 @@ export default function AgentRegister() {
 
                 {/* Sector */}
                 <div>
-                  <label className="block text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-1">Sector</label>
+                  <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1 ${darkMode ? 'text-white/60' : 'text-black/60'}`}>Sector</label>
                   <RwandaLocationSelector
                     level="sector"
                     value={selectedSector}
@@ -348,26 +352,31 @@ export default function AgentRegister() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border ${
+              className={`w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-all border ${
                 loading
-                  ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
-                  : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm'
+                  ? 'bg-black/50 border-zinc-700 text-white/50 cursor-not-allowed'
+                  : 'bg-red-600 hover:bg-red-700 border-red-600 shadow-md active:scale-[0.99]'
               }`}
               style={{ borderRadius: '2px' }}
             >
-              {loading ? 'Creating Agent...' : 'Register as Agent'}
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  <span>Creating Agent...</span>
+                </div>
+              ) : (
+                'Register as Agent'
+              )}
             </button>
           </form>
 
           {/* Login redirection */}
-          <div className="mt-6 text-center border-t pt-4 border-gray-200 dark:border-gray-700">
+          <div className="mt-6 text-center border-t pt-4 border-black/20 dark:border-white/20">
             <Link
               to="/agent/login"
-              className={`text-sm font-semibold transition-colors ${
-                darkMode ? 'text-emerald-450 hover:text-emerald-350' : 'text-emerald-600 hover:text-emerald-700'
-              }`}
+              className="text-xs font-black uppercase tracking-wider transition-colors text-red-600 hover:text-red-700 hover:underline"
             >
-              Already an agent? Login to Portal
+              Already an agent? Login to Portal →
             </Link>
           </div>
         </div>

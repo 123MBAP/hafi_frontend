@@ -118,17 +118,17 @@ const ResetPassword = () => {
   };
 
   const inputBg = darkMode
-    ? 'bg-gray-955 bg-gray-950 border-gray-700 text-white placeholder-gray-550'
-    : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400';
+    ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+    : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400';
 
   return (
-    <div className={`min-h-screen pt-4 pb-12 transition-colors duration-300 ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
-      <div className="w-full max-w-md mx-auto px-0">
+    <div className={`min-h-screen pt-8 pb-16 transition-colors duration-300 ${darkMode ? 'bg-gray-950 text-white' : 'bg-[#F5F5F5] text-[#151515]'}`}>
+      <div className="w-full max-w-md mx-auto px-4">
         {/* Back Link */}
         <Link
           to="/login"
-          className={`mb-4 inline-flex items-center text-sm font-medium transition-colors ${
-            darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-650 hover:text-gray-900'
+          className={`mb-4 inline-flex items-center text-xs font-semibold uppercase tracking-wider transition-colors ${
+            darkMode ? 'text-gray-400 hover:text-[#E5252A]' : 'text-gray-600 hover:text-[#E5252A]'
           }`}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -137,56 +137,43 @@ const ResetPassword = () => {
 
         {/* Card */}
         <div
-          className={`p-0 sm:p-8 border-0 sm:border transition-all duration-300 ${
-            darkMode ? 'bg-gray-955 bg-gray-955 bg-gray-950 sm:bg-gray-900 sm:border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
+          className={`p-6 sm:p-8 rounded-2xl border transition-all duration-300 ${
+            darkMode ? 'bg-gray-900 border-gray-800 shadow-xs' : 'bg-white border-[#E5E5E5] shadow-xs'
           }`}
-          style={{ borderRadius: '2px' }}
         >
           {/* Header */}
           <div className="mb-6">
-            <h1 className={`text-2xl font-bold uppercase tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Reset Password
+            <div className="inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-[#E5252A] text-white rounded-full mb-2.5 shadow-xs">
+              Account Recovery
+            </div>
+            <h1 className={`text-2xl font-extrabold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-[#151515]'}`}>
+              Reset Password<span className="text-[#E5252A]">.</span>
             </h1>
-            <p className={`text-xs font-bold uppercase tracking-wider mt-1 ${darkMode ? 'text-emerald-450' : 'text-emerald-600'}`}>
+            <p className="text-xs font-semibold uppercase tracking-wider mt-1 text-[#E5252A]">
               Securely retrieve access to your account
             </p>
           </div>
 
           {/* Verification Code Errors */}
           {codeError && (
-            <div
-              className={`flex items-start gap-3 p-3 border mb-4 text-xs font-semibold ${
-                darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-655'
-              }`}
-              style={{ borderRadius: '2px' }}
-            >
-              <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-3.5 rounded-xl border border-red-500/20 bg-red-500/10 text-[#E5252A] mb-4 text-xs font-semibold">
+              <AlertCircle className="w-4 h-4 text-[#E5252A] flex-shrink-0 mt-0.5" />
               <span>{codeError}</span>
             </div>
           )}
 
           {/* Password Reset Errors */}
           {passwordError && (
-            <div
-              className={`flex items-start gap-3 p-3 border mb-4 text-xs font-semibold ${
-                darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-655'
-              }`}
-              style={{ borderRadius: '2px' }}
-            >
-              <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-3.5 rounded-xl border border-red-500/20 bg-red-500/10 text-[#E5252A] mb-4 text-xs font-semibold">
+              <AlertCircle className="w-4 h-4 text-[#E5252A] flex-shrink-0 mt-0.5" />
               <span>{passwordError}</span>
             </div>
           )}
 
           {/* Resend Notifications */}
           {resendMsg && (
-            <div
-              className={`flex items-start gap-3 p-3 border mb-4 text-xs font-semibold ${
-                darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
-              }`}
-              style={{ borderRadius: '2px' }}
-            >
-              <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 p-3.5 rounded-xl border border-green-500/20 bg-green-500/10 text-green-600 dark:text-green-400 mb-4 text-xs font-semibold">
+              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
               <span>{resendMsg}</span>
             </div>
           )}
@@ -199,16 +186,15 @@ const ResetPassword = () => {
 
               {/* Email Input */}
               <div>
-                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   Registered Email
                 </label>
                 <div className="relative">
-                  <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                  <Mail className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                   <input
                     type="email"
                     placeholder="Registered Email"
-                    className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${inputBg} focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                    style={{ borderRadius: '2px' }}
+                    className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all ${inputBg} focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]`}
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                   />
@@ -217,16 +203,15 @@ const ResetPassword = () => {
 
               {/* Code Input */}
               <div>
-                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   Verification Code
                 </label>
                 <div className="relative">
-                  <Key className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                  <Key className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                   <input
                     type="text"
                     placeholder="Verification Code"
-                    className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${inputBg} focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                    style={{ borderRadius: '2px' }}
+                    className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all ${inputBg} focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]`}
                     value={code}
                     onChange={e => setCode(e.target.value)}
                   />
@@ -236,17 +221,16 @@ const ResetPassword = () => {
               {/* Verify button */}
               <button
                 onClick={handleVerifyCode}
-                className="w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm"
-                style={{ borderRadius: '2px' }}
+                className="w-full py-3 px-4 text-white text-xs font-bold uppercase tracking-wider transition-all rounded-xl bg-[#E5252A] hover:bg-[#c91d22] shadow-xs active:scale-[0.99]"
               >
                 Verify Reset Code
               </button>
 
               {/* Resend actions */}
-              <div className="mt-4 text-xs flex flex-col gap-2 items-center border-t pt-4 border-gray-200 dark:border-gray-800">
-                <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Haven't received the code?</span>
+              <div className="mt-4 text-xs flex flex-col gap-1.5 items-center border-t pt-4 border-[#E5E5E5] dark:border-gray-800">
+                <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>Haven't received the code?</span>
                 <button
-                  className="text-emerald-500 hover:text-emerald-600 font-bold uppercase tracking-wider text-[11px]"
+                  className="text-[#E5252A] hover:text-[#c91d22] font-bold uppercase tracking-wider text-xs transition-colors"
                   disabled={resending || !email}
                   onClick={handleResendCode}
                   type="button"
@@ -259,27 +243,26 @@ const ResetPassword = () => {
 
           {!success && step === 2 && (
             <div className="space-y-4">
-              <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-650'}`}>Enter your new password below.</p>
+              <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Enter your new password below.</p>
 
               {/* Password field */}
               <div>
-                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   New Password
                 </label>
                 <div className="relative">
-                  <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                  <Lock className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="New Password"
-                    className={`w-full pl-10 pr-10 py-2.5 border text-sm transition-colors ${inputBg} focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                    style={{ borderRadius: '2px' }}
+                    className={`w-full pl-10 pr-10 py-2.5 rounded-xl border text-sm transition-all ${inputBg} focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]`}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-650"
+                    className="absolute right-3 top-3 text-gray-400 hover:text-[#E5252A] transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -288,23 +271,22 @@ const ResetPassword = () => {
 
               {/* Confirm Password field */}
               <div>
-                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   Confirm Password
                 </label>
                 <div className="relative">
-                  <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                  <Lock className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm New Password"
-                    className={`w-full pl-10 pr-10 py-2.5 border text-sm transition-colors ${inputBg} focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                    style={{ borderRadius: '2px' }}
+                    className={`w-full pl-10 pr-10 py-2.5 rounded-xl border text-sm transition-all ${inputBg} focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]`}
                     value={confirmPassword}
                     onChange={e => setConfirmPassword(e.target.value)}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-655"
+                    className="absolute right-3 top-3 text-gray-400 hover:text-[#E5252A] transition-colors"
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -314,8 +296,7 @@ const ResetPassword = () => {
               {/* Reset button */}
               <button
                 onClick={handleResetPassword}
-                className="w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm"
-                style={{ borderRadius: '2px' }}
+                className="w-full py-3 px-4 text-white text-xs font-bold uppercase tracking-wider transition-all rounded-xl bg-[#E5252A] hover:bg-[#c91d22] shadow-xs active:scale-[0.99]"
               >
                 Reset Password
               </button>
@@ -323,16 +304,15 @@ const ResetPassword = () => {
           )}
 
           {success && (
-            <div className="text-center space-y-4">
-              <div className="text-emerald-500 font-bold uppercase tracking-wider text-sm flex items-center justify-center gap-2">
-                <CheckCircle className="w-5 h-5" /> Password reset successfully!
+            <div className="text-center space-y-4 py-4">
+              <div className="text-green-600 font-bold uppercase tracking-wider text-sm flex items-center justify-center gap-2">
+                <CheckCircle className="w-6 h-6 text-green-600" /> Password reset successfully!
               </div>
               <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 You can now log in to HafiConnect with your new credentials.
               </p>
               <button
-                className="w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm"
-                style={{ borderRadius: '2px' }}
+                className="w-full py-3 px-4 text-white text-xs font-bold uppercase tracking-wider transition-all rounded-xl bg-[#E5252A] hover:bg-[#c91d22] shadow-xs"
                 onClick={() => navigate('/login')}
               >
                 Go to Login

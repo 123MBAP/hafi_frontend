@@ -195,19 +195,17 @@ export default function UpgradePlans() {
     });
   }, [adminPlans, userPlanInfo, user]);
 
-  const pageBg = darkMode ? "bg-gray-950 text-white" : "bg-gray-50 text-gray-900";
-  const cardBase = darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
-  const mutedText = darkMode ? "text-gray-300" : "text-gray-600";
-  const subText = darkMode ? "text-gray-400" : "text-gray-500";
+  const pageBg = darkMode ? "bg-black text-white" : "bg-[#F5F5F5] text-[#151515]";
+  const cardBase = darkMode ? "bg-gray-900 border-gray-800 rounded-xl" : "bg-white border-[#E5E5E5] rounded-xl";
+  const mutedText = darkMode ? "text-gray-400" : "text-[#666666]";
+  const subText = darkMode ? "text-gray-500" : "text-[#666666]";
   const inputBase = darkMode
-    ? "bg-gray-950 border-gray-700 text-white placeholder:text-gray-500 focus:border-emerald-500 focus:ring-emerald-500/20"
-    : "bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-emerald-600 focus:ring-emerald-600/20";
-  const buttonPrimary = darkMode
-    ? "bg-emerald-600 hover:bg-emerald-500 text-white"
-    : "bg-emerald-600 hover:bg-emerald-700 text-white";
+    ? "bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 rounded-lg focus:border-[#E5252A] focus:ring-[#E5252A]"
+    : "bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-[#666666] rounded-lg focus:border-[#E5252A] focus:ring-[#E5252A]";
+  const buttonPrimary = "bg-[#E5252A] hover:bg-[#c91d22] text-white rounded-lg shadow-xs active:scale-[0.99]";
   const buttonSecondary = darkMode
-    ? "bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white"
-    : "bg-white hover:bg-gray-50 border border-gray-300 text-gray-900";
+    ? "bg-gray-900 hover:bg-gray-800 border border-gray-800 text-white rounded-lg"
+    : "bg-white hover:bg-gray-50 border border-[#E5E5E5] text-[#151515] rounded-lg";
 
   const fetchData = useCallback(async () => {
     try {
@@ -383,7 +381,7 @@ export default function UpgradePlans() {
     return (
       <div className={`min-h-screen ${pageBg}`}>
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className={`p-6 border-0 shadow-sm text-center`} style={{ borderRadius: '2px' }}>
+          <div className={`p-6 border-0 shadow-sm text-center`}>
             <XCircle className="w-10 h-10 mx-auto mb-3 text-red-500" />
             <p className={mutedText}>{error}</p>
           </div>
@@ -394,7 +392,7 @@ export default function UpgradePlans() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-800'}`}>
+      <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
         <div className="text-center py-16">
           <LoadingSpinner size="lg" message="Loading plans..." variant="dots" />
         </div>
@@ -412,8 +410,11 @@ export default function UpgradePlans() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className={`text-2xl font-bold tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Plans & Storage
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-red-600/30 bg-red-600/10 text-red-600 text-xs font-semibold uppercase tracking-wider mb-2">
+              Subscription & Add-ons
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase">
+              Plans & Storage<span className="text-red-600">.</span>
             </h1>
             <p className={`text-sm ${mutedText} mt-1`}>
               Manage your subscription and storage add-ons
@@ -422,10 +423,10 @@ export default function UpgradePlans() {
           <Link
             to="/dashboard/upgrade/pending"
             className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm transition-colors ${buttonSecondary}`}
-            style={{ borderRadius: '2px' }}
+           
           >
-            <ClipboardList className="w-4 h-4" />
-            Pending
+            <ClipboardList className="w-4 h-4 text-red-600" />
+            Pending Transactions
           </Link>
         </div>
 
@@ -440,18 +441,18 @@ export default function UpgradePlans() {
               <>
                 <div className="flex items-center gap-2">
           
-                  <h2 className="text-base font-semibold">Base Plans</h2>
+                  <h2 className="text-base font-bold uppercase tracking-wider">Base Plans<span className="text-red-600">.</span></h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {visiblePlans.map((plan, index) => (
                     <div
                       key={plan.id}
                       className={`p-4 border shadow-sm relative ${cardBase}`}
-                      style={{ borderRadius: '2px' }}
+                     
                     >
                       {index === 1 && (
                         <div className="absolute -top-2 left-3">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-emerald-500 text-white" style={{ borderRadius: '2px' }}>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-red-600 text-white">
                             Popular
                           </span>
                         </div>
@@ -461,14 +462,14 @@ export default function UpgradePlans() {
                         <div className="mt-2 text-2xl font-bold">
                           {plan.monthly_fee.toLocaleString()} <span className="text-sm font-normal text-gray-400">RWF</span>
                         </div>
-                        <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-700" style={{ borderRadius: '2px' }}>
+                        <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-zinc-100 dark:bg-zinc-900 border border-black/10 dark:border-white/10 text-black dark:text-white">
                           {formatStorage(plan.base_storage_gb)} included
                         </div>
                       </div>
                       <ul className="mt-4 space-y-1.5">
                         {plan.feature_list.slice(0, 4).map((feature, idx) => (
                           <li key={idx} className="flex items-center gap-2 text-xs">
-                            <Check className="w-3 h-3 text-emerald-500" />
+                            <Check className="w-3.5 h-3.5 text-red-600" />
                             <span className={mutedText}>{feature}</span>
                           </li>
                         ))}
@@ -485,7 +486,7 @@ export default function UpgradePlans() {
                             setRenewMessage(null);
                           }}
                           className={`mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-semibold transition-colors ${buttonPrimary}`}
-                          style={{ borderRadius: '2px' }}
+                         
                         >
                           {plan.monthly_fee === 0 ? "Get Started" : "Subscribe"}
                           <ArrowRight className="w-3.5 h-3.5" />
@@ -494,7 +495,7 @@ export default function UpgradePlans() {
                         <Link
                           to={`/checkout?plan=${plan.id}&type=base`}
                           className={`mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-semibold transition-colors ${buttonPrimary}`}
-                          style={{ borderRadius: '2px' }}
+                         
                         >
                           {plan.monthly_fee === 0 ? "Get Started" : "Subscribe"}
                           <ArrowRight className="w-3.5 h-3.5" />
@@ -508,12 +509,12 @@ export default function UpgradePlans() {
               userPlanInfo?.current_plan && (
                 <>
                   <div className="flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-emerald-500" />
-                    <h2 className="text-base font-semibold">Active Plan Info</h2>
+                    <Shield className="w-5 h-5 text-red-600" />
+                    <h2 className="text-base font-bold uppercase tracking-wider">Active Plan Info<span className="text-red-600">.</span></h2>
                   </div>
-                  <div className={`p-5 border shadow-sm relative ${cardBase}`} style={{ borderRadius: '2px' }}>
-                    <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 mb-4" style={{ borderRadius: '2px' }}>
-                      <h4 className="text-lg font-bold text-emerald-500">{userPlanInfo.current_plan.display_name}</h4>
+                  <div className={`p-5 border shadow-sm relative ${cardBase}`}>
+                    <div className="p-4 bg-red-600/10 border border-red-600/25 mb-4">
+                      <h4 className="text-lg font-bold text-red-600">{userPlanInfo.current_plan.display_name}</h4>
                       <p className={`text-xs ${mutedText} mt-1`}>Active Subscription</p>
                     </div>
                     <ul className="space-y-2 mt-4 text-xs">
@@ -545,26 +546,26 @@ export default function UpgradePlans() {
             {storagePricing && (
               <>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-base font-semibold">Storage Add-ons</h2>
+                  <h2 className="text-base font-bold uppercase tracking-wider">Storage Add-ons<span className="text-red-600">.</span></h2>
                 </div>
 
                 {/* Usage Bar */}
                 {storageUsage && (
-                  <div className={`p-4 border ${cardBase}`} style={{ borderRadius: '2px' }}>
+                  <div className={`p-4 border ${cardBase}`}>
                     <div className="flex justify-between text-sm mb-1">
                       <span className={mutedText}>Used: {formatFileSize(storageUsage.used_storage_gb)}</span>
                       <span className={mutedText}>Total: {formatFileSize(storageUsage.total_storage_gb)}</span>
                     </div>
-                    <div className="h-1.5 bg-gray-200 dark:bg-gray-700 overflow-hidden" style={{ borderRadius: '2px' }}>
+                    <div className="h-1.5 bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
                       <div
-                        className="h-full bg-emerald-500 transition-all"
+                        className="h-full bg-red-600 transition-all"
                         style={{ width: `${Math.min(storageUsage.usage_percentage, 100)}%` }}
                       />
                     </div>
                   </div>
                 )}
 
-                <div className={`p-5 border shadow-sm ${!primaryPlanActive ? 'opacity-60' : ''} ${cardBase}`} style={{ borderRadius: '2px' }}>
+                <div className={`p-5 border shadow-sm ${!primaryPlanActive ? 'opacity-60' : ''} ${cardBase}`}>
                   <div className="space-y-6">
                     {/* Action Tabs: Purchase vs Reduce */}
                     {primaryPlanActive && (
@@ -577,7 +578,7 @@ export default function UpgradePlans() {
                           }}
                           className={`flex-1 pb-2 text-xs font-bold uppercase tracking-wider border-b-2 text-center transition-colors ${
                             storageActionType === 'purchase'
-                              ? 'border-emerald-500 text-emerald-500'
+                              ? 'border-red-600 text-red-600'
                               : 'border-transparent text-gray-400 hover:text-gray-300'
                           }`}
                         >
@@ -591,7 +592,7 @@ export default function UpgradePlans() {
                           }}
                           className={`flex-1 pb-2 text-xs font-bold uppercase tracking-wider border-b-2 text-center transition-colors ${
                             storageActionType === 'reduce'
-                              ? 'border-emerald-500 text-emerald-500'
+                              ? 'border-red-600 text-red-600'
                               : 'border-transparent text-gray-400 hover:text-gray-300'
                           }`}
                         >
@@ -613,7 +614,7 @@ export default function UpgradePlans() {
                               onChange={(e) => setStorageAmount(parseFloat(e.target.value) || 0)}
                               disabled={!primaryPlanActive}
                               className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
-                              style={{ borderRadius: '2px' }}
+                             
                             />
                           </div>
                           <div>
@@ -623,19 +624,19 @@ export default function UpgradePlans() {
                               onChange={(e) => setStorageUnit(e.target.value)}
                               disabled={!primaryPlanActive}
                               className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
-                              style={{ borderRadius: '2px' }}
+                             
                             >
                               {storagePricing.available_units.map(unit => <option key={unit} value={unit}>{unit}</option>)}
                             </select>
                           </div>
-                          <div className="p-3 border border-gray-150 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-950/30" style={{ borderRadius: '2px' }}>
+                          <div className="p-3 border border-gray-150 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-950/30">
                             <div className={`text-sm ${mutedText}`}>Price: {storagePricing.price_per_gb_rwf.toLocaleString()} RWF/GB</div>
                             <div className={`text-xs ${subText} mt-1`}>Min: {formatStorage(storagePricing.min_purchase_gb)}</div>
                           </div>
                         </div>
 
                         <div>
-                          <div className="p-4 border border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/20 dark:bg-gray-950/10" style={{ borderRadius: '2px' }}>
+                          <div className="p-4 border border-dashed border-gray-200 dark:border-gray-700 bg-gray-50/20 dark:bg-gray-950/10">
                             <h3 className="text-sm font-semibold mb-3">Summary</h3>
                             {(() => {
                               const addedGb = convertToGB(storageAmount, storageUnit);
@@ -654,7 +655,7 @@ export default function UpgradePlans() {
                                   <div className="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2">
                                     <div className="flex justify-between py-2">
                                       <span className="font-semibold">Total:</span>
-                                      <span className="text-lg font-bold text-emerald-500">{totalPrice.toLocaleString()} RWF</span>
+                                      <span className="text-lg font-bold text-red-600">{totalPrice.toLocaleString()} RWF</span>
                                     </div>
                                   </div>
                                 </>
@@ -665,12 +666,12 @@ export default function UpgradePlans() {
                             <Link
                               to={`/storage-checkout?storage_amount=${storageAmount}&storage_unit=${storageUnit}&type=addon&price=${calculatedTotalPrice}&price_total=${calculatedTotalPrice}`}
                               className={`mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold transition-colors ${storageAmount > 0 ? buttonPrimary : (darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-500')}`}
-                              style={{ borderRadius: '2px', pointerEvents: storageAmount > 0 ? 'auto' : 'none' }}
+                              style={{ pointerEvents: storageAmount > 0 ? 'auto' : 'none' }}
                             >
                               Purchase Add-on <ArrowRight className="w-4 h-4" />
                             </Link>
                           ) : (
-                            <div className="mt-4 w-full text-center px-4 py-2.5 text-sm bg-gray-100 dark:bg-gray-800 text-gray-500" style={{ borderRadius: '2px' }}>
+                            <div className="mt-4 w-full text-center px-4 py-2.5 text-sm bg-gray-100 dark:bg-gray-800 text-gray-500">
                               Subscribe to a plan first
                             </div>
                           )}
@@ -689,7 +690,7 @@ export default function UpgradePlans() {
                               onChange={(e) => setStorageAmount(parseFloat(e.target.value) || 0)}
                               disabled={!primaryPlanActive}
                               className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
-                              style={{ borderRadius: '2px' }}
+                             
                             />
                           </div>
                           <div>
@@ -699,13 +700,13 @@ export default function UpgradePlans() {
                               onChange={(e) => setStorageUnit(e.target.value)}
                               disabled={!primaryPlanActive}
                               className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
-                              style={{ borderRadius: '2px' }}
+                             
                             >
                               {storagePricing.available_units.map(unit => <option key={unit} value={unit}>{unit}</option>)}
                             </select>
                           </div>
                           
-                          <div className={`p-3 border text-[11px] leading-relaxed ${darkMode ? 'border-amber-500/30 bg-amber-500/5 text-amber-400' : 'border-amber-200 bg-amber-50 text-amber-700'}`} style={{ borderRadius: '2px' }}>
+                          <div className={`p-3 border text-[11px] leading-relaxed ${darkMode ? 'border-amber-500/30 bg-amber-500/5 text-amber-400' : 'border-amber-200 bg-amber-50 text-amber-700'}`}>
                             ⚠️ You can reduce free/unoccupied space only. If you try to remove space that is currently holding uploaded files, the request will fail.
                           </div>
                         </div>
@@ -714,9 +715,9 @@ export default function UpgradePlans() {
                           {reductionMessage && (
                             <div className={`p-3 border text-xs font-semibold mb-4 leading-relaxed ${
                               reductionMessage.type === 'success' 
-                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
+                                ? 'bg-red-600/10 border-red-600/20 text-red-600' 
                                 : 'bg-red-500/10 border-red-500/20 text-red-500'}`} 
-                              style={{ borderRadius: '2px' }}
+                             
                             >
                               {reductionMessage.text}
                             </div>
@@ -754,12 +755,12 @@ export default function UpgradePlans() {
                               }}
                               disabled={reductionLoading || storageAmount <= 0}
                               className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold transition-colors ${storageAmount > 0 ? buttonPrimary : (darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-500')}`}
-                              style={{ borderRadius: '2px' }}
+                             
                             >
                               {reductionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Confirm Reduction <ArrowRight className="w-4 h-4" /></>}
                             </button>
                           ) : (
-                            <div className="mt-4 w-full text-center px-4 py-2.5 text-sm bg-gray-100 dark:bg-gray-800 text-gray-500" style={{ borderRadius: '2px' }}>
+                            <div className="mt-4 w-full text-center px-4 py-2.5 text-sm bg-gray-100 dark:bg-gray-800 text-gray-500">
                               Subscribe to a plan first
                             </div>
                           )}
@@ -777,21 +778,30 @@ export default function UpgradePlans() {
 
       {/* Combined Renewal Modal */}
       {renewalModalOpen && selectedPlanForRenewal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm">
           <div 
-            className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 border shadow-lg ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-800'}`}
-            style={{ borderRadius: '2px' }}
+            className={`w-full max-w-3xl max-h-[92vh] overflow-y-auto p-4 sm:p-6 border shadow-2xl rounded-xl ${darkMode ? 'bg-gray-950 border-gray-800 text-white' : 'bg-white border-[#E5E5E5] text-black'}`}
+           
           >
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-base font-extrabold uppercase tracking-wider text-emerald-500">
-                Renew Subscription & Storage
-              </h3>
+            <div className="flex items-start justify-between gap-4 mb-5">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-red-600/30 bg-red-600/10 text-red-600 text-[10px] font-bold uppercase tracking-wider mb-2">
+                  Selected plan
+                </div>
+                <h3 className="text-lg sm:text-xl font-extrabold uppercase tracking-tight">
+                  Complete your subscription
+                </h3>
+                <p className={`text-xs mt-1 ${mutedText}`}>
+                  Review your plan and choose a payment method.
+                </p>
+              </div>
               <button 
                 onClick={() => {
                   setRenewalModalOpen(false);
                   setSelectedPlanForRenewal(null);
                 }} 
-                className="p-1 hover:opacity-70"
+                className={`p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
+                aria-label="Close payment dialog"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -799,21 +809,42 @@ export default function UpgradePlans() {
 
             <div className="space-y-4">
               {/* Plan Summary */}
-              <div className="p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-950/30" style={{ borderRadius: '2px' }}>
-                <div className="flex justify-between text-sm py-1">
-                  <span className="font-semibold">{selectedPlanForRenewal.display_name} Plan:</span>
-                  <span>{selectedPlanForRenewal.monthly_fee.toLocaleString()} RWF</span>
-                </div>
-                {addonGb > 0 && (
-                  <div className="flex justify-between text-sm py-1">
-                    <span className="font-semibold">Existing Storage Add-on ({addonGb} GB):</span>
-                    <span>{(addonGb * (storagePricing?.price_per_gb_rwf ?? 500)).toLocaleString()} RWF</span>
+              <div className={`p-4 sm:p-5 border rounded-xl ${cardBase}`}>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <h4 className="text-base font-bold">{selectedPlanForRenewal.display_name}</h4>
+                    <div className="mt-1 text-2xl font-bold">
+                      {selectedPlanForRenewal.monthly_fee.toLocaleString()} <span className="text-sm font-normal text-gray-400">RWF / month</span>
+                    </div>
+                    <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-zinc-100 dark:bg-zinc-900 border border-black/10 dark:border-white/10">
+                      {formatStorage(selectedPlanForRenewal.base_storage_gb)} included
+                    </div>
                   </div>
+                  {addonGb > 0 && (
+                    <div className={`text-left sm:text-right text-xs ${mutedText}`}>
+                      <div className="font-semibold">Existing storage add-on</div>
+                      <div className="mt-1">{formatStorage(addonGb)} · {(addonGb * (storagePricing?.price_per_gb_rwf ?? 500)).toLocaleString()} RWF</div>
+                    </div>
+                  )}
+                </div>
+                {selectedPlanForRenewal.feature_list.length > 0 && (
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
+                    {selectedPlanForRenewal.feature_list.slice(0, 4).map((feature, idx) => (
+                      <li key={idx} className="flex items-center gap-2 text-xs">
+                        <Check className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                        <span className={mutedText}>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </div>
 
               {/* Add/Reduce Storage Options */}
-              <div className="space-y-3">
+              <div className={`space-y-3 p-4 border rounded-xl ${cardBase}`}>
+                <div>
+                  <h4 className="text-sm font-bold uppercase tracking-wider">Storage options<span className="text-red-600">.</span></h4>
+                  <p className={`text-xs mt-1 ${mutedText}`}>Adjust your storage before confirming payment.</p>
+                </div>
                 <div className="flex flex-col gap-2">
                   <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider cursor-pointer">
                     <input
@@ -827,7 +858,7 @@ export default function UpgradePlans() {
                           setRenewReductionAmount(0);
                         }
                       }}
-                      className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                      className="rounded border-gray-300 text-red-600 focus:ring-red-600"
                     />
                     <span>Add/Expand storage add-on</span>
                   </label>
@@ -845,7 +876,7 @@ export default function UpgradePlans() {
                             setRenewReductionAmount(0);
                           }
                         }}
-                        className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                        className="rounded border-gray-300 text-red-600 focus:ring-red-600"
                       />
                       <span>Reduce storage add-on</span>
                     </label>
@@ -853,7 +884,7 @@ export default function UpgradePlans() {
                 </div>
 
                 {isAddingMoreStorage && (
-                  <div className="flex gap-2 p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-950/20" style={{ borderRadius: '2px' }}>
+                  <div className="flex gap-2 p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-950/20">
                     <div className="flex-1">
                       <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${subText}`}>Extra Storage</label>
                       <input
@@ -863,7 +894,7 @@ export default function UpgradePlans() {
                         value={renewAddonAmount}
                         onChange={(e) => setRenewAddonAmount(parseFloat(e.target.value) || 0)}
                         className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
-                        style={{ borderRadius: '2px' }}
+                       
                       />
                     </div>
                     <div>
@@ -872,7 +903,7 @@ export default function UpgradePlans() {
                         value={renewAddonUnit}
                         onChange={(e) => setRenewAddonUnit(e.target.value)}
                         className={`px-3 py-1.5 text-sm border ${inputBase}`}
-                        style={{ borderRadius: '2px' }}
+                       
                       >
                         {storagePricing?.available_units.map(u => <option key={u} value={u}>{u}</option>)}
                       </select>
@@ -881,7 +912,7 @@ export default function UpgradePlans() {
                 )}
 
                 {isReducingStorage && (
-                  <div className="flex gap-2 p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-950/20" style={{ borderRadius: '2px' }}>
+                  <div className="flex gap-2 p-3 border border-gray-200 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-950/20">
                     <div className="flex-1">
                       <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${subText}`}>Amount to Remove</label>
                       <input
@@ -891,7 +922,7 @@ export default function UpgradePlans() {
                         value={renewReductionAmount}
                         onChange={(e) => setRenewReductionAmount(parseFloat(e.target.value) || 0)}
                         className={`w-full px-3 py-1.5 text-sm border ${inputBase}`}
-                        style={{ borderRadius: '2px' }}
+                       
                       />
                     </div>
                     <div>
@@ -900,7 +931,7 @@ export default function UpgradePlans() {
                         value={renewReductionUnit}
                         onChange={(e) => setRenewReductionUnit(e.target.value)}
                         className={`px-3 py-1.5 text-sm border ${inputBase}`}
-                        style={{ borderRadius: '2px' }}
+                       
                       >
                         {storagePricing?.available_units.map(u => <option key={u} value={u}>{u}</option>)}
                       </select>
@@ -920,13 +951,13 @@ export default function UpgradePlans() {
                   return (
                     <div className="space-y-4">
                       {isOverPurchasedAddon && (
-                        <div className="p-3 border border-red-500/20 bg-red-500/5 text-red-500 text-xs font-semibold leading-relaxed" style={{ borderRadius: '2px' }}>
+                        <div className="p-3 border border-red-500/20 bg-red-500/5 text-red-500 text-xs font-semibold leading-relaxed">
                           You cannot reduce storage by more than your purchased add-on storage ({formatStorage(addonGb)}).
                         </div>
                       )}
 
                       {isOverLimit && (
-                        <div className="p-3 border border-red-500/20 bg-red-500/5 text-red-500 text-xs font-semibold leading-relaxed" style={{ borderRadius: '2px' }}>
+                        <div className="p-3 border border-red-500/20 bg-red-500/5 text-red-500 text-xs font-semibold leading-relaxed">
                           ⚠️ You need to first delete the uploaded products/services occupying this storage you want to reduce to be able to reduce the storage (you can reduce the free space only)
                         </div>
                       )}
@@ -934,9 +965,9 @@ export default function UpgradePlans() {
                       {renewMessage && (
                         <div className={`p-3 border text-xs font-semibold ${
                           renewMessage.startsWith('✅')
-                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
+                            ? 'bg-red-600/10 border-red-600/20 text-red-600' 
                             : 'bg-red-500/10 border-red-500/20 text-red-500'}`} 
-                          style={{ borderRadius: '2px' }}
+                         
                         >
                           {renewMessage}
                         </div>
@@ -978,8 +1009,8 @@ export default function UpgradePlans() {
                             }
                           }}
                           disabled={renewLoading || renewReductionAmount <= 0 || isOverLimit || isOverPurchasedAddon}
-                          className={`flex-grow py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5`}
-                          style={{ borderRadius: '2px' }}
+                          className={`flex-grow py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5`}
+                         
                         >
                           {renewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Reduction'}
                         </button>
@@ -992,8 +1023,8 @@ export default function UpgradePlans() {
                           }}
                           disabled={renewLoading}
                           className={`px-4 py-2 border font-bold text-xs uppercase tracking-wider transition-colors
-                            ${darkMode ? 'bg-gray-700 hover:bg-gray-650 border-gray-600 text-gray-200' : 'bg-white hover:bg-gray-50 border-gray-300 text-gray-600'}`}
-                          style={{ borderRadius: '2px' }}
+                            ${buttonSecondary}`}
+                         
                         >
                           Cancel
                         </button>
@@ -1088,7 +1119,7 @@ export default function UpgradePlans() {
 
                 return (
                   <div className="space-y-4">
-                    <div className="p-3 border border-emerald-500/25 bg-emerald-500/5 text-emerald-500 flex justify-between items-center" style={{ borderRadius: '2px' }}>
+                    <div className="p-3 border border-red-600/25 bg-red-600/5 text-red-600 flex justify-between items-center">
                       <span className="font-extrabold uppercase text-xs tracking-wider">Total Combined Price</span>
                       <div className="text-right">
                         <div className="text-xl font-black">{total.toLocaleString()} RWF</div>
@@ -1099,7 +1130,7 @@ export default function UpgradePlans() {
                     </div>
 
                     {/* Payment method selector and details */}
-                    <div className="mb-4">
+                    <div className="mb-8">
                       <label className={`block text-[10px] font-bold uppercase tracking-wider mb-3 ${subText}`}>
                         Choose Payment Method
                       </label>
@@ -1114,8 +1145,8 @@ export default function UpgradePlans() {
                             onClick={() => setSelectedMethod(method.id)}
                             className={`w-full h-full min-w-0 overflow-hidden border text-left transition-all hover:-translate-y-0.5 hover:shadow-md ${
                               selectedMethod === method.id
-                                ? `${method.active} ring-2 ring-offset-1 ${darkMode ? 'ring-offset-gray-800' : 'ring-offset-white'}`
-                                : `${darkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`
+                                ? `${method.active} ring-2 ring-offset-1 ${darkMode ? 'ring-offset-black' : 'ring-offset-white'}`
+                                : `${darkMode ? 'border-white/20 bg-black' : 'border-black bg-white'}`
                             }`}
                             style={{ borderRadius: '6px' }}
                           >
@@ -1128,8 +1159,8 @@ export default function UpgradePlans() {
                               </div>
                               <span className={`px-8 py-2 border rounded-full text-sm ${
                                 selectedMethod === method.id
-                                  ? 'border-emerald-500 bg-emerald-500 text-white'
-                                  : darkMode ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'
+                                  ? 'border-red-600 bg-red-600 text-white'
+                                  : darkMode ? 'border-white/30 text-white/70' : 'border-black/30 text-black/70'
                               }`}>
                                 {selectedMethod === method.id ? 'Selected' : 'Select'}
                               </span>
@@ -1147,7 +1178,7 @@ export default function UpgradePlans() {
                           className={`w-full h-full min-w-0 overflow-hidden border text-left transition-all hover:-translate-y-0.5 hover:shadow-md ${
                             selectedMethod === 'card'
                               ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-500 ring-offset-1'
-                              : `${darkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`
+                              : `${darkMode ? 'border-white/20 bg-black' : 'border-black bg-white'}`
                           }`}
                           style={{ borderRadius: '6px' }}
                         >
@@ -1159,7 +1190,7 @@ export default function UpgradePlans() {
                               <img src={VisaIcon} alt="Visa" className="w-10 h-7 object-contain" />
                               <img src={MastercardIcon} alt="Mastercard" className="w-10 h-7 object-contain" />
                             </div>
-                            <span className={`px-8 py-2 border rounded-full text-sm ${darkMode ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}>
+                            <span className={`px-8 py-2 border rounded-full text-sm ${darkMode ? 'border-white/30 text-white/70' : 'border-black/30 text-black/70'}`}>
                               {renewLoading ? 'Opening...' : 'Select'}
                             </span>
                           </div>
@@ -1167,11 +1198,11 @@ export default function UpgradePlans() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 pt-8 mb-12 border-t ${darkMode ? 'border-gray-800' : 'border-gray-200'}`}>
                       {selectedMethod !== 'card' && (
-                        <div>
+                        <div className="md:col-span-2">
                           <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${subText}`}>
-                            Mobile Money Details
+                            {selectedMethod === 'mtn' ? 'MTN' : 'Airtel'} mobile money number
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1182,8 +1213,7 @@ export default function UpgradePlans() {
                               placeholder={selectedMethod === 'mtn' ? '078 123 4567' : '073 123 4567'}
                               value={selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone}
                               onChange={(e) => handleInputChange(e, selectedMethod)}
-                              className={`w-full pl-14 pr-3 py-2 border outline-none text-sm ${inputBase}`}
-                              style={{ borderRadius: '2px' }}
+                              className={`w-full pl-14 pr-3 py-3 text-sm border outline-none ${inputBase}`}
                               aria-label={`${selectedMethod === 'mtn' ? 'MTN' : 'Airtel'} phone number`}
                             />
                           </div>
@@ -1194,16 +1224,15 @@ export default function UpgradePlans() {
                     {renewMessage && (
                       <div className={`p-3 border text-xs font-semibold ${
                         renewMessage.includes('initiated') || renewMessage.startsWith('✅') || renewMessage.startsWith('⏳')
-                          ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
+                          ? 'bg-red-600/10 border-red-600/20 text-red-600' 
                           : 'bg-red-500/10 border-red-500/20 text-red-500'}`} 
-                        style={{ borderRadius: '2px' }}
+                       
                       >
                         {renewMessage}
                       </div>
                     )}
-
                     {/* Actions */}
-                    <div className="flex gap-2 pt-2">
+                    <div className="flex flex-col-reverse sm:flex-row gap-3 pt-3">
                       {selectedMethod !== 'card' && <button
                         onClick={async () => {
                           setRenewMessage(null);
@@ -1250,8 +1279,8 @@ export default function UpgradePlans() {
                           }
                         }}
                         disabled={renewLoading || !isPaymentReady || renewMessage?.startsWith('⏳') === true}
-                        className={`flex-grow py-2 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-400 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5`}
-                        style={{ borderRadius: '2px' }}
+                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold transition-colors ${buttonPrimary} disabled:opacity-50 disabled:cursor-not-allowed`}
+                       
                       >
                         {renewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : renewMessage?.startsWith('⏳') ? 'Payment Pending' : 'Confirm & Pay'}
                       </button>
@@ -1264,9 +1293,9 @@ export default function UpgradePlans() {
                           setRenewMessage(null);
                         }}
                         disabled={renewLoading}
-                        className={`px-4 py-2 border font-bold text-xs uppercase tracking-wider transition-colors
-                          ${darkMode ? 'bg-gray-700 hover:bg-gray-650 border-gray-600 text-gray-200' : 'bg-white hover:bg-gray-50 border-gray-300 text-gray-600'}`}
-                        style={{ borderRadius: '2px' }}
+                        className={`px-5 py-2.5 text-sm font-semibold transition-colors
+                          ${buttonSecondary}`}
+                       
                       >
                         Cancel
                       </button>

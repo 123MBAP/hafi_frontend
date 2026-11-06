@@ -104,13 +104,13 @@ export default function ProviderBookingsPage() {
   if (error) {
     return (
       <div className="p-6 max-w-6xl mx-auto">
-        <div className={`border p-6 text-center ${darkMode ? "bg-red-500/10 border-red-500/20 text-red-400" : "bg-red-50 border-red-200 text-red-800"}`} style={{ borderRadius: '2px' }}>
+        <div className={`border p-6 text-center ${darkMode ? "bg-red-500/10 border-red-500/20 text-red-400" : "bg-red-50 border-red-200 text-red-800"}`}>
           <h2 className="font-bold text-base uppercase tracking-tight mb-2">Error Loading Bookings</h2>
           <p className="text-xs">{error}</p>
           <button 
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-750 text-white font-semibold text-xs uppercase tracking-wider transition-colors duration-200"
-            style={{ borderRadius: '2px' }}
+           
           >
             Try Again
           </button>
@@ -127,30 +127,30 @@ export default function ProviderBookingsPage() {
       
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className={`p-4 border shadow-sm ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`} style={{ borderRadius: '2px' }}>
+        <div className={`p-4 border shadow-sm ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`}>
           <h3 className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Total Bookings</h3>
           <p className="text-2xl font-extrabold mt-1">{bookings.length}</p>
         </div>
-        <div className={`p-4 border shadow-sm ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`} style={{ borderRadius: '2px' }}>
+        <div className={`p-4 border shadow-sm ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`}>
           <h3 className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Completed</h3>
           <p className="text-2xl font-extrabold mt-1 text-emerald-500">
             {bookings.filter(b => b.status === 'completed').length}
           </p>
         </div>
-        <div className={`p-4 border shadow-sm ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`} style={{ borderRadius: '2px' }}>
+        <div className={`p-4 border shadow-sm ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`}>
           <h3 className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Pending</h3>
           <p className="text-2xl font-extrabold mt-1 text-amber-500">
             {bookings.filter(b => b.status === 'pending').length}
           </p>
         </div>
-        <div className={`p-4 border shadow-sm ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`} style={{ borderRadius: '2px' }}>
+        <div className={`p-4 border shadow-sm ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`}>
           <h3 className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Total Revenue</h3>
           <p className="text-2xl font-extrabold mt-1 text-emerald-500">{totalRevenue.toLocaleString()} RWF</p>
         </div>
       </div>
 
       {/* Filter Controls */}
-      <div className={`p-4 border shadow-sm mb-6 ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`} style={{ borderRadius: '2px' }}>
+      <div className={`p-4 border shadow-sm mb-6 ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`}>
         <div className="flex flex-wrap gap-3 items-center">
           <span className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Filter status:</span>
           {(['all', 'completed', 'pending', 'refunded'] as const).map((status) => {
@@ -166,7 +166,7 @@ export default function ProviderBookingsPage() {
                       ? 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700' 
                       : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
                 }`}
-                style={{ borderRadius: '2px' }}
+               
               >
                 {status}
               </button>
@@ -178,12 +178,12 @@ export default function ProviderBookingsPage() {
       {/* Bookings List */}
       <div className="space-y-4">
         {filteredBookings.length === 0 ? (
-          <div className={`p-8 border text-center ${darkMode ? "bg-gray-850 border-gray-750 text-gray-400" : "bg-white border-gray-200 text-gray-500"}`} style={{ borderRadius: '2px' }}>
+          <div className={`p-8 border text-center ${darkMode ? "bg-gray-850 border-gray-750 text-gray-400" : "bg-white border-gray-200 text-gray-500"}`}>
             <p className="text-sm font-semibold uppercase tracking-wider">No bookings found</p>
           </div>
         ) : (
           filteredBookings.map((booking) => (
-            <div key={booking.id} className={`border shadow-sm overflow-hidden ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`} style={{ borderRadius: '2px' }}>
+            <div key={booking.id} className={`border shadow-sm overflow-hidden ${darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"}`}>
               {/* Booking Header */}
               <div className={`p-4 border-b flex justify-between items-center flex-wrap gap-2 ${darkMode ? "border-gray-750 bg-gray-900/40" : "border-gray-150 bg-gray-50/50"}`}>
                 <div>
@@ -198,12 +198,12 @@ export default function ProviderBookingsPage() {
                     ${booking.status === 'completed' ? (darkMode ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-emerald-50 text-emerald-700 border-emerald-200') : ''}
                     ${booking.status === 'pending' ? (darkMode ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-amber-50 text-amber-700 border-amber-200') : ''}
                     ${booking.status === 'refunded' ? (darkMode ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-red-50 text-red-700 border-red-200') : ''}
-                  `} style={{ borderRadius: '2px' }}>
+                  `}>
                     {booking.status}
                   </span>
                   <span className={`px-2 py-0.5 border text-[9px] font-bold uppercase tracking-wider
                     ${booking.type === 'direct' ? (darkMode ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-blue-50 text-blue-700 border-blue-200') : (darkMode ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' : 'bg-purple-50 text-purple-700 border-purple-200')}
-                  `} style={{ borderRadius: '2px' }}>
+                  `}>
                     {booking.type}
                   </span>
                 </div>
@@ -214,12 +214,12 @@ export default function ProviderBookingsPage() {
                 <h4 className={`text-[10px] font-bold uppercase tracking-wider mb-3 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Items</h4>
                 <div className="space-y-3">
                   {booking.items.map((item) => (
-                    <div key={item.id} className={`flex items-center gap-4 p-3 border ${darkMode ? "border-gray-750 bg-gray-900/10" : "border-gray-150 bg-white"}`} style={{ borderRadius: '2px' }}>
+                    <div key={item.id} className={`flex items-center gap-4 p-3 border ${darkMode ? "border-gray-750 bg-gray-900/10" : "border-gray-150 bg-white"}`}>
                       <img 
                         src={item.image || '/api/placeholder/80/80'} 
                         alt={item.name}
                         className="w-16 h-16 object-cover border dark:border-gray-700"
-                        style={{ borderRadius: '2px' }}
+                       
                         onError={(e) => {
                           e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik00MCA0MEM0My4zMTM3IDQwIDQ2IDM3LjMxMzcgNDYgMzRDNDYgMzAuNjg2MyA0My4zMTM3IDI4IDQwIDI4QzM2LjY4NjMgMjggMzQgMzAuNjg2MyAzNCAzNEMzNCAzNy4zMTM3IDM2LjY4NjMgNDAgNDAgNDBaTTQwIDUyQzQ2LjYgNTIgNTIuOCA0OC40IDU2IDQyLjRDNjAgMzYuNCA1Ni44IDMyIDQwIDMyQzIzLjIgMzIgMjAgMzYuNCAyNCA0Mi40QzI3LjIgNDguNCAzMy40IDUyIDQwIDUyWiIgZmlsbD0iIzlDQTBCRiIvPgo8L3N2Zz4K';
                         }}

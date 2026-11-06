@@ -4,9 +4,9 @@ import { useAuth } from '@/context/AuthContext';
 import { useDarkMode } from '@/context/DarkMode';
 import ChatBox from './ChatBox';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { API_BASE } from '../api/apiClient';
 import {
-  FileText, 
   RefreshCw, 
   ArrowLeft, 
   Package, 
@@ -84,7 +84,7 @@ const STATUS_CONFIG: Record<OrderStatus, { label: string; tone: string; nextActi
   quoted: { label: 'Quoted Price', tone: 'warning', nextActions: [] },
   quote_accepted: { label: 'Quote Accepted', tone: 'success', nextActions: ['payment_received'] },
   payment_done: { label: 'Payment Sent', tone: 'info', nextActions: ['payment_received'] },
-  payment_received: { label: 'Payment Confirmed', tone: 'warning', nextActions: ['delivery_pending'] },
+  payment_received: { label: 'Payment Confirmed', tone: 'brand', nextActions: ['delivery_pending'] },
   delivery_pending: { label: 'Delivery Pending', tone: 'info', nextActions: ['delivered'] },
   delivered: { label: 'Delivered', tone: 'success', nextActions: [] },
 };
@@ -110,8 +110,9 @@ const normalizeProviderOrder = (order: any): ProviderOrder => ({
 const getStatusTone = (status: OrderStatus, darkMode: boolean): string => {
   const tones = {
     default: darkMode ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-    info: darkMode ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' : 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20',
-    warning: darkMode ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20',
+    info: darkMode ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+    warning: darkMode ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' : 'bg-purple-500/10 text-purple-600 border-purple-500/20',
+    brand: darkMode ? 'bg-red-500/10 text-[#E5252A] border-red-500/20' : 'bg-red-500/10 text-[#E5252A] border-red-500/20',
     success: darkMode ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
   };
   return tones[STATUS_CONFIG[status]?.tone as keyof typeof tones] || tones.default;
@@ -134,7 +135,7 @@ const formatAddress = (addressStr?: string | null) => {
                 href={`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-emerald-500 hover:underline font-bold text-[10px] inline-flex items-center gap-0.5 mt-0.5"
+                className="text-[#E5252A] hover:underline font-bold text-[10px] inline-flex items-center gap-0.5 mt-0.5"
               >
                 Google Maps ({Number(lat).toFixed(5)}, {Number(lng).toFixed(5)})
               </a>
@@ -300,23 +301,27 @@ const useCustomerChatCounts = (token: string | null) => {
 // ===== Components =====
 const OrderSummaryCards = ({ summary, darkMode }: { summary: OrderSummary; darkMode: boolean }) => {
   const cards = [
-    { label: 'Total Orders', value: summary.total, icon: <Package className="w-5 h-5 text-gray-500" /> },
+    { label: 'Total Orders', value: summary.total, icon: <Package className="w-5 h-5 text-gray-400" /> },
     { label: 'Payment Pending', value: summary.paymentPending, icon: <Clock className="w-5 h-5 text-amber-500" /> },
-    { label: 'Payment Confirmed', value: summary.paymentReceived, icon: <DollarSign className="w-5 h-5 text-emerald-500" /> },
-    { label: 'Delivery Pending', value: summary.deliveryPending, icon: <Truck className="w-5 h-5 text-cyan-500" /> },
-    { label: 'Completed', value: summary.delivered, icon: <CheckCircle className="w-5 h-5 text-green-500" /> },
+    { label: 'Payment Confirmed', value: summary.paymentReceived, icon: <DollarSign className="w-5 h-5 text-[#E5252A]" /> },
+    { label: 'Delivery Pending', value: summary.deliveryPending, icon: <Truck className="w-5 h-5 text-blue-500" /> },
+    { label: 'Completed', value: summary.delivered, icon: <CheckCircle className="w-5 h-5 text-emerald-500" /> },
   ];
-
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
       {cards.map((card, idx) => (
-        <div key={idx} className={`border p-4 shadow-sm flex flex-col justify-between ${darkMode ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'}`} style={{ borderRadius: '2px', ...{ backgroundColor: darkMode ? '#111827' : '#ffffff' } }}>
+        <div 
+          key={idx} 
+          className={`rounded-2xl border p-4 shadow-xs flex flex-col justify-between transition-all ${
+            darkMode ? 'border-gray-800 bg-gray-900' : 'border-[#E5E5E5] bg-white'
+          }`}
+        >
           <div className="flex justify-between items-center mb-2">
-            <span className="text-[10px] uppercase tracking-wider font-bold text-gray-400">{card.label}</span>
+            <span className="text-[10px] uppercase tracking-wider font-bold text-[#666666] dark:text-gray-400">{card.label}</span>
             {card.icon}
           </div>
-          <p className="text-2xl font-bold font-mono tracking-tight text-emerald-500">{card.value}</p>
+          <p className="text-2xl font-bold font-mono tracking-tight text-[#151515] dark:text-white">{card.value}</p>
         </div>
       ))}
     </div>
@@ -324,7 +329,7 @@ const OrderSummaryCards = ({ summary, darkMode }: { summary: OrderSummary; darkM
 };
 
 const StatusBadge = ({ status, darkMode }: { status: OrderStatus; darkMode: boolean }) => (
-  <span className={`border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${getStatusTone(status, darkMode)}`} style={{ borderRadius: '2px' }}>
+  <span className={`border rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${getStatusTone(status, darkMode)}`}>
     {STATUS_CONFIG[status]?.label || status}
   </span>
 );
@@ -337,13 +342,13 @@ const ActionButton = ({
 }: { 
   onClick: () => void; 
   disabled: boolean; 
-  children: React.ReactNode;
+  children: React.ReactNode; 
   variant?: 'primary' | 'secondary' | 'danger';
 }) => {
   const variants = {
-    primary: 'bg-emerald-500 hover:bg-emerald-600 text-white',
-    secondary: 'bg-indigo-600 hover:bg-indigo-700 text-white',
-    danger: 'bg-red-600 hover:bg-red-700 text-white',
+    primary: 'bg-[#E5252A] hover:bg-[#c91d22] text-white shadow-xs',
+    secondary: 'bg-[#0A0A0A] hover:bg-black text-white dark:bg-gray-800 dark:hover:bg-gray-700 shadow-xs',
+    danger: 'bg-red-700 hover:bg-red-800 text-white shadow-xs',
   };
 
   return (
@@ -351,10 +356,9 @@ const ActionButton = ({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`w-full py-2.5 text-xs font-bold uppercase tracking-wider transition-colors duration-200 ${
-        disabled ? 'cursor-not-allowed bg-gray-700 text-gray-500' : variants[variant]
+      className={`w-full py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors duration-200 active:scale-[0.98] cursor-pointer ${
+        disabled ? 'cursor-not-allowed bg-gray-200 dark:bg-gray-800 text-gray-400' : variants[variant]
       }`}
-      style={{ borderRadius: '2px' }}
     >
       {children}
     </button>
@@ -379,14 +383,14 @@ const QuoteSection = ({
   const [isEditing, setIsEditing] = useState(false);
   const customization = item.serviceCustomization;
 
-  const borderColor = darkMode ? 'border-gray-800' : 'border-gray-250';
-  const inputBg = darkMode ? 'bg-gray-950 border-gray-850 text-white' : 'bg-white border-gray-250 text-gray-900';
+  const borderColor = darkMode ? 'border-gray-800' : 'border-[#E5E5E5]';
+  const inputBg = darkMode ? 'bg-gray-950 border-gray-800 text-white' : 'bg-white border-[#E5E5E5] text-gray-900';
 
   if (!customization || customization.noCustomizationNeeded) return null;
   if (customization.quoteStatus === 'accepted') {
     return (
-      <div className="mt-3 border border-emerald-500/20 bg-emerald-500/5 p-3 text-xs" style={{ borderRadius: '2px' }}>
-        <p className="font-semibold text-emerald-500 flex items-center gap-1">
+      <div className="mt-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3 text-xs">
+        <p className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
           <CheckCircle className="w-4 h-4" />
           Customer accepted offered quote: RWF {Number(customization.quotedPrice).toLocaleString()}
         </p>
@@ -406,30 +410,30 @@ const QuoteSection = ({
 
   if (!isEditing && customization.quotedPrice) {
     return (
-      <div className={`mt-3 border p-3 ${borderColor} ${darkMode ? 'bg-gray-950/20' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+      <div className={`mt-3 rounded-xl border p-3.5 ${borderColor} ${darkMode ? 'bg-gray-900/40' : 'bg-[#F5F5F5]'}`}>
         <div className="flex justify-between items-center gap-2">
-          <span className="text-xs font-semibold">Active Offered Quote: RWF {Number(customization.quotedPrice).toLocaleString()}</span>
+          <span className="text-xs font-semibold text-[#151515] dark:text-white">Active Offered Quote: RWF {Number(customization.quotedPrice).toLocaleString()}</span>
           <button
             onClick={() => setIsEditing(true)}
-            className="text-xs uppercase font-bold text-emerald-500 hover:underline"
+            className="text-xs uppercase font-bold text-[#E5252A] hover:underline cursor-pointer"
           >
             Adjust Quote
           </button>
         </div>
         {customization.customizationRequest && (
-          <p className="text-[11px] text-gray-500 mt-1">Request notes: {customization.customizationRequest}</p>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Request notes: {customization.customizationRequest}</p>
         )}
       </div>
     );
   }
 
   return (
-    <div className={`mt-3 border p-4 ${borderColor} ${darkMode ? 'bg-gray-950/20' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
-      <p className="text-xs font-bold uppercase tracking-wider text-emerald-500 mb-1.5">Submit custom service quote</p>
+    <div className={`mt-3 rounded-xl border p-4 ${borderColor} ${darkMode ? 'bg-gray-900/40' : 'bg-[#F5F5F5]'}`}>
+      <p className="text-xs font-bold uppercase tracking-wider text-[#E5252A] mb-1.5">Submit custom service quote</p>
       {customization.customizationRequest && (
-        <p className="text-[11px] text-gray-400 mb-2 leading-relaxed">Request: {customization.customizationRequest}</p>
+        <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2 leading-relaxed">Request: {customization.customizationRequest}</p>
       )}
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <input
           type="number"
           min="0"
@@ -437,14 +441,12 @@ const QuoteSection = ({
           value={quoteDraft}
           onChange={(e) => setQuoteDraft(e.target.value)}
           placeholder={`Reg Price: RWF ${Number(item.price).toLocaleString()}`}
-          className={`px-3 py-2 text-xs border focus:outline-none flex-grow ${inputBg}`}
-          style={{ borderRadius: '2px' }}
+          className={`min-w-0 px-3 py-2 text-xs rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A] flex-grow ${inputBg}`}
         />
         <button
           onClick={handleQuote}
           disabled={saving || !quoteDraft}
-          className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider px-3.5 py-2 disabled:opacity-50"
-          style={{ borderRadius: '2px' }}
+          className="w-full sm:w-auto bg-[#E5252A] hover:bg-[#c91d22] text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl disabled:opacity-50 transition-colors shadow-xs cursor-pointer"
         >
           {customization.quotedPrice ? 'Adjust Quote' : 'Send Quote'}
         </button>
@@ -478,9 +480,9 @@ const OrderCard = ({
   customer?: any;
   darkMode: boolean;
 }) => {
-  const cardBg = darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200';
-  const borderColor = darkMode ? 'border-gray-800' : 'border-gray-250';
-  const secondaryTextColor = darkMode ? 'text-gray-400' : 'text-gray-650';
+  const cardBg = darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]';
+  const borderColor = darkMode ? 'border-gray-800' : 'border-[#E5E5E5]';
+  const secondaryTextColor = darkMode ? 'text-gray-400' : 'text-[#666666]';
 
   const isSaving = savingOrderUuid === order.orderUuid;
   const isChatOpen = activeChatOrderUuid === order.orderUuid;
@@ -535,92 +537,76 @@ const OrderCard = ({
   };
 
   return (
-    <div className={`border shadow-sm p-6 ${cardBg}`} style={{ borderRadius: '2px' }}>
+    <div className={`min-w-0 border rounded-2xl shadow-xs p-4 sm:p-6 ${cardBg}`}>
       
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between border-b pb-4 dark:border-gray-800">
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
-            <h2 className="text-base font-bold uppercase tracking-tight">Order #{order.orderUuid.slice(0, 12).toUpperCase()}</h2>
+            <h2 className="text-base font-bold uppercase tracking-tight text-[#151515] dark:text-white">Order #{order.orderUuid.slice(0, 12).toUpperCase()}</h2>
             <StatusBadge status={order.status} darkMode={darkMode} />
           </div>
-          <p className="text-sm font-semibold">{order.customerName}</p>
+          <p className="text-sm font-semibold text-[#151515] dark:text-white">{order.customerName}</p>
           {order.customerEmail && (
             <p className={`text-xs ${secondaryTextColor} mt-0.5`}>{order.customerEmail}</p>
           )}
 
           <div className="mt-3 w-full max-w-xs">
-            <style>{`
-              @keyframes chat-shake {
-                0%, 100% { transform: scale(1); }
-                10%, 30%, 50%, 70%, 90% { transform: scale(1.02) rotate(-0.5deg); }
-                20%, 40%, 60%, 80% { transform: scale(1.02) rotate(0.5deg); }
-              }
-              @keyframes chat-pulse {
-                0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
-                70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-                100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-              }
-              .chat-wave-shake {
-                animation: chat-shake 4s infinite ease-in-out, chat-pulse 2s infinite;
-              }
-            `}</style>
             <button
               onClick={handleChatToggle}
-              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[11px] font-black uppercase tracking-widest shadow-md chat-wave-shake hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2"
-              style={{ borderRadius: '2px' }}
+              className="w-full py-2.5 rounded-xl bg-[#E5252A] hover:bg-[#c91d22] text-white text-xs font-bold uppercase tracking-wider shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
-              <MessageSquare className="w-4 h-4 animate-bounce" />
+              <MessageSquare className="w-4 h-4" />
               <span>Chat with client {unreadCount > 0 ? `(${unreadCount} New)` : ''}</span>
             </button>
           </div>
 
           <div className={`mt-3 text-[10px] font-bold uppercase tracking-wide space-y-1 ${secondaryTextColor}`}>
-            <div className="flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-gray-500" />
-              <span>Placed: {new Date(order.createdAt).toLocaleString()}</span>
+            <div className="flex items-start gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-gray-400" />
+              <span className="break-words">Placed: {new Date(order.createdAt).toLocaleString()}</span>
             </div>
-            {order.customerPaymentDoneAt && <p className="text-amber-500">Payment notified: {new Date(order.customerPaymentDoneAt).toLocaleString()}</p>}
-            {order.customerAcknowledgedAt && <p className="text-emerald-500">Delivery acknowledged: {new Date(order.customerAcknowledgedAt).toLocaleString()}</p>}
+            {order.customerPaymentDoneAt && <p className="text-amber-500 font-semibold">Payment notified: {new Date(order.customerPaymentDoneAt).toLocaleString()}</p>}
+            {order.customerAcknowledgedAt && <p className="text-emerald-500 font-semibold">Delivery acknowledged: {new Date(order.customerAcknowledgedAt).toLocaleString()}</p>}
           </div>
         </div>
 
         <div className="text-left sm:text-right">
           <div className={`text-xs ${secondaryTextColor} uppercase tracking-wider font-bold`}>Quote Sum</div>
-          <div className="text-xl font-bold text-emerald-500">RWF {Number(order.total).toLocaleString()}</div>
+          <div className="text-2xl font-extrabold text-[#E5252A]">RWF {Number(order.total).toLocaleString()}</div>
           <div className={`text-[10px] ${secondaryTextColor} uppercase tracking-wider font-bold mt-0.5`}>Subtotal: RWF {Number(order.subtotal).toLocaleString()}</div>
         </div>
       </div>
 
       {/* Grid contents */}
-      <div className={`mt-4 grid gap-6 ${isChatOpen ? 'lg:grid-cols-[1fr_360px_320px]' : 'lg:grid-cols-[1fr_320px]'}`}>
+      <div className={`mt-4 min-w-0 grid gap-6 ${isChatOpen ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,680px)]' : 'lg:grid-cols-[minmax(0,1fr)_320px]'}`}>
         
         {/* Column 1 - Items */}
         <div className="space-y-4">
-          <div className={`p-3 text-[11px] leading-relaxed border border-emerald-500/15 bg-emerald-500/5 text-gray-500`} style={{ borderRadius: '2px' }}>
-            <div className="flex items-center gap-1 font-bold uppercase tracking-wider text-emerald-500 mb-1">
+          <div className="p-3.5 rounded-xl text-[11px] leading-relaxed border border-red-500/15 bg-red-500/5 text-[#666666] dark:text-gray-400">
+            <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[#E5252A] mb-1">
               <Truck className="w-3.5 h-3.5" />
               <span>Transport & Delivery</span>
             </div>
             Negotiate delivery coordinates and transport terms directly with the customer.
           </div>
 
-          <div className={`border divide-y ${borderColor}`} style={{ borderRadius: '2px' }}>
+          <div className={`border rounded-xl divide-y overflow-hidden ${borderColor}`}>
             {order.items.map((item, idx) => (
-              <div key={idx} className="p-4 flex gap-4">
-                <img src={item.image} alt={item.name} className="h-14 w-14 border dark:border-gray-800 object-cover shrink-0" style={{ borderRadius: '2px' }} />
+              <div key={idx} className="p-3 sm:p-4 flex flex-col sm:flex-row gap-3 sm:gap-4 bg-white dark:bg-gray-900">
+                <img src={item.image} alt={item.name} className="h-14 w-14 rounded-xl border dark:border-gray-800 object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm font-bold uppercase tracking-tight truncate">{item.name}</p>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-start">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold uppercase tracking-tight text-[#151515] dark:text-white truncate">{item.name}</p>
                       {item.description && (
                         <p className={`text-xs ${secondaryTextColor} mt-0.5`}>{item.description}</p>
                       )}
                       <p className={`text-xs ${secondaryTextColor} mt-1`}>
-                        Qty: <strong className="text-emerald-500 font-bold">{item.quantity}</strong> {item.size && ` · Size: ${item.size}`}
+                        Qty: <strong className="text-[#151515] dark:text-white font-bold">{item.quantity}</strong> {item.size && ` · Size: ${item.size}`}
                       </p>
                     </div>
-                    <div className="text-sm font-semibold shrink-0">
+                    <div className="text-sm font-bold text-[#151515] dark:text-white shrink-0">
                       RWF {(item.price * item.quantity).toLocaleString()}
                     </div>
                   </div>
@@ -643,7 +629,7 @@ const OrderCard = ({
 
         {/* Column 2 - Chat Box */}
         {isChatOpen && (
-          <div className={`border p-3 ${borderColor} ${darkMode ? 'bg-gray-955' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+          <div className={`min-w-0 border rounded-2xl overflow-hidden p-2 ${borderColor} ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
             <ChatBox
               providerId={providerId}
               customerId={customerId}
@@ -656,20 +642,20 @@ const OrderCard = ({
         )}
 
         {/* Column 3 - Actions */}
-        <div className="space-y-4">
-          <div className={`border p-4 ${borderColor} ${darkMode ? 'bg-gray-950/20' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+        {!isChatOpen && <div className="space-y-4">
+          <div className={`border rounded-2xl p-4 ${borderColor} ${darkMode ? 'bg-gray-900/40' : 'bg-[#F5F5F5]'}`}>
             <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">Receipt Summary</div>
-            <div className="text-xl font-bold text-emerald-500">RWF {Number(order.total).toLocaleString()}</div>
-            <div className={`text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-0.5`}>Subtotal: RWF {Number(order.subtotal).toLocaleString()}</div>
+            <div className="text-2xl font-extrabold text-[#E5252A]">RWF {Number(order.total).toLocaleString()}</div>
+            <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mt-0.5">Subtotal: RWF {Number(order.subtotal).toLocaleString()}</div>
           </div>
 
-          <div className={`border p-4 ${borderColor} ${darkMode ? 'bg-gray-950/20' : 'bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+          <div className={`border rounded-2xl p-4 ${borderColor} ${darkMode ? 'bg-gray-900/40' : 'bg-[#F5F5F5]'}`}>
             <div className="space-y-3">
               {renderActionButtons()}
             </div>
             
-            <div className={`mt-4 p-3 border text-[11px] leading-relaxed ${borderColor} ${darkMode ? 'bg-gray-955 text-gray-400' : 'bg-gray-50 text-gray-650'}`} style={{ borderRadius: '2px' }}>
-              <div className="flex items-center gap-1 font-bold uppercase tracking-wider text-emerald-500 mb-1">
+            <div className={`mt-4 p-3 rounded-xl border text-[11px] leading-relaxed ${borderColor} ${darkMode ? 'bg-gray-900 text-gray-400' : 'bg-white text-gray-600'}`}>
+              <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[#E5252A] mb-1">
                 <Info className="w-3.5 h-3.5" />
                 <span>Next Action Notes</span>
               </div>
@@ -678,24 +664,24 @@ const OrderCard = ({
           </div>
 
           {/* Client Information Card */}
-          <div className={`border p-4 text-xs space-y-2 ${borderColor} ${darkMode ? 'bg-gray-955 text-gray-300' : 'bg-gray-50 text-gray-800'}`} style={{ borderRadius: '2px' }}>
-            <div className="font-bold text-[10px] uppercase tracking-widest text-emerald-500 border-b pb-1.5 dark:border-gray-800">Client Information</div>
-            <div className="space-y-1.5 mt-2">
-              <div className="flex justify-between items-center">
+          <div className={`border rounded-2xl p-4 text-xs space-y-2 ${borderColor} ${darkMode ? 'bg-gray-900/40 text-gray-300' : 'bg-white text-gray-800'}`}>
+            <div className="font-bold text-[10px] uppercase tracking-widest text-[#E5252A] border-b pb-2 dark:border-gray-800">Client Information</div>
+            <div className="space-y-2 mt-2">
+              <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:justify-between sm:items-center">
                 <span className={secondaryTextColor}>Name:</span>
-                <span className="font-bold text-emerald-500">{order.customerName}</span>
+                <span className="max-w-full break-words font-bold text-[#151515] dark:text-white sm:text-right">{order.customerName}</span>
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:justify-between sm:items-center">
                 <span className={secondaryTextColor}>Phone:</span>
                 {customer?.phone_number ? (
-                  <a href={`tel:${customer.phone_number}`} className="font-semibold text-emerald-500 hover:underline">
+                  <a href={`tel:${customer.phone_number}`} className="font-semibold text-[#E5252A] hover:underline">
                     {customer.phone_number}
                   </a>
                 ) : (
-                  <span className="font-semibold text-gray-500">Not Available</span>
+                  <span className="font-semibold text-gray-400">Not Available</span>
                 )}
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:justify-between sm:items-center">
                 <span className={secondaryTextColor}>WhatsApp:</span>
                 {customer?.whatsapp_number ? (
                   <button
@@ -704,27 +690,27 @@ const OrderCard = ({
                       const phone = customer.whatsapp_number.replace(/\D/g, '');
                       if (phone) window.open(`https://wa.me/${phone}`, '_blank', 'noopener,noreferrer');
                     }}
-                    className="font-semibold text-emerald-500 hover:underline"
+                    className="font-semibold text-[#E5252A] hover:underline cursor-pointer"
                   >
                     {customer.whatsapp_number}
                   </button>
                 ) : (
-                  <span className="font-semibold text-gray-500">Not Available</span>
+                  <span className="font-semibold text-gray-400">Not Available</span>
                 )}
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:justify-between sm:items-center">
                 <span className={secondaryTextColor}>Email:</span>
-                <span className="font-semibold select-all">{order.customerEmail || customer?.email || 'Not Available'}</span>
+                <span className="max-w-full break-all font-semibold select-all text-xs sm:text-right">{order.customerEmail || customer?.email || 'Not Available'}</span>
               </div>
-              <div className="flex justify-between items-start gap-2">
+              <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:justify-between sm:items-start">
                 <span className={secondaryTextColor}>Address:</span>
-                <div className="max-w-[180px] break-words">
+                <div className="max-w-full break-words sm:max-w-[180px] sm:text-right">
                   {formatAddress(customer?.address || customer?.location)}
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </div>}
 
       </div>
     </div>
@@ -836,146 +822,142 @@ export default function ProviderOrdersPage() {
     }));
   };
 
-  const bgColor = darkMode ? 'bg-gray-955 text-gray-100' : 'bg-gray-50 text-gray-900';
-  const secondaryTextColor = darkMode ? 'text-gray-400' : 'text-gray-650';
+  const bgColor = darkMode ? 'bg-gray-950 text-gray-100' : 'bg-[#F5F5F5] text-[#151515]';
+  const secondaryTextColor = darkMode ? 'text-gray-400' : 'text-[#666666]';
 
   return (
-    <div className={`p-6 max-w-7xl mx-auto min-h-screen ${bgColor}`}>
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold uppercase tracking-tight flex items-center gap-2">
-            <FileText className="w-6 h-6 text-emerald-500" />
-            <span>Provider Dashboard Orders</span>
-          </h1>
-          <p className={`text-xs uppercase tracking-wider font-semibold ${secondaryTextColor} mt-1`}>
-            Manage incoming client orders, review service quotes, and confirm transactions
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link
-            to="/dashboard"
-            className={`inline-flex items-center justify-center border text-xs font-bold uppercase tracking-wider px-4 py-2 transition-all hover:scale-102
-              ${darkMode 
-                ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-850' 
-                : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50 shadow-sm'}`}
-            style={{ borderRadius: '2px' }}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </Link>
-          <button
-            onClick={fetchOrders}
-            className={`inline-flex items-center justify-center border text-xs font-bold uppercase tracking-wider px-4 py-2 transition-all hover:scale-102
-              ${darkMode 
-                ? 'bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-850' 
-                : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50 shadow-sm'}`}
-            style={{ borderRadius: '2px' }}
-          >
-            <RefreshCw className="w-3.5 h-3.5 mr-2" />
-            Refresh
-          </button>
-        </div>
-      </div>
-
-      {/* Summary Cards */}
-      <OrderSummaryCards summary={summary} darkMode={darkMode} />
-
-      {/* Orders List */}
-      {loading ? (
-        <div className="py-16">
-          <LoadingSpinner size="lg" message="Loading received orders..." variant="dots" />
-        </div>
-      ) : error ? (
-        <div className={`border p-8 text-center bg-gray-900/10`} style={{ borderRadius: '2px' }}>
-          <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-3" />
-          <p className="font-bold uppercase tracking-wider text-sm text-red-500">Could not load provider orders</p>
-          <p className={`text-xs mt-1 ${secondaryTextColor}`}>{error}</p>
-          <button
-            onClick={fetchOrders}
-            className="mt-4 rounded bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider px-4 py-2"
-            style={{ borderRadius: '2px' }}
-          >
-            Try Again
-          </button>
-        </div>
-      ) : orders.length === 0 ? (
-        <div className={`border p-12 text-center flex flex-col items-center justify-center`} style={{ borderRadius: '2px' }}>
-          <Package className="w-12 h-12 text-gray-500 mb-3 opacity-30" />
-          <p className="font-bold uppercase tracking-wider text-sm text-gray-500">No orders yet</p>
-          <p className={`text-xs mt-1 ${secondaryTextColor}`}>
-            Customer order requests will populate here automatically.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {/* Tabs Filter */}
-          <div className="flex flex-wrap gap-2 border-b dark:border-gray-800 pb-4">
-            {[
-              { id: 'all', label: 'All Orders', count: orders.length },
-              { id: 'new', label: 'New Orders', count: orders.filter(o => o.status === 'placed').length },
-              { id: 'unpaid', label: 'Awaiting Payment', count: orders.filter(o => ['order_received', 'quoted', 'quote_accepted'].includes(o.status)).length },
-              { id: 'payment_sent', label: 'Payment Sent', count: orders.filter(o => o.status === 'payment_done').length },
-              { id: 'processing', label: 'Processing', count: orders.filter(o => ['payment_received', 'delivery_pending'].includes(o.status)).length },
-              { id: 'completed', label: 'Completed', count: orders.filter(o => o.status === 'delivered').length },
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200 border flex items-center gap-2
-                  ${activeTab === tab.id
-                    ? 'bg-emerald-500 border-emerald-500 text-white'
-                    : darkMode
-                      ? 'bg-gray-900 border-gray-800 text-gray-400 hover:text-white hover:bg-gray-850'
-                      : 'bg-white border-gray-250 text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
-                style={{ borderRadius: '2px' }}
+    <div className={`min-h-screen py-5 px-0 sm:py-8 sm:px-6 lg:px-8 ${bgColor}`}>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <PageHeader
+          badge="Operations"
+          title="Client Orders"
+          subtitle="Manage incoming service bookings, product orders, custom quotes, and payment statuses"
+          breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Client Orders' }]}
+          actions={
+            <div className="flex flex-wrap gap-2">
+              <Link
+                to="/dashboard"
+                className={`inline-flex items-center justify-center border text-xs font-bold uppercase tracking-wider rounded-xl px-4 py-2.5 transition-colors ${
+                  darkMode 
+                    ? 'bg-gray-900 border-gray-800 text-gray-300 hover:text-white hover:bg-gray-800' 
+                    : 'bg-white border-[#E5E5E5] text-[#151515] hover:bg-gray-50'
+                }`}
               >
-                <span>{tab.label}</span>
-                <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold
-                  ${activeTab === tab.id
-                    ? 'bg-emerald-600 text-white'
-                    : darkMode
-                      ? 'bg-gray-850 text-gray-500'
-                      : 'bg-gray-100 text-gray-500'
+                <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
+                Dashboard
+              </Link>
+              <button
+                onClick={fetchOrders}
+                className={`inline-flex items-center justify-center border text-xs font-bold uppercase tracking-wider rounded-xl px-4 py-2.5 transition-colors cursor-pointer ${
+                  darkMode 
+                    ? 'bg-gray-900 border-gray-800 text-gray-300 hover:text-white hover:bg-gray-800' 
+                    : 'bg-white border-[#E5E5E5] text-[#151515] hover:bg-gray-50'
+                }`}
+              >
+                <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                Refresh
+              </button>
+            </div>
+          }
+        />
+
+        {/* Summary Cards */}
+        <OrderSummaryCards summary={summary} darkMode={darkMode} />
+
+        {/* Orders List */}
+        {loading ? (
+          <div className="py-16">
+            <LoadingSpinner size="lg" message="Loading received orders..." variant="dots" />
+          </div>
+        ) : error ? (
+          <div className={`border rounded-2xl p-8 text-center ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'}`}>
+            <AlertCircle className="w-10 h-10 text-[#E5252A] mx-auto mb-3" />
+            <p className="font-bold uppercase tracking-wider text-sm text-[#E5252A]">Could not load provider orders</p>
+            <p className={`text-xs mt-1 ${secondaryTextColor}`}>{error}</p>
+            <button
+              onClick={fetchOrders}
+              className="mt-4 rounded-xl bg-[#E5252A] hover:bg-[#c91d22] text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 shadow-xs cursor-pointer"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : orders.length === 0 ? (
+          <div className={`border rounded-2xl p-12 text-center flex flex-col items-center justify-center ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'}`}>
+            <Package className="w-12 h-12 text-gray-400 mb-3 opacity-30" />
+            <p className="font-bold uppercase tracking-wider text-sm text-[#151515] dark:text-white">No orders yet</p>
+            <p className={`text-xs mt-1 ${secondaryTextColor}`}>
+              Customer order requests will populate here automatically.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* Tabs Filter */}
+            <div className="flex flex-wrap gap-2 border-b border-[#E5E5E5] dark:border-gray-800 pb-4">
+              {[
+                { id: 'all', label: 'All Orders', count: orders.length },
+                { id: 'new', label: 'New Orders', count: orders.filter(o => o.status === 'placed').length },
+                { id: 'unpaid', label: 'Awaiting Payment', count: orders.filter(o => ['order_received', 'quoted', 'quote_accepted'].includes(o.status)).length },
+                { id: 'payment_sent', label: 'Payment Sent', count: orders.filter(o => o.status === 'payment_done').length },
+                { id: 'processing', label: 'Processing', count: orders.filter(o => ['payment_received', 'delivery_pending'].includes(o.status)).length },
+                { id: 'completed', label: 'Completed', count: orders.filter(o => o.status === 'delivered').length },
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`px-3.5 py-2 text-xs font-semibold rounded-xl transition-all duration-200 border flex items-center gap-2 cursor-pointer ${
+                    activeTab === tab.id
+                      ? 'bg-[#E5252A] border-[#E5252A] text-white shadow-xs'
+                      : darkMode
+                        ? 'bg-gray-900 border-gray-800 text-gray-400 hover:text-white hover:bg-gray-800'
+                        : 'bg-white border-[#E5E5E5] text-[#666666] hover:text-[#151515] hover:bg-gray-50'
                   }`}
                 >
-                  {tab.count}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          {filteredOrders.length === 0 ? (
-            <div className={`border p-12 text-center flex flex-col items-center justify-center`} style={{ borderRadius: '2px' }}>
-              <Package className="w-12 h-12 text-gray-500 mb-3 opacity-30" />
-              <p className="font-bold uppercase tracking-wider text-sm text-gray-500">No orders found</p>
-              <p className={`text-xs mt-1 ${secondaryTextColor}`}>
-                There are no orders matching this filter tab.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {filteredOrders.map(order => (
-                <OrderCard
-              key={order.orderUuid}
-              order={order}
-              providerId={String(user?.id ?? '')}
-              onUpdateStatus={handleUpdateStatus}
-              onQuoteItem={handleQuoteItem}
-              savingOrderUuid={savingOrderUuid}
-              activeChatOrderUuid={activeChatOrderUuid}
-              onToggleChat={handleToggleChat}
-              customerChatCounts={customerChatCounts}
-              onClearUnreadCount={handleClearUnreadCount}
-              customer={customerContacts[String(order.customerId)]}
-              darkMode={darkMode}
-            />
+                  <span>{tab.label}</span>
+                  <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                    activeTab === tab.id
+                      ? 'bg-black/20 text-white'
+                      : darkMode
+                        ? 'bg-gray-800 text-gray-400'
+                        : 'bg-gray-100 text-[#666666]'
+                  }`}>
+                    {tab.count}
+                  </span>
+                </button>
               ))}
             </div>
-          )}
-        </div>
-      )}
+
+            {filteredOrders.length === 0 ? (
+              <div className={`border rounded-2xl p-12 text-center flex flex-col items-center justify-center ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'}`}>
+                <Package className="w-12 h-12 text-gray-400 mb-3 opacity-30" />
+                <p className="font-bold uppercase tracking-wider text-sm text-[#151515] dark:text-white">No orders found</p>
+                <p className={`text-xs mt-1 ${secondaryTextColor}`}>
+                  There are no orders matching this filter tab.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {filteredOrders.map(order => (
+                  <OrderCard
+                    key={order.orderUuid}
+                    order={order}
+                    providerId={String(user?.id ?? '')}
+                    onUpdateStatus={handleUpdateStatus}
+                    onQuoteItem={handleQuoteItem}
+                    savingOrderUuid={savingOrderUuid}
+                    activeChatOrderUuid={activeChatOrderUuid}
+                    onToggleChat={handleToggleChat}
+                    customerChatCounts={customerChatCounts}
+                    onClearUnreadCount={handleClearUnreadCount}
+                    customer={customerContacts[String(order.customerId)]}
+                    darkMode={darkMode}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

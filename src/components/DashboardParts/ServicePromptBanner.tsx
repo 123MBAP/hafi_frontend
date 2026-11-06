@@ -52,9 +52,9 @@ export default function ServicePromptBanner({ darkMode = false }: Props) {
 
     return (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 backdrop-blur-md bg-black/40">
-            <div className={`relative max-w-md w-full p-8 shadow-[0_20px_60px_rgba(0,0,0,0.3)] border ${card} transform transition-all animate-in zoom-in-95 duration-300`} style={{ borderRadius: '2px' }}>
+            <div className={`relative max-w-md w-full p-8 shadow-[0_20px_60px_rgba(0,0,0,0.3)] border ${card} transform transition-all animate-in zoom-in-95 duration-300`}>
                 <div className="flex flex-col items-center text-center gap-6">
-                    <div className={`shrink-0 p-4 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-200 text-emerald-600'}`} style={{ borderRadius: '2px' }}>
+                    <div className={`shrink-0 p-4 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}>
                         <Briefcase size={32} />
                     </div>
 
@@ -74,7 +74,7 @@ export default function ServicePromptBanner({ darkMode = false }: Props) {
                         <Link
                             to="/profile"
                             className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
-                            style={{ borderRadius: '2px' }}
+                           
                         >
                             Complete Profile Now <ChevronRight size={16} />
                         </Link>

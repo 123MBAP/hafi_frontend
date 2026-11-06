@@ -13,6 +13,16 @@ module.exports = {
       },
       colors: {
         'navy-dark': '#000033',
+        brand: {
+          red: '#E5252A',
+          redHover: '#C81E23',
+          redLight: '#FDF2F2',
+          black: '#0A0A0A',
+          gray: '#151515',
+          muted: '#666666',
+          surface: '#F5F5F5',
+          border: '#E5E5E5',
+        },
         gray: {
           850: '#182030',
         },

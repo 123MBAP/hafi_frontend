@@ -35,12 +35,12 @@ export default function PaymentPasswordManager({ hasPassword, onSave }: { hasPas
   };
 
   return (
-    <div className="p-5 border border-gray-200 bg-white shadow-sm" style={{ borderRadius: '2px' }}>
+    <div className="p-5 border border-gray-200 bg-white shadow-sm">
       {!showForm ? (
         <button
           onClick={() => setShowForm(true)}
           className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 font-bold uppercase text-xs tracking-wider transition-colors duration-200"
-          style={{ borderRadius: '2px' }}
+         
         >
           {hasPassword ? "Change Payment Password" : "Create Payment Password"}
         </button>
@@ -54,7 +54,7 @@ export default function PaymentPasswordManager({ hasPassword, onSave }: { hasPas
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 className="w-full p-2.5 border border-gray-250 text-gray-900 text-sm focus:border-emerald-500 focus:outline-none transition-all"
-                style={{ borderRadius: '2px' }}
+               
               />
             </div>
           )}
@@ -66,7 +66,7 @@ export default function PaymentPasswordManager({ hasPassword, onSave }: { hasPas
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full p-2.5 border border-gray-250 text-gray-900 text-sm focus:border-emerald-500 focus:outline-none transition-all"
-              style={{ borderRadius: '2px' }}
+             
             />
           </div>
 
@@ -77,15 +77,15 @@ export default function PaymentPasswordManager({ hasPassword, onSave }: { hasPas
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full p-2.5 border border-gray-250 text-gray-900 text-sm focus:border-emerald-500 focus:outline-none transition-all"
-              style={{ borderRadius: '2px' }}
+             
             />
           </div>
 
           {/* Password strength meter */}
           {password && (
             <div className="space-y-1">
-              <div className="w-full bg-gray-200 h-1.5 overflow-hidden" style={{ borderRadius: '2px' }}>
-                <div className={`h-1.5 ${strengthColor}`} style={{ width: `${(strengthScore / 5) * 100}%`, borderRadius: '2px' }}></div>
+              <div className="w-full bg-gray-200 h-1.5 overflow-hidden">
+                <div className={`h-1.5 rounded-full ${strengthColor}`} style={{ width: `${(strengthScore / 5) * 100}%` }}></div>
               </div>
               <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Strength: {strength}</p>
             </div>
@@ -114,7 +114,7 @@ export default function PaymentPasswordManager({ hasPassword, onSave }: { hasPas
                   ? "bg-emerald-500 hover:bg-emerald-600"
                   : "bg-gray-300 cursor-not-allowed"
               }`}
-              style={{ borderRadius: '2px' }}
+             
             >
               {hasPassword ? "Update Password" : "Save Password"}
             </button>
@@ -126,7 +126,7 @@ export default function PaymentPasswordManager({ hasPassword, onSave }: { hasPas
                 setShowForm(false);
               }}
               className="px-4 py-2 border border-gray-300 text-gray-750 font-bold uppercase text-xs tracking-wider hover:bg-gray-50 transition-colors"
-              style={{ borderRadius: '2px' }}
+             
             >
               Cancel
             </button>

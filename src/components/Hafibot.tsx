@@ -408,42 +408,42 @@ export default function Hafibot({ onBeforeOpen, chatWidth, onChatWidthChange }: 
 
       {/* Floating Interactive Circle Launcher (Only visible when side panel is closed) */}
       {!isOpen && (
-        <div className="fixed bottom-6 right-6 z-40 font-sans flex flex-col items-end">
+        <div className="fixed bottom-5 right-5 z-40 font-sans flex flex-col items-end pointer-events-none">
           {/* Welcome Tooltip */}
           {showTooltip && (
             <div
-              className="mb-3 bg-white dark:bg-gray-900 text-black dark:text-white px-4 py-2.5 shadow-2xl border border-gray-200 dark:border-gray-800 text-xs font-bold max-w-xs animate-bounce flex items-center gap-2 rounded-xl"
+              className="mb-2.5 bg-white dark:bg-[#0A0A0A] text-[#151515] dark:text-white px-3.5 py-2 shadow-xl border border-gray-200 dark:border-zinc-800 text-xs font-semibold max-w-xs flex items-center gap-2 rounded-xl pointer-events-auto"
             >
-              <Sparkles className="w-4 h-4 text-red-600 shrink-0" />
-              <span>Need help searching services, products, or rentals? Ask Hafibot!</span>
+              <Sparkles className="w-3.5 h-3.5 text-[#E5252A] shrink-0" />
+              <span className="leading-snug">Need help finding anything? Ask Hafibot!</span>
               <button
                 onClick={() => setShowTooltip(false)}
-                className="text-black/60 hover:text-black dark:text-gray-400 dark:hover:text-white p-0.5"
+                className="text-gray-400 hover:text-black dark:hover:text-white p-0.5 ml-1"
+                aria-label="Dismiss tooltip"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
           )}
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 pointer-events-auto">
             <button
               onClick={handleOpenClick}
-              className="bg-white/95 dark:bg-gray-900/95 border-2 border-black dark:border-gray-700 text-black dark:text-white hover:text-red-600 hover:border-red-600 px-4 py-2.5 shadow-xl font-black text-xs tracking-wider uppercase transition-all duration-300 hover:scale-105 active:scale-95 rounded-full flex items-center gap-2"
+              className="hidden sm:inline-flex items-center gap-2 bg-white/95 dark:bg-[#0A0A0A]/95 border border-gray-300 dark:border-zinc-700 text-[#151515] dark:text-white hover:text-[#E5252A] hover:border-[#E5252A] px-3.5 py-2 shadow-lg font-bold text-xs tracking-wider uppercase transition-all duration-200 hover:scale-105 active:scale-95 rounded-full"
             >
-            <span>Search with Hafibot AI</span>
+              <Sparkles className="w-3.5 h-3.5 text-[#E5252A]" />
+              <span>Ask Hafibot AI</span>
             </button>
 
             <button
               onClick={handleOpenClick}
-              className="w-20 h-20 rounded-full bg-gradient-to-tr from-black via-red-600 to-black text-white flex items-center justify-center shadow-xl hover:shadow-2xl hover:shadow-red-600/40 border-2 border-black dark:border-red-600 transition-all duration-300 hover:scale-105 active:scale-95 group relative overflow-hidden animate-hafibot-shake"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-[#0A0A0A] via-[#E5252A] to-[#0A0A0A] text-white flex items-center justify-center shadow-xl hover:shadow-2xl hover:shadow-red-600/30 border-2 border-white dark:border-zinc-800 transition-all duration-300 hover:scale-105 active:scale-95 group relative overflow-hidden"
               title="Open Hafibot AI Assistant"
             >
-              {/* Pulse Ring */}
-              <span className="absolute inset-0 rounded-full bg-red-600/30 animate-ping" style={{ animationDuration: '3s' }}></span>
               <img
                 src={hafiBotImage}
                 alt="Open Hafibot AI Assistant"
-                className="relative z-10 w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                className="relative z-10 w-full h-full object-contain p-1.5 transition-transform duration-300 group-hover:scale-110"
               />
             </button>
           </div>

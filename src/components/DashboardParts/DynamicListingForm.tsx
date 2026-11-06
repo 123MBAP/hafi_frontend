@@ -313,7 +313,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
     }
 
     return (
-        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto bg-white border border-gray-250 p-8 shadow-sm" style={{ borderRadius: '2px' }}>
+        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto bg-white border border-gray-250 p-8 shadow-sm">
             <h2 className="text-xl font-bold uppercase tracking-tight text-gray-900 mb-6">
                 {listingId ? 'Edit Listing' : 'Create New Listing'}
             </h2>
@@ -330,7 +330,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                         className={`w-full px-4 py-2.5 border text-sm focus:border-emerald-500 focus:outline-none transition-all ${
                             errors.service_id ? 'border-red-500 text-red-700' : 'border-gray-250 text-gray-900'
                         }`}
-                        style={{ borderRadius: '2px' }}
+                       
                     >
                         <option value="">Select a service</option>
                         {services.map(service => (
@@ -393,7 +393,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                     className={`w-full px-4 py-2.5 border text-sm focus:border-emerald-500 focus:outline-none transition-all ${
                         errors.title ? 'border-red-500 text-red-700 placeholder-red-300' : 'border-gray-250 text-gray-900 placeholder-gray-400'
                     }`}
-                    style={{ borderRadius: '2px' }}
+                   
                 />
                 {errors.title && <p className="mt-1 text-xs text-red-500 font-semibold">{errors.title}</p>}
             </div>
@@ -408,7 +408,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                     placeholder="Describe your listing"
                     rows={4}
                     className="w-full px-4 py-2.5 border border-gray-250 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
-                    style={{ borderRadius: '2px' }}
+                   
                 />
             </div>
 
@@ -422,7 +422,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                         placeholder="0"
                         step="0.01"
                         className="w-full px-4 py-2.5 border border-gray-250 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
-                        style={{ borderRadius: '2px' }}
+                       
                     />
                 </div>
 
@@ -432,7 +432,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                         value={coreFields.currency}
                         onChange={(e) => handleCoreFieldChange('currency', e.target.value)}
                         className="w-full px-4 py-2.5 border border-gray-250 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none transition-all"
-                        style={{ borderRadius: '2px' }}
+                       
                     >
                         <option value="RWF">RWF</option>
                         <option value="USD">USD</option>
@@ -446,7 +446,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                         value={coreFields.price_type}
                         onChange={(e) => handleCoreFieldChange('price_type', e.target.value)}
                         className="w-full px-4 py-2.5 border border-gray-250 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none transition-all"
-                        style={{ borderRadius: '2px' }}
+                       
                     >
                         <option value="fixed">Fixed</option>
                         <option value="negotiable">Negotiable</option>
@@ -469,7 +469,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                             onChange={(e) => handleCoreFieldChange('location_province', e.target.value)}
                             placeholder="e.g., Kigali City"
                             className="w-full px-4 py-2 border border-gray-250 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
-                            style={{ borderRadius: '2px' }}
+                           
                         />
                     </div>
 
@@ -481,7 +481,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                             onChange={(e) => handleCoreFieldChange('location_district', e.target.value)}
                             placeholder="e.g., Gasabo"
                             className="w-full px-4 py-2 border border-gray-250 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
-                            style={{ borderRadius: '2px' }}
+                           
                         />
                     </div>
 
@@ -493,7 +493,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                             onChange={(e) => handleCoreFieldChange('location_sector', e.target.value)}
                             placeholder="e.g., Remera"
                             className="w-full px-4 py-2 border border-gray-250 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
-                            style={{ borderRadius: '2px' }}
+                           
                         />
                     </div>
 
@@ -505,7 +505,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                             onChange={(e) => handleCoreFieldChange('location_cell', e.target.value)}
                             placeholder="e.g., Rukiri I"
                             className="w-full px-4 py-2 border border-gray-250 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
-                            style={{ borderRadius: '2px' }}
+                           
                         />
                     </div>
                 </div>
@@ -540,7 +540,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                     multiple
                     onChange={handleImageChange}
                     className="w-full px-4 py-2 border border-gray-250 text-sm focus:border-emerald-500 focus:outline-none transition-all"
-                    style={{ borderRadius: '2px' }}
+                   
                 />
 
                 {imagePreviewUrls.length > 0 && (
@@ -551,13 +551,13 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                                     src={url}
                                     alt={`Preview ${index + 1}`}
                                     className="w-full h-32 object-cover border border-gray-200"
-                                    style={{ borderRadius: '2px' }}
+                                   
                                 />
                                 <button
                                     type="button"
                                     onClick={() => removeImage(index)}
                                     className="absolute top-2 right-2 bg-red-500 text-white p-1.5 hover:bg-red-600 transition-colors shadow-sm"
-                                    style={{ borderRadius: '2px' }}
+                                   
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -576,7 +576,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                         type="button"
                         onClick={onCancel}
                         className="px-6 py-2.5 border border-gray-250 text-gray-755 font-bold uppercase text-xs tracking-wider hover:bg-gray-50 transition-colors"
-                        style={{ borderRadius: '2px' }}
+                       
                     >
                         Cancel
                     </button>
@@ -585,7 +585,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                     type="submit"
                     disabled={submitting}
                     className="px-6 py-2.5 bg-emerald-500 text-white font-bold uppercase text-xs tracking-wider hover:bg-emerald-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ borderRadius: '2px' }}
+                   
                 >
                     {submitting ? 'Submitting...' : (listingId ? 'Update Listing' : 'Create Listing')}
                 </button>

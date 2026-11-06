@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import { API_BASE_URL } from '@/api/apiClient';
+import rwandaLocationsData from '@/data/rwandaLocations.json';
 
 interface LocationOption {
     id?: number;
@@ -87,114 +88,171 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
         }
     }, [level, value]);
 
-    // Sync parent values to populate dependent dropdowns in controlled mode
+    // Sync parent values to populate dependent dropdowns in controlled mode.
+    // Each level is rendered as a separate selector, so parent changes must
+    // trigger a new request even when the child already has a previous parent.
     useEffect(() => {
-        if (level && parentValues) {
-            if (parentValues.province && !selectedProvince) {
-                setSelectedProvince(parentValues.province);
-                fetchDistricts(parentValues.province);
+        if (!level) {
+            return;
+        }
+
+        if (level === 'district') {
+            const province = parentValues?.province || '';
+            if (selectedProvince !== province) {
+                setSelectedProvince(province);
+                setDistricts([]);
+                if (province) {
+                    fetchDistricts(province);
+                }
             }
-            if (parentValues.district && !selectedDistrict) {
-                setSelectedDistrict(parentValues.district);
-                fetchSectors(parentValues.district);
+        } else if (level === 'sector') {
+            const district = parentValues?.district || '';
+            if (selectedDistrict !== district) {
+                setSelectedDistrict(district);
+                setSectors([]);
+                if (district) {
+                    fetchSectors(district);
+                }
             }
-            if (parentValues.sector && !selectedSector) {
-                setSelectedSector(parentValues.sector);
-                fetchCells(parentValues.sector);
+        } else if (level === 'cell') {
+            const sector = parentValues?.sector || '';
+            if (selectedSector !== sector) {
+                setSelectedSector(sector);
+                setCells([]);
+                if (sector) {
+                    fetchCells(sector);
+                }
             }
-            if (parentValues.cell && !selectedCell) {
-                setSelectedCell(parentValues.cell);
-                fetchVillages(parentValues.cell);
+        } else if (level === 'village') {
+            const cell = parentValues?.cell || '';
+            if (selectedCell !== cell) {
+                setSelectedCell(cell);
+                setVillages([]);
+                if (cell) {
+                    fetchVillages(cell);
+                }
             }
         }
-    }, [level, parentValues]);
+    }, [level, parentValues?.province, parentValues?.district, parentValues?.sector, parentValues?.cell]);
 
     const fetchProvinces = async () => {
-        setLoading({ ...loading, provinces: true });
+        setLoading(prev => ({ ...prev, provinces: true }));
         setError('');
         try {
             const response = await axios.get(`${API_BASE_URL}/locations/provinces`);
-            if (response.data.success) {
+            if (response.data.success && Array.isArray(response.data.data) && response.data.data.length > 0) {
                 setProvinces(response.data.data);
+                return;
             }
         } catch (err) {
-            setError('Failed to load provinces');
-            console.error('Error fetching provinces:', err);
+            console.error('Error fetching provinces from API, falling back to local data:', err);
         } finally {
-            setLoading({ ...loading, provinces: false });
+            setLoading(prev => ({ ...prev, provinces: false }));
+        }
+
+        if (rwandaLocationsData?.provinces) {
+            setProvinces(rwandaLocationsData.provinces.map((name: string) => ({ name })));
         }
     };
 
     const fetchDistricts = async (province: string) => {
-        setLoading({ ...loading, districts: true });
+        if (!province) {
+            setDistricts([]);
+            return;
+        }
+        setLoading(prev => ({ ...prev, districts: true }));
         setError('');
         try {
             const response = await axios.get(`${API_BASE_URL}/locations/districts`, {
                 params: { province }
             });
-            if (response.data.success) {
+            if (response.data.success && Array.isArray(response.data.data) && response.data.data.length > 0) {
                 setDistricts(response.data.data);
+                return;
             }
         } catch (err) {
-            setError('Failed to load districts');
-            console.error('Error fetching districts:', err);
+            console.error('Error fetching districts from API, falling back to local data:', err);
         } finally {
-            setLoading({ ...loading, districts: false });
+            setLoading(prev => ({ ...prev, districts: false }));
         }
+
+        const localDists = (rwandaLocationsData.districtsByProvince as Record<string, string[]>)?.[province] || [];
+        setDistricts(localDists.map((name: string) => ({ name, province })));
     };
 
     const fetchSectors = async (district: string) => {
-        setLoading({ ...loading, sectors: true });
+        if (!district) {
+            setSectors([]);
+            return;
+        }
+        setLoading(prev => ({ ...prev, sectors: true }));
         setError('');
         try {
             const response = await axios.get(`${API_BASE_URL}/locations/sectors`, {
                 params: { district }
             });
-            if (response.data.success) {
+            if (response.data.success && Array.isArray(response.data.data) && response.data.data.length > 0) {
                 setSectors(response.data.data);
+                return;
             }
         } catch (err) {
-            setError('Failed to load sectors');
-            console.error('Error fetching sectors:', err);
+            console.error('Error fetching sectors from API, falling back to local data:', err);
         } finally {
-            setLoading({ ...loading, sectors: false });
+            setLoading(prev => ({ ...prev, sectors: false }));
         }
+
+        const localSectors = (rwandaLocationsData.sectorsByDistrict as Record<string, string[]>)?.[district] || [];
+        setSectors(localSectors.map((name: string) => ({ name, district })));
     };
 
     const fetchCells = async (sector: string) => {
-        setLoading({ ...loading, cells: true });
+        if (!sector) {
+            setCells([]);
+            return;
+        }
+        setLoading(prev => ({ ...prev, cells: true }));
         setError('');
         try {
             const response = await axios.get(`${API_BASE_URL}/locations/cells`, {
                 params: { sector }
             });
-            if (response.data.success) {
+            if (response.data.success && Array.isArray(response.data.data) && response.data.data.length > 0) {
                 setCells(response.data.data);
+                return;
             }
         } catch (err) {
-            setError('Failed to load cells');
-            console.error('Error fetching cells:', err);
+            console.error('Error fetching cells from API, falling back to local data:', err);
         } finally {
-            setLoading({ ...loading, cells: false });
+            setLoading(prev => ({ ...prev, cells: false }));
         }
+
+        const localCells = (rwandaLocationsData.cellsBySector as Record<string, string[]>)?.[sector] || [];
+        setCells(localCells.map((name: string) => ({ name, sector })));
     };
 
     const fetchVillages = async (cell: string) => {
-        setLoading({ ...loading, villages: true });
+        if (!cell) {
+            setVillages([]);
+            return;
+        }
+        setLoading(prev => ({ ...prev, villages: true }));
         setError('');
         try {
             const response = await axios.get(`${API_BASE_URL}/locations/villages`, {
                 params: { cell }
             });
-            if (response.data.success) {
+            if (response.data.success && Array.isArray(response.data.data) && response.data.data.length > 0) {
                 setVillages(response.data.data);
+                return;
             }
         } catch (err) {
-            setError('Failed to load villages');
-            console.error('Error fetching villages:', err);
+            console.error('Error fetching villages from API, falling back to local data:', err);
         } finally {
-            setLoading({ ...loading, villages: false });
+            setLoading(prev => ({ ...prev, villages: false }));
         }
+
+        const localVillages = (rwandaLocationsData.villagesByCell as Record<string, string[]>)?.[cell] || [];
+        setVillages(localVillages.map((name: string) => ({ name, cell })));
     };
 
     // Handle province selection
@@ -312,10 +370,10 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
 
     // Controlled mode - render single dropdown for specific level
     if (level) {
-        const baseSelectClass = `w-full px-3 py-1.5 border text-sm ${darkMode
-            ? 'bg-gray-950 border-gray-800 focus:border-emerald-500 text-white disabled:bg-gray-900/50 disabled:text-gray-600'
-            : 'bg-gray-100 border-gray-300 focus:border-emerald-500 disabled:bg-gray-100 disabled:text-gray-400'
-            } focus:ring-1 focus:ring-emerald-500 transition disabled:cursor-not-allowed ${className}`;
+        const baseSelectClass = `w-full px-3 py-2 border rounded-lg text-sm ${darkMode
+            ? 'bg-gray-900 border-gray-700 focus:border-[#E5252A] text-white disabled:bg-gray-800 disabled:text-gray-500'
+            : 'bg-white border-[#E5E5E5] text-[#151515] focus:border-[#E5252A] disabled:bg-gray-100 disabled:text-gray-400'
+            } focus:ring-2 focus:ring-[#E5252A]/20 transition disabled:cursor-not-allowed ${className}`;
 
         switch (level) {
             case 'province':
@@ -325,7 +383,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                         onChange={handleProvinceChange}
                         disabled={loading.provinces}
                         className={baseSelectClass}
-                        style={{ borderRadius: '2px' }}
+                       
                     >
                         <option value="">Select Province</option>
                         {provinces.map((province, index) => (
@@ -342,7 +400,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                         onChange={handleDistrictChange}
                         disabled={!parentValues?.province || loading.districts}
                         className={baseSelectClass}
-                        style={{ borderRadius: '2px' }}
+                       
                     >
                         <option value="">
                             {parentValues?.province ? 'Select District' : 'Select Province First'}
@@ -361,7 +419,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                         onChange={handleSectorChange}
                         disabled={!parentValues?.district || loading.sectors}
                         className={baseSelectClass}
-                        style={{ borderRadius: '2px' }}
+                       
                     >
                         <option value="">
                             {parentValues?.district ? 'Select Sector' : 'Select District First'}
@@ -380,7 +438,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                         onChange={handleCellChange}
                         disabled={!parentValues?.sector || loading.cells}
                         className={baseSelectClass}
-                        style={{ borderRadius: '2px' }}
+                       
                     >
                         <option value="">
                             {parentValues?.sector ? 'Select Cell' : 'Select Sector First'}
@@ -399,7 +457,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                         onChange={handleVillageChange}
                         disabled={!parentValues?.cell || loading.villages}
                         className={baseSelectClass}
-                        style={{ borderRadius: '2px' }}
+                       
                     >
                         <option value="">
                             {parentValues?.cell ? 'Select Village' : 'Select Cell First'}
@@ -418,7 +476,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
     return (
         <div className={`min-h-screen py-8 px-4 transition-colors duration-250 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'}`}>
             <div className="max-w-4xl mx-auto">
-                <div className={`border p-8 shadow-xl transition-colors duration-250 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-250'}`} style={{ borderRadius: '2px' }}>
+                <div className={`border p-8 shadow-xl transition-colors duration-250 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-250'}`}>
                     {/* Header */}
                     <div className="mb-8 text-center">
                         <h1 className={`text-2xl font-bold tracking-tighter uppercase mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
@@ -431,14 +489,14 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
 
                     {/* Error Message */}
                     {error && (
-                        <div className={`mb-6 p-4 border text-sm transition-colors ${darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-700'}`} style={{ borderRadius: '2px' }}>
+                        <div className={`mb-6 p-4 border text-sm transition-colors ${darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-700'}`}>
                             {error}
                         </div>
                     )}
 
                     {/* Selected Path Display */}
                     {getSelectedLocationPath() && (
-                        <div className={`mb-6 p-4 border transition-colors ${darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-250 text-emerald-800'}`} style={{ borderRadius: '2px' }}>
+                        <div className={`mb-6 p-4 border transition-colors ${darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-250 text-emerald-800'}`}>
                             <p className={`text-xs uppercase tracking-wider mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Selected Location:</p>
                             <p className="text-lg font-semibold text-emerald-500">
                                 {getSelectedLocationPath()}
@@ -458,7 +516,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                                 onChange={handleProvinceChange}
                                 disabled={loading.provinces}
                                 className={`w-full px-4 py-3 border focus:ring-2 transition disabled:cursor-not-allowed ${darkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-800 disabled:text-gray-500' : 'bg-white border-gray-300 text-gray-900 focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-100 disabled:text-gray-400'}`}
-                                style={{ borderRadius: '2px' }}
+                               
                             >
                                 <option value="">Select Province</option>
                                 {provinces.map((province, index) => (
@@ -479,7 +537,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                                 onChange={handleDistrictChange}
                                 disabled={!selectedProvince || loading.districts}
                                 className={`w-full px-4 py-3 border focus:ring-2 transition disabled:cursor-not-allowed ${darkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-800 disabled:text-gray-500' : 'bg-white border-gray-300 text-gray-900 focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-100 disabled:text-gray-400'}`}
-                                style={{ borderRadius: '2px' }}
+                               
                             >
                                 <option value="">
                                     {selectedProvince ? 'Select District' : 'Select Province First'}
@@ -502,7 +560,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                                 onChange={handleSectorChange}
                                 disabled={!selectedDistrict || loading.sectors}
                                 className={`w-full px-4 py-3 border focus:ring-2 transition disabled:cursor-not-allowed ${darkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-800 disabled:text-gray-500' : 'bg-white border-gray-300 text-gray-900 focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-100 disabled:text-gray-400'}`}
-                                style={{ borderRadius: '2px' }}
+                               
                             >
                                 <option value="">
                                     {selectedDistrict ? 'Select Sector' : 'Select District First'}
@@ -525,7 +583,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                                 onChange={handleCellChange}
                                 disabled={!selectedSector || loading.cells}
                                 className={`w-full px-4 py-3 border focus:ring-2 transition disabled:cursor-not-allowed ${darkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-800 disabled:text-gray-500' : 'bg-white border-gray-300 text-gray-900 focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-100 disabled:text-gray-400'}`}
-                                style={{ borderRadius: '2px' }}
+                               
                             >
                                 <option value="">
                                     {selectedSector ? 'Select Cell' : 'Select Sector First'}
@@ -548,7 +606,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                                 onChange={handleVillageChange}
                                 disabled={!selectedCell || loading.villages}
                                 className={`w-full px-4 py-3 border focus:ring-2 transition disabled:cursor-not-allowed ${darkMode ? 'bg-gray-700 border-gray-600 text-white focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-800 disabled:text-gray-500' : 'bg-white border-gray-300 text-gray-900 focus:border-emerald-500 focus:ring-emerald-500/20 disabled:bg-gray-100 disabled:text-gray-400'}`}
-                                style={{ borderRadius: '2px' }}
+                               
                             >
                                 <option value="">
                                     {selectedCell ? 'Select Village' : 'Select Cell First'}
@@ -567,14 +625,14 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
                         <button
                             onClick={handleReset}
                             className={`px-6 py-3 border font-semibold uppercase tracking-wider transition-colors ${darkMode ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-gray-250' : 'bg-gray-200 border-gray-300 hover:bg-gray-300 text-gray-750'}`}
-                            style={{ borderRadius: '2px' }}
+                           
                         >
                             Reset Selection
                         </button>
                         <button
                             disabled={!selectedVillage}
                             className={`px-6 py-3 border font-semibold uppercase tracking-wider transition-colors ${selectedVillage ? 'bg-emerald-500 border-emerald-500 text-white hover:bg-emerald-600' : 'bg-gray-350 dark:bg-gray-700 border-transparent text-gray-500 dark:text-gray-400 cursor-not-allowed'}`}
-                            style={{ borderRadius: '2px' }}
+                           
                         >
                             Confirm Location
                         </button>
@@ -582,7 +640,7 @@ const RwandaLocationSelector: React.FC<RwandaLocationSelectorProps> = ({
 
                     {/* Location Summary */}
                     {selectedVillage && (
-                        <div className={`mt-8 p-6 border transition-colors ${darkMode ? 'bg-gray-750 border-gray-750' : 'bg-gray-50 border-gray-250'}`} style={{ borderRadius: '2px' }}>
+                        <div className={`mt-8 p-6 border transition-colors ${darkMode ? 'bg-gray-750 border-gray-750' : 'bg-gray-50 border-gray-250'}`}>
                             <h3 className={`text-sm font-bold uppercase tracking-wider mb-3 ${darkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
                                 Complete Location Details
                             </h3>

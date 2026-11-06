@@ -264,83 +264,80 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
 
     return (
         <div 
-            className={`border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm overflow-hidden`}
-            style={{ borderRadius: '2px' }}
+            className={`border rounded-2xl ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'} shadow-xs overflow-hidden`}
         >
             {/* Header */}
-            <div className={`px-6 py-4 border-b ${darkMode ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>
+            <div className={`px-6 py-5 border-b ${darkMode ? 'border-gray-800 bg-gray-900' : 'border-[#E5E5E5] bg-[#F5F5F5]/50'}`}>
                 <div className="flex items-center">
                     <div 
-                        className={`p-2 border ${darkMode ? 'bg-gray-900 border-gray-750 text-indigo-400' : 'bg-white border-gray-150 text-indigo-650'}`}
-                        style={{ borderRadius: '2px' }}
+                        className={`p-2 rounded-lg border ${darkMode ? 'bg-gray-800 border-gray-700 text-[#E5252A]' : 'bg-white border-[#E5E5E5] text-[#E5252A]'}`}
                     >
-                        <Shield className="w-4 h-4 text-indigo-500" />
+                        <Shield className="w-4 h-4 text-[#E5252A]" />
                     </div>
-                    <h3 className={`text-base font-bold uppercase tracking-tight ml-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                        Manage how you use HafiConnect!
+                    <h3 className={`text-sm sm:text-base font-bold uppercase tracking-tight ml-3 ${darkMode ? 'text-white' : 'text-[#151515]'}`}>
+                        Manage how you use HafiConnect
                     </h3>
                 </div>
-                <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    Add, remove or switch the usage of Haficonnect. You can sell products (Seller), upgrade to premium shop (Premium Seller) or offer services (Service Provider) or both. You can modify this anytime as you wish.
+                <p className={`text-xs mt-1.5 ${darkMode ? 'text-gray-400' : 'text-[#666666]'}`}>
+                    Add, remove or switch your operational roles. You can sell products (Seller), manage a shop storefront, or offer services (Service Provider).
                 </p>
             </div>
 
             <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {/* Active Roles */}
                     {currentRoles.map(role => (
                         <div 
                             key={role} 
-                            className={`p-5 border ${darkMode ? 'bg-gray-850/40 border-gray-800' : 'bg-gray-50 border-gray-150 hover:border-emerald-500'}`}
-                            style={{ borderRadius: '2px' }}
+                            className={`p-5 rounded-xl border transition-all ${
+                                darkMode 
+                                    ? 'bg-gray-850 border-gray-800 hover:border-gray-700' 
+                                    : 'bg-white border-[#E5E5E5] hover:border-[#E5252A]/40 shadow-xs'
+                            }`}
                         >
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex items-center">
                                     <div 
-                                        className={`p-2 border ${darkMode ? 'bg-gray-900 border-gray-750' : 'bg-white border-gray-150'}`}
-                                        style={{ borderRadius: '2px' }}
+                                        className={`p-2 rounded-lg border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-[#F5F5F5] border-[#E5E5E5]'}`}
                                     >
                                         {getRoleIcon(role)}
                                     </div>
                                     <div className="ml-3">
-                                        <h4 className={`text-sm font-bold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-950'}`}>
+                                        <h4 className={`text-sm font-bold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-[#151515]'}`}>
                                             {role.replace('_', ' ')}
                                         </h4>
-                                        <p className={`text-[10px] uppercase font-bold tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        <p className="text-[10px] uppercase font-bold tracking-wider text-[#666666] dark:text-gray-400">
                                             Active
                                         </p>
                                     </div>
                                 </div>
                                 <span 
-                                    className="px-2 py-0.5 text-[9px] font-bold bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400"
-                                    style={{ borderRadius: '2px' }}
+                                    className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
                                 >
                                     Active
                                 </span>
                             </div>
 
                             <div 
-                                className={`p-3 border mb-4 text-xs ${darkMode ? 'bg-gray-900/30 border-gray-755 text-gray-405' : 'bg-white border-gray-200'}`}
-                                style={{ borderRadius: '2px' }}
+                                className={`p-3 rounded-lg border mb-4 text-xs ${darkMode ? 'bg-gray-900 border-gray-800 text-gray-300' : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#666666]'}`}
                             >
-                                <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>
+                                <p>
                                     {getRoleDescription(role)}
                                 </p>
                             </div>
 
                             {role === 'seller' && (
                                 <div 
-                                    className={`p-3 border mb-4 text-xs font-semibold ${
-                                        darkMode ? 'bg-indigo-950/20 border-indigo-900/50 text-indigo-400' : 'bg-indigo-50 border-indigo-150 text-indigo-850'
+                                    className={`p-3 rounded-lg border mb-4 text-xs font-medium ${
+                                        darkMode ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-[#E5E5E5] text-[#151515]'
                                     }`}
-                                    style={{ borderRadius: '2px' }}
                                 >
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <span className="text-[10px] font-bold uppercase tracking-wider block opacity-75">
+                                            <span className="text-[10px] font-bold uppercase tracking-wider block text-[#666666] dark:text-gray-400">
                                                 Premium Shop Category
                                             </span>
-                                            <span className="text-sm font-bold block mt-0.5">
+                                            <span className="text-xs font-bold block mt-0.5">
                                                 {shopCategory && shopCategory.key !== 'other' && shopCategory.name?.toLowerCase() !== 'other'
                                                     ? shopCategory.name
                                                     : "None (Default/Other)"}
@@ -350,7 +347,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                                             <button
                                                 onClick={handleRemoveCategory}
                                                 disabled={isUpdatingRole}
-                                                className="text-xs font-semibold text-red-500 hover:text-red-655 focus:outline-none flex items-center transition-colors animate-fadeIn"
+                                                className="text-xs font-semibold text-[#E5252A] hover:text-[#c91d22] focus:outline-none flex items-center transition-colors"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5 mr-1" />
                                                 Remove
@@ -363,7 +360,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                                                     setShowAddCategoryModal(true);
                                                 }}
                                                 disabled={isUpdatingRole}
-                                                className="text-xs font-semibold text-emerald-500 hover:text-emerald-655 focus:outline-none flex items-center transition-colors animate-fadeIn"
+                                                className="text-xs font-semibold text-[#E5252A] hover:text-[#c91d22] focus:outline-none flex items-center transition-colors"
                                             >
                                                 <Plus className="w-3.5 h-3.5 mr-1" />
                                                 Add
@@ -376,25 +373,23 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                             {role !== "customer" && (
                                 <button
                                     onClick={() => handleRemoveRoleClick(role)}
-                                    className={`w-full py-2 border font-semibold text-xs transition-colors uppercase tracking-wider ${
+                                    className={`w-full py-2 rounded-lg border font-semibold text-xs transition-colors uppercase tracking-wider ${
                                         darkMode 
-                                            ? 'border-red-900/50 bg-red-950/10 text-red-400 hover:bg-red-900/20' 
-                                            : 'border-red-200 bg-red-50/50 text-red-650 hover:bg-red-50'
+                                            ? 'border-red-900/40 bg-red-950/20 text-red-400 hover:bg-red-950/40' 
+                                            : 'border-red-200 bg-red-50 text-[#E5252A] hover:bg-red-100'
                                     }`}
-                                    style={{ borderRadius: '2px' }}
                                 >
                                     <span className="flex items-center justify-center">
-                                        <Trash2 className="w-4 h-4 mr-2" />
+                                        <Trash2 className="w-3.5 h-3.5 mr-1.5" />
                                         Remove Role
                                     </span>
                                 </button>
                             )}
                             {role === "customer" && (
                                 <div 
-                                    className={`w-full py-2 border text-center text-xs font-semibold uppercase tracking-wider opacity-60 ${
-                                        darkMode ? 'border-gray-700 bg-gray-900/20 text-gray-500' : 'border-gray-200 bg-gray-50 text-gray-400'
+                                    className={`w-full py-2 rounded-lg border text-center text-xs font-semibold uppercase tracking-wider ${
+                                        darkMode ? 'border-gray-800 bg-gray-900 text-gray-500' : 'border-[#E5E5E5] bg-[#F5F5F5] text-[#666666]'
                                     }`}
-                                    style={{ borderRadius: '2px' }}
                                 >
                                     Default Role
                                 </div>
@@ -406,22 +401,20 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                     {availableRoles.map(role => (
                         <div 
                             key={role} 
-                            className={`p-5 border border-dashed opacity-75 ${darkMode ? 'bg-gray-900/10 border-gray-800' : 'bg-gray-50/50 border-gray-150'}`}
-                            style={{ borderRadius: '2px' }}
+                            className={`p-5 rounded-xl border border-dashed transition-all ${darkMode ? 'bg-gray-900/30 border-gray-800' : 'bg-[#F5F5F5]/60 border-[#E5E5E5]'}`}
                         >
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex items-center">
                                     <div 
-                                        className={`p-2 border opacity-70 ${darkMode ? 'bg-gray-900 border-gray-750' : 'bg-white border-gray-150'}`}
-                                        style={{ borderRadius: '2px' }}
+                                        className={`p-2 rounded-lg border opacity-80 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-[#E5E5E5]'}`}
                                     >
                                         {getRoleIcon(role)}
                                     </div>
                                     <div className="ml-3">
-                                        <h4 className={`text-sm font-bold uppercase tracking-tight ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        <h4 className={`text-sm font-bold uppercase tracking-tight ${darkMode ? 'text-gray-400' : 'text-[#666666]'}`}>
                                             {role.replace('_', ' ')}
                                         </h4>
-                                        <p className={`text-[10px] uppercase font-bold tracking-wider ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                                        <p className="text-[10px] uppercase font-bold tracking-wider text-gray-400 dark:text-gray-500">
                                             Not Active
                                         </p>
                                     </div>
@@ -429,8 +422,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                             </div>
 
                             <div 
-                                className={`p-3 border mb-4 text-xs opacity-70 ${darkMode ? 'bg-gray-900/30 border-gray-750 text-gray-400' : 'bg-white border-gray-200 text-gray-500'}`}
-                                style={{ borderRadius: '2px' }}
+                                className={`p-3 rounded-lg border mb-4 text-xs ${darkMode ? 'bg-gray-900/50 border-gray-800 text-gray-400' : 'bg-white border-[#E5E5E5] text-[#666666]'}`}
                             >
                                 <p>
                                     {getRoleDescription(role)}
@@ -440,11 +432,10 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                             <button
                                 onClick={() => handleUpdateRole(role, "add")}
                                 disabled={isUpdatingRole}
-                                className="w-full py-2 bg-emerald-500 hover:bg-emerald-650 hover:bg-emerald-600 text-white font-semibold text-xs uppercase tracking-wider transition-all duration-200"
-                                style={{ borderRadius: '2px' }}
+                                className="w-full py-2 rounded-lg bg-[#E5252A] hover:bg-[#c91d22] text-white font-semibold text-xs uppercase tracking-wider transition-all duration-200 shadow-xs active:scale-[0.98]"
                             >
                                 <span className="flex items-center justify-center">
-                                    <Plus className="w-4 h-4 mr-2" />
+                                    <Plus className="w-4 h-4 mr-1.5" />
                                     Add {role.replace('_', ' ')}
                                 </span>
                             </button>
@@ -457,27 +448,26 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
             {showRemoveRoleModal && roleToRemove && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
                     <div 
-                        className={`${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-850'} border p-6 max-w-md w-full shadow-2xl transform transition-all`}
-                        style={{ borderRadius: '2px' }}
+                        className={`${darkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#E5E5E5] text-[#151515]'} border rounded-2xl p-6 max-w-md w-full shadow-2xl transform transition-all`}
                     >
-                        <div className="flex items-center mb-4 text-red-600">
-                            <AlertTriangle className="w-6 h-6 mr-2" />
-                            <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Confirm Removal</h3>
+                        <div className="flex items-center mb-4 text-[#E5252A]">
+                            <AlertTriangle className="w-5 h-5 mr-2" />
+                            <h3 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-[#151515]'}`}>Confirm Removal</h3>
                         </div>
 
-                        <div className={`bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 p-4 mb-6`} style={{ borderRadius: '2px' }}>
-                            <p className="text-sm text-red-800 dark:text-red-200 font-medium">
+                        <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-xl p-4 mb-5">
+                            <p className="text-xs text-[#E5252A] dark:text-red-300 font-semibold">
                                 Warning: removing the <span className="uppercase font-bold">{roleToRemove.replace('_', ' ')}</span> role is destructive.
                             </p>
-                            <ul className="text-xs text-red-700 dark:text-red-300 mt-2 list-disc list-inside">
+                            <ul className="text-xs text-red-700 dark:text-red-300 mt-2 list-disc list-inside space-y-1">
                                 <li>Associated products and services will be deleted</li>
                                 <li>Images and videos will be removed</li>
                                 <li>This action cannot be undone</li>
                             </ul>
                         </div>
 
-                        <p className={`mb-3 text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-350' : 'text-gray-600'}`}>
-                            Type <span className="font-mono bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-red-500">remove the {roleToRemove.replace('_', ' ')}</span> to confirm:
+                        <p className={`mb-2 text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-[#666666]'}`}>
+                            Type <span className="font-mono bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-[#E5252A] font-bold">remove the {roleToRemove.replace('_', ' ')}</span> to confirm:
                         </p>
 
                         <input
@@ -485,10 +475,9 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                             value={confirmationInput}
                             onChange={(e) => setConfirmationInput(e.target.value)}
                             placeholder={`remove the ${roleToRemove.replace('_', ' ')}`}
-                            className={`w-full p-2.5 border text-sm focus:ring-1 focus:ring-red-500 focus:outline-none transition-all mb-6 ${
-                                darkMode ? 'bg-gray-900 border-gray-750 text-white placeholder-gray-500' : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                            className={`w-full p-2.5 rounded-lg border text-sm focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A] focus:outline-none transition-all mb-6 ${
+                                darkMode ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500' : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400'
                             }`}
-                            style={{ borderRadius: '2px' }}
                             autoFocus
                         />
 
@@ -500,33 +489,31 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                                     setConfirmationInput("");
                                 }}
                                 disabled={isUpdatingRole}
-                                className={`px-5 py-2 border font-semibold text-xs transition-colors uppercase tracking-wider ${
-                                    darkMode ? 'border-gray-750 bg-gray-800 text-gray-300 hover:bg-gray-700' : 'border-gray-250 bg-white text-gray-755 hover:bg-gray-50'
+                                className={`px-4 py-2 rounded-lg border font-semibold text-xs transition-colors uppercase tracking-wider ${
+                                    darkMode ? 'border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700' : 'border-[#E5E5E5] bg-white text-[#151515] hover:bg-gray-50'
                                 }`}
-                                style={{ borderRadius: '2px' }}
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleConfirmRemoveRole}
                                 disabled={isUpdatingRole || confirmationInput.toLowerCase() !== `remove the ${roleToRemove.replace('_', ' ')}`.toLowerCase()}
-                                className={`px-5 py-2 text-white font-semibold text-xs uppercase tracking-wider transition-all ${
+                                className={`px-4 py-2 rounded-lg text-white font-semibold text-xs uppercase tracking-wider transition-all shadow-xs ${
                                     isUpdatingRole || confirmationInput.toLowerCase() !== `remove the ${roleToRemove.replace('_', ' ')}`.toLowerCase()
-                                        ? 'bg-gray-400 cursor-not-allowed opacity-70'
-                                        : 'bg-red-505 bg-red-500 hover:bg-red-600'
+                                        ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
+                                        : 'bg-[#E5252A] hover:bg-[#c91d22]'
                                 }`}
-                                style={{ borderRadius: '2px' }}
                             >
                                 {isUpdatingRole ? 'Removing...' : 'Confirm Removal'}
                             </button>
                         </div>
 
                         {deletionSummary && (
-                            <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 text-sm border border-green-150 dark:border-green-900/30" style={{ borderRadius: '2px' }}>
-                                <p className="font-bold text-green-700 dark:text-green-400 mb-1 flex items-center">
-                                    <CheckCircle className="w-4 h-4 mr-1" /> Deleted Items:
+                            <div className="mt-4 p-3 bg-emerald-50 dark:bg-emerald-950/20 text-sm border border-emerald-200 dark:border-emerald-900/30 rounded-xl">
+                                <p className="font-bold text-emerald-700 dark:text-emerald-400 mb-1 flex items-center">
+                                    <CheckCircle className="w-4 h-4 mr-1.5" /> Deleted Items:
                                 </p>
-                                <ul className="text-green-600 dark:text-green-300 pl-5 list-disc text-xs">
+                                <ul className="text-emerald-600 dark:text-emerald-300 pl-5 list-disc text-xs space-y-0.5">
                                     <li>Products/Services: {deletionSummary.products}</li>
                                     <li>Images: {deletionSummary.images}</li>
                                     <li>Videos: {deletionSummary.videos}</li>
@@ -540,29 +527,27 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
             {showAddCategoryModal && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
                     <div 
-                        className={`${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-850'} border p-6 max-w-md w-full shadow-2xl transform transition-all`}
-                        style={{ borderRadius: '2px' }}
+                        className={`${darkMode ? 'bg-gray-900 border-gray-800 text-white' : 'bg-white border-[#E5E5E5] text-[#151515]'} border rounded-2xl p-6 max-w-md w-full shadow-2xl transform transition-all`}
                     >
-                        <div className="flex items-center mb-4 text-indigo-500">
-                            <Store className="w-6 h-6 mr-2" />
-                            <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Assign Shop Category</h3>
+                        <div className="flex items-center mb-4 text-[#E5252A]">
+                            <Store className="w-5 h-5 mr-2" />
+                            <h3 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-[#151515]'}`}>Assign Shop Category</h3>
                         </div>
 
-                        <p className={`mb-4 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        <p className={`mb-4 text-xs ${darkMode ? 'text-gray-300' : 'text-[#666666]'}`}>
                             Select a marketplace category to assign to your shop. Premium categories come with custom storage, product limits, and VIP plans.
                         </p>
 
                         <div className="mb-6">
-                            <label className={`block text-[10px] font-bold uppercase tracking-wider mb-2 ${darkMode ? 'text-gray-450' : 'text-gray-600'}`}>
+                            <label className="block text-[11px] font-bold uppercase tracking-wider mb-2 text-[#666666] dark:text-gray-400">
                                 Select Category
                             </label>
                             <select
                                 value={selectedCategoryId || ""}
                                 onChange={(e) => setSelectedCategoryId(Number(e.target.value) || null)}
-                                className={`w-full p-2.5 border text-sm focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all ${
-                                    darkMode ? 'bg-gray-900 border-gray-750 text-white placeholder-gray-505' : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
+                                className={`w-full p-2.5 rounded-lg border text-sm focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A] focus:outline-none transition-all ${
+                                    darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515]'
                                 }`}
-                                style={{ borderRadius: '2px' }}
                             >
                                 <option value="" disabled>-- Select a Shop Category --</option>
                                 {availableCategories
@@ -582,22 +567,20 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                                     setSelectedCategoryId(null);
                                 }}
                                 disabled={isUpdatingRole}
-                                className={`px-5 py-2 border font-semibold text-xs transition-colors uppercase tracking-wider ${
-                                    darkMode ? 'border-gray-750 bg-gray-800 text-gray-300 hover:bg-gray-700' : 'border-gray-250 bg-white text-gray-755 hover:bg-gray-50'
+                                className={`px-4 py-2 rounded-lg border font-semibold text-xs transition-colors uppercase tracking-wider ${
+                                    darkMode ? 'border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700' : 'border-[#E5E5E5] bg-white text-[#151515] hover:bg-gray-50'
                                 }`}
-                                style={{ borderRadius: '2px' }}
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleAddCategory}
                                 disabled={isUpdatingRole || !selectedCategoryId}
-                                className={`px-5 py-2 text-white font-semibold text-xs uppercase tracking-wider transition-all ${
+                                className={`px-4 py-2 rounded-lg text-white font-semibold text-xs uppercase tracking-wider transition-all shadow-xs ${
                                     isUpdatingRole || !selectedCategoryId
-                                        ? 'bg-gray-400 cursor-not-allowed opacity-70'
-                                        : 'bg-emerald-500 hover:bg-emerald-600'
+                                        ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
+                                        : 'bg-[#E5252A] hover:bg-[#c91d22]'
                                 }`}
-                                style={{ borderRadius: '2px' }}
                             >
                                 {isUpdatingRole ? 'Assigning...' : 'Assign Category'}
                             </button>

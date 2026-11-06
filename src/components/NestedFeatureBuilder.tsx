@@ -133,15 +133,14 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                     {features.map((feature, index) => (
                         <div
                             key={index}
-                            className={`border transition-all ${darkMode
-                                ? 'bg-gray-800 border-gray-700'
-                                : 'bg-white border-gray-250'
+                            className={`border rounded-xl transition-all shadow-xs overflow-hidden ${darkMode
+                                ? 'bg-gray-900 border-gray-800'
+                                : 'bg-white border-[#E5E5E5]'
                                 }`}
-                            style={{ borderRadius: '2px' }}
                         >
                             {/* Feature Header */}
                             <div className="flex items-center gap-3 p-4">
-                                <span className="text-sm font-bold text-emerald-500 w-8">
+                                <span className="text-xs font-bold text-[#E5252A] w-6">
                                     {index + 1}.
                                 </span>
 
@@ -152,11 +151,10 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                         value={feature.name}
                                         onChange={(e) => updateSimpleFeature(index, 'name', e.target.value)}
                                         placeholder="Feature name (e.g., 24/7 Support)"
-                                        className={`flex-1 px-4 py-2 border transition-all ${darkMode
-                                            ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500'
-                                            : 'bg-gray-50 border-gray-300 text-gray-950 placeholder-gray-400'
-                                            } focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500`}
-                                        style={{ borderRadius: '2px' }}
+                                        className={`flex-1 px-3.5 py-2 text-sm border rounded-lg transition-all ${darkMode
+                                            ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                                            : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400'
+                                            } focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A] focus:outline-none`}
                                     />
                                 ) : (
                                     // Object Feature Header
@@ -166,36 +164,33 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                             value={feature.name}
                                             onChange={(e) => updateObjectFeatureName(index, e.target.value)}
                                             placeholder="Feature name (e.g., Location)"
-                                            className={`flex-1 px-4 py-2 border transition-all ${darkMode
-                                                ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-500'
-                                                : 'bg-gray-50 border-gray-300 text-gray-950 placeholder-gray-400'
-                                                } focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500`}
-                                            style={{ borderRadius: '2px' }}
+                                            className={`flex-1 px-3.5 py-2 text-sm border rounded-lg transition-all ${darkMode
+                                                ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                                                : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400'
+                                                } focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A] focus:outline-none`}
                                         />
                                         <button
                                             type="button"
                                             onClick={() => toggleExpanded(index)}
-                                            className={`p-2 transition-colors ${darkMode
-                                                ? 'hover:bg-gray-700 text-gray-350'
-                                                : 'hover:bg-gray-100 text-gray-650'
+                                            className={`p-2 rounded-lg transition-colors ${darkMode
+                                                ? 'hover:bg-gray-800 text-gray-400'
+                                                : 'hover:bg-gray-100 text-[#666666]'
                                                 }`}
-                                            style={{ borderRadius: '2px' }}
                                         >
                                             {expandedFeatures.has(index) ? (
-                                                <ChevronUp className="w-5 h-5" />
+                                                <ChevronUp className="w-4 h-4" />
                                             ) : (
-                                                <ChevronDown className="w-5 h-5" />
+                                                <ChevronDown className="w-4 h-4" />
                                             )}
                                         </button>
                                     </>
                                 )}
 
                                 <span
-                                    className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider ${feature.type === 'simple'
-                                        ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-450'
-                                        : 'bg-gray-500/10 text-gray-600 dark:bg-gray-500/20 dark:text-gray-400'
+                                    className={`px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-full ${feature.type === 'simple'
+                                        ? 'bg-[#E5252A]/10 text-[#E5252A]'
+                                        : 'bg-gray-100 text-[#666666] dark:bg-gray-800 dark:text-gray-300'
                                         }`}
-                                    style={{ borderRadius: '2px' }}
                                 >
                                     {feature.type === 'simple' ? 'Simple' : 'Object'}
                                 </span>
@@ -203,8 +198,7 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                 <button
                                     type="button"
                                     onClick={() => removeFeature(index)}
-                                    className="p-2 bg-red-500/10 text-red-500 hover:bg-red-500/20 dark:bg-red-500/20 dark:text-red-400 dark:hover:bg-red-500/30 transition-colors"
-                                    style={{ borderRadius: '2px' }}
+                                    className="p-2 rounded-lg bg-red-50 text-[#E5252A] hover:bg-red-100 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40 transition-colors"
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
@@ -212,19 +206,18 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
 
                             {/* Object Feature Schema (Expanded) */}
                             {feature.type === 'object' && expandedFeatures.has(index) && (
-                                <div className={`px-4 pb-4 border-t pt-4 ${darkMode ? 'border-gray-750 bg-gray-750' : 'border-gray-200 bg-gray-50/50'
+                                <div className={`px-4 pb-4 border-t pt-4 ${darkMode ? 'border-gray-800 bg-gray-850' : 'border-[#E5E5E5] bg-[#F5F5F5]/40'
                                     }`}>
                                     <div className="flex justify-between items-center mb-3">
-                                        <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-455">
+                                        <h4 className="text-xs font-bold uppercase tracking-wider text-[#E5252A]">
                                             Sub-fields ({Object.keys(feature.schema).length})
                                         </h4>
                                         <button
                                             type="button"
                                             onClick={() => addSubField(index)}
-                                            className="px-3 py-1.5 bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 transition flex items-center gap-1"
-                                            style={{ borderRadius: '2px' }}
+                                            className="px-3 py-1.5 bg-[#E5252A] text-white text-xs font-semibold rounded-lg hover:bg-[#c91d22] transition flex items-center gap-1 shadow-xs"
                                         >
-                                            <Plus className="w-3 h-3" />
+                                            <Plus className="w-3.5 h-3.5" />
                                             Add Sub-field
                                         </button>
                                     </div>
@@ -233,19 +226,18 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                         {Object.entries(feature.schema).map(([fieldKey, fieldConfig]) => (
                                             <div
                                                 key={fieldKey}
-                                                className={`p-4 border ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
+                                                className={`p-4 border rounded-xl ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'
                                                     }`}
-                                                style={{ borderRadius: '2px' }}
                                             >
                                                 <div className="flex justify-between items-start mb-3">
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-550 dark:text-gray-405 bg-gray-100 dark:bg-gray-800 px-2 py-1" style={{ borderRadius: '2px' }}>
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-550 dark:text-gray-405 bg-gray-100 dark:bg-gray-800 px-2 py-1">
                                                          Sub-field
                                                     </span>
                                                     <button
                                                         type="button"
                                                         onClick={() => removeSubField(index, fieldKey)}
                                                         className="text-red-505 hover:text-red-600 hover:bg-red-500/10 dark:hover:bg-red-500/20 p-1 transition"
-                                                        style={{ borderRadius: '2px' }}
+                                                       
                                                         title="Remove sub-field"
                                                     >
                                                         <X className="w-4 h-4" />
@@ -302,7 +294,7 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                                                 ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-600'
                                                                 : 'bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400'
                                                                 } focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500`}
-                                                            style={{ borderRadius: '2px' }}
+                                                           
                                                         />
                                                     </div>
 
@@ -320,7 +312,7 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                                                 ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-600'
                                                                 : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
                                                                 } focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500`}
-                                                            style={{ borderRadius: '2px' }}
+                                                           
                                                         />
                                                     </div>
 
@@ -336,7 +328,7 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                                                 ? 'bg-gray-800 border-gray-700 text-white'
                                                                 : 'bg-white border-gray-300 text-gray-900'
                                                                 } focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500`}
-                                                            style={{ borderRadius: '2px' }}
+                                                           
                                                         >
                                                             <option value="text">Text</option>
                                                             <option value="number">Number</option>
@@ -364,7 +356,7 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                                                         updateSubField(index, fieldKey, { options: [...currentOptions, ''] });
                                                                     }}
                                                                     className="px-2 py-1 bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 transition flex items-center gap-1"
-                                                                    style={{ borderRadius: '2px' }}
+                                                                   
                                                                 >
                                                                     <Plus className="w-3 h-3" />
                                                                     Add Option
@@ -389,7 +381,7 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                                                                 ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-600'
                                                                                 : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
                                                                                 } focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500`}
-                                                                            style={{ borderRadius: '2px' }}
+                                                                           
                                                                         />
                                                                         <button
                                                                             type="button"
@@ -398,7 +390,7 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                                                                 updateSubField(index, fieldKey, { options: newOptions });
                                                                             }}
                                                                             className="p-1.5 text-red-500 hover:text-red-600 hover:bg-red-500/10 dark:hover:bg-red-500/20 transition"
-                                                                            style={{ borderRadius: '2px' }}
+                                                                           
                                                                             title="Remove option"
                                                                         >
                                                                             <X className="w-4 h-4" />
@@ -406,7 +398,7 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                                                     </div>
                                                                 ))}
                                                                 {(!fieldConfig.options || fieldConfig.options.length === 0) && (
-                                                                    <div className={`text-center py-3 border border-dashed ${darkMode ? 'border-gray-700 text-gray-550 bg-gray-900' : 'border-gray-300 text-gray-500 bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+                                                                    <div className={`text-center py-3 border border-dashed ${darkMode ? 'border-gray-700 text-gray-550 bg-gray-900' : 'border-gray-300 text-gray-500 bg-gray-50'}`}>
                                                                         <p className="text-xs">No options added yet. Click "Add Option" to start.</p>
                                                                     </div>
                                                                 )}
@@ -422,7 +414,7 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                                                 checked={fieldConfig.requiresValue || false}
                                                                 onChange={(e) => updateSubField(index, fieldKey, { requiresValue: e.target.checked })}
                                                                 className="w-4 h-4 text-emerald-500 border-gray-300 dark:border-gray-750 bg-white dark:bg-gray-800 focus:ring-emerald-500 focus:ring-2 mt-0.5"
-                                                                style={{ borderRadius: '2px' }}
+                                                               
                                                             />
                                                             <div>
                                                                 <span className="text-xs font-semibold uppercase tracking-wider text-gray-750 dark:text-gray-300">
@@ -442,7 +434,7 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                                             checked={fieldConfig.required || false}
                                                             onChange={(e) => updateSubField(index, fieldKey, { required: e.target.checked })}
                                                             className="w-4 h-4 text-emerald-500 border-gray-300 dark:border-gray-755 bg-white dark:bg-gray-800 focus:ring-emerald-500 focus:ring-2"
-                                                            style={{ borderRadius: '2px' }}
+                                                           
                                                         />
                                                         <span className="text-xs font-semibold uppercase tracking-wider text-gray-755 dark:text-gray-300">
                                                             Required field
@@ -453,7 +445,7 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                                         ))}
 
                                         {Object.keys(feature.schema).length === 0 && (
-                                            <div className={`text-center py-6 border border-dashed ${darkMode ? 'border-gray-700 text-gray-400 bg-gray-850' : 'border-gray-300 text-gray-500 bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+                                            <div className={`text-center py-6 border border-dashed ${darkMode ? 'border-gray-700 text-gray-400 bg-gray-850' : 'border-gray-300 text-gray-500 bg-gray-50'}`}>
                                                 <p className="text-sm font-semibold uppercase tracking-wider">No sub-fields defined yet</p>
                                                 <p className="text-xs mt-1 text-gray-500 dark:text-gray-405">Click "Add Sub-field" to create fields</p>
                                             </div>
@@ -467,11 +459,11 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
             )}
 
             {/* Add Feature Buttons */}
-            <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                    <div className="flex-1 border-t border-gray-300 dark:border-gray-700"></div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-gray-550 dark:text-gray-405 px-3">Add Feature</span>
-                    <div className="flex-1 border-t border-gray-300 dark:border-gray-700"></div>
+            <div className="space-y-3 pt-2">
+                <div className="flex items-center gap-3">
+                    <div className="flex-1 border-t border-[#E5E5E5] dark:border-gray-800"></div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#666666] dark:text-gray-400">Add Feature</span>
+                    <div className="flex-1 border-t border-[#E5E5E5] dark:border-gray-800"></div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -479,10 +471,9 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                     <button
                         type="button"
                         onClick={addSimpleFeature}
-                        className="flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500 border border-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all uppercase tracking-wider"
-                        style={{ borderRadius: '2px' }}
+                        className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#E5252A] hover:bg-[#c91d22] text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-xs active:scale-[0.98]"
                     >
-                        <Plus className="w-5 h-5" />
+                        <Plus className="w-4 h-4" />
                         <span>Simple Feature</span>
                     </button>
 
@@ -490,48 +481,44 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
                     <button
                         type="button"
                         onClick={addCustomObjectFeature}
-                        className="flex items-center justify-center gap-2 px-4 py-3 bg-transparent border border-emerald-500 text-emerald-600 dark:text-emerald-450 font-semibold hover:bg-emerald-500/10 transition-all uppercase tracking-wider"
-                        style={{ borderRadius: '2px' }}
+                        className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#E5E5E5] dark:border-gray-800 hover:border-[#E5252A] dark:hover:border-[#E5252A] bg-white dark:bg-gray-900 text-[#151515] dark:text-white hover:text-[#E5252A] text-xs font-semibold uppercase tracking-wider transition-all shadow-xs active:scale-[0.98]"
                     >
-                        <Plus className="w-5 h-5" />
+                        <Plus className="w-4 h-4" />
                         <span>Custom Object</span>
                     </button>
                 </div>
 
                 {/* Template Buttons */}
-                <div className="space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Or use a template:</p>
+                <div className="space-y-2 pt-1">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#666666] dark:text-gray-400">Or use a template:</p>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                         <button
                             type="button"
                             onClick={() => addTemplateFeature('location')}
-                            className={`px-4 py-2 border font-semibold uppercase tracking-wider transition-all ${darkMode
-                                ? 'border-gray-700 text-gray-300 hover:bg-gray-800'
-                                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                            className={`px-3 py-2 border rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${darkMode
+                                ? 'border-gray-800 bg-gray-900 text-gray-300 hover:border-[#E5252A] hover:text-[#E5252A]'
+                                : 'border-[#E5E5E5] bg-white text-[#151515] hover:border-[#E5252A] hover:text-[#E5252A]'
                                 }`}
-                            style={{ borderRadius: '2px' }}
                         >
                             📍 Location
                         </button>
                         <button
                             type="button"
                             onClick={() => addTemplateFeature('contact')}
-                            className={`px-4 py-2 border font-semibold uppercase tracking-wider transition-all ${darkMode
-                                ? 'border-gray-700 text-gray-300 hover:bg-gray-800'
-                                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                            className={`px-3 py-2 border rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${darkMode
+                                ? 'border-gray-800 bg-gray-900 text-gray-300 hover:border-[#E5252A] hover:text-[#E5252A]'
+                                : 'border-[#E5E5E5] bg-white text-[#151515] hover:border-[#E5252A] hover:text-[#E5252A]'
                                 }`}
-                            style={{ borderRadius: '2px' }}
                         >
                             📞 Contact
                         </button>
                         <button
                             type="button"
                             onClick={() => addTemplateFeature('pricing')}
-                            className={`px-4 py-2 border font-semibold uppercase tracking-wider transition-all ${darkMode
-                                ? 'border-gray-700 text-gray-300 hover:bg-gray-800'
-                                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                            className={`px-3 py-2 border rounded-lg text-xs font-semibold uppercase tracking-wider transition-all ${darkMode
+                                ? 'border-gray-800 bg-gray-900 text-gray-300 hover:border-[#E5252A] hover:text-[#E5252A]'
+                                : 'border-[#E5E5E5] bg-white text-[#151515] hover:border-[#E5252A] hover:text-[#E5252A]'
                                 }`}
-                            style={{ borderRadius: '2px' }}
                         >
                             💰 Pricing
                         </button>
@@ -540,7 +527,7 @@ export default function NestedFeatureBuilder({ features, onChange, darkMode }: N
             </div>
 
             {features.length === 0 && (
-                <div className={`text-center py-8 border border-dashed ${darkMode ? 'border-gray-700 text-gray-450 bg-gray-805' : 'border-gray-300 text-gray-500 bg-gray-50'}`} style={{ borderRadius: '2px' }}>
+                <div className={`text-center py-8 rounded-xl border border-dashed ${darkMode ? 'border-gray-800 text-gray-400 bg-gray-900/40' : 'border-[#E5E5E5] text-[#666666] bg-[#F5F5F5]/60'}`}>
                     <p className="text-sm">No features added yet. Click a button above to add your first feature.</p>
                 </div>
             )}

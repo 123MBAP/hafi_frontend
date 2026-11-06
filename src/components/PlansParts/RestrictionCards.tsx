@@ -1,9 +1,9 @@
 // src/components/RestrictionCard.tsx
 import React from "react";
-// Update the import path to match the actual file location and extension
 import { Subscription } from "../PlansParts/UseSubsriptions";
 import { useNavigate } from "react-router-dom";
 import { useDarkMode } from "@/context/DarkMode";
+import { Lock, AlertOctagon, Sparkles, ArrowRight } from "lucide-react";
 
 interface RestrictionCardProps {
   subscription: Subscription | null;
@@ -24,78 +24,51 @@ const RestrictionCard: React.FC<RestrictionCardProps> = ({
     return null;
   }
 
-  // Color schemes for different restriction types
-  const restrictionStyles = {
-    noSubscription: {
-      bg: darkMode ? "bg-yellow-900/20" : "bg-yellow-50",
-      border: darkMode ? "border-yellow-700" : "border-yellow-300",
-      text: darkMode ? "text-yellow-200" : "text-yellow-800",
-      icon: "🔒",
-      title: "Access Restricted",
-      button: darkMode ? "bg-yellow-600 hover:bg-yellow-700" : "bg-yellow-500 hover:bg-yellow-600"
-    },
-    expired: {
-      bg: darkMode ? "bg-red-900/20" : "bg-red-50",
-      border: darkMode ? "border-red-700" : "border-red-300",
-      text: darkMode ? "text-red-200" : "text-red-800",
-      icon: "⛔",
-      title: "Subscription Expired",
-      button: darkMode ? "bg-red-600 hover:bg-red-700" : "bg-red-500 hover:bg-red-600"
-    },
-    planUpgrade: {
-      bg: darkMode ? "bg-blue-900/20" : "bg-blue-50",
-      border: darkMode ? "border-blue-700" : "border-blue-300",
-      text: darkMode ? "text-blue-200" : "text-blue-800",
-      icon: "🚀",
-      title: "Upgrade Required",
-      button: darkMode ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-500 hover:bg-blue-600"
-    },
-    featureRestricted: {
-      bg: darkMode ? "bg-purple-900/20" : "bg-purple-50",
-      border: darkMode ? "border-purple-700" : "border-purple-300",
-      text: darkMode ? "text-purple-200" : "text-purple-800",
-      icon: "🔐",
-      title: "Feature Locked",
-      button: darkMode ? "bg-purple-600 hover:bg-purple-700" : "bg-purple-500 hover:bg-purple-600"
-    }
-  };
-
-  // Restriction card component
-  const renderRestrictionCard = (styles: typeof restrictionStyles.noSubscription, message: string, buttonText: string, navigateTo: string) => {
+  const renderRestrictionCard = (
+    icon: React.ReactNode,
+    title: string,
+    message: string,
+    buttonText: string,
+    navigateTo: string
+  ) => {
     return (
-      <div className={`relative p-6 border-2 rounded-xl ${styles.bg} ${styles.border} ${styles.text} shadow-lg`}>
-        {/* Decorative corner accent */}
-        <div className={`absolute top-0 right-0 w-16 h-16 overflow-hidden`}>
-          <div className={`absolute top-0 right-0 w-8 h-8 ${styles.border} border-b-2 border-l-2 rounded-bl-xl`}></div>
-        </div>
-        
-        <div className="flex items-start space-x-4">
-          <div className="text-2xl flex-shrink-0">{styles.icon}</div>
+      <div className={`relative p-6 sm:p-8 rounded-2xl border transition-all duration-200 shadow-xs overflow-hidden ${
+        darkMode
+          ? 'bg-gradient-to-br from-gray-900 via-gray-900 to-[#0A0A0A] border-gray-800 text-white'
+          : 'bg-gradient-to-br from-white via-white to-[#F5F5F5] border-[#E5E5E5] text-[#151515]'
+      }`}>
+        <div className="flex flex-col sm:flex-row items-start gap-5">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-[#E5252A]/10 text-[#E5252A]">
+            {icon}
+          </div>
           <div className="flex-1">
-            <h3 className={`font-semibold text-lg mb-1 ${styles.text}`}>{styles.title}</h3>
-            <p className="mb-4 leading-relaxed">{message}</p>
-              <button
-                onClick={() => navigate(navigateTo)}
-                className={`px-5 py-2.5 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 ${styles.button}`}
-              >
-                {buttonText}
-              </button>
-
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#E5252A]/10 text-[#E5252A] mb-2">
+              Membership Feature
+            </div>
+            <h3 className="font-bold text-lg text-[#151515] dark:text-white mb-1.5">{title}</h3>
+            <p className="text-sm text-[#666666] dark:text-gray-400 mb-5 leading-relaxed max-w-xl">
+              {message}
+            </p>
+            <button
+              onClick={() => navigate(navigateTo)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#E5252A] hover:bg-[#c91d22] text-white text-xs font-semibold rounded-lg transition-colors shadow-xs active:scale-[0.98]"
+            >
+              <span>{buttonText}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
-        
-        {/* Restriction pattern overlay */}
-        <div className={`absolute inset-0 pointer-events-none opacity-5 bg-gradient-to-br from-current to-transparent rounded-xl`}></div>
       </div>
     );
   };
 
-  // An active implicit subscription, such as a premium shop plan, may not have an end date.
+  // 1. No active subscription
   if (!subscription || subscription.status !== "active") {
     return renderRestrictionCard(
-      restrictionStyles.noSubscription,
-      "You need an active subscription to access this content. Choose a plan that fits your needs.",
-      "View Plans",
+      <Lock className="w-6 h-6" />,
+      "Active Subscription Required",
+      "You need an active provider subscription to publish listings, manage service inventory, and accept customer bookings.",
+      "View Available Plans",
       "/dashboard/upgrade"
     );
   }
@@ -103,9 +76,10 @@ const RestrictionCard: React.FC<RestrictionCardProps> = ({
   // 2. Expired subscription
   if (subscription.status === "expired") {
     return renderRestrictionCard(
-      restrictionStyles.expired,
-      "Your subscription has expired. Renew your plan to continue accessing premium features.",
-      "Renew Plan",
+      <AlertOctagon className="w-6 h-6" />,
+      "Subscription Expired",
+      "Your subscription has expired. Renew your plan to continue accessing publishing tools and client bookings.",
+      "Renew Subscription",
       "/dashboard/upgrade"
     );
   }
@@ -113,24 +87,15 @@ const RestrictionCard: React.FC<RestrictionCardProps> = ({
   // 3. Required plan check
   if (requiredPlan && subscription.plan_name.toLowerCase() !== requiredPlan.toLowerCase()) {
     return renderRestrictionCard(
-      restrictionStyles.planUpgrade,
-      `This feature requires the ${requiredPlan} plan. Your current plan (${subscription.plan_name}) doesn't include this access.`,
-      "Upgrade Now",
+      <Sparkles className="w-6 h-6" />,
+      "Upgrade Required",
+      `This feature requires the ${requiredPlan} tier. Your current tier (${subscription.plan_name}) does not include this permission.`,
+      "Upgrade Plan Tier",
       "/dashboard/upgrade"
     );
   }
 
-  // // 4. Required feature check
-  // if (requiredFeature && !subscription.features?.includes(requiredFeature)) {
-  //   return renderRestrictionCard(
-  //     restrictionStyles.featureRestricted,
-  //     `The "${requiredFeature}" feature is not available in your current plan. Upgrade to unlock this capability.`,
-  //     "Unlock Feature",
-  //     "/dashboard/upgrade"
-  //   );
-  // }
-
-  return null; // ✅ Access granted
+  return null; // Access granted
 };
 
 export default RestrictionCard;

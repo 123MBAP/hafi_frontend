@@ -216,10 +216,7 @@ export default function MessagesCard({ providerId }: Props) {
                 >
                   {/* Avatar */}
                   <div
-                    className={`w-12 h-12 flex items-center justify-center text-white font-semibold flex-shrink-0 ${
-                      darkMode ? 'bg-emerald-600' : 'bg-emerald-500'
-                    }`}
-                    style={{ borderRadius: '2px' }}
+                    className="w-11 h-11 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0 bg-[#E5252A]"
                   >
                     {cust.name?.charAt(0).toUpperCase()}
                   </div>
@@ -239,10 +236,7 @@ export default function MessagesCard({ providerId }: Props) {
                         </div>
                         {cust.unread_count && cust.unread_count > 0 && (
                           <div
-                            className={`px-2 py-0.5 text-xs font-semibold ${
-                              darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                            }`}
-                            style={{ borderRadius: '2px' }}
+                            className="px-2 py-0.5 text-xs font-semibold rounded-full bg-[#E5252A] text-white"
                           >
                             {cust.unread_count}
                           </div>
@@ -264,17 +258,19 @@ export default function MessagesCard({ providerId }: Props) {
 
       {/* Desktop WhatsApp-like View */}
       <div
-        className={`hidden lg:flex border h-[600px] w-full ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-        style={{ borderRadius: '2px' }}
+        className={`hidden lg:flex border rounded-2xl overflow-hidden h-[600px] w-full shadow-xs ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'}`}
       >
         {/* Sidebar - Chat List */}
-        <div className={`w-1/3 border-r flex flex-col ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
-          <div className={`p-4 border-b ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
-            <h2 className={`text-sm font-bold uppercase tracking-wider ${darkMode ? 'text-emerald-450' : 'text-emerald-600'}`}>
-              Chats
+        <div className={`w-1/3 border-r flex flex-col ${darkMode ? 'border-gray-800 bg-gray-900' : 'border-[#E5E5E5] bg-[#F5F5F5]/40'}`}>
+          <div className={`p-4 border-b flex items-center justify-between ${darkMode ? 'border-gray-800 bg-gray-900' : 'border-[#E5E5E5] bg-white'}`}>
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#E5252A]">
+              Conversations
             </h2>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-[#666666] dark:text-gray-400">
+              {customerMessages.length}
+            </span>
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto divide-y divide-[#E5E5E5]/60 dark:divide-gray-800">
             {loadingCustomers ? (
               <div className="flex items-center justify-center py-16">
                 <LoadingSpinner variant="dots" size="md" message="Loading conversations..." />
@@ -289,32 +285,29 @@ export default function MessagesCard({ providerId }: Props) {
                   <div
                     key={cust.customer_id}
                     onClick={() => handleSelectCustomer(cust)}
-                    className={`p-4 cursor-pointer border-b transition ${
-                      darkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-100 hover:bg-gray-100'
+                    className={`p-4 cursor-pointer transition ${
+                      darkMode ? 'hover:bg-gray-800/60' : 'hover:bg-white'
                     } ${
                       selectedCustomer?.customer_id === cust.customer_id
                         ? darkMode
-                          ? 'bg-gray-700 border-l-2 border-emerald-500'
-                          : 'bg-gray-200 border-l-2 border-emerald-500'
+                          ? 'bg-gray-800 border-l-4 border-[#E5252A]'
+                          : 'bg-white border-l-4 border-[#E5252A] shadow-xs'
                         : ''
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-12 h-12 flex items-center justify-center text-white font-semibold flex-shrink-0 ${
-                          darkMode ? 'bg-emerald-600' : 'bg-emerald-500'
-                        }`}
-                        style={{ borderRadius: '2px' }}
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0 bg-[#E5252A]"
                       >
                         {cust.name?.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-baseline">
-                          <div className={`text-sm font-medium truncate ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                          <div className={`text-sm font-semibold truncate ${darkMode ? 'text-gray-100' : 'text-[#151515]'}`}>
                             {cust.name}
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-[#666666]'}`}>
                               {cust.latest_time && new Date(cust.latest_time).toLocaleTimeString([], {
                                 hour: '2-digit',
                                 minute: '2-digit'
@@ -322,17 +315,14 @@ export default function MessagesCard({ providerId }: Props) {
                             </div>
                             {cust.unread_count && cust.unread_count > 0 && (
                               <div
-                                className={`px-2 py-0.5 text-xs font-semibold ${
-                                  darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                                }`}
-                                style={{ borderRadius: '2px' }}
+                                className="px-2 py-0.5 text-xs font-semibold rounded-full bg-[#E5252A] text-white"
                               >
                                 {cust.unread_count}
                               </div>
                             )}
                           </div>
                         </div>
-                        <div className={`text-xs truncate ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <div className={`text-xs truncate mt-0.5 ${darkMode ? 'text-gray-400' : 'text-[#666666]'}`}>
                           {cust.latest_message?.trim()
                             ? `${cust.latest_sender === 'provider' ? 'You: ' : ''}${cust.latest_message}`
                             : 'No messages yet'}
@@ -351,12 +341,9 @@ export default function MessagesCard({ providerId }: Props) {
           {selectedCustomer ? (
             <>
               {/* Chat Header */}
-              <div className={`p-4 border-b flex items-center gap-3 ${darkMode ? 'border-gray-700 bg-gray-905 bg-gray-900' : 'border-gray-200 bg-white'}`}>
+              <div className={`p-4 border-b flex items-center gap-3 ${darkMode ? 'border-gray-800 bg-gray-900' : 'border-[#E5E5E5] bg-white'}`}>
                 <div
-                  className={`w-10 h-10 flex items-center justify-center text-white font-semibold ${
-                    darkMode ? 'bg-emerald-600' : 'bg-emerald-500'
-                  }`}
-                  style={{ borderRadius: '2px' }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold bg-[#E5252A]"
                 >
                   {selectedCustomer.name?.charAt(0).toUpperCase()}
                 </div>
@@ -381,22 +368,21 @@ export default function MessagesCard({ providerId }: Props) {
                         className={`mb-3 flex ${msg.sender === 'provider' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-[70%] p-3 border ${
+                          className={`max-w-[70%] p-3.5 rounded-2xl border text-sm ${
                             msg.sender === 'provider'
                               ? darkMode
-                                ? 'bg-emerald-600/20 border-emerald-500/30 text-white'
-                                : 'bg-emerald-50 border-emerald-250 text-emerald-900'
+                                ? 'bg-[#E5252A]/15 border-[#E5252A]/30 text-white rounded-br-xs'
+                                : 'bg-[#FFF5F5] border-[#E5252A]/20 text-[#151515] rounded-br-xs'
                               : darkMode
-                                ? 'bg-gray-800 border-gray-700 text-gray-100'
-                                : 'bg-white border-gray-200 text-gray-900'
+                                ? 'bg-gray-800 border-gray-700 text-gray-100 rounded-bl-xs'
+                                : 'bg-white border-[#E5E5E5] text-[#151515] rounded-bl-xs shadow-xs'
                           }`}
-                          style={{ borderRadius: '2px' }}
                         >
-                          <div className="text-sm break-words">{msg.message}</div>
+                          <div className="break-words">{msg.message}</div>
                           <div
-                            className={`text-[10px] mt-1 font-bold ${
+                            className={`text-[10px] mt-1 font-semibold ${
                               msg.sender === 'provider'
-                                ? darkMode ? 'text-emerald-500/70' : 'text-emerald-600/70'
+                                ? darkMode ? 'text-[#E5252A]/70' : 'text-[#E5252A]/80'
                                 : darkMode ? 'text-gray-500' : 'text-gray-400'
                             }`}
                           >
@@ -414,31 +400,29 @@ export default function MessagesCard({ providerId }: Props) {
               </div>
 
               {/* Input Area */}
-              <div className={`p-4 border-t ${darkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`}>
+              <div className={`p-4 border-t ${darkMode ? 'border-gray-800 bg-gray-900' : 'border-[#E5E5E5] bg-white'}`}>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && !sendingMessage && sendMessage()}
-                    placeholder="Type a message"
+                    placeholder="Type a message..."
                     disabled={sendingMessage}
-                    className={`flex-1 px-4 py-2 border focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 ${
+                    className={`flex-1 px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A] text-sm ${
                       darkMode
-                        ? 'bg-gray-800 border-gray-700 text-gray-100'
-                        : 'bg-white border-gray-300 text-gray-900'
+                        ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500'
+                        : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-[#666666]'
                     } ${sendingMessage ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    style={{ borderRadius: '2px' }}
                   />
                   <button
                     onClick={sendMessage}
                     disabled={sendingMessage || !newMessage.trim()}
-                    className={`px-6 py-2 font-bold uppercase text-xs tracking-wider transition flex items-center gap-2 ${
+                    className={`px-5 py-2.5 font-bold uppercase text-xs tracking-wider rounded-xl transition flex items-center gap-2 shadow-xs ${
                       darkMode
-                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                        : 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                        ? 'bg-[#E5252A] hover:bg-[#c91d22] text-white'
+                        : 'bg-[#E5252A] hover:bg-[#c91d22] text-white'
                     } ${sendingMessage || !newMessage.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    style={{ borderRadius: '2px' }}
                   >
                     {sendingMessage ? (
                       <>

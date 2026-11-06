@@ -96,14 +96,14 @@ export default function WhatsAppPromptBanner({ providerId, darkMode = false }: P
 
     return (
         <div className="fixed bottom-6 right-6 z-[9999] max-w-sm w-full p-4 md:p-0">
-            <div className={`relative p-6 shadow-[0_20px_50px_rgba(0,0,0,0.15)] backdrop-blur-xl border ${card} transition-all duration-500 hover:scale-[1.02]`} style={{ borderRadius: '2px' }}>
+            <div className={`relative p-6 shadow-[0_20px_50px_rgba(0,0,0,0.15)] backdrop-blur-xl border ${card} transition-all duration-500 hover:scale-[1.02]`}>
                 {/* Dismiss */}
                 <button
                     onClick={() => setDismissed(true)}
                     className={`absolute top-2 right-2 p-1.5 opacity-40 hover:opacity-100 transition-colors border ${
                         darkMode ? 'bg-gray-800 border-gray-750 text-gray-350 hover:bg-gray-700' : 'bg-white border-gray-250 text-gray-750 hover:bg-gray-50'
                     }`}
-                    style={{ borderRadius: '2px' }}
+                   
                     aria-label="Dismiss"
                 >
                     <X size={16} />
@@ -111,7 +111,7 @@ export default function WhatsAppPromptBanner({ providerId, darkMode = false }: P
 
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-4">
-                        <div className={`shrink-0 p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-200 text-emerald-600'}`} style={{ borderRadius: '2px' }}>
+                        <div className={`shrink-0 p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}>
                             <PhoneCall size={20} />
                         </div>
                         <div>
@@ -137,21 +137,21 @@ export default function WhatsAppPromptBanner({ providerId, darkMode = false }: P
                                 onChange={e => { setInputValue(e.target.value); setSaveError(''); }}
                                 onKeyDown={e => e.key === 'Enter' && handleSave()}
                                 className={`w-full pl-4 pr-4 py-2.5 border text-sm font-semibold transition-all focus:outline-none focus:ring-1 focus:ring-emerald-500/20 ${inputCls}`}
-                                style={{ borderRadius: '2px' }}
+                               
                             />
                         </div>
                         <button
                             onClick={handleSave}
                             disabled={saving}
                             className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider transition-colors duration-200 disabled:opacity-50"
-                            style={{ borderRadius: '2px' }}
+                           
                         >
                             {saving ? 'Saving...' : 'Connect WhatsApp'}
                         </button>
                     </div>
 
                     {saveError && (
-                        <div className="bg-red-500/10 border border-red-500/20 px-3 py-2" style={{ borderRadius: '2px' }}>
+                        <div className="bg-red-500/10 border border-red-500/20 px-3 py-2">
                             <p className="text-[10px] font-bold text-red-500 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" /> {saveError}
                             </p>

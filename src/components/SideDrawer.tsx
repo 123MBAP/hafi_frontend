@@ -1,7 +1,7 @@
 // components/SideDrawer.tsx
 import { useDarkMode } from "@/context/DarkMode";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 interface SideDrawerProps {
   open: boolean;
@@ -19,6 +19,7 @@ const SideDrawer: React.FC<SideDrawerProps> = ({
   logout,
 }) => {
   const { darkMode } = useDarkMode();
+  const location = useLocation();
 
   return (
     <>
@@ -55,7 +56,12 @@ const SideDrawer: React.FC<SideDrawerProps> = ({
               <Link to="/register" className="hover:text-purple-700" onClick={onClose}>
                 Register
               </Link>
-              <Link to="/login" className="hover:text-purple-700" onClick={onClose}>
+              <Link
+                to="/login"
+                state={{ backgroundLocation: location, from: location.pathname }}
+                className="hover:text-purple-700"
+                onClick={onClose}
+              >
                 Login
               </Link>
             </>

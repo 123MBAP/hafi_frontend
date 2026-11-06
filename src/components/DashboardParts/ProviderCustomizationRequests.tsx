@@ -107,7 +107,7 @@ export default function ProviderCustomizationRequests() {
     return (
       <span
         className={`px-2 py-0.5 border text-[10px] font-bold uppercase tracking-wider ${statusColors[status as keyof typeof statusColors]}`}
-        style={{ borderRadius: '2px' }}
+       
       >
         {status}
       </span>
@@ -140,7 +140,7 @@ export default function ProviderCustomizationRequests() {
         </h1>
 
         {requests.length === 0 ? (
-          <div className={`text-center py-12 border ${darkMode ? "bg-gray-850 border-gray-750 text-gray-400" : "bg-white border-gray-200 text-gray-500"}`} style={{ borderRadius: '2px' }}>
+          <div className={`text-center py-12 border ${darkMode ? "bg-gray-850 border-gray-750 text-gray-400" : "bg-white border-gray-200 text-gray-500"}`}>
             <p className="text-sm font-semibold uppercase tracking-wider">No customization requests found.</p>
             <p className="text-xs mt-1">When customers request custom services, they'll appear here.</p>
           </div>
@@ -152,7 +152,7 @@ export default function ProviderCustomizationRequests() {
                 className={`p-6 border shadow-sm transition-all duration-300 ${
                   darkMode ? "bg-gray-850 border-gray-750" : "bg-white border-gray-200"
                 } hover:border-emerald-500`}
-                style={{ borderRadius: '2px' }}
+               
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -213,7 +213,7 @@ export default function ProviderCustomizationRequests() {
                               ? "bg-gray-900 border-gray-750 text-white" 
                               : "bg-white border-gray-250"
                           } focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
-                          style={{ borderRadius: '2px' }}
+                         
                           min="0"
                           step="0.01"
                         />
@@ -226,7 +226,7 @@ export default function ProviderCustomizationRequests() {
                             ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                             : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm"
                         }`}
-                        style={{ borderRadius: '2px' }}
+                       
                       >
                         Quote Price
                       </button>
@@ -248,7 +248,7 @@ export default function ProviderCustomizationRequests() {
                         className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider border transition-colors ${
                           darkMode ? "bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700" : "bg-white border-gray-250 text-gray-705 hover:bg-gray-50"
                         }`}
-                        style={{ borderRadius: '2px' }}
+                       
                       >
                         Edit Quote
                       </button>
@@ -277,7 +277,7 @@ export default function ProviderCustomizationRequests() {
                         }
                       }}
                       className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-white transition-colors"
-                      style={{ borderRadius: '2px' }}
+                     
                     >
                       Mark as Completed
                     </button>
@@ -285,7 +285,7 @@ export default function ProviderCustomizationRequests() {
                 )}
 
                 {editingRequestId === request.id && (
-                  <div className={`mt-4 p-4 ${darkMode ? "bg-gray-900 border-gray-750" : "bg-yellow-50/50 border-gray-200"} border`} style={{ borderRadius: '2px' }}>
+                  <div className={`mt-4 p-4 ${darkMode ? "bg-gray-900 border-gray-750" : "bg-yellow-50/50 border-gray-200"} border`}>
                     <h4 className={`text-[10px] font-bold uppercase tracking-wider mb-2.5 ${darkMode ? "text-white" : "text-gray-750"}`}>
                       Edit Quote
                     </h4>
@@ -299,13 +299,13 @@ export default function ProviderCustomizationRequests() {
                             ? "bg-gray-800 border-gray-700 text-white" 
                             : "bg-white border-gray-250 text-gray-900"
                         } focus:ring-1 focus:ring-emerald-500 focus:outline-none`}
-                        style={{ borderRadius: '2px' }}
+                       
                         placeholder="New price"
                       />
                       <button
                         onClick={() => handleQuotePrice(request.id)}
                         className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-white transition-colors"
-                        style={{ borderRadius: '2px' }}
+                       
                       >
                         Update
                       </button>
@@ -314,7 +314,7 @@ export default function ProviderCustomizationRequests() {
                         className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider border transition-colors ${
                           darkMode ? "bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700" : "bg-white border-gray-250 text-gray-705 hover:bg-gray-50"
                         }`}
-                        style={{ borderRadius: '2px' }}
+                       
                       >
                         Cancel
                       </button>
@@ -330,30 +330,30 @@ export default function ProviderCustomizationRequests() {
         {requests.length > 0 && (
           <div className={`mt-8 p-6 border shadow-sm ${
             darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-          }`} style={{ borderRadius: '2px' }}>
+          }`}>
             <h3 className={`text-base font-bold uppercase tracking-tight mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>
               Request Statistics
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-3 border border-gray-150 dark:border-gray-750 bg-gray-50/30 dark:bg-gray-900/30" style={{ borderRadius: '2px' }}>
+              <div className="text-center p-3 border border-gray-150 dark:border-gray-750 bg-gray-50/30 dark:bg-gray-900/30">
                 <div className={`text-2xl font-bold ${darkMode ? "text-emerald-450" : "text-emerald-600"}`}>
                   {requests.length}
                 </div>
                 <div className={`text-[10px] font-bold uppercase tracking-wider mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Total Requests</div>
               </div>
-              <div className="text-center p-3 border border-gray-150 dark:border-gray-750 bg-gray-50/30 dark:bg-gray-900/30" style={{ borderRadius: '2px' }}>
+              <div className="text-center p-3 border border-gray-150 dark:border-gray-750 bg-gray-50/30 dark:bg-gray-900/30">
                 <div className="text-2xl font-bold text-amber-500">
                   {requests.filter(r => r.status === 'pending').length}
                 </div>
                 <div className={`text-[10px] font-bold uppercase tracking-wider mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Pending</div>
               </div>
-              <div className="text-center p-3 border border-gray-150 dark:border-gray-750 bg-gray-50/30 dark:bg-gray-900/30" style={{ borderRadius: '2px' }}>
+              <div className="text-center p-3 border border-gray-150 dark:border-gray-750 bg-gray-50/30 dark:bg-gray-900/30">
                 <div className="text-2xl font-bold text-blue-500">
                   {requests.filter(r => r.status === 'quoted').length}
                 </div>
                 <div className={`text-[10px] font-bold uppercase tracking-wider mt-1 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Quoted</div>
               </div>
-              <div className="text-center p-3 border border-gray-150 dark:border-gray-750 bg-gray-50/30 dark:bg-gray-900/30" style={{ borderRadius: '2px' }}>
+              <div className="text-center p-3 border border-gray-150 dark:border-gray-750 bg-gray-50/30 dark:bg-gray-900/30">
                 <div className="text-2xl font-bold text-emerald-500">
                   {requests.filter(r => r.status === 'accepted').length}
                 </div>

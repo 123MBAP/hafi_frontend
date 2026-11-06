@@ -9,8 +9,11 @@ import {
     MapPin,
     Phone,
     Mail,
+    CheckCircle,
+    Building,
+    ShieldCheck,
     Clock,
-    CheckCircle
+    Award
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
@@ -33,12 +36,6 @@ export default function CommissionerDetailPage() {
 
     const profileFallbackUrl = `${API_BASE}/services/profile-image/${commissionerId ?? ''}`;
 
-    const cardBg = darkMode ? "bg-zinc-900 text-white" : "bg-zinc-100 text-black";
-    const dividerCol = darkMode ? "border-white/10" : "border-black/10";
-    const textTitle = darkMode ? "text-white" : "text-black";
-    const textMuted = darkMode ? "text-white/60" : "text-black/60";
-    const tagBg = darkMode ? "bg-black text-white" : "bg-white text-black";
-
     useEffect(() => {
         const controller = new AbortController();
         let didCancel = false;
@@ -55,7 +52,7 @@ export default function CommissionerDetailPage() {
                 const propsData = await propsRes.json();
                 const allProperties: Property[] = Array.isArray(propsData?.properties) ? propsData.properties : [];
 
-                const providerProps = allProperties.filter(prop => prop.commissionerId === commissionerId);
+                const providerProps = allProperties.filter(prop => String(prop.commissionerId) === String(commissionerId));
 
                 const rawProfileImage =
                     p.profile_image_url ||
@@ -115,7 +112,7 @@ export default function CommissionerDetailPage() {
             didCancel = true;
             controller.abort();
         };
-    }, [commissionerId, API_BASE]);
+    }, [commissionerId]);
 
     const formatPrice = (price: number): string => {
         return new Intl.NumberFormat('en-RW', {
@@ -130,29 +127,29 @@ export default function CommissionerDetailPage() {
     const getCategoryIcon = (category: PropertyCategory) => {
         switch (category) {
             case PropertyCategory.Land:
-                return <LandPlot className="w-4 h-4 text-red-600" />;
+                return <LandPlot className="w-4 h-4 text-[#E5252A]" />;
             case PropertyCategory.Residential:
-                return <Home className="w-4 h-4 text-red-600" />;
+                return <Home className="w-4 h-4 text-[#E5252A]" />;
             case PropertyCategory.Commercial:
-                return <Building2 className="w-4 h-4 text-red-600" />;
+                return <Building2 className="w-4 h-4 text-[#E5252A]" />;
+            default:
+                return <Building className="w-4 h-4 text-[#E5252A]" />;
         }
     };
 
     if (loading) {
         return (
-            <div className={`min-h-screen ${darkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
-                <div className="max-w-7xl mx-auto px-4 py-6">
+            <div className={`min-h-screen ${darkMode ? 'bg-gray-950 text-gray-100' : 'bg-[#F5F5F5] text-[#151515]'}`}>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <button
+                        type="button"
                         onClick={() => navigate('/real-estate/commissioners')}
-                        className={`flex items-center gap-2 mb-6 px-3 py-1.5 transition-all text-xs font-bold uppercase tracking-wider ${
-                            darkMode ? 'text-white/80 hover:text-red-500 bg-zinc-900 hover:bg-zinc-800' : 'text-black/80 hover:text-red-600 bg-zinc-100 hover:bg-zinc-200'
-                        }`}
-                        style={{ borderRadius: '2px' }}
+                        className="inline-flex items-center gap-2 mb-6 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl border border-[#E5E5E5] dark:border-gray-800 bg-white dark:bg-gray-900 text-[#151515] dark:text-white shadow-xs"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         <span>Back</span>
                     </button>
-                    <div className="py-16">
+                    <div className="py-24">
                         <LoadingSpinner size="lg" message="Loading agent details..." variant="dots" />
                     </div>
                 </div>
@@ -162,15 +159,19 @@ export default function CommissionerDetailPage() {
 
     if (!commissioner) {
         return (
-            <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
-                <div className="text-center">
-                    <h2 className="text-2xl font-extrabold mb-4">Agent Not Found</h2>
+            <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-950 text-gray-100' : 'bg-[#F5F5F5] text-[#151515]'}`}>
+                <div className="text-center p-8 bg-white dark:bg-gray-900 rounded-2xl border border-[#E5E5E5] dark:border-gray-800 shadow-sm max-w-md mx-4">
+                    <div className="w-12 h-12 rounded-full bg-red-500/10 text-[#E5252A] flex items-center justify-center mx-auto mb-3">
+                        <Building2 className="w-6 h-6" />
+                    </div>
+                    <h2 className="text-xl font-bold mb-2">Agent Not Found</h2>
+                    <p className="text-xs text-[#666666] dark:text-gray-400 mb-6">The requested commissioner profile could not be located.</p>
                     <button
+                        type="button"
                         onClick={() => navigate('/real-estate/commissioners')}
-                        className="px-6 py-2.5 bg-red-600 hover:bg-black dark:hover:bg-white dark:hover:text-black text-white font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-sm"
-                        style={{ borderRadius: '2px' }}
+                        className="px-6 py-2.5 bg-[#E5252A] hover:bg-[#c91d22] text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs cursor-pointer"
                     >
-                        Back to Agents
+                        Back to Commissioners
                     </button>
                 </div>
             </div>
@@ -178,151 +179,155 @@ export default function CommissionerDetailPage() {
     }
 
     return (
-        <div className={`min-h-screen ${darkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
-            <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className={`min-h-screen py-8 px-4 sm:px-6 lg:px-8 ${darkMode ? 'bg-gray-950 text-gray-100' : 'bg-[#F5F5F5] text-[#151515]'}`}>
+            <div className="max-w-7xl mx-auto">
                 {/* Back Button */}
                 <button
+                    type="button"
                     onClick={() => navigate('/real-estate/commissioners')}
-                    className={`flex items-center gap-2 mb-6 px-3 py-1.5 transition-all text-xs font-bold uppercase tracking-wider ${
-                        darkMode ? 'text-white/80 hover:text-red-500 bg-zinc-900 hover:bg-zinc-800' : 'text-black/80 hover:text-red-600 bg-zinc-100 hover:bg-zinc-200'
-                    }`}
-                    style={{ borderRadius: '2px' }}
+                    className="inline-flex items-center gap-2 mb-6 px-4 py-2.5 rounded-xl border border-[#E5E5E5] dark:border-gray-800 bg-white dark:bg-gray-900 text-[#151515] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-bold uppercase tracking-wider shadow-xs transition-colors cursor-pointer"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    <span>Back to Agents</span>
+                    <span>Back to Commissioners</span>
                 </button>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Content - Left Column */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Agent Profile Card - Borderless */}
-                        <div className={`p-6 ${cardBg} shadow-sm`} style={{ borderRadius: '2px' }}>
-                            <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-5">
+                        {/* Agent Profile Card */}
+                        <div className="p-6 sm:p-8 rounded-2xl border border-[#E5E5E5] dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs">
+                            <div className="flex flex-col sm:flex-row sm:items-start gap-5 mb-6">
                                 <div className="relative flex-shrink-0">
                                     <img
                                         src={commissioner.photo || profileFallbackUrl}
                                         alt={commissioner.name}
-                                        className="w-20 h-20 object-cover"
-                                        style={{ borderRadius: '2px' }}
+                                        className="w-24 h-24 rounded-2xl object-cover border border-[#E5E5E5] dark:border-gray-700 shadow-xs"
                                         onError={(e) => {
                                             e.currentTarget.onerror = null;
                                             e.currentTarget.src = 'https://i.pravatar.cc/100?img=1';
                                         }}
                                     />
+                                    {commissioner.verified && (
+                                        <div className="absolute -bottom-2 -right-2 bg-white dark:bg-gray-900 rounded-full p-1 shadow-xs border border-[#E5E5E5] dark:border-gray-700">
+                                            <BadgeCheck className="w-5 h-5 text-[#E5252A]" />
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="flex-1">
-                                    <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight mb-1 ${textTitle}`}>
-                                        {commissioner.name}
-                                    </h1>
-                                    <div className="flex flex-wrap items-center gap-3 mb-2">
+                                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                                        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#151515] dark:text-white">
+                                            {commissioner.name}
+                                        </h1>
+                                    </div>
+                                    <div className="flex flex-wrap items-center gap-2 mb-3">
                                         {commissioner.verified && (
-                                            <span
-                                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider ${
-                                                    darkMode ? 'bg-black text-red-500' : 'bg-white text-red-600 shadow-xs'
-                                                }`}
-                                                style={{ borderRadius: '2px' }}
-                                            >
-                                                <BadgeCheck className="w-3.5 h-3.5 text-red-600" />
-                                                Verified Agent
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-500/10 text-[#E5252A] border border-red-500/20">
+                                                <BadgeCheck className="w-3.5 h-3.5" />
+                                                Certified Real Estate Agent
                                             </span>
                                         )}
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-[#666666] dark:text-gray-300">
+                                            <Award className="w-3.5 h-3.5 text-[#E5252A]" />
+                                            {commissioner.yearsOfExperience}+ Years Experience
+                                        </span>
                                     </div>
                                     {commissioner.email && (
-                                        <div className="flex items-center gap-1.5">
-                                            <Mail className="w-3.5 h-3.5 text-red-600" />
-                                            <span className={`text-xs ${textMuted}`}>{commissioner.email}</span>
+                                        <div className="flex items-center gap-2 text-xs text-[#666666] dark:text-gray-400">
+                                            <Mail className="w-3.5 h-3.5 text-[#E5252A]" />
+                                            <span className="select-all">{commissioner.email}</span>
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-                            {/* Stats Grid - Borderless */}
-                            <div className={`grid grid-cols-3 gap-3 mb-5 pt-4 border-t ${dividerCol}`}>
-                                <div className="text-center">
-                                    <div className={`text-xl sm:text-2xl font-extrabold ${textTitle}`}>
-                                        {commissioner.propertiesManaged || 0}
+                            {/* Stats Grid */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 p-4 rounded-xl bg-[#F5F5F5] dark:bg-gray-800/40 border border-[#E5E5E5] dark:border-gray-800">
+                                <div>
+                                    <div className="text-[10px] font-bold uppercase tracking-wider text-[#666666] dark:text-gray-400 mb-0.5">
+                                        Managed Portfolio
                                     </div>
-                                    <div className={`text-xs font-bold uppercase tracking-wider mt-1 ${textMuted}`}>
-                                        Properties
+                                    <div className="text-2xl font-extrabold text-[#151515] dark:text-white">
+                                        {commissioner.propertiesManaged || 0}{' '}
+                                        <span className="text-xs font-semibold text-[#666666] dark:text-gray-400">Active Listings</span>
                                     </div>
                                 </div>
-                                <div className="text-center col-span-2">
-                                    <div className="text-xl sm:text-2xl font-extrabold text-red-600">
-                                        {formatPrice(commissioner.priceRange.min)} - {formatPrice(commissioner.priceRange.max)}
+                                <div>
+                                    <div className="text-[10px] font-bold uppercase tracking-wider text-[#666666] dark:text-gray-400 mb-0.5">
+                                        Price Scope
                                     </div>
-                                    <div className={`text-xs font-bold uppercase tracking-wider mt-1 ${textMuted}`}>
-                                        Price range
+                                    <div className="text-xl font-extrabold text-[#E5252A]">
+                                        {formatPrice(commissioner.priceRange.min)} - {formatPrice(commissioner.priceRange.max)}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Bio */}
                             {commissioner.bio && (
-                                <div className="mb-5">
-                                    <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-red-600 mb-2">
-                                        About
+                                <div className="mb-6">
+                                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#E5252A] mb-2 flex items-center gap-1.5">
+                                        <span className="w-2 h-2 rounded-full bg-[#E5252A]" />
+                                        About the Agent
                                     </h3>
-                                    <p className="text-sm leading-relaxed font-medium">
+                                    <p className="text-sm leading-relaxed text-[#151515] dark:text-gray-300 font-medium">
                                         {commissioner.bio}
                                     </p>
                                 </div>
                             )}
 
                             {/* Operating Locations */}
-                            <div className="mb-5">
-                                <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-red-600 mb-2">
+                            <div className="mb-6">
+                                <h3 className="text-xs font-bold uppercase tracking-wider text-[#E5252A] mb-2.5 flex items-center gap-1.5">
+                                    <MapPin className="w-3.5 h-3.5" />
                                     Operating Areas
                                 </h3>
                                 <div className="space-y-3">
                                     <div>
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#666666] dark:text-gray-400 block mb-1.5">
+                                            Districts
+                                        </span>
                                         <div className="flex flex-wrap gap-1.5">
                                             {commissioner.operatingLocations.districts.map((district, idx) => (
                                                 <span
                                                     key={idx}
-                                                    className={`text-xs font-bold px-2.5 py-1 ${tagBg} shadow-xs`}
-                                                    style={{ borderRadius: '2px' }}
+                                                    className="text-xs font-semibold px-3 py-1 rounded-lg bg-[#F5F5F5] dark:bg-gray-800 text-[#151515] dark:text-gray-200 border border-[#E5E5E5] dark:border-gray-700 shadow-2xs"
                                                 >
                                                     {district}
                                                 </span>
                                             ))}
                                         </div>
                                     </div>
-                                    <div>
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {commissioner.operatingLocations.sectors.slice(0, 6).map((sector, idx) => (
-                                                <span
-                                                    key={idx}
-                                                    className={`text-xs font-medium px-2 py-0.5 ${tagBg} shadow-xs`}
-                                                    style={{ borderRadius: '2px' }}
-                                                >
-                                                    {sector}
-                                                </span>
-                                            ))}
-                                            {commissioner.operatingLocations.sectors.length > 6 && (
-                                                <span
-                                                    className={`text-xs font-bold px-2 py-0.5 ${tagBg} shadow-xs`}
-                                                    style={{ borderRadius: '2px' }}
-                                                >
-                                                    +{commissioner.operatingLocations.sectors.length - 6} more
-                                                </span>
-                                            )}
+                                    {commissioner.operatingLocations.sectors.length > 0 && (
+                                        <div>
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#666666] dark:text-gray-400 block mb-1.5">
+                                                Sectors
+                                            </span>
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {commissioner.operatingLocations.sectors.map((sector, idx) => (
+                                                    <span
+                                                        key={idx}
+                                                        className="text-xs font-medium px-2.5 py-0.5 rounded-lg bg-[#F5F5F5] dark:bg-gray-800 text-[#666666] dark:text-gray-300 border border-[#E5E5E5] dark:border-gray-700"
+                                                    >
+                                                        {sector}
+                                                    </span>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
 
                             {/* Specialization */}
                             {commissioner.specialization && commissioner.specialization.length > 0 && (
                                 <div>
-                                    <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-red-600 mb-2">
-                                        Specialization
+                                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#E5252A] mb-2 flex items-center gap-1.5">
+                                        <Building2 className="w-3.5 h-3.5" />
+                                        Property Specializations
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
                                         {commissioner.specialization.map((spec, idx) => (
                                             <span
                                                 key={idx}
-                                                className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1 ${tagBg} shadow-xs`}
-                                                style={{ borderRadius: '2px' }}
+                                                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-xl bg-red-500/10 border border-red-500/20 text-[#E5252A]"
                                             >
                                                 {getCategoryIcon(spec)}
                                                 {spec}
@@ -333,18 +338,20 @@ export default function CommissionerDetailPage() {
                             )}
                         </div>
 
-                        {/* Managed Properties - Borderless */}
+                        {/* Managed Properties */}
                         {managedProperties.length > 0 && (
-                            <div className={`p-6 ${cardBg} shadow-sm`} style={{ borderRadius: '2px' }}>
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className={`text-base font-extrabold tracking-tight ${textTitle}`}>
-                                        Properties Managed
-                                    </h3>
-                                    <span
-                                        className={`text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 ${tagBg} shadow-xs`}
-                                        style={{ borderRadius: '2px' }}
-                                    >
-                                        {managedProperties.length} properties
+                            <div className="p-6 sm:p-8 rounded-2xl border border-[#E5E5E5] dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div>
+                                        <h3 className="text-lg font-bold tracking-tight text-[#151515] dark:text-white">
+                                            Managed Properties
+                                        </h3>
+                                        <p className="text-xs text-[#666666] dark:text-gray-400 mt-0.5">
+                                            Exclusive real estate listings managed by {commissioner.name}
+                                        </p>
+                                    </div>
+                                    <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-red-500/10 text-[#E5252A] border border-red-500/20">
+                                        {managedProperties.length} Available
                                     </span>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -352,31 +359,24 @@ export default function CommissionerDetailPage() {
                                         <div
                                             key={property.id}
                                             onClick={() => navigate(`/real-estate/property/${property.id}`)}
-                                            className="group cursor-pointer"
+                                            className="group cursor-pointer rounded-2xl border border-[#E5E5E5] dark:border-gray-800 bg-[#F5F5F5] dark:bg-gray-800/40 overflow-hidden hover:border-[#E5252A] transition-all duration-300"
                                         >
-                                            <div
-                                                className={`overflow-hidden ${darkMode ? 'bg-black' : 'bg-white'}`}
-                                                style={{ borderRadius: '2px' }}
-                                            >
+                                            <div className="overflow-hidden aspect-[16/10] bg-gray-100 dark:bg-gray-900">
                                                 <img
                                                     src={property.images[0]}
                                                     alt={property.title}
-                                                    className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
+                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                 />
                                             </div>
-                                            <div className="mt-2.5">
-                                                <h4 className={`text-sm font-bold line-clamp-1 transition-colors ${
-                                                    darkMode ? 'text-white group-hover:text-red-500' : 'text-black group-hover:text-red-600'
-                                                }`}>
+                                            <div className="p-4">
+                                                <h4 className="text-sm font-bold text-[#151515] dark:text-white group-hover:text-[#E5252A] transition-colors truncate">
                                                     {property.title}
                                                 </h4>
-                                                <div className="flex items-center gap-1 mt-1">
-                                                    <MapPin className="w-3 h-3 text-red-600" />
-                                                    <span className={`text-xs font-medium ${textMuted}`}>
-                                                        {property.location.district}
-                                                    </span>
+                                                <div className="flex items-center gap-1.5 mt-1 text-xs text-[#666666] dark:text-gray-400">
+                                                    <MapPin className="w-3.5 h-3.5 text-[#E5252A]" />
+                                                    <span>{property.location.district}</span>
                                                 </div>
-                                                <div className="text-sm font-extrabold text-red-600 mt-1">
+                                                <div className="text-base font-extrabold text-[#E5252A] mt-2">
                                                     {formatPrice(property.price)}
                                                 </div>
                                             </div>
@@ -389,63 +389,63 @@ export default function CommissionerDetailPage() {
 
                     {/* Sidebar - Right Column */}
                     <div className="lg:col-span-1 space-y-6">
-                        {/* Contact Card - Borderless */}
-                        <div className={`p-6 ${cardBg} shadow-sm sticky top-6`} style={{ borderRadius: '2px' }}>
-                            <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-red-600 mb-4">
-                                Contact Agent
+                        {/* Contact Card */}
+                        <div className="p-6 rounded-2xl border border-[#E5E5E5] dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xs sticky top-6">
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-[#E5252A] mb-4 flex items-center gap-2">
+                                <Phone className="w-4 h-4" />
+                                Contact Commissioner
                             </h3>
 
                             <button
+                                type="button"
                                 onClick={() => window.location.href = `tel:${commissioner.phone}`}
-                                className="w-full flex items-center justify-center gap-2 py-3 text-xs font-bold uppercase tracking-wider bg-red-600 hover:bg-black dark:hover:bg-white dark:hover:text-black text-white transition-all duration-300 shadow-sm mb-4"
-                                style={{ borderRadius: '2px' }}
+                                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#E5252A] hover:bg-[#c91d22] text-white shadow-xs transition-colors mb-5 cursor-pointer"
                             >
                                 <Phone className="w-4 h-4" />
                                 <span>Call {commissioner.phone}</span>
                             </button>
 
-                            <div className={`pt-4 border-t ${dividerCol}`}>
-                                <h4 className="text-xs font-bold uppercase tracking-[0.22em] text-red-600 mb-3">
-                                    Why Choose This Agent?
+                            <div className="pt-5 border-t border-[#E5E5E5] dark:border-gray-800">
+                                <h4 className="text-xs font-bold uppercase tracking-wider text-[#151515] dark:text-white mb-3">
+                                    Trust & Accreditation
                                 </h4>
-                                <ul className="space-y-2.5">
-                                    <li className="flex items-center gap-2">
-                                        <CheckCircle className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />
-                                        <span className="text-xs font-medium">Verified professional</span>
+                                <ul className="space-y-3">
+                                    <li className="flex items-start gap-2.5 text-xs text-[#151515] dark:text-gray-300">
+                                        <CheckCircle className="w-4 h-4 text-[#E5252A] shrink-0 mt-0.5" />
+                                        <span>Verified HafiConnect real estate commissioner</span>
                                     </li>
-                                    <li className="flex items-center gap-2">
-                                        <CheckCircle className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />
-                                        <span className="text-xs font-medium">{commissioner.yearsOfExperience}+ years experience</span>
+                                    <li className="flex items-start gap-2.5 text-xs text-[#151515] dark:text-gray-300">
+                                        <ShieldCheck className="w-4 h-4 text-[#E5252A] shrink-0 mt-0.5" />
+                                        <span>Direct property verification & site visit guidance</span>
                                     </li>
-                                    <li className="flex items-center gap-2">
-                                        <CheckCircle className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />
-                                        <span className="text-xs font-medium">Manages {commissioner.propertiesManaged} properties</span>
+                                    <li className="flex items-start gap-2.5 text-xs text-[#151515] dark:text-gray-300">
+                                        <Building2 className="w-4 h-4 text-[#E5252A] shrink-0 mt-0.5" />
+                                        <span>Currently managing {commissioner.propertiesManaged} listings</span>
                                     </li>
-                                    <li className="flex items-center gap-2">
-                                        <CheckCircle className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />
-                                        <span className="text-xs font-medium">Customer feedback available</span>
+                                    <li className="flex items-start gap-2.5 text-xs text-[#151515] dark:text-gray-300">
+                                        <Clock className="w-4 h-4 text-[#E5252A] shrink-0 mt-0.5" />
+                                        <span>Typical consultation response within 24 hours</span>
                                     </li>
                                 </ul>
                             </div>
-                        </div>
 
-                        {/* Quick Info Card - Borderless */}
-                        <div className={`p-6 ${cardBg} shadow-sm`} style={{ borderRadius: '2px' }}>
-                            <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-red-600 mb-4">
-                                Quick Info
-                            </h3>
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center">
-                                    <span className={`text-xs font-medium ${textMuted}`}>Response Time</span>
-                                    <span className={`text-xs font-bold ${textTitle}`}>Within 24h</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className={`text-xs font-medium ${textMuted}`}>Languages</span>
-                                    <span className={`text-xs font-bold ${textTitle}`}>English, Kinyarwanda</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className={`text-xs font-medium ${textMuted}`}>License</span>
-                                    <span className={`text-xs font-bold ${textTitle}`}>RWA-{commissioner.id.slice(0, 6)}</span>
+                            <div className="pt-5 mt-5 border-t border-[#E5E5E5] dark:border-gray-800">
+                                <h4 className="text-xs font-bold uppercase tracking-wider text-[#151515] dark:text-white mb-3">
+                                    Quick Overview
+                                </h4>
+                                <div className="space-y-2 text-xs">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[#666666] dark:text-gray-400">Response Rate</span>
+                                        <span className="font-bold text-[#151515] dark:text-white">&lt; 24h</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[#666666] dark:text-gray-400">Languages</span>
+                                        <span className="font-bold text-[#151515] dark:text-white">Kinyarwanda, English</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-[#666666] dark:text-gray-400">Registration ID</span>
+                                        <span className="font-mono font-bold text-[#E5252A]">RWA-{commissioner.id.slice(0, 6).toUpperCase()}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -4,11 +4,13 @@ import ErrorMessage from '@/components/ui/ErrorMessage';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import Pagination from '@/components/ui/Pagination';
 import SearchBar from '@/components/ui/SearchBar';
+import PageHeader from '@/components/ui/PageHeader';
+import Badge from '@/components/ui/Badge';
 import { useDarkMode } from '@/context/DarkMode';
 import { cachedFetch } from '@/utils/cachedFetch';
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Filter, X } from 'lucide-react';
+import { Filter, X, Search } from 'lucide-react';
 import ServiceCard from './ServiceCard';
 import { API_BASE } from '../../api/apiClient';
 
@@ -108,81 +110,97 @@ export default function Services() {
   const hasActiveFilters = searchQuery || selectedCategory !== null;
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-black' : 'bg-white'}`}>
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-black'} uppercase`}>
-            Find Services and Connect with Service Providers
-          </h1>
-          <p className={`text-sm sm:text-base font-normal ${darkMode ? 'text-white' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
-            Find the services you need, all in one place. HafiConnect helps you discover service providers across different industries, explore their offerings, view available products, and connect with providers directly. Whether you need professional assistance, everyday services, or specialized expertise, find the right provider, make enquiries, book services, and purchase available products through one convenient platform.
-          </p>
-          <div className="mt-3 flex items-center gap-2">
-            <span className={`inline-block px-2.5 py-0.5 text-xs font-bold ${darkMode ? 'bg-red-950/60 text-red-300 border border-red-800/60' : 'bg-red-50 text-red-700 border border-red-200'} rounded-md`}>
-              {filteredServices.length} services available
-            </span>
-          </div>
-        </div>
+    <div className={`min-h-screen ${darkMode ? 'bg-[#0A0A0A]' : 'bg-white'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Editorial Header */}
+        <PageHeader
+          title="Services Directory"
+          subtitle="Discover verified service providers, technicians, creative experts, and professionals across Rwanda."
+          badge={
+            <Badge variant="red-subtle">
+              {filteredServices.length} Services
+            </Badge>
+          }
+          darkMode={darkMode}
+        />
 
-        {/* Search and Filter Controls - Compact row */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-          <div className="relative flex-1 max-w-md">
-            <SearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="Search services..."
-              darkMode={darkMode}
-            />
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`lg:hidden flex items-center gap-1.5 px-3 py-2 text-sm font-bold
-                ${darkMode ? 'bg-black border border-white text-white' : 'bg-white border border-black text-black'} rounded-lg shadow-sm hover:bg-red-600 hover:text-white`}
-            >
-              <Filter className="w-4 h-4" />
-              {showFilters ? 'Hide' : 'Categories'}
-            </button>
-            
-            {hasActiveFilters && (
+        {/* Search & Category Filter Controls */}
+        <div className={`p-3 sm:p-4 rounded-xl border mb-5 transition-colors ${
+          darkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-[#F5F5F5] border-[#E5E5E5]'
+        }`}>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search services by title or description..."
+                className={`w-full pl-9 pr-3 py-2 text-xs sm:text-sm rounded-lg border outline-none transition-all ${
+                  darkMode
+                    ? 'bg-zinc-950 border-zinc-800 text-white placeholder-zinc-500 focus:border-[#E5252A]'
+                    : 'bg-white border-gray-200 text-[#151515] placeholder-gray-400 focus:border-[#E5252A]'
+                }`}
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
               <button
-                onClick={clearFilters}
-                className={`flex items-center gap-1 px-3 py-2 text-sm font-bold ${darkMode ? 'text-red-400 hover:text-white' : 'text-red-600 hover:text-black'}`}
+                onClick={() => setShowFilters(!showFilters)}
+                className={`lg:hidden flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-lg border ${
+                  darkMode ? 'bg-zinc-950 border-zinc-800 text-white' : 'bg-white border-gray-200 text-gray-800'
+                }`}
               >
-                <X className="w-3.5 h-3.5" />
-                Clear
+                <Filter className="w-3.5 h-3.5" />
+                {showFilters ? 'Hide' : 'Categories'}
               </button>
-            )}
+
+              {hasActiveFilters && (
+                <button
+                  onClick={clearFilters}
+                  className="flex items-center gap-1 px-3 py-2 text-xs font-bold text-[#E5252A] hover:underline"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  Clear filters
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Category Filter - Auto-scrolling chips (desktop) */}
-        <div className={`${showFilters ? 'block' : 'hidden'} lg:block mb-4`}>
+        {/* Category Filter Chips */}
+        <div className={`${showFilters ? 'block' : 'hidden'} lg:block mb-6`}>
           <div className="w-full overflow-hidden">
             <div
               ref={categoryStripRef}
-              className="flex w-full max-w-full items-center gap-2 overflow-x-auto overflow-y-hidden whitespace-nowrap pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+              className="flex w-full items-center gap-2 overflow-x-auto whitespace-nowrap pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               <button
                 onClick={() => handleCategoryChange(undefined)}
-                className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${!selectedCategory
-                    ? 'bg-red-600 text-white'
-                    : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
-                  }`}
+                className={`flex shrink-0 items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                  !selectedCategory
+                    ? 'bg-[#E5252A] text-white shadow-sm'
+                    : darkMode
+                    ? 'bg-zinc-900 border border-zinc-800 text-gray-300 hover:text-white'
+                    : 'bg-white border border-gray-200 text-[#151515] hover:border-gray-300'
+                }`}
               >
-                All
-                <span className="text-xs opacity-90 text-white">({services.length})</span>
+                All Services
+                <span className={`text-[10px] ${!selectedCategory ? 'text-white/90' : 'text-gray-400'}`}>
+                  ({services.length})
+                </span>
               </button>
               {categories.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => handleCategoryChange(cat.id)}
-                  className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${selectedCategory === cat.id
-                      ? 'bg-red-600 text-white'
-                      : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
-                    }`}
+                  className={`flex shrink-0 items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                    selectedCategory === cat.id
+                      ? 'bg-[#E5252A] text-white shadow-sm'
+                      : darkMode
+                      ? 'bg-zinc-900 border border-zinc-800 text-gray-300 hover:text-white'
+                      : 'bg-white border border-gray-200 text-[#151515] hover:border-gray-300'
+                  }`}
                 >
                   {cat.name}
                 </button>

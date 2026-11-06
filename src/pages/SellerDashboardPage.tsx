@@ -7,7 +7,9 @@ import SubscriptionBanner from '../components/DashboardParts/PlansScrollingBanne
 import RestrictionCard from '../components/PlansParts/RestrictionCards';
 import { cachedFetch } from '../utils/cachedFetch';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { API_BASE } from '../api/apiClient';
+import { uploadMultipleFilesToR2 } from '../services/r2UploadService';
 
 // Types (unchanged)
 interface Category { id: string; name: string; description: string; }
@@ -110,6 +112,8 @@ export default function SellerDashboardPage() {
   const [originalUploads, setOriginalUploads] = useState<Record<string, Product[]>>({});
   const [loading, setLoading] = useState(true);
   const [subscription, setSubscription] = useState<any>(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
+  const [productsLoading, setProductsLoading] = useState(true);
   const [sellerProfile, setSellerProfile] = useState<any>(null);
   const [uploadingCids, setUploadingCids] = useState<Record<string, boolean>>({});
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
@@ -276,6 +280,7 @@ export default function SellerDashboardPage() {
   const loadProducts = async () => {
     if (!token) return;
     try {
+      setProductsLoading(true);
       const res = await fetch(`${API_BASE}/api/seller/products/images`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -299,6 +304,8 @@ export default function SellerDashboardPage() {
       }
     } catch (err) {
       console.error("❌ Failed to load products:", err);
+    } finally {
+      setProductsLoading(false);
     }
   };
 
@@ -312,6 +319,7 @@ export default function SellerDashboardPage() {
   useEffect(() => {
     const fetchSubscription = async () => {
       try {
+        setSubscriptionLoading(true);
         const res = await fetchWithAutoLogout(`${API_BASE}/api/provider/restrict/features`);
         if (!res.ok) {
           console.error('Failed to load subscription status', res.status, res.statusText);
@@ -327,6 +335,8 @@ export default function SellerDashboardPage() {
       } catch (err) {
         console.error('Error fetching subscription status', err);
         setSubscription(null);
+      } finally {
+        setSubscriptionLoading(false);
       }
     };
 
@@ -397,14 +407,67 @@ export default function SellerDashboardPage() {
       setUploadingCids(prev => ({ ...prev, [cid]: true }));
       setUploadProgress(prev => ({ ...prev, [cid]: 0 }));
 
-      const data = await uploadWithProgress(
-        "POST",
-        `${API_BASE}/api/upload/seller-product`,
-        form,
-        (percent) => {
-          setUploadProgress(prev => ({ ...prev, [cid]: percent }));
+      let directR2Success = false;
+
+      // Try Direct Cloudflare R2 Upload First
+      try {
+        const itemsToUpload: Array<{ file: File; isMain?: boolean; isView?: boolean }> = [];
+        itemsToUpload.push({ file: main, isMain: true });
+        (viewFiles[cid] || []).forEach(f => itemsToUpload.push({ file: f, isView: true }));
+        if (videoFiles[cid]) itemsToUpload.push({ file: videoFiles[cid]! });
+
+        const r2Files = await uploadMultipleFilesToR2(itemsToUpload, {
+          category: 'seller_products',
+          onProgress: (percent) => {
+            setUploadProgress(prev => ({ ...prev, [cid]: percent }));
+          }
+        });
+
+        const r2Main = r2Files.find(f => f.isMain) || r2Files[0];
+        const r2Views = r2Files.filter(f => f.isView);
+        const r2Video = r2Files.find(f => f.type === 'video');
+
+        const res = await fetch(`${API_BASE}/api/upload/seller-product`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          },
+          body: JSON.stringify({
+            title: product.title,
+            description: product.description,
+            price: product.price,
+            used: product.used === 'true' || product.used === true,
+            pricingUnit: product.pricing_unit || "Per Item / Piece",
+            categoryId: targetCategoryId,
+            madeInRwanda: Boolean(madeInRwanda[cid]),
+            r2MainImage: r2Main,
+            r2ViewImages: r2Views,
+            r2Video: r2Video || null,
+          }),
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || 'Failed to save product with R2 media');
         }
-      );
+
+        directR2Success = true;
+      } catch (r2Err: any) {
+        console.warn('Direct R2 upload error, falling back to server upload:', r2Err.message);
+      }
+
+      if (!directR2Success) {
+        // Fallback: Legacy uploadWithProgress
+        await uploadWithProgress(
+          "POST",
+          `${API_BASE}/api/upload/seller-product`,
+          form,
+          (percent) => {
+            setUploadProgress(prev => ({ ...prev, [cid]: percent }));
+          }
+        );
+      }
 
       // Re-fetch products to ensure correct grouping
       await loadProducts();
@@ -446,42 +509,47 @@ export default function SellerDashboardPage() {
     setProductUploads(filtered);
   };
 
-  if (loading) {
+  if (loading || subscriptionLoading) {
     return (
-      <div className={`min-h-screen -mx-4 sm:mx-0 flex items-center justify-center ${darkMode ? "bg-gray-950" : "bg-gray-50"}`}>
-        <LoadingSpinner variant="dots" size="lg" message="Loading dashboard..." />
+      <div className={`min-h-screen -mx-4 sm:mx-0 flex items-center justify-center ${darkMode ? "bg-black" : "bg-white"}`}>
+        <LoadingSpinner variant="dots" size="lg" message="Loading dashboard & fields..." />
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen -mx-4 sm:mx-0 overflow-x-hidden transition-colors duration-200 ${darkMode ? "bg-gray-950 text-gray-100" : "bg-gray-50 text-gray-900"}`}>
-      {/* Subscription Banner */}
+    <div className={`min-h-screen -mx-4 sm:mx-0 overflow-x-hidden transition-colors duration-200 ${darkMode ? "bg-[#0A0A0A] text-white" : "bg-[#F5F5F5] text-[#151515]"}`}>
       <div
-        className="sticky z-40 w-full overflow-x-hidden overflow-y-visible bg-yellow-100 border-b border-yellow-400 mb-2"
+        className="sticky z-40 w-full overflow-x-hidden overflow-y-visible bg-red-50 border-b border-red-300 mb-2"
         style={{ top: 'var(--navbar-height)' }}
       >
         <SubscriptionBanner />
       </div>
+
       {/* Header */}
-      <div className={`max-w-6xl mx-auto py-0 ${darkMode ? "bg-gray-950" : "bg-white"}`}>
-        <h1 className="text-2xl font-bold tracking-tighter uppercase text-center mb-4">Seller's Dashboard</h1>
+      <div className="max-w-7xl mx-auto px-4 pt-4 pb-2">
+        <PageHeader
+          badge="Merchant Studio"
+          title="Seller Dashboard"
+          subtitle="Manage product categories, upload inventory items, and track storefront visibility"
+          breadcrumbs={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Seller Studio' }]}
+        />
       </div>
 
-      <main className="max-w-full mx-auto py-4 px-0 sm:px-4">
+      <main className="max-w-7xl mx-auto py-2 px-4">
         {/* Category Selector */}
         {(!sellerProfile?.shopping_type_id || sellerProfile.shopping_type_key === 'other') && (
           <section className="mb-12">
             <h2 className="text-2xl font-bold tracking-tighter uppercase mb-4 flex items-center gap-2">
               <span 
-                className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border border-emerald-500/20 px-3 py-1 text-sm font-bold"
-                style={{ borderRadius: '2px' }}
+                className="bg-red-600/10 text-red-700 dark:text-red-400 border border-red-600/20 px-3 py-1 text-sm font-bold"
+               
               >
                 {categories.length}
               </span>
               Product Categories
             </h2>
-            <p className='text-gray-600 dark:text-gray-400 mb-6'>
+            <p className='text-black/70 dark:text-white/70 mb-6'>
               Select from the product category list to start uploading your products
             </p>
             <div className="flex flex-wrap gap-3">
@@ -491,18 +559,18 @@ export default function SellerDashboardPage() {
                   onClick={() => toggleCategory(cat.id)}
                   className={`px-4 py-2 font-semibold text-xs uppercase tracking-wider transition-all duration-300 flex items-center gap-2 border
                     ${selectedCategoryIds.includes(cat.id)
-                      ? "bg-emerald-500 border-emerald-500 text-white shadow-sm"
+                      ? "bg-[#E5252A] border-[#E5252A] text-white rounded-xl shadow-xs"
                       : darkMode
-                        ? "bg-gray-900 border-gray-800 hover:bg-gray-800 text-gray-300"
-                        : "bg-white hover:bg-gray-100 border-gray-200 text-gray-750"}
+                        ? "bg-black border-white/30 hover:bg-black text-white/80"
+                        : "bg-white dark:bg-gray-900 border-[#E5E5E5] dark:border-gray-800 text-[#151515] dark:text-gray-200 rounded-xl hover:border-[#E5252A]/50"}
                     ${productUploads[cat.id]?.length ? "pr-3" : "pr-4"}`}
-                  style={{ borderRadius: '2px' }}
+                 
                 >
                   {cat.name}
                   {productUploads[cat.id]?.length > 0 && (
                     <span 
-                      className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5"
-                      style={{ borderRadius: '2px' }}
+                      className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5"
+                     
                     >
                       {productUploads[cat.id]?.length}
                     </span>
@@ -524,15 +592,15 @@ export default function SellerDashboardPage() {
                 return (
                   <div
                     key={cid}
-                    className={`border ${darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} shadow-sm overflow-hidden`}
-                    style={{ borderRadius: '2px' }}
+                    className={`border ${darkMode ? "bg-gray-900 border-gray-800 rounded-2xl" : "bg-white border-[#E5E5E5] rounded-2xl"} shadow-sm overflow-hidden`}
+                   
                   >
-                    <div className={`p-6 border-b ${darkMode ? "border-gray-800 bg-gray-950/50" : "border-gray-200 bg-gray-50"} flex justify-between items-center`}>
+                    <div className={`p-6 border-b ${darkMode ? "border-gray-800 bg-gray-900" : "border-[#E5E5E5] bg-[#F5F5F5]/40"} flex justify-between items-center`}>
                       <h3 className="text-base font-bold uppercase tracking-tight flex items-center gap-3">
                         {cat.name}
                         <span 
-                          className={`text-xs px-2 py-0.5 border font-bold uppercase ${darkMode ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-emerald-50 text-emerald-600 border-emerald-500/10"}`}
-                          style={{ borderRadius: '2px' }}
+                          className={`text-xs px-2 py-0.5 border font-bold uppercase ${darkMode ? "bg-red-600/10 text-red-400 border-red-600/20" : "bg-red-50 text-red-700 border-red-600/10"}`}
+                         
                         >
                           {productUploads[cid]?.length || 0} products
                         </span>
@@ -543,8 +611,8 @@ export default function SellerDashboardPage() {
                           className={`flex items-center gap-1 px-4 py-2 font-semibold text-xs uppercase tracking-wider transition-all border
                             ${showForm[cid]
                               ? "bg-red-500 hover:bg-red-655 hover:bg-red-600 text-white border-red-500"
-                              : "bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500"}`}
-                          style={{ borderRadius: '2px' }}
+                              : "bg-red-600 hover:bg-red-700 text-white border-red-600"}`}
+                         
                         >
                           {showForm[cid] ? (
                             <>
@@ -561,9 +629,9 @@ export default function SellerDashboardPage() {
                             onClick={() => toggleCategory(cid)}
                             className={`flex items-center gap-1 px-3 py-2 font-semibold text-xs border uppercase tracking-wider transition-colors
                               ${darkMode
-                                ? "bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800"
-                                : "bg-white border-gray-250 text-gray-700 hover:bg-gray-50"}`}
-                            style={{ borderRadius: '2px' }}
+                                ? "bg-black border-white/30 text-white/80 hover:bg-black"
+                                : "bg-white border-[#E5E5E5] text-[#151515] rounded-lg hover:bg-gray-100"}`}
+                           
                           >
                             <FiX size={14} /> Close
                           </button>
@@ -575,50 +643,50 @@ export default function SellerDashboardPage() {
                     {showForm[cid] && (
                       <form
                         onSubmit={(e) => handleSubmit(e, cid)}
-                        className={`p-6 ${darkMode ? "bg-gray-900/40" : "bg-gray-50/50"}`}
+                        className={`p-6 ${darkMode ? "bg-black/40" : "bg-white/50"}`}
                       >
                         <div className="grid md:grid-cols-2 gap-6">
                           <div className="space-y-4">                             <div>
-                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Product Title</label>
+                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-white/80" : "text-black/70"}`}>Product Title</label>
                               <input
                                 type="text"
                                 value={productForms[cid]?.title || ""}
                                 onChange={(e) => handleInput(cid, "title", e.target.value)}
-                                className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-950 border-gray-800 text-white placeholder-gray-550" : "bg-white border-gray-250 text-gray-900 placeholder-gray-400"} focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
-                                style={{ borderRadius: '2px' }}
+                                className={`w-full p-2.5 rounded-lg border text-sm ${darkMode ? "bg-gray-800 border-gray-700 text-white placeholder-gray-500" : "bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400"} focus:ring-1 focus:ring-red-600 focus:outline-none transition-all`}
+                               
                                 placeholder="AMAZING PRODUCT..."
                               />
                             </div>
                             <div>
-                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Description</label>
+                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-white/80" : "text-black/70"}`}>Description</label>
                               <textarea
                                 value={productForms[cid]?.description || ""}
                                 onChange={(e) => handleInput(cid, "description", e.target.value)}
-                                className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-950 border-gray-800 text-white placeholder-gray-550" : "bg-white border-gray-250 text-gray-900 placeholder-gray-400"} focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
-                                style={{ borderRadius: '2px' }}
+                                className={`w-full p-2.5 rounded-lg border text-sm ${darkMode ? "bg-gray-800 border-gray-700 text-white placeholder-gray-500" : "bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400"} focus:ring-1 focus:ring-red-600 focus:outline-none transition-all`}
+                               
                                 rows={3}
                                 placeholder="DESCRIBE YOUR PRODUCT..."
                               />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Price ($)</label>
+                                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-white/80" : "text-black/70"}`}>Price ($)</label>
                                 <input
                                   type="number"
                                   value={productForms[cid]?.price || ""}
                                   onChange={(e) => handleInput(cid, "price", e.target.value)}
-                                  className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-950 border-gray-800 text-white placeholder-gray-550" : "bg-white border-gray-250 text-gray-900 placeholder-gray-400"} focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
-                                  style={{ borderRadius: '2px' }}
+                                  className={`w-full p-2.5 rounded-lg border text-sm ${darkMode ? "bg-gray-800 border-gray-700 text-white placeholder-gray-500" : "bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400"} focus:ring-1 focus:ring-red-600 focus:outline-none transition-all`}
+                                 
                                   placeholder="29.99"
                                 />
                               </div>
                               <div>
-                                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Pricing Unit</label>
+                                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-white/80" : "text-black/70"}`}>Pricing Unit</label>
                                 <select
                                   value={productForms[cid]?.pricing_unit || "Per Item / Piece"}
                                   onChange={(e) => handleInput(cid, "pricing_unit", e.target.value)}
-                                  className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-950 border-gray-800 text-white" : "bg-white border-gray-250 text-gray-900"} focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
-                                  style={{ borderRadius: '2px' }}
+                                  className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-900 border-gray-700 text-white rounded-lg" : "bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] rounded-lg"} focus:ring-1 focus:ring-red-600 focus:outline-none transition-all`}
+                                 
                                 >
                                   {PRICING_UNITS.map(unit => (
                                     <option key={unit.value} value={unit.value}>{unit.label}</option>
@@ -627,12 +695,12 @@ export default function SellerDashboardPage() {
                               </div>
                             </div>
                             <div>
-                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Category</label>
+                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-white/80" : "text-black/70"}`}>Category</label>
                               <select
                                 value={productForms[cid]?.category_id || (sellerProfile?.shopping_type_id && sellerProfile.shopping_type_key !== 'other' ? "uncategorized" : cid)}
                                 onChange={(e) => handleInput(cid, "category_id", e.target.value)}
-                                className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-950 border-gray-800 text-white" : "bg-white border-gray-250 text-gray-900"} focus:ring-1 focus:ring-emerald-500 focus:outline-none transition-all`}
-                                style={{ borderRadius: '2px' }}
+                                className={`w-full p-2.5 border text-sm ${darkMode ? "bg-gray-900 border-gray-700 text-white rounded-lg" : "bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] rounded-lg"} focus:ring-1 focus:ring-red-600 focus:outline-none transition-all`}
+                               
                               >
                                 <option value="uncategorized">Uncategorised</option>
                                 {allCategories.map((c) => (
@@ -649,10 +717,9 @@ export default function SellerDashboardPage() {
                                     type="checkbox"
                                     checked={madeInRwanda[cid] || false}
                                     onChange={(e) => setMadeInRwanda(prev => ({ ...prev, [cid]: e.target.checked }))}
-                                    className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:outline-none border-gray-300"
-                                    style={{ borderRadius: '2px' }}
+                                    className="w-4 h-4 rounded text-[#E5252A] focus:ring-[#E5252A] focus:outline-none border-gray-300"
                                   />
-                                  <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? "text-gray-300" : "text-gray-650"}`}>Made in Rwanda 🇷🇼</span>
+                                  <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? "text-gray-300" : "text-[#151515]"}`}>Made in Rwanda 🇷🇼</span>
                                 </label>
                               </div>
                               <div className="space-y-1">
@@ -661,22 +728,21 @@ export default function SellerDashboardPage() {
                                     type="checkbox"
                                     checked={productForms[cid]?.used === 'true' || productForms[cid]?.used === true}
                                     onChange={(e) => handleInput(cid, "used", e.target.checked ? "true" : "false")}
-                                    className="w-4 h-4 text-emerald-600 focus:ring-emerald-500 focus:outline-none border-gray-300"
-                                    style={{ borderRadius: '2px' }}
+                                    className="w-4 h-4 rounded text-[#E5252A] focus:ring-[#E5252A] focus:outline-none border-gray-300"
                                   />
-                                  <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? "text-gray-300" : "text-gray-650"}`}>Used / Second Hand</span>
+                                  <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? "text-gray-300" : "text-[#151515]"}`}>Used / Second Hand</span>
                                 </label>
-                                <p className={`text-[10.5px] ${darkMode ? "text-gray-450" : "text-gray-500"} pl-6 leading-tight`}>
+                                <p className={`text-[10.5px] ${darkMode ? "text-white/70" : "text-black/60"} pl-6 leading-tight`}>
                                   This product has been used before (second-hand item).
                                 </p>
                               </div>
                             </div>
                           </div>                           <div className="space-y-4">
                             <div>
-                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Main Image</label>
+                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-white/80" : "text-black/70"}`}>Main Image</label>
                               <div 
-                                className={`border-2 border-dashed ${darkMode ? "border-gray-800 bg-gray-950/30" : "border-gray-300 bg-white"} p-4 flex flex-col items-center justify-center transition hover:border-emerald-500`}
-                                style={{ borderRadius: '2px' }}
+                                className={`border-2 border-dashed ${darkMode ? "border-gray-700 bg-gray-900 rounded-xl" : "border-[#E5E5E5] bg-[#F5F5F5] rounded-xl"} p-4 flex flex-col items-center justify-center transition hover:border-red-600`}
+                               
                               >
                                 <input
                                   type="file"
@@ -694,12 +760,12 @@ export default function SellerDashboardPage() {
                                       src={previewMain[cid]}
                                       alt="Preview"
                                       className="w-full h-40 object-contain mb-2"
-                                      style={{ borderRadius: '2px' }}
+                                     
                                     />
                                   ) : (
                                     <>
-                                      <FiUpload size={24} className="mb-2 text-gray-400" />
-                                      <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-450" : "text-gray-500"}`}>Click to upload main image</p>
+                                      <FiUpload size={24} className="mb-2 text-white/70" />
+                                      <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-white/70" : "text-black/60"}`}>Click to upload main image</p>
                                     </>
                                   )}
                                 </label>
@@ -707,10 +773,10 @@ export default function SellerDashboardPage() {
                             </div>
 
                             <div>
-                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Additional Images (Optional)</label>
+                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-white/80" : "text-black/70"}`}>Additional Images (Optional)</label>
                               <div 
-                                className={`border-2 border-dashed ${darkMode ? "border-gray-800 bg-gray-950/30" : "border-gray-300 bg-white"} p-4 transition hover:border-emerald-500`}
-                                style={{ borderRadius: '2px' }}
+                                className={`border-2 border-dashed ${darkMode ? "border-gray-700 bg-gray-900 rounded-xl" : "border-[#E5E5E5] bg-[#F5F5F5] rounded-xl"} p-4 transition hover:border-red-600`}
+                               
                               >
                                 <input
                                   type="file"
@@ -730,15 +796,15 @@ export default function SellerDashboardPage() {
                                         <img
                                           key={i}
                                           src={src}
-                                          className="w-16 h-16 object-cover border dark:border-gray-700"
-                                          style={{ borderRadius: '2px' }}
+                                          className="w-16 h-16 object-cover border dark:border-white/30"
+                                         
                                         />
                                       ))}
                                     </div>
                                   ) : (
                                     <>
-                                      <FiUpload size={24} className="mb-2 text-gray-400" />
-                                      <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-450" : "text-gray-500"}`}>Click to upload additional images</p>
+                                      <FiUpload size={24} className="mb-2 text-white/70" />
+                                      <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-white/70" : "text-black/60"}`}>Click to upload additional images</p>
                                     </>
                                   )}
                                 </label>
@@ -746,10 +812,10 @@ export default function SellerDashboardPage() {
                             </div>
 
                             <div>
-                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>Video (Optional)</label>
+                              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? "text-white/80" : "text-black/70"}`}>Video (Optional)</label>
                               <div 
-                                className={`border-2 border-dashed ${darkMode ? "border-gray-800 bg-gray-950/30" : "border-gray-300 bg-white"} p-4 transition hover:border-emerald-500`}
-                                style={{ borderRadius: '2px' }}
+                                className={`border-2 border-dashed ${darkMode ? "border-gray-700 bg-gray-900 rounded-xl" : "border-[#E5E5E5] bg-[#F5F5F5] rounded-xl"} p-4 transition hover:border-red-600`}
+                               
                               >
                                 <input
                                   type="file"
@@ -766,13 +832,13 @@ export default function SellerDashboardPage() {
                                     <video
                                       src={previewVideo[cid]}
                                       className="w-full h-40 object-contain mb-2"
-                                      style={{ borderRadius: '2px' }}
+                                     
                                       controls
                                     />
                                   ) : (
                                     <>
-                                      <FiUpload size={24} className="mb-2 text-gray-400" />
-                                      <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-gray-450" : "text-gray-500"}`}>Click to upload video</p>
+                                      <FiUpload size={24} className="mb-2 text-white/70" />
+                                      <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? "text-white/70" : "text-black/60"}`}>Click to upload video</p>
                                     </>
                                   )}
                                 </label>
@@ -790,16 +856,16 @@ export default function SellerDashboardPage() {
                         {uploadProgress[cid] !== undefined && (
                           <div className="w-full mt-4 space-y-1.5">
                             <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
-                              <span className={darkMode ? "text-gray-405" : "text-gray-500"}>
+                              <span className={darkMode ? "text-white/70" : "text-black/60"}>
                                 {uploadProgress[cid] < 100 
                                   ? "Uploading Files..." 
-                                  : "Processing and optimizing media on Cloudinary..."}
+                                  : "Processing and optimizing media in storage..."}
                               </span>
-                              <span className="text-emerald-500">{uploadProgress[cid]}%</span>
+                              <span className="text-red-600">{uploadProgress[cid]}%</span>
                             </div>
-                            <div className={`w-full h-1.5 rounded-full overflow-hidden ${darkMode ? "bg-gray-950" : "bg-gray-200"}`}>
+                            <div className={`w-full h-1.5 rounded-full overflow-hidden ${darkMode ? "bg-black" : "bg-black/10"}`}>
                               <div 
-                                className="h-full bg-emerald-500 transition-all duration-300 ease-out" 
+                                className="h-full bg-red-600 transition-all duration-300 ease-out" 
                                 style={{ width: `${uploadProgress[cid]}%` }}
                               />
                             </div>
@@ -812,9 +878,9 @@ export default function SellerDashboardPage() {
                             onClick={() => resetForm(cid)}
                             className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border
                               ${darkMode 
-                                ? "bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800" 
-                                : "bg-red-100 border-gray-250 text-gray-700 hover:bg-red-300"}`}
-                            style={{ borderRadius: '2px' }}
+                                ? "bg-black border-white/30 text-white/80 hover:bg-black" 
+                                : "bg-white border-[#E5E5E5] text-[#151515] rounded-lg hover:bg-gray-100"}`}
+                           
                           >
                             Reset
                           </button>
@@ -823,10 +889,10 @@ export default function SellerDashboardPage() {
                             disabled={uploadingCids[cid] || !canUploadProducts}
                             className={`px-6 py-2 font-semibold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2
                               ${canUploadProducts
-                                ? "bg-emerald-300 text-white hover:bg-emerald-600 shadow-sm"
-                                : "bg-gray-400 cursor-not-allowed text-gray-200"
+                                ? "bg-red-300 text-white hover:bg-red-700 shadow-sm"
+                                : "bg-black/40 cursor-not-allowed text-white/90"
                               }`}
-                            style={{ borderRadius: '2px' }}
+                           
                           >
                             {uploadingCids[cid] ? (
                               <>
@@ -852,17 +918,17 @@ export default function SellerDashboardPage() {
             <h2 className="text-2xl font-bold tracking-tighter uppercase mb-4 flex items-center gap-2">
               Your Product Collection
               <span 
-                className={`text-xs px-2 py-0.5 border font-bold uppercase ${darkMode ? "bg-emerald-500/10 text-emerald-455 border-emerald-500/20" : "bg-emerald-50 text-emerald-600 border-emerald-500/10"}`}
-                style={{ borderRadius: '2px' }}
+                className={`text-xs px-2 py-0.5 border font-bold uppercase ${darkMode ? "bg-red-600/10 text-red-400 border-red-600/20" : "bg-red-50 text-red-700 border-red-600/10"}`}
+               
               >
                 {Object.values(productUploads).flat().length} total
               </span>
             </h2>
             <div 
-              className={`relative border max-w-md ${darkMode ? "bg-gray-900 border-gray-800 text-white" : "bg-white border-gray-250 text-gray-900"} focus-within:ring-1 focus-within:ring-emerald-500`}
-              style={{ borderRadius: '2px' }}
+              className={`relative border max-w-md ${darkMode ? "bg-gray-900 border-gray-700 text-white rounded-lg" : "bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] rounded-lg"} focus-within:ring-1 focus-within:ring-red-600`}
+             
             >
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70" />
               <input
                 type="text"
                 placeholder="SEARCH PRODUCTS..."
@@ -872,12 +938,16 @@ export default function SellerDashboardPage() {
             </div>
           </div>
 
-          {Object.keys(productUploads).length === 0 ? (
+          {productsLoading ? (
+            <div className="py-12 flex justify-center">
+              <LoadingSpinner variant="dots" size="md" message="Loading your products..." />
+            </div>
+          ) : Object.keys(productUploads).length === 0 ? (
             <div 
-              className={`text-center py-12 border ${darkMode ? "bg-gray-900 border-gray-800" : "bg-gray-50/50 border-gray-200"}`}
-              style={{ borderRadius: '2px' }}
+              className={`text-center py-12 border ${darkMode ? "bg-gray-900 border-gray-800 rounded-2xl" : "bg-white border-[#E5E5E5] rounded-2xl"}`}
+             
             >
-              <p className={`text-sm font-semibold uppercase tracking-wider ${darkMode ? "text-gray-450" : "text-gray-500"}`}>No products found. Start by adding some!</p>
+              <p className={`text-sm font-semibold uppercase tracking-wider ${darkMode ? "text-white/70" : "text-black/60"}`}>No products found. Start by adding some!</p>
             </div>
           ) : (
             <div className="space-y-10">
@@ -889,8 +959,8 @@ export default function SellerDashboardPage() {
                     <h3 className="text-base font-bold uppercase tracking-tight mb-4 flex items-center gap-2">
                       {cat?.name}
                       <span 
-                        className={`text-xs px-2 py-0.5 border font-bold uppercase ${darkMode ? "bg-emerald-500/10 text-emerald-455 border-emerald-500/20" : "bg-emerald-50 text-emerald-600 border-emerald-500/10"}`}
-                        style={{ borderRadius: '2px' }}
+                        className={`text-xs px-2 py-0.5 border font-bold uppercase ${darkMode ? "bg-red-600/10 text-red-400 border-red-600/20" : "bg-red-50 text-red-700 border-red-600/10"}`}
+                       
                       >
                         {products.length} items
                       </span>
@@ -916,16 +986,16 @@ export default function SellerDashboardPage() {
       {editingProduct && editForm && (
         <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 overflow-y-auto backdrop-blur-sm">
           <div 
-            className={`w-full max-w-2xl border ${darkMode ? "bg-gray-900 border-gray-800 text-white" : "bg-white border-gray-200 text-gray-900"} max-h-[90vh] flex flex-col shadow-2xl`}
-            style={{ borderRadius: '4px' }}
+            className={`w-full max-w-2xl border ${darkMode ? "bg-gray-900 border-gray-700 text-white rounded-lg" : "bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] rounded-lg"} max-h-[90vh] flex flex-col shadow-2xl`}
+            
           >
             {/* Modal Header */}
-            <div className={`p-4 border-b ${darkMode ? "border-gray-800" : "border-gray-150"} flex items-center justify-between`}>
+            <div className={`p-4 border-b ${darkMode ? "border-gray-800" : "border-[#E5E5E5]"} flex items-center justify-between`}>
               <h3 className="font-bold text-lg uppercase tracking-tight">Edit Product</h3>
               <button 
                 onClick={() => setEditingProduct(null)}
-                className={`p-2 hover:bg-gray-500/10 transition-colors`}
-                style={{ borderRadius: '2px' }}
+                className={`p-2 hover:bg-black/10 dark:hover:bg-white/10 transition-colors`}
+               
               >
                 <FiX size={20} />
               </button>
@@ -942,8 +1012,8 @@ export default function SellerDashboardPage() {
                     required
                     value={editForm.title}
                     onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                    className={`w-full p-3 border text-sm focus:ring-1 focus:ring-emerald-500 focus:outline-none ${darkMode ? "bg-gray-950 border-gray-800" : "bg-gray-50 border-gray-250"}`}
-                    style={{ borderRadius: '2px' }}
+                    className={`w-full p-3 border text-sm focus:ring-1 focus:ring-red-600 focus:outline-none ${darkMode ? "bg-gray-900 border-gray-800 rounded-2xl" : "bg-white border-[#E5E5E5] rounded-2xl"}`}
+                   
                   />
                 </div>
 
@@ -957,8 +1027,8 @@ export default function SellerDashboardPage() {
                       required
                       value={editForm.price}
                       onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-                      className={`w-full p-3 border text-sm focus:ring-1 focus:ring-emerald-500 focus:outline-none ${darkMode ? "bg-gray-950 border-gray-800" : "bg-gray-50 border-gray-250"}`}
-                      style={{ borderRadius: '2px' }}
+                      className={`w-full p-3 border text-sm focus:ring-1 focus:ring-red-600 focus:outline-none ${darkMode ? "bg-gray-900 border-gray-800 rounded-2xl" : "bg-white border-[#E5E5E5] rounded-2xl"}`}
+                     
                     />
                   </div>
                   <div>
@@ -966,8 +1036,8 @@ export default function SellerDashboardPage() {
                     <select
                       value={editPricingUnit}
                       onChange={(e) => setEditPricingUnit(e.target.value)}
-                      className={`w-full p-3 border text-sm focus:ring-1 focus:ring-emerald-500 focus:outline-none ${darkMode ? "bg-gray-950 border-gray-800 text-white" : "bg-gray-50 border-gray-250 text-gray-900"}`}
-                      style={{ borderRadius: '2px' }}
+                      className={`w-full p-3 border text-sm focus:ring-1 focus:ring-red-600 focus:outline-none ${darkMode ? "bg-gray-900 border-gray-700 text-white rounded-lg" : "bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] rounded-lg"}`}
+                     
                     >
                       {PRICING_UNITS.map(unit => (
                         <option key={unit.value} value={unit.value}>{unit.label}</option>
@@ -982,8 +1052,8 @@ export default function SellerDashboardPage() {
                   <select
                     value={editForm.category_id || "uncategorized"}
                     onChange={(e) => setEditForm({ ...editForm, category_id: e.target.value })}
-                    className={`w-full p-3 border text-sm focus:ring-1 focus:ring-emerald-500 focus:outline-none ${darkMode ? "bg-gray-950 border-gray-800 text-white" : "bg-gray-50 border-gray-250 text-gray-900"}`}
-                    style={{ borderRadius: '2px' }}
+                    className={`w-full p-3 border text-sm focus:ring-1 focus:ring-red-600 focus:outline-none ${darkMode ? "bg-gray-900 border-gray-700 text-white rounded-lg" : "bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] rounded-lg"}`}
+                   
                   >
                     <option value="uncategorized">Uncategorised</option>
                     {allCategories.map((c) => (
@@ -1002,8 +1072,8 @@ export default function SellerDashboardPage() {
                     value={editForm.description}
                     onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                     rows={3}
-                    className={`w-full p-3 border text-sm focus:ring-1 focus:ring-emerald-500 focus:outline-none ${darkMode ? "bg-gray-950 border-gray-800" : "bg-gray-50 border-gray-250"}`}
-                    style={{ borderRadius: '2px' }}
+                    className={`w-full p-3 border text-sm focus:ring-1 focus:ring-red-600 focus:outline-none ${darkMode ? "bg-gray-900 border-gray-800 rounded-2xl" : "bg-white border-[#E5E5E5] rounded-2xl"}`}
+                   
                   />
                 </div>
 
@@ -1015,7 +1085,7 @@ export default function SellerDashboardPage() {
                       id="edit-madeInRwanda"
                       checked={editMadeInRwanda}
                       onChange={(e) => setEditMadeInRwanda(e.target.checked)}
-                      className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+                      className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-[#E5252A]"
                     />
                     <label htmlFor="edit-madeInRwanda" className="text-sm font-semibold select-none cursor-pointer">
                       🇷🇼 Made in Rwanda
@@ -1028,26 +1098,26 @@ export default function SellerDashboardPage() {
                         id="edit-used"
                         checked={editUsed}
                         onChange={(e) => setEditUsed(e.target.checked)}
-                        className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+                        className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-[#E5252A]"
                       />
                       <label htmlFor="edit-used" className="text-sm font-semibold select-none cursor-pointer">
                         Used / Second Hand
                       </label>
                     </div>
-                    <p className={`text-[10.5px] ${darkMode ? "text-gray-450" : "text-gray-500"} pl-6 leading-tight`}>
+                    <p className={`text-[10.5px] ${darkMode ? "text-white/70" : "text-black/60"} pl-6 leading-tight`}>
                       This product has been used before (second-hand item).
                     </p>
                   </div>
                 </div>
 
-                <div className={`h-[1px] ${darkMode ? "bg-gray-800" : "bg-gray-150"} my-4`} />
+                <div className={`h-[1px] ${darkMode ? "bg-white/30" : "bg-black/20"} my-4`} />
 
                 {/* Main Image Upload */}
                 <div>
                   <label className="block text-xs uppercase font-bold tracking-wider mb-1">Main Image</label>
                   <div className="flex gap-4 items-center">
                     {editPreviewMain && (
-                      <div className="relative w-20 h-20 border border-gray-700/30 bg-black/10 flex items-center justify-center overflow-hidden" style={{ borderRadius: '2px' }}>
+                      <div className="relative w-20 h-20 border border-white/30/30 bg-black/10 flex items-center justify-center overflow-hidden">
                         <img src={editPreviewMain} className="w-full h-full object-cover" />
                       </div>
                     )}
@@ -1061,7 +1131,7 @@ export default function SellerDashboardPage() {
                           setEditPreviewMain(URL.createObjectURL(file));
                         }
                       }}
-                      className="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-none file:border file:border-gray-300 file:text-xs file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+                      className="text-xs text-[#666666] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#E5252A] file:text-white hover:file:bg-[#c91d22]"
                     />
                   </div>
                 </div>
@@ -1073,7 +1143,7 @@ export default function SellerDashboardPage() {
                     {editPreviewViews.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {editPreviewViews.map((url, idx) => (
-                          <div key={idx} className="relative w-16 h-16 border border-gray-700/20 bg-black/5 flex items-center justify-center overflow-hidden" style={{ borderRadius: '2px' }}>
+                          <div key={idx} className="relative w-16 h-16 rounded-lg border border-[#E5E5E5] bg-black/5 flex items-center justify-center overflow-hidden">
                             <img src={url} className="w-full h-full object-cover" />
                           </div>
                         ))}
@@ -1090,7 +1160,7 @@ export default function SellerDashboardPage() {
                           setEditPreviewViews(files.map(f => URL.createObjectURL(f)));
                         }
                       }}
-                      className="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-none file:border file:border-gray-300 file:text-xs file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+                      className="text-xs text-[#666666] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#E5252A] file:text-white hover:file:bg-[#c91d22]"
                     />
                   </div>
                 </div>
@@ -1100,7 +1170,7 @@ export default function SellerDashboardPage() {
                   <label className="block text-xs uppercase font-bold tracking-wider mb-1">Product Video (Optional)</label>
                   <div className="space-y-3">
                     {editPreviewVideo && (
-                      <div className="relative w-full max-h-48 border border-gray-750 bg-black/10 flex items-center justify-center overflow-hidden" style={{ borderRadius: '2px' }}>
+                      <div className="relative w-full max-h-48 rounded-lg border border-[#E5E5E5] bg-black/10 flex items-center justify-center overflow-hidden">
                         <video src={editPreviewVideo} controls className="max-w-full max-h-48" />
                       </div>
                     )}
@@ -1114,7 +1184,7 @@ export default function SellerDashboardPage() {
                           setEditPreviewVideo(URL.createObjectURL(file));
                         }
                       }}
-                      className="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-none file:border file:border-gray-300 file:text-xs file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+                      className="text-xs text-[#666666] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#E5252A] file:text-white hover:file:bg-[#c91d22]"
                     />
                   </div>
                 </div>
@@ -1122,16 +1192,16 @@ export default function SellerDashboardPage() {
                 {editUploadProgress !== null && (
                   <div className="w-full space-y-1.5 mb-4">
                     <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
-                      <span className={darkMode ? "text-gray-400" : "text-gray-500"}>
+                      <span className={darkMode ? "text-white/70" : "text-black/60"}>
                         {editUploadProgress < 100 
                           ? "Saving and Uploading..." 
-                          : "Processing and optimizing media on Cloudinary..."}
+                          : "Processing and optimizing media in storage..."}
                       </span>
-                      <span className="text-emerald-500 font-bold">{editUploadProgress}%</span>
+                      <span className="text-red-600 font-bold">{editUploadProgress}%</span>
                     </div>
-                    <div className={`w-full h-1.5 rounded-full overflow-hidden ${darkMode ? "bg-gray-950" : "bg-gray-250"}`}>
+                    <div className={`w-full h-1.5 rounded-full overflow-hidden ${darkMode ? "bg-black" : "bg-black/10"}`}>
                       <div 
-                        className="h-full bg-emerald-500 transition-all duration-300 ease-out" 
+                        className="h-full bg-red-600 transition-all duration-300 ease-out" 
                         style={{ width: `${editUploadProgress}%` }}
                       />
                     </div>
@@ -1139,22 +1209,22 @@ export default function SellerDashboardPage() {
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex gap-3 justify-end pt-4 border-t border-gray-800">
+                <div className="flex gap-3 justify-end pt-4 border-t border-white/30">
                   <button
                     type="button"
                     onClick={() => setEditingProduct(null)}
                     disabled={editIsSaving}
                     className={`px-5 py-2.5 border font-bold text-xs uppercase tracking-wider transition-colors
-                      ${darkMode ? "bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800" : "bg-white border-gray-250 text-gray-750 hover:bg-gray-50"}`}
-                    style={{ borderRadius: '2px' }}
+                      ${darkMode ? "bg-black border-gray-800 text-gray-300 rounded-lg hover:bg-gray-800" : "bg-white border-[#E5E5E5] text-[#151515] rounded-lg hover:bg-gray-100"}`}
+                   
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={editIsSaving}
-                    className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500/50 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all"
-                    style={{ borderRadius: '2px' }}
+                    className="px-5 py-2.5 bg-red-600 hover:bg-red-700 disabled:bg-red-600/50 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all"
+                   
                   >
                     {editIsSaving ? (
                       <>
@@ -1263,7 +1333,7 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
                 setShowVideoModal(false);
               }}
               className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white p-2 border border-white/20 transition"
-              style={{ borderRadius: '2px' }}
+             
             >
               <FiX size={24} />
             </button>
@@ -1276,7 +1346,7 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
                   setModalImageIndex((prev) => (prev - 1 + mediaItems.length) % mediaItems.length);
                 }}
                 className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 border border-white/20 transition z-10"
-                style={{ borderRadius: '2px' }}
+               
                 aria-label="Previous"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1291,8 +1361,8 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
                 src={mediaItems[modalImageIndex]}
                 controls
                 autoPlay
-                className="max-w-full max-h-[90vh] border border-gray-700/50"
-                style={{ borderRadius: '2px' }}
+                className="max-w-full max-h-[90vh] border border-white/30/50"
+               
                 key={mediaItems[modalImageIndex]} // Force re-render when changing videos
                 onError={(e) => console.error('Video load error:', e, 'URL:', mediaItems[modalImageIndex])}
               >
@@ -1303,8 +1373,8 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
               <img
                 src={mediaItems[modalImageIndex]}
                 alt={product.title}
-                className="max-w-full max-h-[90vh] object-contain border border-gray-700/50"
-                style={{ borderRadius: '2px' }}
+                className="max-w-full max-h-[90vh] object-contain border border-white/30/50"
+               
               />
             )}
 
@@ -1316,7 +1386,7 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
                   setModalImageIndex((prev) => (prev + 1) % mediaItems.length);
                 }}
                 className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 border border-white/20 transition z-10"
-                style={{ borderRadius: '2px' }}
+               
                 aria-label="Next"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1328,7 +1398,7 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
             {/* Media Counter & Type Indicator */}
             <div 
               className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider flex items-center gap-2 border border-white/10"
-              style={{ borderRadius: '2px' }}
+             
             >
               <span>{modalImageIndex + 1} / {mediaItems.length}</span>
               {isVideo(mediaItems[modalImageIndex]) && (
@@ -1342,14 +1412,14 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
       )}
 
       <div 
-        className={`relative group border overflow-hidden shadow-sm transition-all duration-300 ${darkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"} hover:border-emerald-500 hover:shadow-md`}
-        style={{ borderRadius: '2px' }}
+        className={`relative group border overflow-hidden shadow-sm transition-all duration-300 ${darkMode ? "bg-gray-900 border-gray-800 rounded-2xl" : "bg-white border-[#E5E5E5] rounded-2xl"} hover:border-red-600 hover:shadow-md`}
+       
       >
         {/* Out of Stock Badge */}
         {product.in_stock === false && (
           <div 
             className="absolute top-2 left-2 z-20 bg-red-600 text-white px-2 py-1 text-[9px] font-bold uppercase tracking-wider shadow-md"
-            style={{ borderRadius: '2px' }}
+           
           >
             Out of Stock
           </div>
@@ -1358,8 +1428,8 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
         {/* Made in Rwanda Badge */}
         {product.madeInRwanda && (
           <div 
-            className={`absolute z-10 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-3 py-1 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm border border-emerald-500/20 ${product.in_stock === false ? 'top-10' : 'top-2'} left-2`}
-            style={{ borderRadius: '2px' }}
+            className={`absolute z-10 bg-gradient-to-r from-red-700 to-red-600 text-white px-3 py-1 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm border border-red-600/20 ${product.in_stock === false ? 'top-10' : 'top-2'} left-2`}
+           
           >
             🇷🇼 Made in Rwanda
           </div>
@@ -1369,7 +1439,7 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
         {product.video_url && (
           <div 
             className="absolute top-2 right-2 z-10 bg-black/70 text-white px-2 py-1 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-sm border border-white/10"
-            style={{ borderRadius: '2px' }}
+           
           >
             <FiVideo size={12} /> Video
           </div>
@@ -1401,7 +1471,7 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
                       setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
                     }}
                     className={`absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 border border-white/10`}
-                    style={{ borderRadius: '2px' }}
+                   
                     aria-label="Previous image"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1416,7 +1486,7 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
                       setCurrentImageIndex((prev) => (prev + 1) % images.length);
                     }}
                     className={`absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 border border-white/10`}
-                    style={{ borderRadius: '2px' }}
+                   
                     aria-label="Next image"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1433,8 +1503,8 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
                           e.stopPropagation();
                           setCurrentImageIndex(idx);
                         }}
-                        className={`w-4 h-1 transition ${idx === currentImageIndex ? "bg-emerald-500" : "bg-white/40"}`}
-                        style={{ borderRadius: '2px' }}
+                        className={`w-4 h-1 transition ${idx === currentImageIndex ? "bg-red-600" : "bg-white/40"}`}
+                       
                       />
                     ))}
                   </div>
@@ -1442,8 +1512,8 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
               )}
             </>
           ) : (
-            <div className={`w-full h-full flex items-center justify-center ${darkMode ? "bg-gray-950" : "bg-gray-100"}`}>
-              <span className={`text-xs uppercase font-bold tracking-wider ${darkMode ? "text-gray-500" : "text-gray-400"}`}>No Image</span>
+            <div className={`w-full h-full flex items-center justify-center ${darkMode ? "bg-black" : "bg-white"}`}>
+              <span className={`text-xs uppercase font-bold tracking-wider ${darkMode ? "text-black/60" : "text-white/70"}`}>No Image</span>
             </div>
           )}
         </div>
@@ -1451,18 +1521,18 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
         {/* Product Info */}
         <div className="p-4">
           <h3 className="font-bold text-sm uppercase tracking-tight mb-1 line-clamp-1">{product.title}</h3>
-          <p className={`text-xs mb-2 line-clamp-2 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+          <p className={`text-xs mb-2 line-clamp-2 ${darkMode ? "text-white/70" : "text-black/60"}`}>
             {product.description}
           </p>
-          <p className="font-bold text-sm text-emerald-500 flex items-center justify-between">
+          <p className="font-bold text-sm text-red-600 flex items-center justify-between">
             <span>
               ${product.price}
-              <span className={`text-[11px] font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} ml-1`}>
+              <span className={`text-[11px] font-normal ${darkMode ? 'text-white/70' : 'text-black/60'} ml-1`}>
                 / {product.pricing_unit || 'Item'}
               </span>
             </span>
             {product.used && (
-              <span className="text-[9px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 py-0.5 font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+              <span className="text-[9px] bg-red-600/10 text-red-600 border border-red-600/20 px-1.5 py-0.5 font-bold uppercase tracking-wider">
                 USED
               </span>
             )}
@@ -1470,10 +1540,10 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
         </div>
 
         {/* Action Buttons */}
-        <div className={`px-4 pb-4 flex flex-col gap-2 ${darkMode ? "bg-gray-900" : "bg-white"}`}>
+        <div className={`px-4 pb-4 flex flex-col gap-2 ${darkMode ? "bg-black" : "bg-white"}`}>
           {/* Stock Toggle Confirm Overlay */}
           {showConfirmStock ? (
-            <div className={`p-2 mb-1 border ${darkMode ? 'border-gray-800 bg-gray-950 text-white' : 'border-gray-250 bg-gray-50 text-gray-900'} text-center space-y-2`} style={{ borderRadius: '2px' }}>
+            <div className={`p-3 mb-1 border rounded-xl ${darkMode ? 'border-gray-800 bg-gray-900 text-white' : 'border-[#E5E5E5] bg-[#F5F5F5] text-[#151515]'} text-center space-y-2`}>
               <p className="text-[10px] font-bold uppercase tracking-wider">
                 Mark as {product.in_stock !== false ? 'Out of Stock' : 'In Stock'}?
               </p>
@@ -1502,16 +1572,14 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
                     }
                   }}
                   disabled={isUpdatingStock}
-                  className="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider"
-                  style={{ borderRadius: '2px' }}
+                  className="px-3 py-1 rounded-lg bg-[#E5252A] hover:bg-[#c91d22] text-white text-[10px] font-bold uppercase tracking-wider shadow-xs"
                 >
                   Yes
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); setShowConfirmStock(false); }}
                   disabled={isUpdatingStock}
-                  className={`px-3 py-1 border text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'bg-gray-900 border-gray-800 text-gray-300' : 'bg-white border-gray-250 text-gray-700'}`}
-                  style={{ borderRadius: '2px' }}
+                  className={`px-3 py-1 border rounded-lg text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-white border-[#E5E5E5] text-[#151515]'}`}
                 >
                   No
                 </button>
@@ -1521,8 +1589,8 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
             <button
               onClick={(e) => { e.stopPropagation(); setShowConfirmStock(true); }}
               className={`w-full py-2 flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-wider transition-colors border
-                ${product.in_stock !== false ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20 border-red-500/25' : 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border-emerald-500/25'}`}
-              style={{ borderRadius: '2px' }}
+                ${product.in_stock !== false ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20 border-red-500/25' : 'bg-red-600/10 text-red-600 hover:bg-red-600/20 border-red-600/25'}`}
+             
             >
               {product.in_stock !== false ? 'Mark Out of Stock' : 'Mark In Stock'}
             </button>
@@ -1536,8 +1604,8 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
                 setModalImageIndex(mediaItems.length - 1);
                 setShowVideoModal(true);
               }}
-              className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center gap-2 font-semibold text-xs transition-colors uppercase tracking-wider"
-              style={{ borderRadius: '2px' }}
+              className="w-full py-2 bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-2 font-semibold text-xs transition-colors uppercase tracking-wider"
+             
             >
               <FiVideo size={14} /> View Video
             </button>
@@ -1547,8 +1615,8 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
             <button
               onClick={() => onEdit(product)}
               className={`flex-1 py-2 border flex items-center justify-center gap-1 font-semibold text-xs transition-colors uppercase tracking-wider
-                ${darkMode ? "bg-gray-900 border-gray-800 text-gray-300 hover:bg-gray-800" : "bg-white border-gray-250 text-gray-750 hover:bg-gray-50"}`}
-              style={{ borderRadius: '2px' }}
+                ${darkMode ? "bg-black border-gray-800 text-gray-300 rounded-lg hover:bg-gray-800" : "bg-white border-[#E5E5E5] text-[#151515] rounded-lg hover:bg-gray-100"}`}
+             
             >
               <FiEdit2 size={14} /> Edit
             </button>
@@ -1559,7 +1627,7 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
                 ${darkMode 
                   ? "bg-red-950/20 border-red-900/30 text-red-400 hover:bg-red-950/40" 
                   : "bg-red-50 border-red-200 text-red-650 hover:bg-red-100"}`}
-              style={{ borderRadius: '2px' }}
+             
             >
               {isDeleting ? (
                 <span className="animate-spin">↻</span>

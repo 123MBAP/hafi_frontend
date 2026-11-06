@@ -3,7 +3,9 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import MapComponent from "@/components/MapComponent";
-import { Search, Filter, MapPin } from "lucide-react";
+import PageHeader from "@/components/ui/PageHeader";
+import Badge from "@/components/ui/Badge";
+import { Search, Filter, MapPin, X } from "lucide-react";
 import { API_BASE } from '../api/apiClient';
 
 
@@ -73,7 +75,7 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   return R * c;
 }
 
-// Modernized product card component (AliExpress/Amazon style)
+// Premium Made in Rwanda product card
 function ProductCard({ product, darkMode, onView }: {
   product: MadeInRwandaProduct;
   darkMode: boolean;
@@ -81,66 +83,79 @@ function ProductCard({ product, darkMode, onView }: {
 }) {
   return (
     <div
-      className={`group cursor-pointer rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 flex flex-col h-full ${darkMode ? 'bg-black border border-white/30 hover:border-red-600' : 'bg-white border border-black hover:border-red-600 shadow-sm'}`}
+      className={`group cursor-pointer rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 flex flex-col h-full ${
+        darkMode
+          ? 'bg-zinc-900 border border-zinc-800 hover:border-[#E5252A]'
+          : 'bg-white border border-gray-200 hover:border-[#E5252A] shadow-sm'
+      }`}
       onClick={(e) => {
         e.stopPropagation();
         onView(product.id);
       }}
     >
-      <div className="relative aspect-square w-full overflow-hidden bg-white dark:bg-black">
+      <div className="relative aspect-square w-full overflow-hidden bg-gray-50 dark:bg-zinc-950 flex items-center justify-center">
         <img
           src={product.image_url}
           alt={product.title}
-          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${product.inStock === false ? 'opacity-60' : ''}`}
+          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+            product.inStock === false ? 'opacity-70' : ''
+          }`}
           loading="lazy"
         />
+
         {product.inStock === false && (
-          <div className="absolute inset-0 bg-black/50 z-10 flex items-center justify-center backdrop-blur-[1px]">
-            <span className="bg-red-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md uppercase tracking-wider shadow-lg">
-              OUT OF STOCK
+          <div className="absolute top-2 right-2 z-10">
+            <span className="bg-zinc-900/90 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider backdrop-blur-sm">
+              Out of stock
             </span>
           </div>
         )}
-        <div className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold bg-red-600 text-white z-10 rounded-full shadow-sm flex items-center gap-1">
+
+        <div className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold bg-[#E5252A] text-white z-10 rounded-full shadow-sm flex items-center gap-1">
           🇷🇼 Made in Rwanda
         </div>
+
         {product.fileType === 'video' && (
-          <div className="absolute top-2 right-2 px-2 py-0.5 text-[10px] font-semibold bg-black/70 backdrop-blur-sm text-white z-10 rounded-full">
+          <div className="absolute bottom-2 right-2 px-2 py-0.5 text-[10px] font-semibold bg-black/75 backdrop-blur-sm text-white z-10 rounded-full">
             ▶ Video
           </div>
         )}
       </div>
 
-      <div className="p-3 flex-1 flex flex-col justify-between">
+      <div className="p-3 sm:p-3.5 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className={`text-[13px] font-semibold leading-snug line-clamp-2 mb-1.5 ${darkMode ? 'text-white group-hover:text-red-400' : 'text-black group-hover:text-red-600'} transition-colors`}>
+          <h3 className={`text-xs sm:text-[13px] font-semibold leading-snug line-clamp-2 mb-1.5 transition-colors ${
+            darkMode ? 'text-white group-hover:text-red-400' : 'text-[#151515] group-hover:text-[#E5252A]'
+          }`}>
             {product.title}
           </h3>
-          
+
           {product.description && (
-            <p className={`text-[11px] font-normal line-clamp-3 mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>
+            <p className={`text-[11px] font-normal line-clamp-2 mb-2 leading-relaxed ${
+              darkMode ? 'text-gray-400' : 'text-[#666666]'
+            }`}>
               {product.description}
             </p>
           )}
         </div>
 
-        <div className="mt-1 pt-1.5 border-t border-black dark:border-white/30">
-          <div className="flex items-baseline gap-1.5 flex-wrap">
-            <span className="text-[11px] font-bold text-red-600 dark:text-red-400">FRw</span>
-            <span className="text-lg font-black text-red-600 dark:text-red-400 tracking-tight">
+        <div className="mt-2 pt-2 border-t border-gray-100 dark:border-zinc-800">
+          <div className="flex items-baseline gap-1 flex-wrap">
+            <span className="text-[11px] font-bold text-[#E5252A]">FRw</span>
+            <span className="text-base sm:text-lg font-black text-[#E5252A] tracking-tight">
               {product.price.toLocaleString()}
             </span>
-            <span className={`text-[10px] font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
+            <span className={`text-[10px] font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
               / {product.pricingUnit || product.pricing_unit || 'Piece'}
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-            <span className="text-[10px] font-bold text-red-600 dark:text-red-400 bg-white dark:bg-black border border-red-600 px-1.5 py-0.5 rounded">
+          <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+            <span className="text-[9px] font-bold text-[#E5252A] bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 px-1.5 py-0.5 rounded">
               Verified Origin
             </span>
             {product.used && (
-              <span className="text-[9px] bg-white dark:bg-black text-black dark:text-white border border-black dark:border-white px-1.5 py-0.5 font-bold uppercase rounded">
+              <span className="text-[9px] bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 px-1.5 py-0.5 font-bold uppercase rounded">
                 USED
               </span>
             )}
@@ -402,32 +417,37 @@ export default function MadeInRwanda() {
     setConditionFilter("all");
   };
 
-  // Compact Filters Panel
+  // Refined Filters Panel on light-grey surface
   const FiltersPanel = () => (
-    <div className={`border shadow-sm mb-4 overflow-x-auto ${darkMode ? 'bg-black border-white' : 'bg-white border-black'}`} style={{ borderRadius: '2px' }}>
-      <div className="p-3 min-w-max flex items-center gap-3">
-        <div className="flex items-center gap-1.5 text-black dark:text-white flex-shrink-0">
-          <Filter className="w-4 h-4" />
-          <span className="text-xs font-medium uppercase tracking-wider">Filters</span>
-        </div>
-
-        <div className="relative flex-shrink-0 outline-0 border border-black dark:border-white">
-          <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-black dark:text-white" />
+    <div className={`p-3 sm:p-4 rounded-xl border mb-5 transition-colors ${
+      darkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-[#F5F5F5] border-[#E5E5E5]'
+    }`}>
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[180px]">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search Made in Rwanda..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`pl-8 pr-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-black text-white placeholder-white' : 'bg-white text-black placeholder-black'} focus:ring-1 focus:ring-red-600 w-40`}
-            style={{ borderRadius: '2px' }}
+            className={`w-full pl-9 pr-3 py-2 text-xs sm:text-sm rounded-lg border outline-none transition-all ${
+              darkMode
+                ? 'bg-zinc-950 border-zinc-800 text-white placeholder-zinc-500 focus:border-[#E5252A]'
+                : 'bg-white border-gray-200 text-[#151515] placeholder-gray-400 focus:border-[#E5252A]'
+            }`}
           />
         </div>
 
+        {/* Sort */}
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as any)}
-          className={`px-3 py-1.5 text-sm ${darkMode ? 'bg-black border border-white text-white' : 'bg-white border border-black text-black'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0`}
-          style={{ borderRadius: '2px' }}
+          className={`px-3 py-2 text-xs sm:text-sm rounded-lg border outline-none cursor-pointer ${
+            darkMode
+              ? 'bg-zinc-950 border-zinc-800 text-white'
+              : 'bg-white border-gray-200 text-[#151515]'
+          }`}
         >
           <option value="popular">Most Popular</option>
           <option value="price-low">Price: Low to High</option>
@@ -438,131 +458,150 @@ export default function MadeInRwanda() {
         <select
           value={conditionFilter}
           onChange={(e) => setConditionFilter(e.target.value as any)}
-          className={`px-3 py-1.5 text-sm ${darkMode ? 'bg-black border border-white text-white' : 'bg-white border border-black text-black'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0`}
-          style={{ borderRadius: '2px' }}
+          className={`px-3 py-2 text-xs sm:text-sm rounded-lg border outline-none cursor-pointer ${
+            darkMode
+              ? 'bg-zinc-950 border-zinc-800 text-white'
+              : 'bg-white border-gray-200 text-[#151515]'
+          }`}
         >
           <option value="all">All Conditions</option>
-          <option value="new">New Only</option>
-          <option value="used">Used Only</option>
+          <option value="new">New Products</option>
+          <option value="used">Pre-owned</option>
         </select>
 
+        {/* Nearby */}
         <button
           onClick={() => {
             setNearbyOnly(!nearbyOnly);
             if (!nearbyOnly) handleUseMyLocation();
           }}
-          className={`px-3 py-1.5 text-sm transition-colors flex-shrink-0 ${nearbyOnly ? 'bg-red-600 text-white' : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'}`}
-          style={{ borderRadius: '2px' }}
+          className={`flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm rounded-lg font-semibold transition-all ${
+            nearbyOnly
+              ? 'bg-[#E5252A] text-white shadow-sm'
+              : darkMode
+              ? 'bg-zinc-950 border border-zinc-800 text-gray-300 hover:text-white'
+              : 'bg-white border border-gray-200 text-[#151515] hover:border-gray-300'
+          }`}
         >
-          <MapPin className="w-3.5 h-3.5 inline mr-1" />
+          <MapPin className="w-3.5 h-3.5" />
           Nearby
         </button>
 
         {nearbyOnly && (
-          <input
-            type="number"
-            min={1}
-            value={nearbyRadiusKm}
-            onChange={(e) => setNearbyRadiusKm(Math.max(1, Number(e.target.value || 1)))}
-            className={`w-16 px-2 py-1.5 text-sm ${darkMode ? 'bg-black text-white border border-white' : 'bg-white text-black border border-black'} focus:ring-1 focus:ring-red-600 flex-shrink-0`}
-            style={{ borderRadius: '2px' }}
-          />
+          <div className="flex items-center gap-1">
+            <input
+              type="number"
+              min={1}
+              value={nearbyRadiusKm}
+              onChange={(e) => setNearbyRadiusKm(Math.max(1, Number(e.target.value || 1)))}
+              className={`w-16 px-2 py-2 text-xs sm:text-sm rounded-lg border text-center outline-none ${
+                darkMode ? 'bg-zinc-950 border-zinc-800 text-white' : 'bg-white border-gray-200 text-black'
+              }`}
+            />
+            <span className="text-xs text-gray-400">km</span>
+          </div>
         )}
 
-        <label className="flex items-center gap-1.5 cursor-pointer flex-shrink-0">
+        {/* Show Map Toggle */}
+        <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold select-none">
           <input
             type="checkbox"
             checked={showMap}
             onChange={(e) => setShowMap(e.target.checked)}
-            className="w-3.5 h-3.5 rounded focus:ring-1 focus:ring-red-600"
+            className="w-4 h-4 rounded text-red-600 focus:ring-red-600"
           />
-          <span className={`text-xs ${darkMode ? 'text-white' : 'text-black'}`}>Show Map</span>
+          <span className={darkMode ? 'text-gray-300' : 'text-[#151515]'}>Show Map</span>
         </label>
 
+        {/* Clear Filters */}
         {(searchQuery || selectedCategory !== "All" || sortBy !== "popular" || nearbyOnly || conditionFilter !== "all") && (
-          <button onClick={clearFilters} className="text-xs text-red-600 hover:text-black whitespace-nowrap flex-shrink-0">
-            Clear all
+          <button
+            onClick={clearFilters}
+            className="text-xs font-bold text-[#E5252A] hover:underline ml-auto"
+          >
+            Clear filters
           </button>
         )}
       </div>
     </div>
   );
 
-  // Auto-scrolling Category chips
+  // Category Chips
   const CategoryChips = () => (
-    <div className="mb-4 w-full overflow-hidden">
+    <div className="mb-6 w-full overflow-hidden">
       <div
         ref={categoryStripRef}
-        className="flex w-full max-w-full items-center gap-2 overflow-x-auto overflow-y-hidden whitespace-nowrap pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="flex w-full items-center gap-2 overflow-x-auto whitespace-nowrap pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         <button
           onClick={() => setSelectedCategory("All")}
-          className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${selectedCategory === "All"
-              ? 'bg-red-600 text-white'
-              : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
-            }`}
+          className={`flex shrink-0 items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+            selectedCategory === "All"
+              ? 'bg-[#E5252A] text-white shadow-sm'
+              : darkMode
+              ? 'bg-zinc-900 border border-zinc-800 text-gray-300 hover:text-white'
+              : 'bg-white border border-gray-200 text-[#151515] hover:border-gray-300'
+          }`}
         >
-          All
-          <span className="text-xs opacity-90 text-white">({products.length})</span>
+          All Items
+          <span className={`text-[10px] ${selectedCategory === "All" ? 'text-white/90' : 'text-gray-400'}`}>
+            ({products.length})
+          </span>
         </button>
 
-        {categories.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => setSelectedCategory(cat.name)}
-            className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${selectedCategory === cat.name
-                ? 'bg-red-600 text-white'
-                : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
+        {categories.map((cat) => {
+          const isSelected = selectedCategory === cat.name;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.name)}
+              className={`flex shrink-0 items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                isSelected
+                  ? 'bg-[#E5252A] text-white shadow-sm'
+                  : darkMode
+                  ? 'bg-zinc-900 border border-zinc-800 text-gray-300 hover:text-white'
+                  : 'bg-white border border-gray-200 text-[#151515] hover:border-gray-300'
               }`}
-          >
-            {cat.name}
-          </button>
-        ))}
+            >
+              {cat.name}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-black' : 'bg-white'}`}>
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-black'} uppercase`}>
-            Discover and Support Made in Rwanda Products
-          </h1>
-          <p className={`text-sm sm:text-base font-normal ${darkMode ? 'text-white' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
-            Celebrate local creativity, craftsmanship, and entrepreneurship with HafiConnect's Made in Rwanda collection. Discover locally produced goods, handmade crafts, traditional Rwandan art, woven baskets, pottery, clothing, accessories, home décor, and other products made by local artisans, creators, and businesses. Explore unique products, connect directly with sellers, and support Rwandan businesses while discovering the creativity and quality of locally made goods.
-          </p>
-          <div className="mt-3 flex items-center gap-2">
-            <span className={`inline-block px-2.5 py-0.5 text-xs font-bold ${darkMode ? 'bg-black text-white border border-red-600' : 'bg-white text-black border border-red-600'} rounded-md`}>
-              {visibleProducts.length} products proudly made in Rwanda
-            </span>
-          </div>
-        </div>
+    <div className={`min-h-screen ${darkMode ? 'bg-[#0A0A0A]' : 'bg-white'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Editorial Compact Header */}
+        <PageHeader
+          title="Made in Rwanda"
+          subtitle="Discover authentic craftsmanship, home-grown products, fashion, and artisanal goods from verified Rwandan creators."
+          badge={
+            <Badge variant="red-subtle">
+              {visibleProducts.length} Products
+            </Badge>
+          }
+          darkMode={darkMode}
+        />
 
         {/* Provider Filter Banner */}
         {filterProviderId && (
-          <div className={`mb-6 p-4 border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-            darkMode 
-              ? 'bg-black border-white text-white' 
-              : 'bg-white border-black text-black'
-          }`} style={{ borderRadius: '2px' }}>
+          <div className={`mb-6 p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+            darkMode ? 'bg-zinc-900 border-zinc-800 text-white' : 'bg-red-50/50 border-red-200 text-black'
+          }`}>
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-semibold">Showing products by:</span>
-              <span className="font-bold underline text-red-600">
+              <span className="font-medium text-gray-600 dark:text-gray-400">Filtering products by:</span>
+              <span className="font-bold text-[#E5252A]">
                 {filterProviderName || 'Loading...'}
               </span>
             </div>
             <button
               onClick={() => setSearchParams({})}
-              className={`text-xs px-3 py-1.5 font-bold transition-all border ${
-                darkMode
-                  ? 'border-white bg-black hover:bg-red-600 text-white'
-                  : 'border-black bg-white hover:bg-red-600 text-black hover:text-white'
-              }`}
-              style={{ borderRadius: '2px' }}
+              className="text-xs font-bold px-3 py-1.5 rounded-lg border border-red-300 bg-white text-red-600 hover:bg-red-600 hover:text-white transition-colors"
             >
-              Clear Filter / Show All
+              Show All Products
             </button>
           </div>
         )}
@@ -605,29 +644,28 @@ export default function MadeInRwanda() {
 
         {/* Error */}
         {!loading && error && (
-          <div className={`p-4 text-sm ${darkMode ? 'bg-red-900/30 text-red-200' : 'bg-red-50 text-red-700'} text-center`} style={{ borderRadius: '2px' }}>
+          <div className="p-4 rounded-xl text-sm bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 border border-red-200 dark:border-red-900/50 text-center">
             Failed to load products: {error}
           </div>
         )}
 
         {/* Empty state */}
         {!loading && !error && visibleProducts.length === 0 && (
-          <div className="text-center py-16">
-            <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-black' : 'bg-white'} border border-black dark:border-white`} style={{ borderRadius: '2px' }}>
-              <Search className="w-6 h-6 text-red-600" />
+          <div className="text-center py-20 bg-gray-50 dark:bg-zinc-900/50 rounded-2xl border border-gray-100 dark:border-zinc-800 p-8 my-6">
+            <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 flex items-center justify-center shadow-sm">
+              <Search className="w-6 h-6 text-[#E5252A]" />
             </div>
-            <h3 className={`text-base font-bold mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
-              No products found
+            <h3 className={`text-base font-bold mb-1 ${darkMode ? 'text-white' : 'text-[#151515]'}`}>
+              No Made in Rwanda products found
             </h3>
-            <p className={`text-sm ${darkMode ? 'text-white' : 'text-black'}`}>
-              Try adjusting your search or category filter
+            <p className={`text-xs sm:text-sm max-w-sm mx-auto ${darkMode ? 'text-gray-400' : 'text-[#666666]'}`}>
+              We couldn't find matching items. Try relaxing your filters or searching for another term.
             </p>
             <button
               onClick={clearFilters}
-              className={`mt-4 px-4 py-2 text-sm ${darkMode ? 'bg-black text-white hover:bg-red-600' : 'bg-white text-black hover:bg-red-600 hover:text-white'} border border-black dark:border-white shadow-sm`}
-              style={{ borderRadius: '2px' }}
+              className="mt-5 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-[#E5252A] hover:bg-[#C81E23] rounded-lg shadow-sm transition-all"
             >
-              Clear all filters
+              Reset All Filters
             </button>
           </div>
         )}

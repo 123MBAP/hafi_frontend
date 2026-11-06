@@ -1,8 +1,9 @@
 import { useDarkMode } from "@/context/DarkMode";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import PageHeader from "@/components/ui/PageHeader";
+import Badge from "@/components/ui/Badge";
 import {
   ChevronRight,
-
   Grid3X3,
   List,
   Menu,
@@ -49,7 +50,7 @@ const getUrl = (path: string | undefined) => {
   return `${API_BASE}/${path.replace(/^\/+/, '')}`;
 };
 
-// Modern AliExpress / Amazon style product card
+// Premium Market Product Card
 function MarketProductCard({
   product,
   darkMode,
@@ -65,8 +66,8 @@ function MarketProductCard({
 
   return (
     <div
-      className={`group cursor-pointer overflow-hidden rounded-xl transition-all duration-200 hover:shadow-lg flex flex-col h-full ${
-        darkMode ? 'bg-gray-900 border border-gray-800 hover:border-gray-700' : 'bg-white border border-gray-100 hover:border-gray-200'
+      className={`group cursor-pointer overflow-hidden rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 flex flex-col h-full ${
+        darkMode ? 'bg-zinc-900 border border-zinc-800 hover:border-[#E5252A]' : 'bg-white border border-gray-200 hover:border-[#E5252A]'
       } shadow-sm`}
       onClick={(e) => {
         e.stopPropagation();
@@ -74,13 +75,13 @@ function MarketProductCard({
       }}
     >
       {/* Image section with 1:1 Aspect Ratio */}
-      <div className="relative aspect-square w-full overflow-hidden bg-gray-50 dark:bg-gray-800/60 rounded-t-xl flex items-center justify-center">
+      <div className="relative aspect-square w-full overflow-hidden bg-gray-50 dark:bg-zinc-950 flex items-center justify-center">
         {mainImage ? (
           <img
             src={mainImage}
             alt={product.title}
-            className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${
-              product.inStock === false ? 'opacity-60' : ''
+            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+              product.inStock === false ? 'opacity-70' : ''
             }`}
             loading="lazy"
           />
@@ -90,67 +91,57 @@ function MarketProductCard({
           </div>
         )}
 
-        {/* Floating Quick Add-To-Cart Action Button (AliExpress style) */}
+        {/* Floating Quick Action Button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             onView(product.id);
           }}
           title="View product details"
-          className="absolute bottom-2 right-2 z-10 w-8 h-8 rounded-full bg-white/95 dark:bg-gray-800 text-black dark:text-white shadow-md hover:bg-red-600 hover:text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+          className="absolute bottom-2.5 right-2.5 z-10 w-8 h-8 rounded-full bg-white/95 dark:bg-zinc-800 text-black dark:text-white shadow-md hover:bg-[#E5252A] hover:text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
         >
           <ShoppingCart className="w-4 h-4" />
         </button>
 
         {/* Badges on Image */}
         {product.inStock === false ? (
-          <div className="absolute inset-0 bg-black/50 z-10 flex items-center justify-center">
-            <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded">
-              OUT OF STOCK
+          <div className="absolute top-2 right-2 z-10">
+            <span className="bg-zinc-900/90 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider backdrop-blur-sm">
+              Out of stock
             </span>
           </div>
         ) : product.used ? (
-          <div className="absolute top-2 left-2 z-10 bg-black/80 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+          <div className="absolute top-2 left-2 z-10 bg-[#0A0A0A]/85 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm uppercase tracking-wider">
             USED
           </div>
         ) : null}
 
         {product.fileType === 'video' && (
-          <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[9px] font-medium bg-black/60 text-white z-10 rounded">
-            🎥 Video
+          <div className="absolute bottom-2 left-2 px-1.5 py-0.5 text-[9px] font-medium bg-black/75 text-white z-10 rounded-full">
+            ▶ Video
           </div>
         )}
       </div>
 
       {/* Content */}
-      <div className="p-3 flex-1 flex flex-col justify-between">
+      <div className="p-3 sm:p-3.5 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className={`text-xs sm:text-sm font-semibold text-black dark:text-white line-clamp-2 h-9 leading-snug group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors`}>
+          <h3 className={`text-xs sm:text-[13px] font-semibold text-[#151515] dark:text-white line-clamp-2 leading-snug group-hover:text-[#E5252A] dark:group-hover:text-red-400 transition-colors`}>
             {product.title}
           </h3>
-          <p className="mt-1 text-xs sm:text-sm leading-5 text-black/80 dark:text-gray-300 line-clamp-3 min-h-[3.75rem]">
+          <p className="mt-1 text-[11px] leading-relaxed text-[#666666] dark:text-gray-400 line-clamp-2">
             {product.description || 'No description available'}
           </p>
         </div>
 
-        {/* Pricing and product details link */}
-        <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-gray-800">
-          <div className="flex items-baseline gap-1.5 flex-wrap">
-            <span className="text-base sm:text-lg font-black text-red-600 dark:text-red-500 tracking-tight font-sans">
-              FRw {product.price.toLocaleString()}
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onView(product.id);
-            }}
-            className="mt-2 text-xs font-bold uppercase tracking-wider text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
-          >
-            View more →
-          </button>
+        {/* Pricing */}
+        <div className="mt-2 pt-2 border-t border-gray-100 dark:border-zinc-800 flex items-baseline justify-between gap-1 flex-wrap">
+          <span className="text-base sm:text-lg font-black text-[#E5252A] tracking-tight">
+            FRw {product.price.toLocaleString()}
+          </span>
+          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider group-hover:text-[#E5252A] transition-colors">
+            View →
+          </span>
         </div>
       </div>
     </div>
@@ -411,24 +402,25 @@ export default function MarketWithCategoryProducts() {
     }
   };
 
-  // Compact Filters Panel - Single row
+  // Refined Filters Panel on light-grey surface
   const FiltersPanel = () => (
-    <div className={`shadow-sm mb-4 overflow-x-auto rounded-xl border border-black dark:border-white ${darkMode ? 'bg-black' : 'bg-white'}`}>
-      <div className="p-3 min-w-max flex items-center gap-3">
-        <div className="flex items-center gap-1.5 text-black dark:text-white flex-shrink-0">
-          <Filter className="w-4 h-4 text-black dark:text-white" />
-          <span className="text-xs font-bold uppercase tracking-wider text-black dark:text-white">Filters</span>
-        </div>
-
+    <div className={`p-3 sm:p-4 rounded-xl border mb-5 transition-colors ${
+      darkMode ? 'bg-zinc-900/80 border-zinc-800' : 'bg-[#F5F5F5] border-[#E5E5E5]'
+    }`}>
+      <div className="flex flex-wrap items-center gap-3">
         {/* Search inline */}
-        <div className={`border relative flex-shrink-0 rounded-lg ${darkMode ? 'bg-black border-white' : 'bg-white border-black'}`}>
-          <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-black dark:text-white" />
+        <div className="relative flex-1 min-w-[180px]">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
             placeholder="Search products..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`pl-8 pr-3 py-1.5 text-sm border-0 ${darkMode ? 'bg-black text-white placeholder-white' : 'bg-white text-black placeholder-black font-medium'} focus:ring-1 focus:ring-red-600 w-44 rounded-lg`}
+            className={`w-full pl-9 pr-3 py-2 text-xs sm:text-sm rounded-lg border outline-none transition-all ${
+              darkMode
+                ? 'bg-zinc-950 border-zinc-800 text-white placeholder-zinc-500 focus:border-[#E5252A]'
+                : 'bg-white border-gray-200 text-[#151515] placeholder-gray-400 focus:border-[#E5252A]'
+            }`}
           />
         </div>
 
@@ -436,7 +428,11 @@ export default function MarketWithCategoryProducts() {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as any)}
-          className={`border outline-0 px-3 py-1.5 text-sm font-semibold ${darkMode ? 'bg-black text-white border-white' : 'bg-white text-black border-black'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0 rounded-lg`}
+          className={`px-3 py-2 text-xs sm:text-sm rounded-lg border outline-none cursor-pointer ${
+            darkMode
+              ? 'bg-zinc-950 border-zinc-800 text-white'
+              : 'bg-white border-gray-200 text-[#151515]'
+          }`}
         >
           <option value="popular">Most Popular</option>
           <option value="newest">Newest</option>
@@ -452,9 +448,13 @@ export default function MarketWithCategoryProducts() {
             const cat = categories.find(c => String(c.id) === catId);
             setSelectedCategory(cat || null);
           }}
-          className={`border outline-0 px-3 py-1.5 text-sm font-semibold ${darkMode ? 'bg-black text-white border-white' : 'bg-white text-black border-black'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0 rounded-lg`}
+          className={`px-3 py-2 text-xs sm:text-sm rounded-lg border outline-none cursor-pointer ${
+            darkMode
+              ? 'bg-zinc-950 border-zinc-800 text-white'
+              : 'bg-white border-gray-200 text-[#151515]'
+          }`}
         >
-          <option value="">All Categories</option>
+          <option value="">All Categories ({products.length})</option>
           {categories.map(cat => (
             <option key={cat.id} value={cat.id}>
               {cat.name} ({categoryCounts[cat.id] || 0})
@@ -466,57 +466,74 @@ export default function MarketWithCategoryProducts() {
         <select
           value={conditionFilter}
           onChange={(e) => setConditionFilter(e.target.value as any)}
-          className={`border outline-0 px-3 py-1.5 text-sm font-semibold ${darkMode ? 'bg-black text-white border-white' : 'bg-white text-black border-black'} focus:ring-1 focus:ring-red-600 cursor-pointer flex-shrink-0 rounded-lg`}
+          className={`px-3 py-2 text-xs sm:text-sm rounded-lg border outline-none cursor-pointer ${
+            darkMode
+              ? 'bg-zinc-950 border-zinc-800 text-white'
+              : 'bg-white border-gray-200 text-[#151515]'
+          }`}
         >
           <option value="all">All Conditions</option>
-          <option value="new">New Only</option>
-          <option value="used">Used Only</option>
+          <option value="new">Brand New</option>
+          <option value="used">Pre-owned</option>
         </select>
 
         {/* Clear filters */}
         {(selectedCategory || searchQuery || sortBy !== 'popular' || conditionFilter !== 'all') && (
           <button
             onClick={clearFilters}
-            className="text-xs font-bold text-red-600 hover:text-red-700 whitespace-nowrap flex-shrink-0"
+            className="text-xs font-bold text-[#E5252A] hover:underline ml-auto"
           >
-            Clear all
+            Clear filters
           </button>
         )}
       </div>
     </div>
   );
 
-  // Auto-scrolling Category chips row (marquee effect)
+  // Category chips row
   const CategoryChips = () => (
-    <div className="mb-4 w-full overflow-hidden">
+    <div className="mb-6 w-full overflow-hidden">
       <div
         ref={categoryStripRef}
-        className="flex w-full max-w-full items-center gap-2 overflow-x-auto overflow-y-hidden whitespace-nowrap pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="flex w-full items-center gap-2 overflow-x-auto whitespace-nowrap pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         <button
           onClick={() => handleCategorySelect(null)}
-          className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${!selectedCategory
-              ? 'bg-red-600 text-white'
-              : darkMode ? 'border border-white bg-black text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
-            }`}
+          className={`flex shrink-0 items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+            !selectedCategory
+              ? 'bg-[#E5252A] text-white shadow-sm'
+              : darkMode
+              ? 'bg-zinc-900 border border-zinc-800 text-gray-300 hover:text-white'
+              : 'bg-white border border-gray-200 text-[#151515] hover:border-gray-300'
+          }`}
         >
-          All
-          <span className="text-xs opacity-90 text-white">({products.length})</span>
+          All Items
+          <span className={`text-[10px] ${!selectedCategory ? 'text-white/90' : 'text-gray-400'}`}>
+            ({products.length})
+          </span>
         </button>
 
-        {categories.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => handleCategorySelect(cat)}
-            className={`flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-sm font-bold transition-all shadow-sm rounded-lg ${selectedCategory?.id === cat.id
-                ? 'bg-red-600 text-white'
-                : darkMode ? 'border border-white bg-black text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
+        {categories.map((cat) => {
+          const isSelected = selectedCategory?.id === cat.id;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => handleCategorySelect(cat)}
+              className={`flex shrink-0 items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                isSelected
+                  ? 'bg-[#E5252A] text-white shadow-sm'
+                  : darkMode
+                  ? 'bg-zinc-900 border border-zinc-800 text-gray-300 hover:text-white'
+                  : 'bg-white border border-gray-200 text-[#151515] hover:border-gray-300'
               }`}
-          >
-            {cat.name}
-            <span className="text-xs opacity-90 text-white">({categoryCounts[cat.id] || 0})</span>
-          </button>
-        ))}
+            >
+              {cat.name}
+              <span className={`text-[10px] ${isSelected ? 'text-white/90' : 'text-gray-400'}`}>
+                ({categoryCounts[cat.id] || 0})
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -525,40 +542,35 @@ export default function MarketWithCategoryProducts() {
   const MobileOverlay = () => (
     showMobileSidebar && (
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden transition-opacity duration-300"
+        className="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300"
         onClick={() => setShowMobileSidebar(false)}
       />
     )
   );
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-black'} uppercase`}>
-            Discover Products. Buy and Sell with Ease.
-          </h1>
-          <p className={`text-sm sm:text-base font-normal ${darkMode ? 'text-gray-200' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
-            Welcome to the HafiConnect marketplace, where individuals and businesses can discover, buy, and sell products in one convenient place. Explore new and second-hand items across categories such as electronics, furniture, fashion, home essentials, and more. Browse available listings, find products that match your needs and budget, and connect directly with sellers to ask questions and arrange your purchase.
-          </p>
-          <div className="mt-3 flex items-center gap-2">
-            <span className={`inline-block px-2.5 py-0.5 text-xs font-bold ${darkMode ? 'bg-red-950/60 text-red-300 border border-red-800/60' : 'bg-red-50 text-red-700 border border-red-200'} rounded-md`}>
-              {filteredAndSortedProducts.length} products available
-            </span>
-          </div>
-        </div>
+    <div className={`min-h-screen ${darkMode ? 'bg-[#0A0A0A]' : 'bg-white'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Editorial Compact Header */}
+        <PageHeader
+          title="Marketplace"
+          subtitle="Discover and shop electronics, fashion, lifestyle goods, and unique essentials across Rwanda."
+          badge={
+            <Badge variant="red-subtle">
+              {filteredAndSortedProducts.length} Products
+            </Badge>
+          }
+          darkMode={darkMode}
+        />
 
         {/* Provider Filter Banner */}
         {filterProviderId && (
-          <div className={`mb-6 p-4 border rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-            darkMode 
-              ? 'bg-red-950/20 border-red-800/60 text-red-200' 
-              : 'bg-red-50 border-red-200 text-red-800'
+          <div className={`mb-6 p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+            darkMode ? 'bg-zinc-900 border-zinc-800 text-white' : 'bg-red-50/50 border-red-200 text-black'
           }`}>
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-semibold text-black dark:text-white">Showing products by:</span>
-              <span className="font-bold underline text-red-600 dark:text-red-400">
+              <span className="font-medium text-gray-600 dark:text-gray-400">Showing products by:</span>
+              <span className="font-bold text-[#E5252A]">
                 {filterProviderName || 'Loading...'}
               </span>
             </div>
@@ -576,22 +588,24 @@ export default function MarketWithCategoryProducts() {
         )}
 
         {/* Mobile action buttons */}
-        <div className="flex items-center gap-3 mb-4 lg:hidden">
+        <div className="flex items-center gap-2 mb-4 lg:hidden">
           <button
             onClick={() => setShowMobileSidebar(true)}
-            className={`flex items-center gap-1.5 px-3 py-2 text-sm ${darkMode ? 'bg-black text-white border border-white' : 'bg-white text-black border border-black'} shadow-sm hover:bg-red-600 hover:text-white`}
-            style={{ borderRadius: '2px' }}
+            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-lg border ${
+              darkMode ? 'bg-zinc-900 text-white border-zinc-800' : 'bg-white text-[#151515] border-gray-200'
+            } shadow-sm hover:border-[#E5252A]`}
           >
             <Menu className="w-4 h-4" />
             Categories
           </button>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-1.5 px-3 py-2 text-sm ${darkMode ? 'bg-black text-white border border-white' : 'bg-white text-black border border-black'} shadow-sm hover:bg-red-600 hover:text-white`}
-            style={{ borderRadius: '2px' }}
+            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider rounded-lg border ${
+              darkMode ? 'bg-zinc-900 text-white border-zinc-800' : 'bg-white text-[#151515] border-gray-200'
+            } shadow-sm hover:border-[#E5252A]`}
           >
             <Filter className="w-4 h-4" />
-            {showFilters ? 'Hide' : 'Filters'}
+            {showFilters ? 'Hide Filters' : 'Filters'}
           </button>
         </div>
 
@@ -600,31 +614,30 @@ export default function MarketWithCategoryProducts() {
           <FiltersPanel />
         </div>
 
-        {/* Auto-scrolling Category Chips */}
+        {/* Category Chips */}
         <CategoryChips />
 
-        {/* Products Grid - Small width cards, equal sizes */}
+        {/* Products Grid */}
         {loadingProducts ? (
-          <div className="py-16">
+          <div className="py-20">
             <LoadingSpinner size="lg" message="Loading products..." variant="dots" />
           </div>
         ) : filteredAndSortedProducts.length === 0 ? (
-          <div className="text-center py-16">
-            <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`} style={{ borderRadius: '2px' }}>
-              <Search className="w-6 h-6 text-gray-400" />
+          <div className="text-center py-20 bg-gray-50 dark:bg-zinc-900/50 rounded-2xl border border-gray-100 dark:border-zinc-800 p-8 my-6">
+            <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 flex items-center justify-center shadow-sm">
+              <Search className="w-6 h-6 text-[#E5252A]" />
             </div>
-            <h3 className={`text-base font-semibold mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <h3 className={`text-base font-bold mb-1 ${darkMode ? 'text-white' : 'text-[#151515]'}`}>
               No products found
             </h3>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              Try adjusting your search or category filter
+            <p className={`text-xs sm:text-sm max-w-sm mx-auto ${darkMode ? 'text-gray-400' : 'text-[#666666]'}`}>
+              Try relaxing your category selection or search keywords to see more items.
             </p>
             <button
               onClick={clearFilters}
-              className={`mt-4 px-4 py-2 text-sm ${darkMode ? 'bg-gray-950 text-white hover:bg-gray-900' : 'bg-white text-gray-700 hover:bg-gray-50'} shadow-sm`}
-              style={{ borderRadius: '2px' }}
+              className="mt-5 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-[#E5252A] hover:bg-[#C81E23] rounded-lg shadow-sm transition-all"
             >
-              Clear all filters
+              Reset All Filters
             </button>
           </div>
         ) : (

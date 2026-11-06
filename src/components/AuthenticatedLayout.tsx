@@ -11,7 +11,7 @@ export default function AuthenticatedLayout() {
   const location = useLocation();
 
   const isActiveExact = (p: string) => location.pathname === p;
-  const isActivePrefix = (p: string) => location.pathname === p || location.pathname.startsWith(p + '/');
+  const isActivePrefix = (p: string) => location.pathname === p || (p !== '/dashboard' && location.pathname.startsWith(p + '/'));
 
   const getIcon = (path: string) => {
     if (path === '/dashboard') return <LayoutDashboard className="w-4 h-4" />;
@@ -26,14 +26,12 @@ export default function AuthenticatedLayout() {
   };
 
   const tabClass = (active: boolean) => `
-    inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-200
+    inline-flex items-center gap-2 px-3.5 py-3 text-xs sm:text-sm font-semibold transition-all duration-200 border-b-2
     ${active 
-      ? darkMode 
-        ? 'text-emerald-400 border-b-2 border-emerald-400' 
-        : 'text-emerald-600 border-b-2 border-emerald-500'
+      ? 'text-[#E5252A] border-[#E5252A]' 
       : darkMode 
-        ? 'text-gray-400 hover:text-gray-200 border-b-2 border-transparent hover:border-gray-600'
-        : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent hover:border-gray-300'
+        ? 'text-gray-400 hover:text-white border-transparent hover:border-gray-700' 
+        : 'text-[#666666] hover:text-[#151515] border-transparent hover:border-gray-300'
     }
   `;
 
@@ -43,11 +41,10 @@ export default function AuthenticatedLayout() {
     { path: '/dashboard/provider', label: 'Service Provider', roles: ['service_provider'], icon: <Briefcase className="w-4 h-4" /> },
     { path: '/dashboard/agent', label: 'Agent Area', roles: ['agent'], icon: <ShieldCheck className="w-4 h-4" /> },
     { path: '/dashboard/account', label: 'Account', roles: ['all'] },
-    { path: '/dashboard/orders', label: 'Clients Orders', roles: ['all'] },
+    { path: '/dashboard/orders', label: 'Client Orders', roles: ['all'] },
     { path: '/dashboard/messages', label: 'Messages', roles: ['all'] },
     { path: '/dashboard/upgrade', label: 'Upgrade', roles: ['all'] },
   ];
-
 
   const isAgent = roles.includes('agent');
   const allNavItems = navItems.filter(item => {
@@ -64,25 +61,35 @@ export default function AuthenticatedLayout() {
         <Link
           key={item.path}
           to={item.path}
-          className={tabClass(isActivePrefix(item.path))}
+          className={tabClass(item.path === '/dashboard' ? isActiveExact(item.path) : isActivePrefix(item.path))}
         >
           {getIcon(item.path)}
           <span>{item.label}</span>
         </Link>
       ))}
-
+      <button
+        onClick={logout}
+        className={`ml-2 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+          darkMode
+            ? 'text-gray-400 hover:text-[#E5252A] hover:bg-gray-800'
+            : 'text-[#666666] hover:text-[#E5252A] hover:bg-gray-100'
+        }`}
+      >
+        <LogOut className="w-3.5 h-3.5" />
+        <span>Exit</span>
+      </button>
     </nav>
   );
 
   // Mobile navigation - right-aligned with horizontal scroll
   const MobileNav = () => (
-    <nav className="md:hidden overflow-x-auto whitespace-nowrap px-3 py-2">
-      <div className="flex items-center justify-end gap-2 min-w-max">
+    <nav className="md:hidden overflow-x-auto whitespace-nowrap px-3 py-1 scrollbar-none">
+      <div className="flex items-center justify-start sm:justify-end gap-1 min-w-max">
         {allNavItems.map((item) => (
           <Link
             key={item.path}
             to={item.path}
-            className={tabClass(isActivePrefix(item.path))}
+            className={tabClass(item.path === '/dashboard' ? isActiveExact(item.path) : isActivePrefix(item.path))}
           >
             {getIcon(item.path)}
             <span>{item.label}</span>
@@ -90,19 +97,23 @@ export default function AuthenticatedLayout() {
         ))}
         <button
           onClick={logout}
-          className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${darkMode ? 'text-gray-400 hover:text-red-400' : 'text-gray-500 hover:text-red-600'}`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+            darkMode ? 'text-gray-400 hover:text-[#E5252A]' : 'text-[#666666] hover:text-[#E5252A]'
+          }`}
         >
           <LogOut className="w-3.5 h-3.5" />
-          Exit
+          <span>Exit</span>
         </button>
       </div>
     </nav>
   );
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-[#0A0A0A]' : 'bg-[#F5F5F5]'}`}>
       {/* Header Bar */}
-      <div className={`sticky top-0 z-40 border-b ${darkMode ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'}`}>
+      <div className={`sticky top-0 z-40 border-b backdrop-blur-md ${
+        darkMode ? 'bg-[#0A0A0A]/90 border-gray-800' : 'bg-white/90 border-[#E5E5E5]'
+      }`}>
         <div className="max-w-7xl mx-auto">
           {/* Desktop Navigation - Right Aligned */}
           <DesktopNav />

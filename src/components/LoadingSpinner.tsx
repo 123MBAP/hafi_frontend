@@ -28,6 +28,7 @@ interface LoadingSpinnerProps {
     fullScreen?: boolean;
     variant?: 'default' | 'pulse' | 'dots' | 'skeleton';
     showProgress?: boolean;
+    className?: string;
 }
 
 export default function LoadingSpinner({
@@ -35,7 +36,8 @@ export default function LoadingSpinner({
     message = 'Loading...',
     fullScreen = false,
     variant = 'default',
-    showProgress = false
+    showProgress = false,
+    className = ''
 }: LoadingSpinnerProps) {
     const { darkMode } = useDarkMode();
     const [progress, setProgress] = useState(0);
@@ -243,7 +245,7 @@ export default function LoadingSpinner({
 
     if (fullScreen) {
         return (
-            <div className={`fixed inset-0 flex items-center justify-center ${bgColor} z-50 transition-all duration-300`}>
+            <div className={`fixed inset-0 flex items-center justify-center ${bgColor} z-50 transition-all duration-300 ${className}`}>
                 <div className="transform transition-transform duration-300 scale-100">
                     {containerContent}
                 </div>
@@ -252,7 +254,7 @@ export default function LoadingSpinner({
     }
 
     return (
-        <div className="flex items-center justify-center p-4 min-h-[200px]">
+        <div className={`flex items-center justify-center p-4 min-h-[200px] ${className}`}>
             {containerContent}
         </div>
     );

@@ -33,7 +33,7 @@ const ServiceFeaturesFields: React.FC<ServiceFeaturesFieldsProps> = ({ featureDa
             setFeatureData({ pricePerHour: parseFloat(e.target.value) || 0 })
           }
           className={inputCls}
-          style={{ borderRadius: '2px' }}
+         
           placeholder="0"
         />
       </div>
@@ -47,7 +47,7 @@ const ServiceFeaturesFields: React.FC<ServiceFeaturesFieldsProps> = ({ featureDa
             setFeatureData({ pricePerDay: parseFloat(e.target.value) || 0 })
           }
           className={inputCls}
-          style={{ borderRadius: '2px' }}
+         
           placeholder="0"
         />
       </div>
@@ -61,7 +61,7 @@ const ServiceFeaturesFields: React.FC<ServiceFeaturesFieldsProps> = ({ featureDa
             setFeatureData({ discount: parseFloat(e.target.value) || 0 })
           }
           className={inputCls}
-          style={{ borderRadius: '2px' }}
+         
           placeholder="0"
         />
       </div>
@@ -75,7 +75,7 @@ const ServiceFeaturesFields: React.FC<ServiceFeaturesFieldsProps> = ({ featureDa
             setFeatureData({ withDriverCost: parseFloat(e.target.value) || 0 })
           }
           className={inputCls}
-          style={{ borderRadius: '2px' }}
+         
           placeholder="0"
         />
       </div>

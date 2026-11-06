@@ -27,7 +27,6 @@ type Service = {
   title: string;
 };
 
-
 export default function RegisterPage() {
   const [step, setStep] = useState<'register' | 'verify' | 'google-role-select'>('register');
   const [userEmail, setUserEmail] = useState('');
@@ -293,30 +292,19 @@ export default function RegisterPage() {
     setLoading(false);
   };
 
-  const getRoleDescription = (role: string) => {
-    switch (role) {
-      case 'service_provider': return 'Service provider and selling related products';
-      case 'seller': return 'Selling products and goods';
-      case 'customer': return 'Buying products and find services';
-      default: return '';
-    }
-  };
-
-  const showServiceField = form.role === 'service_provider';
-  const showShopField = form.role === 'seller';
   const selectedShopType = shoppingTypes.find(st => String(st.id) === String(form.shopping_type_id));
   const isPremiumSeller = form.role === 'seller' && selectedShopType && selectedShopType.key !== 'other';
   const showLocationFields = form.role === 'service_provider' || isPremiumSeller;
 
   return (
-    <div className={`min-h-screen pt-2 pb-8 transition-colors duration-300 ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
-      <div className="w-full max-w-2xl mx-auto px-0">
+    <div className={`min-h-screen pt-8 pb-16 px-4 transition-colors duration-200 ${darkMode ? 'bg-gray-950 text-white' : 'bg-[#F5F5F5] text-[#151515]'}`}>
+      <div className="w-full max-w-2xl mx-auto">
         {/* Back Button */}
         {step === 'verify' && (
           <button
             onClick={() => setStep('register')}
-            className={`mb-4 flex items-center text-sm font-medium transition-colors ${
-              darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-650 hover:text-gray-900'
+            className={`mb-4 inline-flex items-center text-xs font-bold uppercase tracking-wider transition-colors ${
+              darkMode ? 'text-gray-400 hover:text-[#E5252A]' : 'text-gray-600 hover:text-[#E5252A]'
             }`}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -326,40 +314,37 @@ export default function RegisterPage() {
 
         {/* Main Card */}
         <div
-          className={`p-0 sm:p-8 border-0 sm:border transition-all duration-300 ${
-            darkMode ? 'bg-gray-950 sm:bg-gray-900 sm:border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
+          className={`p-6 sm:p-8 rounded-2xl border transition-all duration-200 ${
+            darkMode ? 'bg-gray-900 border-gray-800 shadow-xs' : 'bg-white border-[#E5E5E5] shadow-xs'
           }`}
-          style={{ borderRadius: '2px' }}
         >
           {step === 'register' ? (
             <>
               {/* Header */}
               <div className="mb-6">
-                <h1 className={`text-2xl font-bold uppercase tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                  Create your account
+                <div className="inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-[#E5252A] text-white rounded-full mb-2.5 shadow-xs">
+                  Get Started
+                </div>
+                <h1 className={`text-2xl sm:text-3xl font-extrabold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-[#151515]'}`}>
+                  Create Your Account<span className="text-[#E5252A]">.</span>
                 </h1>
-                <p className={`text-xs font-bold uppercase tracking-wider mt-1 ${darkMode ? 'text-gray-455' : 'text-gray-500'}`}>
-                  Join HafiConnect and start your journey
+                <p className={`text-xs font-semibold uppercase tracking-wider mt-1.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Join HafiConnect to provide services, sell products, or browse Rwanda's markets
                 </p>
               </div>
 
               {/* Error Message */}
               {error && (
-                <div
-                  className={`flex items-start gap-3 p-3 border mb-6 ${
-                    darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-655'
-                  }`}
-                  style={{ borderRadius: '2px' }}
-                >
-                  <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm font-semibold">{error}</span>
+                <div className="flex items-start gap-3 p-3.5 rounded-xl border border-red-500/20 bg-red-500/10 text-[#E5252A] mb-6">
+                  <AlertCircle className="w-5 h-5 text-[#E5252A] flex-shrink-0 mt-0.5" />
+                  <span className="text-xs font-semibold">{error}</span>
                 </div>
               )}
 
               {/* Registration Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Google Sign-In Button */}
-                <div>
+                <div className="flex justify-center">
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
                     onError={handleGoogleError}
@@ -374,39 +359,38 @@ export default function RegisterPage() {
 
                 {/* Divider */}
                 <div className="relative flex items-center py-2">
-                  <div className={`flex-grow border-t ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}></div>
+                  <div className={`flex-grow border-t ${darkMode ? 'border-gray-800' : 'border-[#E5E5E5]'}`}></div>
                   <span className={`flex-shrink mx-4 text-[10px] font-bold uppercase tracking-widest ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                    or
+                    OR
                   </span>
-                  <div className={`flex-grow border-t ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}></div>
+                  <div className={`flex-grow border-t ${darkMode ? 'border-gray-800' : 'border-[#E5E5E5]'}`}></div>
                 </div>
 
                 {/* Name Field */}
                 <div>
-                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
-                    Full name
+                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Full Name
                   </label>
                   <div className="relative">
-                    <User className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                    <User className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                     <input
                       name="name"
-                      placeholder="Enter your full name"
+                      placeholder="ENTER YOUR FULL NAME..."
                       value={form.name}
                       onChange={handleChange}
                       required
-                      className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
+                      className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all ${
                         darkMode
-                          ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
-                          : 'bg-white border-gray- text-gray-900 placeholder-gray-400'
-                      } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                      style={{ borderRadius: '2px' }}
+                          ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                          : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400'
+                      } focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]`}
                     />
                   </div>
                 </div>
 
                 {/* Role Selection */}
                 <div>
-                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Choose how you want to use HafiConnect
                   </label>
                   <div className="space-y-3">
@@ -419,23 +403,20 @@ export default function RegisterPage() {
                       return (
                         <div
                           key={role.value}
-                          className={`flex flex-col border cursor-pointer transition-all duration-200 ${
+                          className={`flex flex-col rounded-xl border cursor-pointer transition-all duration-200 ${
                             isSelected
-                              ? darkMode
-                                ? 'border-emerald-500 bg-emerald-500/10'
-                                : 'border-emerald-500 bg-emerald-50'
+                              ? 'border-[#E5252A] bg-red-500/5 dark:bg-red-950/20 shadow-xs'
                               : darkMode
-                              ? 'border-gray-700 bg-gray-900 hover:border-gray-600'
-                              : 'border-gray-255 bg-white hover:border-gray-350'
+                              ? 'border-gray-800 bg-gray-800/40 hover:border-[#E5252A]/40'
+                              : 'border-[#E5E5E5] bg-white hover:border-[#E5252A]/40'
                           }`}
-                          style={{ borderRadius: '2px' }}
                           onClick={() => setForm({ ...form, role: role.value })}
                         >
                           <div className="flex items-center gap-4 p-4">
                             {/* Check selection indicator */}
                             <div className={`w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 transition-colors duration-200 ${
                               isSelected
-                                ? 'border-emerald-500 bg-emerald-500'
+                                ? 'border-[#E5252A] bg-[#E5252A]'
                                 : darkMode ? 'border-gray-600 bg-transparent' : 'border-gray-300 bg-transparent'
                             }`}>
                               {isSelected && (
@@ -446,15 +427,15 @@ export default function RegisterPage() {
                             {/* Icon */}
                             <role.icon className={`w-5 h-5 flex-shrink-0 ${
                               isSelected
-                                ? 'text-emerald-500'
+                                ? 'text-[#E5252A]'
                                 : darkMode ? 'text-gray-400' : 'text-gray-500'
                             }`} />
 
                             {/* Label */}
                             <span className={`text-xs font-bold uppercase tracking-wider ${
                               isSelected
-                                ? darkMode ? 'text-emerald-450' : 'text-emerald-755'
-                                : darkMode ? 'text-gray-300' : 'text-gray-600'
+                                ? 'text-[#E5252A]'
+                                : darkMode ? 'text-white' : 'text-[#151515]'
                             }`}>
                               {role.label}
                             </span>
@@ -467,19 +448,18 @@ export default function RegisterPage() {
                                 Select service to provide
                               </label>
                               {loadingServices ? (
-                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-emerald-500 border-t-transparent"></div>
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#E5252A] border-t-transparent"></div>
                               ) : (
                                 <select
                                   name="service"
                                   value={form.service}
                                   onChange={handleChange}
                                   required
-                                  className={`w-full p-2 border text-xs transition-colors ${
+                                  className={`w-full p-2.5 rounded-xl border text-xs transition-colors ${
                                     darkMode
-                                      ? 'bg-gray-950 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
-                                      : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
+                                      ? 'bg-gray-800 border-gray-700 text-white focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]'
+                                      : 'bg-white border-[#E5E5E5] text-[#151515] focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]'
                                   }`}
-                                  style={{ borderRadius: '2px' }}
                                 >
                                   <option value="">-- Select a service --</option>
                                   {services.map(service => (
@@ -499,19 +479,18 @@ export default function RegisterPage() {
                                 Select Shop Type
                               </label>
                               {loadingShoppingTypes ? (
-                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-emerald-500 border-t-transparent"></div>
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#E5252A] border-t-transparent"></div>
                               ) : (
                                 <select
                                   name="shopping_type_id"
                                   value={form.shopping_type_id}
                                   onChange={handleChange}
                                   required
-                                  className={`w-full p-2 border text-xs transition-colors ${
+                                  className={`w-full p-2.5 rounded-xl border text-xs transition-colors ${
                                     darkMode
-                                      ? 'bg-gray-950 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
-                                      : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
+                                      ? 'bg-gray-800 border-gray-700 text-white focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]'
+                                      : 'bg-white border-[#E5E5E5] text-[#151515] focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]'
                                   }`}
-                                  style={{ borderRadius: '2px' }}
                                 >
                                   {[...shoppingTypes]
                                     .sort((a, b) => {
@@ -531,11 +510,11 @@ export default function RegisterPage() {
                               
                               {/* Selected Premium Shop Type Details */}
                               {selectedShopType && selectedShopType.key !== 'other' && (
-                                <div className={`mt-3 p-3.5 border transition-colors ${darkMode ? 'bg-emerald-950/20 border-emerald-900/40 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'} space-y-2`} style={{ borderRadius: '2px' }}>
-                                  <div className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+                                <div className="mt-3 p-3.5 rounded-xl border border-red-500/20 bg-red-500/5 dark:bg-red-950/20 space-y-1.5">
+                                  <div className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 text-[#E5252A]">
                                    Premium Seller Shop
                                   </div>
-                                  <p className="text-[11px] leading-relaxed text-gray-600 dark:text-gray-300">
+                                  <p className={`text-[11px] leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                                     The selected shop type is a Premium Seller Shop that provides outstanding VIP features. 
                                     All of your products will be displayed in the shops workspace, and you can easily change your options later.
                                   </p>
@@ -552,23 +531,22 @@ export default function RegisterPage() {
                 {/* Business Name Field */}
                 {(form.role === 'service_provider' || form.role === 'seller') && (
                   <div>
-                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
-                      Business name {form.role === 'seller' && selectedShopType?.key === 'other' ? '(Optional)' : ''}
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Business Name {form.role === 'seller' && selectedShopType?.key === 'other' ? '(Optional)' : ''}
                     </label>
                     <div className="relative">
-                      <Building className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                      <Building className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                       <input
                         name="businessName"
-                        placeholder="Enter your business name"
+                        placeholder="ENTER YOUR BUSINESS NAME..."
                         value={form.businessName}
                         onChange={handleChange}
                         required={!(form.role === 'seller' && selectedShopType?.key === 'other')}
-                        className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
+                        className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all ${
                           darkMode
-                            ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
-                            : 'bg-white border-gray-255 text-gray-900 placeholder-gray-400'
-                        } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                        style={{ borderRadius: '2px' }}
+                            ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                            : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400'
+                        } focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]`}
                       />
                     </div>
                   </div>
@@ -576,53 +554,51 @@ export default function RegisterPage() {
 
                 {/* Email Field */}
                 <div>
-                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
-                    Email address
+                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Email Address
                   </label>
                   <div className="relative">
-                    <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                    <Mail className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                     <input
                       name="email"
-                      placeholder="you@example.com"
+                      placeholder="YOU@EXAMPLE.COM"
                       type="email"
                       value={form.email}
                       onChange={handleChange}
                       required
-                      className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
+                      className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all ${
                         darkMode
-                          ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
-                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                      } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                      style={{ borderRadius: '2px' }}
+                          ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                          : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400'
+                      } focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]`}
                     />
                   </div>
                 </div>
 
-                 {/* Password Field */}
+                {/* Password Field */}
                 <div>
-                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Password
                   </label>
                   <div className="relative">
-                    <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                    <Lock className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                     <input
                       name="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Create a password"
+                      placeholder="CREATE A PASSWORD..."
                       value={form.password}
                       onChange={handleChange}
                       required
-                      className={`w-full pl-10 pr-10 py-2.5 border text-sm transition-colors ${
+                      className={`w-full pl-10 pr-10 py-2.5 rounded-xl border text-sm transition-all ${
                         darkMode
-                          ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
-                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                      } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                      style={{ borderRadius: '2px' }}
+                          ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                          : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400'
+                      } focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                      className="absolute right-3 top-3 text-gray-400 hover:text-[#E5252A] transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -631,28 +607,27 @@ export default function RegisterPage() {
 
                 {/* Confirm Password Field */}
                 <div>
-                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Confirm Password
                   </label>
                   <div className="relative">
-                    <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                    <Lock className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                     <input
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
+                      placeholder="CONFIRM YOUR PASSWORD..."
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      className={`w-full pl-10 pr-10 py-2.5 border text-sm transition-colors ${
+                      className={`w-full pl-10 pr-10 py-2.5 rounded-xl border text-sm transition-all ${
                         darkMode
-                          ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
-                          : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                      } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                      style={{ borderRadius: '2px' }}
+                          ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                          : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400'
+                      } focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                      className="absolute right-3 top-3 text-gray-400 hover:text-[#E5252A] transition-colors"
                     >
                       {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -662,21 +637,18 @@ export default function RegisterPage() {
                 {/* Location Fields */}
                 {showLocationFields && (
                   <div>
-                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
-                      Location settings
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Location Settings
                     </label>
                     <div className="space-y-2">
                       <label
-                        className={`flex items-center gap-3 p-3 border cursor-pointer transition-colors ${
+                        className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
                           form.locationOption === 'auto'
-                            ? darkMode
-                              ? 'border-emerald-500 bg-emerald-500/10'
-                              : 'border-emerald-500 bg-emerald-50'
+                            ? 'border-[#E5252A] bg-red-500/5 dark:bg-red-950/20'
                             : darkMode
-                            ? 'border-gray-750 bg-gray-950'
-                            : 'border-gray-255 bg-white'
+                            ? 'border-gray-800 bg-gray-800/40 hover:border-[#E5252A]/50'
+                            : 'border-[#E5E5E5] bg-white hover:border-[#E5252A]/50'
                         }`}
-                        style={{ borderRadius: '2px' }}
                       >
                         <input
                           type="radio"
@@ -684,16 +656,16 @@ export default function RegisterPage() {
                           value="auto"
                           checked={form.locationOption === 'auto'}
                           onChange={handleLocationOptionChange}
-                          className="text-emerald-600 focus:ring-emerald-500"
+                          className="accent-[#E5252A]"
                         />
                         <Target className={`w-4 h-4 ${
-                          form.locationOption === 'auto' ? 'text-emerald-500' : darkMode ? 'text-gray-400' : 'text-gray-500'
+                          form.locationOption === 'auto' ? 'text-[#E5252A]' : darkMode ? 'text-gray-400' : 'text-gray-500'
                         }`} />
                         <div className="flex-1">
-                          <div className={`text-sm font-bold uppercase tracking-wider ${
+                          <div className={`text-xs font-bold uppercase tracking-wider ${
                             form.locationOption === 'auto'
-                              ? darkMode ? 'text-emerald-400' : 'text-emerald-707'
-                              : darkMode ? 'text-gray-300' : 'text-gray-600'
+                              ? 'text-[#E5252A]'
+                              : darkMode ? 'text-white' : 'text-[#151515]'
                           }`}>
                             Auto-detect location
                           </div>
@@ -701,16 +673,13 @@ export default function RegisterPage() {
                       </label>
 
                       <label
-                        className={`flex items-center gap-3 p-3 border cursor-pointer transition-colors ${
+                        className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
                           form.locationOption === 'manual'
-                            ? darkMode
-                              ? 'border-emerald-500 bg-emerald-500/10'
-                              : 'border-emerald-500 bg-emerald-50'
+                            ? 'border-[#E5252A] bg-red-500/5 dark:bg-red-950/20'
                             : darkMode
-                            ? 'border-gray-750 bg-gray-955'
-                            : 'border-gray-255 bg-white'
+                            ? 'border-gray-800 bg-gray-800/40 hover:border-[#E5252A]/50'
+                            : 'border-[#E5E5E5] bg-white hover:border-[#E5252A]/50'
                         }`}
-                        style={{ borderRadius: '2px' }}
                       >
                         <input
                           type="radio"
@@ -718,16 +687,16 @@ export default function RegisterPage() {
                           value="manual"
                           checked={form.locationOption === 'manual'}
                           onChange={handleLocationOptionChange}
-                          className="text-emerald-600 focus:ring-emerald-500"
+                          className="accent-[#E5252A]"
                         />
                         <Navigation className={`w-4 h-4 ${
-                          form.locationOption === 'manual' ? 'text-emerald-500' : darkMode ? 'text-gray-400' : 'text-gray-500'
+                          form.locationOption === 'manual' ? 'text-[#E5252A]' : darkMode ? 'text-gray-400' : 'text-gray-500'
                         }`} />
                         <div className="flex-1">
-                          <div className={`text-sm font-bold uppercase tracking-wider ${
+                          <div className={`text-xs font-bold uppercase tracking-wider ${
                             form.locationOption === 'manual'
-                              ? darkMode ? 'text-emerald-400' : 'text-emerald-707'
-                              : darkMode ? 'text-gray-300' : 'text-gray-600'
+                              ? 'text-[#E5252A]'
+                              : darkMode ? 'text-white' : 'text-[#151515]'
                           }`}>
                             Enter manually
                           </div>
@@ -736,33 +705,29 @@ export default function RegisterPage() {
 
                       {form.locationOption === 'manual' && (
                         <div className="relative">
-                          <MapPin className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                          <MapPin className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                           <input
                             name="location"
                             placeholder="e.g., -1.946, 30.128"
                             value={form.location}
                             onChange={handleChange}
-                            className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
+                            className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all ${
                               darkMode
-                                ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
-                                : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                            } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                            style={{ borderRadius: '2px' }}
+                                ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                                : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400'
+                            } focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]`}
                           />
                         </div>
                       )}
 
                       <label
-                        className={`flex items-center gap-3 p-3 border cursor-pointer transition-colors ${
+                        className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
                           form.locationOption === 'skip'
-                            ? darkMode
-                              ? 'border-gray-650 bg-gray-750'
-                              : 'border-gray-350 bg-gray-100'
+                            ? 'border-[#E5252A] bg-red-500/5 dark:bg-red-950/20'
                             : darkMode
-                            ? 'border-gray-750 bg-gray-955'
-                            : 'border-gray-255 bg-white'
+                            ? 'border-gray-800 bg-gray-800/40 hover:border-[#E5252A]/50'
+                            : 'border-[#E5E5E5] bg-white hover:border-[#E5252A]/50'
                         }`}
-                        style={{ borderRadius: '2px' }}
                       >
                         <input
                           type="radio"
@@ -770,11 +735,15 @@ export default function RegisterPage() {
                           value="skip"
                           checked={form.locationOption === 'skip'}
                           onChange={handleLocationOptionChange}
-                          className="text-gray-600 focus:ring-gray-500"
+                          className="accent-[#E5252A]"
                         />
-                        <div className="text-lg">⏭️</div>
+                        <div className="text-sm">⏭️</div>
                         <div className="flex-1">
-                          <div className={`text-sm font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          <div className={`text-xs font-bold uppercase tracking-wider ${
+                            form.locationOption === 'skip'
+                              ? 'text-[#E5252A]'
+                              : darkMode ? 'text-white' : 'text-[#151515]'
+                          }`}>
                             Skip for now
                           </div>
                         </div>
@@ -787,12 +756,11 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border ${
+                  className={`w-full py-3 px-4 text-white text-xs font-bold uppercase tracking-wider transition-all rounded-xl shadow-xs active:scale-[0.99] ${
                     loading
-                      ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
-                      : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm'
+                      ? 'bg-gray-400 dark:bg-gray-800 text-gray-200 dark:text-gray-500 cursor-not-allowed'
+                      : 'bg-[#E5252A] hover:bg-[#c91d22]'
                   }`}
-                  style={{ borderRadius: '2px' }}
                 >
                   {loading ? (
                     <div className="flex items-center justify-center gap-2">
@@ -805,46 +773,54 @@ export default function RegisterPage() {
                 </button>
               </form>
 
-              {/* Agent Registration Link */}
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-center">
-                <Link
-                  to="/agent/register"
-                  className={`text-xs font-bold uppercase tracking-wider transition-colors ${
-                    darkMode ? 'text-emerald-450 hover:text-emerald-350' : 'text-emerald-600 hover:text-emerald-700'
-                  }`}
-                >
-                  Register as HafiConnect Agent
-                </Link>
+              {/* Links */}
+              <div className="mt-6 pt-4 border-t border-[#E5E5E5] dark:border-gray-800 text-center space-y-3">
+                <div>
+                  <Link
+                    to="/login"
+                    className={`inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                      darkMode ? 'text-gray-300 hover:text-[#E5252A]' : 'text-gray-600 hover:text-[#E5252A]'
+                    }`}
+                  >
+                    Already have an account? Sign in
+                  </Link>
+                </div>
+                <div>
+                  <Link
+                    to="/agent/register"
+                    className="text-xs font-bold uppercase tracking-wider transition-colors text-[#E5252A] hover:text-[#c91d22] hover:underline"
+                  >
+                    Register as HafiConnect Agent →
+                  </Link>
+                </div>
               </div>
             </>
           ) : step === 'google-role-select' ? (
             /* Google Role Selection Step */
             <div>
               <div className="mb-6">
-                <h1 className={`text-2xl font-bold uppercase tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                  Select your role
+                <div className="inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-wider bg-[#E5252A] text-white rounded-full mb-2.5 shadow-xs">
+                  Account Setup
+                </div>
+                <h1 className={`text-2xl sm:text-3xl font-extrabold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-[#151515]'}`}>
+                  Select Your Role<span className="text-[#E5252A]">.</span>
                 </h1>
-                <p className={`text-xs font-bold uppercase tracking-wider mt-1 ${darkMode ? 'text-gray-455' : 'text-gray-500'}`}>
+                <p className={`text-xs font-semibold uppercase tracking-wider mt-1.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                   Welcome, {googleUserData?.name}! Choose how you want to use HafiConnect
                 </p>
               </div>
 
               {error && (
-                <div
-                  className={`flex items-start gap-3 p-3 border mb-6 ${
-                    darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-655'
-                  }`}
-                  style={{ borderRadius: '2px' }}
-                >
-                  <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm font-semibold">{error}</span>
+                <div className="flex items-start gap-3 p-3.5 rounded-xl border border-red-500/20 bg-red-500/10 text-[#E5252A] mb-6">
+                  <AlertCircle className="w-5 h-5 text-[#E5252A] flex-shrink-0 mt-0.5" />
+                  <span className="text-xs font-semibold">{error}</span>
                 </div>
               )}
 
               <form onSubmit={handleGoogleRoleSubmit} className="space-y-4">
                 {/* Role Selection */}
                 <div>
-                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+                  <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     Select your role
                   </label>
                   <div className="space-y-3">
@@ -857,23 +833,20 @@ export default function RegisterPage() {
                       return (
                         <div
                           key={role.value}
-                          className={`flex flex-col border cursor-pointer transition-all duration-200 ${
+                          className={`flex flex-col rounded-xl border cursor-pointer transition-all duration-200 ${
                             isSelected
-                              ? darkMode
-                                ? 'border-emerald-500 bg-emerald-500/10'
-                                : 'border-emerald-500 bg-emerald-50'
+                              ? 'border-[#E5252A] bg-red-500/5 dark:bg-red-950/20 shadow-xs'
                               : darkMode
-                              ? 'border-gray-750 bg-gray-950 hover:border-gray-600'
-                              : 'border-gray-255 bg-white hover:border-gray-350'
+                              ? 'border-gray-800 bg-gray-800/40 hover:border-[#E5252A]/40'
+                              : 'border-[#E5E5E5] bg-white hover:border-[#E5252A]/40'
                           }`}
-                          style={{ borderRadius: '2px' }}
                           onClick={() => setForm({ ...form, role: role.value })}
                         >
                           <div className="flex items-center gap-4 p-4">
                             {/* Check selection indicator */}
                             <div className={`w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 transition-colors duration-200 ${
                               isSelected
-                                ? 'border-emerald-500 bg-emerald-500'
+                                ? 'border-[#E5252A] bg-[#E5252A]'
                                 : darkMode ? 'border-gray-600 bg-transparent' : 'border-gray-300 bg-transparent'
                             }`}>
                               {isSelected && (
@@ -884,15 +857,15 @@ export default function RegisterPage() {
                             {/* Icon */}
                             <role.icon className={`w-5 h-5 flex-shrink-0 ${
                               isSelected
-                                ? 'text-emerald-500'
+                                ? 'text-[#E5252A]'
                                 : darkMode ? 'text-gray-400' : 'text-gray-500'
                             }`} />
 
                             {/* Label */}
                             <span className={`text-xs font-bold uppercase tracking-wider ${
                               isSelected
-                                ? darkMode ? 'text-emerald-450' : 'text-emerald-755'
-                                : darkMode ? 'text-gray-300' : 'text-gray-600'
+                                ? 'text-[#E5252A]'
+                                : darkMode ? 'text-white' : 'text-[#151515]'
                             }`}>
                               {role.label}
                             </span>
@@ -901,23 +874,22 @@ export default function RegisterPage() {
                           {/* Nested dropdown for Service Provider */}
                           {role.value === 'service_provider' && isSelected && (
                             <div className="px-4 pb-4 pt-1" onClick={(e) => e.stopPropagation()}>
-                              <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                              <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                 Select service to provide
                               </label>
                               {loadingServices ? (
-                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-emerald-500 border-t-transparent"></div>
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#E5252A] border-t-transparent"></div>
                               ) : (
                                 <select
                                   name="service"
                                   value={form.service}
                                   onChange={handleChange}
                                   required
-                                  className={`w-full p-2 border text-xs transition-colors ${
+                                  className={`w-full p-2.5 rounded-xl border text-xs transition-colors ${
                                     darkMode
-                                      ? 'bg-gray-950 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
-                                      : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
+                                      ? 'bg-gray-800 border-gray-700 text-white focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]'
+                                      : 'bg-white border-[#E5E5E5] text-[#151515] focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]'
                                   }`}
-                                  style={{ borderRadius: '2px' }}
                                 >
                                   <option value="">-- Select a service --</option>
                                   {services.map(service => (
@@ -933,23 +905,22 @@ export default function RegisterPage() {
                           {/* Nested dropdown for Seller */}
                           {role.value === 'seller' && isSelected && (
                             <div className="px-4 pb-4 pt-1" onClick={(e) => e.stopPropagation()}>
-                              <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+                              <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                 Select Shop Type
                               </label>
                               {loadingShoppingTypes ? (
-                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-emerald-500 border-t-transparent"></div>
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#E5252A] border-t-transparent"></div>
                               ) : (
                                 <select
                                   name="shopping_type_id"
                                   value={form.shopping_type_id}
                                   onChange={handleChange}
                                   required
-                                  className={`w-full p-2 border text-xs transition-colors ${
+                                  className={`w-full p-2.5 rounded-xl border text-xs transition-colors ${
                                     darkMode
-                                      ? 'bg-gray-950 border-gray-700 text-white focus:ring-1 focus:ring-emerald-500'
-                                      : 'bg-white border-gray-250 text-gray-900 focus:ring-1 focus:ring-emerald-500'
+                                      ? 'bg-gray-800 border-gray-700 text-white focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]'
+                                      : 'bg-white border-[#E5E5E5] text-[#151515] focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]'
                                   }`}
-                                  style={{ borderRadius: '2px' }}
                                 >
                                   {[...shoppingTypes]
                                     .sort((a, b) => {
@@ -966,13 +937,14 @@ export default function RegisterPage() {
                                     ))}
                                 </select>
                               )}
-                                                          {/* Selected Premium Shop Type Details */}
+                              
+                              {/* Selected Premium Shop Type Details */}
                               {selectedShopType && selectedShopType.key !== 'other' && (
-                                <div className={`mt-3 p-3.5 border transition-colors ${darkMode ? 'bg-emerald-950/20 border-emerald-900/40 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'} space-y-2`} style={{ borderRadius: '2px' }}>
-                                  <div className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+                                <div className="mt-3 p-3.5 rounded-xl border border-red-500/20 bg-red-500/5 dark:bg-red-950/20 space-y-1.5">
+                                  <div className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 text-[#E5252A]">
                                    Premium Seller Shop
                                   </div>
-                                  <p className="text-[11px] leading-relaxed text-gray-600 dark:text-gray-300">
+                                  <p className={`text-[11px] leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                                     The selected shop type is a Premium Seller Shop that provides outstanding VIP features. 
                                     All of your products will be displayed in the shops workspace, and you can easily change your options later.
                                   </p>
@@ -989,23 +961,22 @@ export default function RegisterPage() {
                 {/* Business Name Field for Google Sign-In */}
                 {(form.role === 'service_provider' || form.role === 'seller') && (
                   <div>
-                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
-                      Business name {form.role === 'seller' && selectedShopType?.key === 'other' ? '(Optional)' : ''}
+                    <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Business Name {form.role === 'seller' && selectedShopType?.key === 'other' ? '(Optional)' : ''}
                     </label>
                     <div className="relative">
-                      <Building className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                      <Building className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                       <input
                         name="businessName"
-                        placeholder="Enter your business name"
+                        placeholder="ENTER YOUR BUSINESS NAME..."
                         value={form.businessName}
                         onChange={handleChange}
                         required={!(form.role === 'seller' && selectedShopType?.key === 'other')}
-                        className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
+                        className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all ${
                           darkMode
-                            ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
-                            : 'bg-white border-gray-255 text-gray-900 placeholder-gray-400'
-                        } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                        style={{ borderRadius: '2px' }}
+                            ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                            : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400'
+                        } focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]`}
                       />
                     </div>
                   </div>
@@ -1015,20 +986,17 @@ export default function RegisterPage() {
                 {showLocationFields && (
                   <div>
                     <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      Location settings
+                      Location Settings
                     </label>
                     <div className="space-y-2">
                       <label
-                        className={`flex items-center gap-3 p-3 border cursor-pointer transition-colors ${
+                        className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
                           form.locationOption === 'auto'
-                            ? darkMode
-                              ? 'border-emerald-500 bg-emerald-500/10'
-                              : 'border-emerald-500 bg-emerald-50'
+                            ? 'border-[#E5252A] bg-red-500/5 dark:bg-red-950/20'
                             : darkMode
-                            ? 'border-gray-700 bg-gray-900'
-                            : 'border-gray-255 bg-white'
+                            ? 'border-gray-800 bg-gray-800/40 hover:border-[#E5252A]/50'
+                            : 'border-[#E5E5E5] bg-white hover:border-[#E5252A]/50'
                         }`}
-                        style={{ borderRadius: '2px' }}
                       >
                         <input
                           type="radio"
@@ -1036,16 +1004,16 @@ export default function RegisterPage() {
                           value="auto"
                           checked={form.locationOption === 'auto'}
                           onChange={handleLocationOptionChange}
-                          className="text-emerald-600 focus:ring-emerald-500"
+                          className="accent-[#E5252A]"
                         />
                         <Target className={`w-4 h-4 ${
-                          form.locationOption === 'auto' ? 'text-emerald-500' : darkMode ? 'text-gray-400' : 'text-gray-500'
+                          form.locationOption === 'auto' ? 'text-[#E5252A]' : darkMode ? 'text-gray-400' : 'text-gray-500'
                         }`} />
                         <div className="flex-1">
-                          <div className={`text-sm font-bold uppercase tracking-wider ${
+                          <div className={`text-xs font-bold uppercase tracking-wider ${
                             form.locationOption === 'auto'
-                              ? darkMode ? 'text-emerald-400' : 'text-emerald-707'
-                              : darkMode ? 'text-gray-300' : 'text-gray-600'
+                              ? 'text-[#E5252A]'
+                              : darkMode ? 'text-white' : 'text-[#151515]'
                           }`}>
                             Auto-detect location
                           </div>
@@ -1053,16 +1021,13 @@ export default function RegisterPage() {
                       </label>
 
                       <label
-                        className={`flex items-center gap-3 p-3 border cursor-pointer transition-colors ${
+                        className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
                           form.locationOption === 'manual'
-                            ? darkMode
-                              ? 'border-emerald-500 bg-emerald-500/10'
-                              : 'border-emerald-500 bg-emerald-50'
+                            ? 'border-[#E5252A] bg-red-500/5 dark:bg-red-950/20'
                             : darkMode
-                            ? 'border-gray-700 bg-gray-900'
-                            : 'border-gray-255 bg-white'
+                            ? 'border-gray-800 bg-gray-800/40 hover:border-[#E5252A]/50'
+                            : 'border-[#E5E5E5] bg-white hover:border-[#E5252A]/50'
                         }`}
-                        style={{ borderRadius: '2px' }}
                       >
                         <input
                           type="radio"
@@ -1070,16 +1035,16 @@ export default function RegisterPage() {
                           value="manual"
                           checked={form.locationOption === 'manual'}
                           onChange={handleLocationOptionChange}
-                          className="text-emerald-600 focus:ring-emerald-500"
+                          className="accent-[#E5252A]"
                         />
                         <Navigation className={`w-4 h-4 ${
-                          form.locationOption === 'manual' ? 'text-emerald-500' : darkMode ? 'text-gray-400' : 'text-gray-500'
+                          form.locationOption === 'manual' ? 'text-[#E5252A]' : darkMode ? 'text-gray-400' : 'text-gray-500'
                         }`} />
                         <div className="flex-1">
-                          <div className={`text-sm font-bold uppercase tracking-wider ${
+                          <div className={`text-xs font-bold uppercase tracking-wider ${
                             form.locationOption === 'manual'
-                              ? darkMode ? 'text-emerald-400' : 'text-emerald-707'
-                              : darkMode ? 'text-gray-300' : 'text-gray-600'
+                              ? 'text-[#E5252A]'
+                              : darkMode ? 'text-white' : 'text-[#151515]'
                           }`}>
                             Enter manually
                           </div>
@@ -1088,33 +1053,29 @@ export default function RegisterPage() {
 
                       {form.locationOption === 'manual' && (
                         <div className="relative">
-                          <MapPin className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                          <MapPin className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
                           <input
                             name="location"
                             placeholder="e.g., -1.946, 30.128"
                             value={form.location}
                             onChange={handleChange}
-                            className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
+                            className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all ${
                               darkMode
-                                ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
-                                : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                            } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                            style={{ borderRadius: '2px' }}
+                                ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500'
+                                : 'bg-[#F5F5F5] border-[#E5E5E5] text-[#151515] placeholder-gray-400'
+                            } focus:outline-none focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]`}
                           />
                         </div>
                       )}
 
                       <label
-                        className={`flex items-center gap-3 p-3 border cursor-pointer transition-colors ${
+                        className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
                           form.locationOption === 'skip'
-                            ? darkMode
-                              ? 'border-gray-650 bg-gray-750'
-                              : 'border-gray-350 bg-gray-100'
+                            ? 'border-[#E5252A] bg-red-500/5 dark:bg-red-950/20'
                             : darkMode
-                            ? 'border-gray-700 bg-gray-900'
-                            : 'border-gray-255 bg-white'
+                            ? 'border-gray-800 bg-gray-800/40 hover:border-[#E5252A]/50'
+                            : 'border-[#E5E5E5] bg-white hover:border-[#E5252A]/50'
                         }`}
-                        style={{ borderRadius: '2px' }}
                       >
                         <input
                           type="radio"
@@ -1122,11 +1083,15 @@ export default function RegisterPage() {
                           value="skip"
                           checked={form.locationOption === 'skip'}
                           onChange={handleLocationOptionChange}
-                          className="text-gray-600 focus:ring-gray-500"
+                          className="accent-[#E5252A]"
                         />
-                        <div className="text-lg">⏭️</div>
+                        <div className="text-sm">⏭️</div>
                         <div className="flex-1">
-                          <div className={`text-sm font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          <div className={`text-xs font-bold uppercase tracking-wider ${
+                            form.locationOption === 'skip'
+                              ? 'text-[#E5252A]'
+                              : darkMode ? 'text-white' : 'text-[#151515]'
+                          }`}>
                             Skip for now
                           </div>
                         </div>
@@ -1139,12 +1104,11 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={loading || !form.role}
-                  className={`w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border ${
+                  className={`w-full py-3.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-all rounded-xl shadow-xs active:scale-[0.99] ${
                     loading || !form.role
-                      ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
-                      : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm'
+                      ? 'bg-gray-400 dark:bg-gray-800 text-gray-200 dark:text-gray-500 cursor-not-allowed'
+                      : 'bg-[#E5252A] hover:bg-[#c91d22]'
                   }`}
-                  style={{ borderRadius: '2px' }}
                 >
                   {loading ? (
                     <div className="flex items-center justify-center gap-2">
@@ -1160,15 +1124,6 @@ export default function RegisterPage() {
           ) : (
             /* Verification Step */
             <div>
-              <div className="mb-6">
-                <h1 className={`text-2xl font-bold uppercase tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                  Verify your email
-                </h1>
-                <p className={`text-xs font-bold uppercase tracking-wider mt-1 ${darkMode ? 'text-gray-455' : 'text-gray-500'}`}>
-                  We've sent a verification code to {userEmail}
-                </p>
-              </div>
-
               <VerifyEmailForm email={userEmail} />
             </div>
           )}
@@ -1176,8 +1131,8 @@ export default function RegisterPage() {
 
         {/* Footer */}
         <div className="text-center mt-6">
-          <p className={`text-[10px] font-bold uppercase tracking-widest ${darkMode ? 'text-gray-600' : 'text-gray-400'}`}>
-            Secure registration powered by HafiConnect
+          <p className={`text-[10px] font-bold uppercase tracking-widest ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+            Secure registration powered by HafiConnect<span className="text-[#E5252A]">.</span>
           </p>
         </div>
       </div>

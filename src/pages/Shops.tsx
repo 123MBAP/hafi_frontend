@@ -1,5 +1,6 @@
 import { useDarkMode } from "@/context/DarkMode";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import PageHeader from "@/components/ui/PageHeader";
 import {
   ChevronRight,
   Grid3X3,
@@ -45,7 +46,7 @@ const getUrl = (path: string | undefined) => {
   return `${API_BASE}/${path.replace(/^\/+/, '')}`;
 };
 
-// Modern AliExpress / Amazon style Shop Product Card
+// Modern refined Shop Product Card
 function ShopProductCard({
   product,
   darkMode,
@@ -62,7 +63,7 @@ function ShopProductCard({
   return (
     <div
       className={`group cursor-pointer overflow-hidden rounded-xl transition-all duration-200 hover:shadow-lg flex flex-col h-full ${
-        darkMode ? 'bg-black border border-white/20 hover:border-red-600' : 'bg-white border border-black hover:border-red-600'
+        darkMode ? 'bg-zinc-900 border border-zinc-800 hover:border-[#E5252A]' : 'bg-white border border-gray-200 hover:border-[#E5252A]'
       } shadow-sm`}
       onClick={(e) => {
         e.stopPropagation();
@@ -70,7 +71,7 @@ function ShopProductCard({
       }}
     >
       {/* Image section with 1:1 Aspect Ratio */}
-      <div className="relative aspect-square w-full overflow-hidden bg-white dark:bg-black rounded-t-xl flex items-center justify-center">
+      <div className="relative aspect-square w-full overflow-hidden bg-gray-50 dark:bg-black rounded-t-xl flex items-center justify-center">
         {mainImage ? (
           <img
             src={mainImage}
@@ -79,44 +80,44 @@ function ShopProductCard({
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-black dark:text-white text-xs">
+          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
             No image
           </div>
         )}
 
-        {/* Floating Quick Add-To-Cart Action Button */}
+        {/* Floating Quick Action Button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             onView(product.id);
           }}
           title="View product details"
-          className="absolute bottom-2 right-2 z-10 w-8 h-8 rounded-full bg-white dark:bg-black text-black dark:text-white shadow-md hover:bg-red-600 hover:text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+          className="absolute bottom-2.5 right-2.5 z-10 w-8 h-8 rounded-full bg-white dark:bg-zinc-800 text-[#151515] dark:text-white shadow-md hover:bg-[#E5252A] hover:text-white flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-gray-100 dark:border-zinc-700"
         >
           <ShoppingCart className="w-4 h-4" />
         </button>
 
         {product.fileType === 'video' && (
-          <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[9px] font-medium bg-black/60 text-white rounded">
+          <div className="absolute top-2.5 right-2.5 px-2 py-0.5 text-[10px] font-semibold bg-black/70 backdrop-blur-sm text-white rounded-full">
             🎥 Video
           </div>
         )}
       </div>
 
       {/* Content */}
-      <div className="p-3 flex-1 flex flex-col justify-between">
+      <div className="p-3.5 flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="text-xs sm:text-sm font-semibold text-black dark:text-white line-clamp-2 h-9 leading-snug group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+          <h3 className="text-xs sm:text-sm font-semibold text-[#151515] dark:text-zinc-100 line-clamp-2 h-9 leading-snug group-hover:text-[#E5252A] dark:group-hover:text-[#E5252A] transition-colors">
             {product.title}
           </h3>
-          <p className="mt-1 text-xs sm:text-sm leading-5 text-black dark:text-white line-clamp-3 min-h-[3.75rem]">
+          <p className="mt-1 text-xs leading-relaxed text-[#666666] dark:text-zinc-400 line-clamp-2 min-h-[2.5rem]">
             {product.description || 'No description available'}
           </p>
         </div>
 
-        <div className="mt-2.5 pt-2 border-t border-black dark:border-white/30">
+        <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-zinc-800">
           <div className="flex items-baseline gap-1.5 flex-wrap">
-            <span className="text-base sm:text-lg font-black text-red-600 dark:text-red-500 tracking-tight font-sans">
+            <span className="text-base sm:text-lg font-black text-[#E5252A] tracking-tight font-sans">
               FRw {product.price.toLocaleString()}
             </span>
           </div>
@@ -127,9 +128,10 @@ function ShopProductCard({
               e.stopPropagation();
               onView(product.id);
             }}
-            className="mt-2 text-xs font-bold uppercase tracking-wider text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
+            className="mt-2 text-xs font-bold uppercase tracking-wider text-[#E5252A] hover:text-black dark:hover:text-white transition-colors flex items-center gap-1"
           >
-            View more →
+            <span>View details</span>
+            <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -353,51 +355,60 @@ export default function ShopsPage() {
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-black' : 'bg-white'}`}>
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="mb-6 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-          <div>
-            <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-black'} uppercase flex items-center gap-2`}>
-             Explore Premium Shops and Exceptional Products
-            </h1>
-            <p className={`text-sm sm:text-base font-normal ${darkMode ? 'text-white' : 'text-black'} mt-2.5 leading-relaxed max-w-4xl`}>
-              Discover a curated shopping experience through HafiConnect Premium Shops. Explore shops offering quality fashion, clothing, shoes, jewelry, handbags, accessories, beauty products, and lifestyle items. Browse shop collections, discover products that match your style, and connect directly with retailers to ask questions or make purchases. Whether you are looking for everyday elegance or something special, find shops and products that meet your preferences.
-            </p>
-          </div>
-
-          <div className="flex gap-2">
+        {/* Editorial Header */}
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Home', href: '/' },
+            { label: 'Shops' },
+          ]}
+          title="Shops & Storefronts"
+          subtitle="Explore curated boutiques, clothing, electronics, jewelry, and lifestyle products from verified retail storefronts."
+          badge="Verified Stores"
+          actions={
             <button
               onClick={handleFilterToggle}
-              className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold uppercase tracking-wider ${darkMode ? 'bg-black text-white' : 'bg-white text-black'} border border-black dark:border-white shadow-sm hover:bg-red-600 hover:text-white`}
-              style={{ borderRadius: '2px' }}
+              className={`flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors border shadow-sm ${
+                showFilters
+                  ? 'bg-[#E5252A] border-[#E5252A] text-white'
+                  : darkMode
+                    ? 'bg-zinc-900 border-zinc-700 text-zinc-200 hover:border-[#E5252A]'
+                    : 'bg-white border-gray-200 text-gray-800 hover:border-[#E5252A]'
+              }`}
             >
               <Filter className="w-4 h-4" />
-              {showFilters ? 'Hide Filters' : 'Show Filters'}
+              <span>{showFilters ? 'Hide Filters' : 'Filters'}</span>
             </button>
-          </div>
-        </div>
+          }
+        />
 
-        {/* Filters Panel */}
+        {/* Refined Filters Panel on Light-Grey Surface */}
         {showFilters && (
-          <div className={`p-4 mb-6 shadow-sm ${darkMode ? 'bg-black' : 'bg-white'}`} style={{ borderRadius: '2px' }}>
-            <div className="flex flex-col md:flex-row md:items-center gap-4">
+          <div className="p-4 mb-6 rounded-xl border border-gray-200 dark:border-zinc-800 bg-[#F5F5F5] dark:bg-zinc-900/80 shadow-sm transition-all">
+            <div className="flex flex-col md:flex-row md:items-center gap-3">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-black dark:text-white" />
+                <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search products..."
+                  placeholder="Search products by title or description..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full pl-9 pr-4 py-2 text-sm border ${darkMode ? 'bg-black border-white text-white placeholder-white' : 'bg-white border-black text-black placeholder-black'} focus:ring-1 focus:ring-red-600`}
-                  style={{ borderRadius: '2px' }}
+                  className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border transition-all ${
+                    darkMode
+                      ? 'bg-zinc-950 border-zinc-700 text-white placeholder-zinc-500 focus:border-[#E5252A]'
+                      : 'bg-white border-gray-200 text-black placeholder-gray-400 focus:border-[#E5252A]'
+                  } focus:outline-none focus:ring-1 focus:ring-[#E5252A]`}
                 />
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-black border-white text-white' : 'bg-white border-black text-black'} focus:ring-1 focus:ring-red-600 cursor-pointer`}
-                  style={{ borderRadius: '2px' }}
+                  className={`px-3 py-2.5 text-sm rounded-lg border cursor-pointer transition-all ${
+                    darkMode
+                      ? 'bg-zinc-950 border-zinc-700 text-white focus:border-[#E5252A]'
+                      : 'bg-white border-gray-200 text-black focus:border-[#E5252A]'
+                  } focus:outline-none focus:ring-1 focus:ring-[#E5252A]`}
                 >
                   <option value="popular">Most Popular</option>
                   <option value="newest">Newest Products</option>
@@ -412,8 +423,11 @@ export default function ShopsPage() {
                     const cat = categories.find(c => String(c.id) === catId);
                     setSelectedCategory(cat || null);
                   }}
-                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-black border-white text-white' : 'bg-white border-black text-black'} focus:ring-1 focus:ring-red-600 cursor-pointer`}
-                  style={{ borderRadius: '2px' }}
+                  className={`px-3 py-2.5 text-sm rounded-lg border cursor-pointer transition-all ${
+                    darkMode
+                      ? 'bg-zinc-950 border-zinc-700 text-white focus:border-[#E5252A]'
+                      : 'bg-white border-gray-200 text-black focus:border-[#E5252A]'
+                  } focus:outline-none focus:ring-1 focus:ring-[#E5252A]`}
                 >
                   <option value="">All Shop Types</option>
                   {categories.map(cat => (
@@ -428,8 +442,11 @@ export default function ShopsPage() {
                   onChange={(e) => {
                     setSelectedProductCategory(e.target.value || null);
                   }}
-                  className={`px-3 py-2 text-sm border ${darkMode ? 'bg-black border-white text-white' : 'bg-white border-black text-black'} focus:ring-1 focus:ring-red-600 cursor-pointer`}
-                  style={{ borderRadius: '2px' }}
+                  className={`px-3 py-2.5 text-sm rounded-lg border cursor-pointer transition-all ${
+                    darkMode
+                      ? 'bg-zinc-950 border-zinc-700 text-white focus:border-[#E5252A]'
+                      : 'bg-white border-gray-200 text-black focus:border-[#E5252A]'
+                  } focus:outline-none focus:ring-1 focus:ring-[#E5252A]`}
                 >
                   <option value="">All Product Categories</option>
                   <option value="uncategorized">Uncategorised</option>
@@ -443,7 +460,7 @@ export default function ShopsPage() {
                 {(selectedCategory || selectedProductCategory || searchQuery || sortBy !== 'popular') && (
                   <button
                     onClick={clearFilters}
-                    className="text-xs font-bold uppercase tracking-wider text-red-600 hover:text-black whitespace-nowrap"
+                    className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-[#E5252A] hover:text-black dark:hover:text-white transition-colors whitespace-nowrap"
                   >
                     Clear All
                   </button>
@@ -461,30 +478,37 @@ export default function ShopsPage() {
           >
             <button
               onClick={() => handleCategorySelect(null)}
-              className={`flex shrink-0 items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors border shadow-sm ${!selectedCategory
-                  ? 'bg-red-600 border-red-600 text-white'
-                  : darkMode ? 'bg-black border-white text-white hover:bg-red-600' : 'bg-white border-black text-black hover:bg-red-600 hover:text-white'
-                }`}
-              style={{ borderRadius: '2px' }}
+              className={`flex shrink-0 items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all border shadow-sm ${
+                !selectedCategory
+                  ? 'bg-[#E5252A] border-[#E5252A] text-white'
+                  : darkMode
+                    ? 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:border-[#E5252A]'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-[#E5252A]'
+              }`}
             >
               All Shops
-              <span className="text-[10px] opacity-80">({products.length})</span>
+              <span className="text-[10px] opacity-75">({products.length})</span>
             </button>
 
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => handleCategorySelect(cat)}
-                className={`flex shrink-0 items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors border shadow-sm ${selectedCategory?.id === cat.id
-                    ? 'bg-red-600 border-red-600 text-white'
-                    : darkMode ? 'bg-black border-white text-white hover:bg-red-600' : 'bg-white border-black text-black hover:bg-red-600 hover:text-white'
+            {categories.map((cat) => {
+              const isSelected = selectedCategory?.id === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => handleCategorySelect(cat)}
+                  className={`flex shrink-0 items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all border shadow-sm ${
+                    isSelected
+                      ? 'bg-[#E5252A] border-[#E5252A] text-white'
+                      : darkMode
+                        ? 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:border-[#E5252A]'
+                        : 'bg-white border-gray-200 text-gray-700 hover:border-[#E5252A]'
                   }`}
-                style={{ borderRadius: '2px' }}
-              >
-                {cat.name}
-                <span className="text-[10px] opacity-80">({categoryCounts[cat.id] || 0})</span>
-              </button>
-            ))}
+                >
+                  {cat.name}
+                  <span className="text-[10px] opacity-75">({categoryCounts[cat.id] || 0})</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -494,28 +518,27 @@ export default function ShopsPage() {
             <LoadingSpinner size="lg" message="Loading shop products..." variant="dots" />
           </div>
         ) : filteredAndSortedProducts.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-black border border-black dark:border-white" style={{ borderRadius: '2px' }}>
-            <div className={`w-16 h-16 mx-auto mb-4 flex items-center justify-center ${darkMode ? 'bg-black' : 'bg-white'}`} style={{ borderRadius: '2px' }}>
-              <Store className="w-6 h-6 text-red-600" />
+          <div className="text-center py-16 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm">
+            <div className="w-14 h-14 mx-auto mb-3.5 rounded-full bg-red-50 dark:bg-red-950/40 flex items-center justify-center">
+              <Store className="w-6 h-6 text-[#E5252A]" />
             </div>
-            <h3 className={`text-base font-bold mb-1 ${darkMode ? 'text-white' : 'text-black'}`}>
+            <h3 className="text-base font-bold mb-1 text-[#151515] dark:text-white">
               No products available
             </h3>
-            <p className={`text-sm ${darkMode ? 'text-white' : 'text-black'}`}>
-              There are no products listed under this shop category.
+            <p className="text-xs sm:text-sm text-[#666666] dark:text-zinc-400 max-w-sm mx-auto">
+              There are no products listed under this category or matching your search.
             </p>
             {(selectedCategory || searchQuery) && (
               <button
                 onClick={clearFilters}
-                className="mt-4 bg-red-600 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider hover:bg-black transition-colors"
-                style={{ borderRadius: '2px' }}
+                className="mt-4 bg-[#E5252A] text-white px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg hover:bg-black transition-colors"
               >
                 Clear filters
               </button>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5">
             {filteredAndSortedProducts.map((product) => (
               <ShopProductCard
                 key={product.id}

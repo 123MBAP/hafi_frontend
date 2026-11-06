@@ -1,6 +1,7 @@
 import PaymentSettingsCard from '@/components/DashboardParts/PaymentCredentials';
 import { useDarkMode } from '@/context/DarkMode';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import PageHeader from '@/components/ui/PageHeader';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import RoleManagement from '../components/RoleManagement';
@@ -324,8 +325,7 @@ export default function AccountDashboard() {
           <p className={`mb-6 text-sm ${darkMode ? 'text-gray-450' : 'text-gray-550'}`}>{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 transition-all font-semibold"
-            style={{ borderRadius: '2px' }}
+            className="bg-brand-red hover:bg-red-700 text-white px-5 py-2.5 rounded-lg transition-all font-semibold text-sm"
           >
             Retry
           </button>
@@ -345,75 +345,51 @@ export default function AccountDashboard() {
   const displayStatus = typeof status === 'string' ? status.replace('_', ' ') : String(status);
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-850'} py-8`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-black text-white' : 'bg-white text-black'} py-6`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header - Styled like standard dashboard page titles */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <div className="flex items-center">
-            <Link
-              to="/profile"
-              className={`flex items-center text-sm font-semibold transition-colors ${darkMode ? 'text-emerald-400 hover:text-emerald-350' : 'text-emerald-600 hover:text-emerald-700'} mr-4`}
-            >
-              <ArrowLeft className="w-4 h-4 mr-1.5" />
-              Back to Profile
-            </Link>
-            <div>
-              <h1 className={`text-2xl font-bold tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                Account Dashboard
-              </h1>
-              {user_profile?.shopping_type_name && (
-                <div className="flex mt-1.5 animate-fadeIn">
-                  <span 
-                    className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 border ${
-                      darkMode ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' : 'bg-indigo-50 border-indigo-200 text-indigo-805'
-                    }`}
-                    style={{ borderRadius: '2px' }}
-                  >
-                    Premium Shop Category: {user_profile.shopping_type_name}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-          {!isPureCustomer && (
-            <div className="flex gap-2">
-              <Link
-                to="/dashboard/upgrade"
-                className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 font-semibold text-xs transition-all flex items-center shadow-sm uppercase tracking-wider"
-                style={{ borderRadius: '2px' }}
-              >
-                <Crown className="w-3.5 h-3.5 mr-1.5" />
-                Upgrade Plan
-              </Link>
-              <Link
-                to="/dashboard"
-                className={`px-4 py-2 border font-semibold text-xs transition-all flex items-center shadow-sm uppercase tracking-wider
-                  ${darkMode
-                    ? 'bg-gray-850 hover:bg-gray-800 border-gray-700 text-white'
-                    : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-750'}`}
-                style={{ borderRadius: '2px' }}
-              >
-                <TrendingUp className="w-3.5 h-3.5 mr-1.5" />
-                Main Dashboard
-              </Link>
-            </div>
-          )}
-        </div>
+        {/* Editorial Header */}
+        <PageHeader
+          breadcrumbs={[
+            { label: 'Home', href: '/' },
+            { label: 'Profile', href: '/profile' },
+            { label: 'Account Dashboard' },
+          ]}
+          title="Account Dashboard"
+          subtitle="View and manage your active plan, storage metrics, agent referral rewards, and role configurations."
+          badge={user_profile?.shopping_type_name ? `Shop: ${user_profile.shopping_type_name}` : undefined}
+          actions={
+            !isPureCustomer ? (
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/dashboard/upgrade"
+                  className="bg-[#E5252A] hover:bg-black text-white px-4 py-2 font-bold text-xs transition-colors flex items-center shadow-sm uppercase tracking-wider rounded-lg"
+                >
+                  <Crown className="w-3.5 h-3.5 mr-1.5" />
+                  Upgrade Plan
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className="px-4 py-2 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-[#151515] dark:text-white hover:border-[#E5252A] font-bold text-xs transition-colors flex items-center shadow-sm uppercase tracking-wider rounded-lg"
+                >
+                  <TrendingUp className="w-3.5 h-3.5 mr-1.5" />
+                  Main Dashboard
+                </Link>
+              </div>
+            ) : undefined
+          }
+        />
 
         {!isPureCustomer && (
-          <div
-            className={`p-4 mb-6 border shadow-sm ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-            style={{ borderRadius: '2px' }}
-          >
+          <div className="p-5 mb-6 rounded-xl border border-gray-200 dark:border-zinc-800 bg-[#F5F5F5] dark:bg-zinc-900/80 shadow-sm">
             <div className="text-center">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-450 dark:text-gray-450 block mb-1">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#666666] dark:text-zinc-400 block mb-1">
                 Subscription Time Remaining
               </span>
-              <div className={`text-3xl font-mono font-extrabold tracking-widest leading-none ${timeRemaining.isExpired ? 'text-red-505' : 'text-emerald-505 animate-pulse'}`}>
+              <div className={`text-3xl sm:text-4xl font-mono font-black tracking-widest leading-none ${timeRemaining.isExpired ? 'text-red-500' : 'text-[#E5252A]'}`}>
                 {timeRemaining.days}:{timeRemaining.hours}:{timeRemaining.minutes}:{timeRemaining.seconds}
               </div>
-              <div className="flex justify-center gap-6 mt-2 text-[9px] font-bold uppercase tracking-widest text-gray-450 dark:text-gray-550">
+              <div className="flex justify-center gap-6 mt-2 text-[9px] font-bold uppercase tracking-widest text-[#666666] dark:text-zinc-500">
                 <span>Days</span>
                 <span>Hours</span>
                 <span>Mins</span>
@@ -425,37 +401,34 @@ export default function AccountDashboard() {
 
         {/* Agent Referral Code Card */}
         {data?.referral_code && (
-          <div 
-            className={`p-6 border border-emerald-500 shadow-md mb-6 ${darkMode ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-300'}`}
-            style={{ borderRadius: '2px' }}
-          >
+          <div className="p-6 rounded-xl border border-red-200 dark:border-red-900/60 bg-red-50/50 dark:bg-red-950/20 shadow-sm mb-6">
             <div className="flex items-center mb-4">
-              <div className="p-2 bg-emerald-500 text-white rounded" style={{ borderRadius: '2px' }}>
+              <div className="p-2 rounded-lg bg-[#E5252A] text-white">
                 <Shield className="w-5 h-5" />
               </div>
               <div className="ml-3">
-                <h4 className={`text-sm font-bold uppercase tracking-wider ${darkMode ? 'text-emerald-400' : 'text-emerald-805'}`}>
+                <h4 className="text-sm font-bold uppercase tracking-wider text-[#E5252A]">
                   Agent Referral Code
                 </h4>
-                <p className={`text-[10px] uppercase font-bold tracking-widest ${darkMode ? 'text-emerald-500' : 'text-emerald-600'}`}>
+                <p className="text-[10px] uppercase font-bold tracking-widest text-[#666666] dark:text-zinc-400">
                   Valid for 24 hours after first payment
                 </p>
               </div>
             </div>
             
-            <div className="bg-white dark:bg-gray-900 border border-emerald-500/20 py-3 px-4 text-center select-all cursor-pointer hover:border-emerald-500 transition-colors" style={{ borderRadius: '2px' }} onClick={() => {
+            <div className="bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900/40 rounded-xl py-3 px-4 text-center select-all cursor-pointer hover:border-[#E5252A] transition-colors" onClick={() => {
               navigator.clipboard.writeText(data.referral_code?.code || '');
               alert('Referral code copied to clipboard!');
             }}>
-              <span className={`text-xl font-mono font-extrabold tracking-widest ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+              <span className="text-xl font-mono font-black tracking-widest text-[#E5252A]">
                 {data.referral_code.code}
               </span>
             </div>
 
-            <p className={`text-[10px] font-semibold text-center mt-3 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              Give this code to the agent who registered you. They will claim a registration reward!
+            <p className="text-xs text-center mt-3 text-[#666666] dark:text-zinc-400">
+              Share this code with the agent who registered your account to claim their reward.
             </p>
-            <p className={`text-[9px] font-bold text-center mt-1 text-red-500 dark:text-red-400`}>
+            <p className="text-[10px] font-bold text-center mt-1 text-[#E5252A]">
               Expires: {new Date(data.referral_code.expires_at).toLocaleString()}
             </p>
           </div>
@@ -463,18 +436,12 @@ export default function AccountDashboard() {
 
         {/* Payment Settings Card */}
         {!isPureCustomer && (user_profile?.roles?.includes('service_provider') || user_profile?.roles?.includes('seller')) && (
-          <div 
-            className={`border p-6 mb-6 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm`}
-            style={{ borderRadius: '2px' }}
-          >
+          <div className="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 mb-6 shadow-sm">
             <div className="flex items-center mb-6">
-              <div 
-                className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-200 text-emerald-650'}`}
-                style={{ borderRadius: '2px' }}
-              >
-                <CreditCard className="w-5 h-5 text-emerald-500" />
+              <div className="p-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-[#F5F5F5] dark:bg-zinc-800 text-[#E5252A]">
+                <CreditCard className="w-5 h-5 text-[#E5252A]" />
               </div>
-              <h3 className={`text-base font-bold uppercase tracking-tight ml-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              <h3 className="text-base font-bold uppercase tracking-tight ml-3.5 text-[#151515] dark:text-white">
                 Payment Settings
               </h3>
             </div>
@@ -495,32 +462,26 @@ export default function AccountDashboard() {
 
         {!isPureCustomer && (
           <>
-            {/* Section Header - Standard clean format */}
-            <h2 className={`text-lg font-bold tracking-tighter uppercase mt-8 mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            {/* Section Header */}
+            <h2 className="text-base sm:text-lg font-bold tracking-tight uppercase mt-8 mb-4 text-[#151515] dark:text-white">
               Storage Usage & Plan Analytics
             </h2>
 
             {/* Horizontal Subscription Status Header */}
-            <div 
-              className={`p-6 mb-6 border shadow-sm ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-              style={{ borderRadius: '2px' }}
-            >
+            <div className="p-6 mb-6 rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 items-center">
                 
                 {/* Col 1: Plan Icon & Name */}
                 <div className="flex items-center lg:col-span-2">
-                  <div 
-                    className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-205 text-emerald-650'}`}
-                    style={{ borderRadius: '2px' }}
-                  >
-                    <Crown className="w-6 h-6 text-emerald-500" />
+                  <div className="p-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-[#F5F5F5] dark:bg-zinc-800 text-[#E5252A]">
+                    <Crown className="w-6 h-6 text-[#E5252A]" />
                   </div>
-                  <div className="ml-4">
-                    <h3 className={`text-lg font-extrabold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <div className="ml-3.5">
+                    <h3 className="text-base sm:text-lg font-bold uppercase tracking-tight text-[#151515] dark:text-white">
                       {plan.status === 'none' || plan.status === 'expired' ? 'No Active Plan' : plan.plan_display_name}
                     </h3>
-                    <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-50'}`}>
-                      Current Plan
+                    <p className="text-xs text-[#666666] dark:text-zinc-400">
+                      Current Subscription
                     </p>
                   </div>
                 </div>
@@ -529,19 +490,19 @@ export default function AccountDashboard() {
                 <div>
                   {user_profile?.shopping_type_name ? (
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-450 dark:text-gray-400 block">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#666666] dark:text-zinc-400 block">
                         Shop Category
                       </span>
-                      <span className={`text-sm font-bold block mt-0.5 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      <span className="text-xs sm:text-sm font-bold block mt-0.5 text-[#151515] dark:text-white">
                         {user_profile.shopping_type_name}
                       </span>
                     </div>
                   ) : (
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-455 dark:text-gray-400 block">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#666666] dark:text-zinc-400 block">
                         Recent Subscribed
                       </span>
-                      <span className={`text-sm font-bold block mt-0.5 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      <span className="text-xs sm:text-sm font-bold block mt-0.5 text-[#151515] dark:text-white">
                         {plan.status === 'expired' && plan.recent_plan ? plan.recent_plan : (plan.status === 'none' ? 'None' : 'N/A')}
                       </span>
                     </div>
@@ -550,13 +511,13 @@ export default function AccountDashboard() {
 
                 {/* Col 3: Pricing Plan Fee */}
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-455 dark:text-gray-400 block">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#666666] dark:text-zinc-400 block">
                     Pricing
                   </span>
-                  <span className={`text-sm font-extrabold block mt-0.5 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <span className="text-sm font-black block mt-0.5 text-[#E5252A]">
                     {plan.status !== 'none' && plan.status !== 'expired' ? `${plan.monthly_fee?.toLocaleString()} RWF` : '0 RWF'}
                   </span>
-                  <span className="text-[9px] font-bold text-gray-450 dark:text-gray-450 uppercase tracking-widest block leading-none mt-0.5">
+                  <span className="text-[9px] font-bold text-[#666666] dark:text-zinc-400 uppercase tracking-widest block leading-none mt-0.5">
                     {plan.status !== 'none' && plan.status !== 'expired' ? 'per month' : 'Free Tier'}
                   </span>
                 </div>
@@ -565,23 +526,23 @@ export default function AccountDashboard() {
                 <div className="flex flex-col gap-1 text-xs">
                   {plan.subscription_start && (
                     <div className="flex justify-between">
-                      <span className="text-gray-455 dark:text-gray-400 font-medium">Subscribed:</span>
-                      <span className={`font-bold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <span className="text-[#666666] dark:text-zinc-400">Subscribed:</span>
+                      <span className="font-semibold text-[#151515] dark:text-white">
                         {new Date(plan.subscription_start).toLocaleDateString()}
                       </span>
                     </div>
                   )}
                   {plan.subscription_end && (
                     <div className="flex justify-between">
-                      <span className="text-gray-455 dark:text-gray-400 font-medium">Expires:</span>
-                      <span className={`font-bold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <span className="text-[#666666] dark:text-zinc-400">Expires:</span>
+                      <span className="font-semibold text-[#151515] dark:text-white">
                         {new Date(plan.subscription_end).toLocaleDateString()}
                       </span>
                     </div>
                   )}
-                  <div className="flex justify-between items-center mt-1 pt-1 border-t border-gray-200 dark:border-gray-700">
-                    <span className="text-gray-455 dark:text-gray-400 font-medium">Status:</span>
-                    <span className={`font-bold uppercase text-[9px] ${getStatusColor(plan.status || 'none')}`}>
+                  <div className="flex justify-between items-center mt-1 pt-1 border-t border-gray-100 dark:border-zinc-800">
+                    <span className="text-[#666666] dark:text-zinc-400">Status:</span>
+                    <span className={`font-bold uppercase text-[9px] px-2 py-0.5 rounded-full ${getStatusBg(plan.status || 'none')} ${getStatusColor(plan.status || 'none')}`}>
                       {plan.status === 'none' ? 'no active plan' : (plan.status === 'expired' ? 'expired' : 'active')}
                     </span>
                   </div>
@@ -597,19 +558,13 @@ export default function AccountDashboard() {
               <div className="xl:col-span-2 space-y-6">
                 
                 {/* Storage Overview Card */}
-                <div 
-                  className={`border p-6 shadow-sm ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-                  style={{ borderRadius: '2px' }}
-                >
+                <div className="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center">
-                      <div 
-                        className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-200 text-emerald-650'}`}
-                        style={{ borderRadius: '2px' }}
-                      >
-                        <HardDrive className="w-5 h-5 text-emerald-500" />
+                      <div className="p-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-[#F5F5F5] dark:bg-zinc-800 text-[#E5252A]">
+                        <HardDrive className="w-5 h-5 text-[#E5252A]" />
                       </div>
-                      <div className="ml-4">
+                      <div className="ml-3.5">
                         <h3 className={`text-base font-bold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           Storage Usage
                         </h3>
@@ -619,10 +574,7 @@ export default function AccountDashboard() {
                       </div>
                     </div>
                     
-                    <span 
-                      className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 border ${getStatusBg('active')} ${getStatusColor('active')}`}
-                      style={{ borderRadius: '2px' }}
-                    >
+                    <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-gray-200 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-gray-200">
                       {storage.usagePercentage}% Used
                     </span>
                   </div>
@@ -634,28 +586,24 @@ export default function AccountDashboard() {
                     <div>
                       <div className="flex justify-between items-center mb-2">
                         <div className="flex items-center">
-                          <span className={`text-xs font-semibold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'} mr-2`}>
+                          <span className="text-xs font-semibold uppercase tracking-wider text-[#666666] dark:text-zinc-400 mr-2">
                             Subscription Plan Storage
                           </span>
                           {plan.status === 'expired' && (
-                            <span 
-                              className="px-2 py-0.5 text-[9px] font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800"
-                              style={{ borderRadius: '2px' }}
-                            >
+                            <span className="px-2 py-0.5 text-[9px] font-bold bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-200 dark:border-red-900 rounded-full">
                               EXPIRED
                             </span>
                           )}
                         </div>
-                        <span className={`text-xs font-bold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        <span className="text-xs font-bold text-[#151515] dark:text-zinc-300">
                           {(storage.breakdown.baseStorageMB / 1024).toFixed(2)} GB
                         </span>
                       </div>
-                      <div className={`w-full h-3 overflow-hidden ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`} style={{ borderRadius: '2px' }}>
+                      <div className="w-full h-2.5 overflow-hidden rounded-full bg-gray-100 dark:bg-zinc-800">
                         <div
-                          className={`h-full transition-all duration-700 ${plan.status === 'expired'
-                            ? 'bg-gray-400 dark:bg-gray-650'
-                            : 'bg-emerald-500'
-                            }`}
+                          className={`h-full transition-all duration-700 rounded-full ${
+                            plan.status === 'expired' ? 'bg-gray-400 dark:bg-zinc-600' : 'bg-[#E5252A]'
+                          }`}
                           style={{
                             width: `${Math.min((storage.totalSizeMB / (storage.breakdown.baseStorageMB || 1)) * 100, 100)}%`
                           }}
@@ -663,41 +611,36 @@ export default function AccountDashboard() {
                       </div>
                     </div>
 
-                    {/* 2. Bought/Extra Storage */}
+                    {/* 2. Extra Storage */}
                     {storage.breakdown.purchasedStorageMB > 0 && (
                       <div>
                         <div className="flex justify-between items-center mb-2">
                           <div className="flex items-center">
-                            <span className={`text-xs font-semibold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'} mr-2`}>
+                            <span className="text-xs font-semibold uppercase tracking-wider text-[#666666] dark:text-zinc-400 mr-2">
                               Extra Purchased Storage
                             </span>
                             {storage.breakdown.purchasedStorageStatus === 'expired' && (
-                              <span 
-                                className="px-2 py-0.5 text-[9px] font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200"
-                                style={{ borderRadius: '2px' }}
-                              >
-                                UNRENEWED STORAGE PLAN
+                              <span className="px-2 py-0.5 text-[9px] font-bold bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-200 rounded-full">
+                                UNRENEWED
                               </span>
                             )}
                             {storage.breakdown.purchasedStorageStatus === 'active' && (
-                              <span 
-                                className="px-2 py-0.5 text-[9px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-450 border border-emerald-200 dark:border-emerald-800"
-                                style={{ borderRadius: '2px' }}
-                              >
+                              <span className="px-2 py-0.5 text-[9px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-full">
                                 ACTIVE
                               </span>
                             )}
                           </div>
-                          <span className={`text-xs font-bold ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                          <span className="text-xs font-bold text-[#151515] dark:text-zinc-300">
                             {(storage.breakdown.purchasedStorageMB / 1024).toFixed(2)} GB
                           </span>
                         </div>
-                        <div className={`w-full h-3 overflow-hidden ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`} style={{ borderRadius: '2px' }}>
+                        <div className="w-full h-2.5 overflow-hidden rounded-full bg-gray-100 dark:bg-zinc-800">
                           <div
-                            className={`h-full transition-all duration-700 ${storage.breakdown.purchasedStorageStatus === 'expired'
-                              ? 'bg-gray-400 dark:bg-gray-650'
-                              : 'bg-emerald-600'
-                              }`}
+                            className={`h-full transition-all duration-700 rounded-full ${
+                              storage.breakdown.purchasedStorageStatus === 'expired'
+                                ? 'bg-gray-400 dark:bg-zinc-600'
+                                : 'bg-[#151515] dark:bg-white'
+                            }`}
                             style={{
                               width: `${Math.min(
                                 Math.max(0, storage.totalSizeMB - storage.breakdown.baseStorageMB) / (storage.breakdown.purchasedStorageMB || 1) * 100,
@@ -712,82 +655,70 @@ export default function AccountDashboard() {
                     {/* 3. Total Storage */}
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className={`text-xs font-semibold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-[#666666] dark:text-zinc-400">
                           Total Storage Usage
                         </span>
                         <div className="text-right">
-                          <span className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'} mr-1.5`}>
+                          <span className="text-sm font-bold text-[#151515] dark:text-white mr-1.5">
                             {storage.totalSizeGB} GB
                           </span>
-                          <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                          <span className="text-xs text-[#666666] dark:text-zinc-500">
                             / {storage.storageLimitGB} GB
                           </span>
                         </div>
                       </div>
-                      <div className={`w-full h-3.5 overflow-hidden ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`} style={{ borderRadius: '2px' }}>
+                      <div className="w-full h-3 overflow-hidden rounded-full bg-gray-100 dark:bg-zinc-800">
                         <div
-                          className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-700"
+                          className="h-full bg-[#E5252A] transition-all duration-700 rounded-full"
                           style={{ width: `${Math.min(storage.usagePercentage, 100)}%` }}
                         ></div>
                       </div>
                       <div className="text-right mt-1.5">
-                        <span className={`text-[10px] font-bold ${darkMode ? 'text-gray-550' : 'text-gray-450'}`}>
+                        <span className="text-[10px] font-bold text-[#666666] dark:text-zinc-400">
                           {(parseFloat(storage.remainingMB) / 1024).toFixed(2)} GB free
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Storage Breakdown Grid - Sharp Flat Cards */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div 
-                      className={`p-4 border ${darkMode ? 'bg-gray-900/40 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                      style={{ borderRadius: '2px' }}
-                    >
-                      <div className="flex items-center mb-3">
-                        <FileImage className="w-4 h-4 text-emerald-500 mr-2" />
-                        <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Total Images</span>
+                  {/* Storage Breakdown Grid */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+                    <div className="p-4 rounded-xl border border-gray-200 dark:border-zinc-800 bg-[#F5F5F5] dark:bg-zinc-950/60 shadow-sm">
+                      <div className="flex items-center mb-2">
+                        <FileImage className="w-4 h-4 text-[#E5252A] mr-2" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#666666] dark:text-zinc-400">Images</span>
                       </div>
-                      <div className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      <div className="text-xl font-black text-[#151515] dark:text-white">
                         {storage.fileCount.images}
                       </div>
                     </div>
 
-                    <div 
-                      className={`p-4 border ${darkMode ? 'bg-gray-900/40 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                      style={{ borderRadius: '2px' }}
-                    >
-                      <div className="flex items-center mb-3">
-                        <FileVideo className="w-4 h-4 text-emerald-500 mr-2" />
-                        <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Total Videos</span>
+                    <div className="p-4 rounded-xl border border-gray-200 dark:border-zinc-800 bg-[#F5F5F5] dark:bg-zinc-950/60 shadow-sm">
+                      <div className="flex items-center mb-2">
+                        <FileVideo className="w-4 h-4 text-[#E5252A] mr-2" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#666666] dark:text-zinc-400">Videos</span>
                       </div>
-                      <div className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      <div className="text-xl font-black text-[#151515] dark:text-white">
                         {storage.fileCount.videos}
                       </div>
                     </div>
 
-                    <div 
-                      className={`p-4 border ${darkMode ? 'bg-gray-900/40 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                      style={{ borderRadius: '2px' }}
-                    >
-                      <div className="flex items-center mb-3">
-                        <Database className="w-4 h-4 text-emerald-500 mr-2" />
-                        <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Total Files</span>
+                    <div className="p-4 rounded-xl border border-gray-200 dark:border-zinc-800 bg-[#F5F5F5] dark:bg-zinc-950/60 shadow-sm">
+                      <div className="flex items-center mb-2">
+                        <Database className="w-4 h-4 text-[#E5252A] mr-2" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#666666] dark:text-zinc-400">Total Files</span>
                       </div>
-                      <div className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      <div className="text-xl font-black text-[#151515] dark:text-white">
                         {storage.fileCount.total}
                       </div>
                     </div>
 
-                    <div 
-                      className={`p-4 border ${darkMode ? 'bg-gray-900/40 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                      style={{ borderRadius: '2px' }}
-                    >
-                      <div className="flex items-center mb-3">
-                        <TrendingUp className="w-4 h-4 text-emerald-500 mr-2" />
-                        <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Avg File Size</span>
+                    <div className="p-4 rounded-xl border border-gray-200 dark:border-zinc-800 bg-[#F5F5F5] dark:bg-zinc-950/60 shadow-sm">
+                      <div className="flex items-center mb-2">
+                        <TrendingUp className="w-4 h-4 text-[#E5252A] mr-2" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#666666] dark:text-zinc-400">Avg Size</span>
                       </div>
-                      <div className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      <div className="text-xl font-black text-[#151515] dark:text-white">
                         {storage.breakdown.averageFileSize}
                       </div>
                     </div>
@@ -798,106 +729,76 @@ export default function AccountDashboard() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   
                   {/* Plan Features Card */}
-                  <div 
-                    className={`p-6 border shadow-sm ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-                    style={{ borderRadius: '2px' }}
-                  >
+                  <div className={`p-6 border rounded-xl shadow-sm ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'}`}>
                     <div className="flex items-center mb-6">
-                      <div 
-                        className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-200 text-emerald-650'}`}
-                        style={{ borderRadius: '2px' }}
-                      >
-                        <Shield className="w-5 h-5 text-emerald-500" />
+                      <div className={`p-2.5 rounded-lg border ${darkMode ? 'bg-zinc-800 border-zinc-700 text-brand-red' : 'bg-red-50 border-red-100 text-brand-red'}`}>
+                        <Shield className="w-5 h-5 text-brand-red" />
                       </div>
-                      <h3 className={`text-base font-bold ml-4 uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      <h3 className={`text-base font-bold ml-3.5 tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                         Plan Features
                       </h3>
                     </div>
-                    <div className="space-y-3">
-                      <div 
-                        className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/20 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                        style={{ borderRadius: '2px' }}
-                      >
+                    <div className="space-y-2.5">
+                      <div className={`flex items-center justify-between p-3 rounded-lg border ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
                         <div className="flex items-center">
-                          <Upload className="w-4 h-4 text-emerald-500 mr-3" />
-                          <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Image Uploads</span>
+                          <Upload className="w-4 h-4 text-brand-red mr-3" />
+                          <span className={`text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Image Uploads</span>
                         </div>
-                        <span 
-                          className={`px-2 py-0.5 text-[10px] font-bold border ${plan.features.can_upload_images
-                            ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
-                            : 'bg-red-100 text-red-650 border-red-200'
-                            }`}
-                          style={{ borderRadius: '2px' }}
-                        >
+                        <span className={`px-2 py-0.5 text-[11px] font-semibold rounded-md border ${plan.features.can_upload_images
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800'
+                            : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800'
+                          }`}>
                           {plan.features.can_upload_images ? 'Enabled' : 'Disabled'}
                         </span>
                       </div>
 
-                      <div 
-                        className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/20 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                        style={{ borderRadius: '2px' }}
-                      >
+                      <div className={`flex items-center justify-between p-3 rounded-lg border ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
                         <div className="flex items-center">
-                          <Download className="w-4 h-4 text-emerald-500 mr-3" />
-                          <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Video Uploads</span>
+                          <Download className="w-4 h-4 text-brand-red mr-3" />
+                          <span className={`text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Video Uploads</span>
                         </div>
-                        <span 
-                          className={`px-2 py-0.5 text-[10px] font-bold border ${plan.features.can_upload_videos
-                            ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
-                            : 'bg-red-100 text-red-650 border-red-200'
-                            }`}
-                          style={{ borderRadius: '2px' }}
-                        >
+                        <span className={`px-2 py-0.5 text-[11px] font-semibold rounded-md border ${plan.features.can_upload_videos
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800'
+                            : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800'
+                          }`}>
                           {plan.features.can_upload_videos ? 'Enabled' : 'Disabled'}
                         </span>
                       </div>
 
-                      <div 
-                        className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/20 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                        style={{ borderRadius: '2px' }}
-                      >
+                      <div className={`flex items-center justify-between p-3 rounded-lg border ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
                         <div className="flex items-center">
-                          <FileImage className="w-4 h-4 text-emerald-500 mr-3" />
-                          <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Max Image Size</span>
+                          <FileImage className="w-4 h-4 text-brand-red mr-3" />
+                          <span className={`text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Max Image Size</span>
                         </div>
                         <span className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           {plan.features.max_image_size_mb === 'Unlimited' ? 'Unlimited' : `${plan.features.max_image_size_mb} MB`}
                         </span>
                       </div>
 
-                      <div 
-                        className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/20 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                        style={{ borderRadius: '2px' }}
-                      >
+                      <div className={`flex items-center justify-between p-3 rounded-lg border ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
                         <div className="flex items-center">
-                          <FileVideo className="w-4 h-4 text-emerald-500 mr-3" />
-                          <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Max Video Size</span>
+                          <FileVideo className="w-4 h-4 text-brand-red mr-3" />
+                          <span className={`text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Max Video Size</span>
                         </div>
                         <span className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           {plan.features.max_video_size_mb === 'Unlimited' ? 'Unlimited' : `${plan.features.max_video_size_mb} MB`}
                         </span>
                       </div>
 
-                      <div 
-                        className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/20 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                        style={{ borderRadius: '2px' }}
-                      >
+                      <div className={`flex items-center justify-between p-3 rounded-lg border ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
                         <div className="flex items-center">
-                          <Database className="w-4 h-4 text-emerald-500 mr-3" />
-                          <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Max Products</span>
+                          <Database className="w-4 h-4 text-brand-red mr-3" />
+                          <span className={`text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Max Products</span>
                         </div>
                         <span className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           {plan.features.max_products}
                         </span>
                       </div>
 
-                      <div 
-                        className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/20 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                        style={{ borderRadius: '2px' }}
-                      >
+                      <div className={`flex items-center justify-between p-3 rounded-lg border ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
                         <div className="flex items-center">
-                          <Headphones className="w-4 h-4 text-emerald-500 mr-3" />
-                          <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Support Level</span>
+                          <Headphones className="w-4 h-4 text-brand-red mr-3" />
+                          <span className={`text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Support Level</span>
                         </div>
                         <span className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           {plan.features.support_level}
@@ -907,66 +808,54 @@ export default function AccountDashboard() {
                   </div>
 
                   {/* Recent Uploads Card */}
-                  <div 
-                    className={`p-6 border shadow-sm ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-                    style={{ borderRadius: '2px' }}
-                  >
+                  <div className={`p-6 border rounded-xl shadow-sm ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'}`}>
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center">
-                        <div 
-                          className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-200 text-emerald-650'}`}
-                          style={{ borderRadius: '2px' }}
-                        >
-                          <PieChart className="w-5 h-5 text-emerald-500" />
+                        <div className={`p-2.5 rounded-lg border ${darkMode ? 'bg-zinc-800 border-zinc-700 text-brand-red' : 'bg-red-50 border-red-100 text-brand-red'}`}>
+                          <PieChart className="w-5 h-5 text-brand-red" />
                         </div>
-                        <h3 className={`text-base font-bold ml-4 uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        <h3 className={`text-base font-bold ml-3.5 tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           Recent Uploads
                         </h3>
                       </div>
-                      <span 
-                        className={`px-2 py-0.5 text-[10px] font-bold border bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400`}
-                        style={{ borderRadius: '2px' }}
-                      >
+                      <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-zinc-700">
                         {recent_uploads.length} files
                       </span>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-2.5">
                       {recent_uploads.slice(0, 4).map((upload, index) => (
                         <div 
                           key={index} 
-                          className={`flex items-center justify-between p-3 border transition-all duration-200 hover:-translate-y-0.5
-                            ${darkMode ? 'bg-gray-900/30 border-gray-700' : 'bg-gray-50/50 border-gray-200'}`}
-                          style={{ borderRadius: '2px' }}
+                          className={`flex items-center justify-between p-3 rounded-lg border transition-all duration-200 hover:border-gray-300 dark:hover:border-zinc-700
+                            ${darkMode ? 'bg-zinc-800/30 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}
                         >
-                          <div className="flex items-center">
-                            {upload.type === 'image' ? (
-                              <div className="p-2 bg-emerald-500/10 text-emerald-500 border border-emerald-500/10 rounded mr-3" style={{ borderRadius: '2px' }}>
-                                <FileImage className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                              </div>
-                            ) : (
-                              <div className="p-2 bg-emerald-500/10 text-emerald-500 border border-emerald-500/10 rounded mr-3" style={{ borderRadius: '2px' }}>
-                                <FileVideo className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                              </div>
-                            )}
-                            <div>
-                              <div className={`font-bold text-xs uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                          <div className="flex items-center min-w-0 pr-3">
+                            <div className="p-2 bg-red-50 dark:bg-red-950/30 text-brand-red border border-red-100 dark:border-red-900/40 rounded-lg mr-3 shrink-0">
+                              {upload.type === 'image' ? (
+                                <FileImage className="w-4 h-4 text-brand-red" />
+                              ) : (
+                                <FileVideo className="w-4 h-4 text-brand-red" />
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <div className={`font-semibold text-xs truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                                 {upload.filename}
                               </div>
-                              <div className={`text-[10px] ${darkMode ? 'text-gray-450' : 'text-gray-450'}`}>
+                              <div className={`text-[10px] ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                 {new Date(upload.uploaded_at).toLocaleDateString()}
                               </div>
                             </div>
                           </div>
-                          <div className={`text-xs font-bold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          <div className={`text-xs font-bold shrink-0 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             {upload.size_mb} MB
                           </div>
                         </div>
                       ))}
 
                       {recent_uploads.length === 0 && (
-                        <div className={`text-center py-8 ${darkMode ? 'text-gray-555' : 'text-gray-455'} border border-dashed border-gray-200 dark:border-gray-700`} style={{ borderRadius: '2px' }}>
-                          <FileImage className="w-10 h-10 mx-auto mb-2 opacity-40 text-emerald-500" />
-                          <p className="text-xs font-semibold">No recent uploads</p>
+                        <div className={`text-center py-8 rounded-lg border border-dashed ${darkMode ? 'text-gray-500 border-zinc-800' : 'text-gray-400 border-gray-200'}`}>
+                          <FileImage className="w-9 h-9 mx-auto mb-2 opacity-40 text-gray-400" />
+                          <p className="text-xs font-medium">No recent uploads</p>
                         </div>
                       )}
                     </div>
@@ -977,22 +866,15 @@ export default function AccountDashboard() {
               {/* Right Column - Stats & Payment */}
               <div className="space-y-6">
 
-
                 {/* Storage Subscription Status Card (Right Column) */}
                 {storage.breakdown.purchasedStorageMB > 0 && (
-                  <div 
-                    className={`p-6 border shadow-sm ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-                    style={{ borderRadius: '2px' }}
-                  >
+                  <div className={`p-6 border rounded-xl shadow-sm ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'}`}>
                     <div className="flex items-center mb-6">
-                      <div 
-                        className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-200 text-emerald-650'}`}
-                        style={{ borderRadius: '2px' }}
-                      >
-                        <Database className="w-5 h-5 text-emerald-500" />
+                      <div className={`p-2.5 rounded-lg border ${darkMode ? 'bg-zinc-800 border-zinc-700 text-brand-red' : 'bg-red-50 border-red-100 text-brand-red'}`}>
+                        <Database className="w-5 h-5 text-brand-red" />
                       </div>
-                      <div className="ml-4">
-                        <h3 className={`text-base font-bold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      <div className="ml-3.5">
+                        <h3 className={`text-base font-bold tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           Extra Storage Plan
                         </h3>
                         <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -1001,35 +883,26 @@ export default function AccountDashboard() {
                       </div>
                     </div>
 
-                    <div className="space-y-3">
-                      <div 
-                        className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/20 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                        style={{ borderRadius: '2px' }}
-                      >
+                    <div className="space-y-2.5">
+                      <div className={`flex items-center justify-between p-3 rounded-lg border ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
                         <div className="flex items-center">
-                          <HardDrive className="w-4 h-4 text-emerald-500 mr-3" />
-                          <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Amount Bought</span>
+                          <HardDrive className="w-4 h-4 text-brand-red mr-3" />
+                          <span className={`text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Amount Bought</span>
                         </div>
-                        <span className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-gray-905'}`}>
+                        <span className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                           {(storage.breakdown.purchasedStorageMB / 1024).toFixed(2)} GB
                         </span>
                       </div>
 
-                      <div 
-                        className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/20 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                        style={{ borderRadius: '2px' }}
-                      >
+                      <div className={`flex items-center justify-between p-3 rounded-lg border ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
                         <div className="flex items-center">
-                          <Shield className="w-4 h-4 text-emerald-500 mr-3" />
-                          <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>Status</span>
+                          <Shield className="w-4 h-4 text-brand-red mr-3" />
+                          <span className={`text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Status</span>
                         </div>
-                        <span 
-                          className={`px-2 py-0.5 text-[9px] font-bold border uppercase ${storage.breakdown.purchasedStorageStatus === 'active'
-                            ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
-                            : 'bg-red-100 text-red-700 border-red-200'
-                            }`}
-                          style={{ borderRadius: '2px' }}
-                        >
+                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md border uppercase ${storage.breakdown.purchasedStorageStatus === 'active'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800'
+                            : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800'
+                          }`}>
                           {storage.breakdown.purchasedStorageStatus === 'expired' ? 'unrenewed storage plan' : (storage.breakdown.purchasedStorageStatus || 'N/A')}
                         </span>
                       </div>
@@ -1038,55 +911,40 @@ export default function AccountDashboard() {
                 )}
 
                 {/* File Statistics Card */}
-                <div 
-                  className={`p-6 border shadow-sm ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-                  style={{ borderRadius: '2px' }}
-                >
+                <div className={`p-6 border rounded-xl shadow-sm ${darkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'}`}>
                   <div className="flex items-center mb-6">
-                    <div 
-                      className={`p-3 border ${darkMode ? 'bg-gray-900 border-gray-700 text-emerald-450' : 'bg-gray-50 border-gray-200 text-emerald-650'}`}
-                      style={{ borderRadius: '2px' }}
-                    >
-                      <Database className="w-5 h-5 text-emerald-500" />
+                    <div className={`p-2.5 rounded-lg border ${darkMode ? 'bg-zinc-800 border-zinc-700 text-brand-red' : 'bg-red-50 border-red-100 text-brand-red'}`}>
+                      <Database className="w-5 h-5 text-brand-red" />
                     </div>
-                    <h3 className={`text-base font-bold ml-4 uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <h3 className={`text-base font-bold ml-3.5 tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                       File Statistics
                     </h3>
                   </div>
-                  <div className="space-y-3">
-                    <div 
-                      className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/40 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                      style={{ borderRadius: '2px' }}
-                    >
+                  <div className="space-y-2.5">
+                    <div className={`flex items-center justify-between p-3 rounded-lg border ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
                       <div className="flex items-center">
-                        <FileImage className="w-4 h-4 text-emerald-500 mr-3" />
-                        <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Total Images</span>
+                        <FileImage className="w-4 h-4 text-brand-red mr-3" />
+                        <span className={`text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Total Images</span>
                       </div>
                       <span className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                         {storage.fileCount.images}
                       </span>
                     </div>
 
-                    <div 
-                      className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/40 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                      style={{ borderRadius: '2px' }}
-                    >
+                    <div className={`flex items-center justify-between p-3 rounded-lg border ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
                       <div className="flex items-center">
-                        <FileVideo className="w-4 h-4 text-emerald-500 mr-3" />
-                        <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Total Videos</span>
+                        <FileVideo className="w-4 h-4 text-brand-red mr-3" />
+                        <span className={`text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Total Videos</span>
                       </div>
                       <span className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                         {storage.fileCount.videos}
                       </span>
                     </div>
 
-                    <div 
-                      className={`flex items-center justify-between p-3 border ${darkMode ? 'bg-gray-900/40 border-gray-700' : 'bg-gray-50 border-gray-200'}`}
-                      style={{ borderRadius: '2px' }}
-                    >
+                    <div className={`flex items-center justify-between p-3 rounded-lg border ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
                       <div className="flex items-center">
-                        <Database className="w-4 h-4 text-emerald-500 mr-3" />
-                        <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Total Files</span>
+                        <Database className="w-4 h-4 text-brand-red mr-3" />
+                        <span className={`text-xs font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Total Files</span>
                       </div>
                       <span className={`font-bold text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                         {storage.fileCount.total}

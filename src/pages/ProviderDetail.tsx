@@ -322,7 +322,7 @@ export default function ProviderDetail() {
       <div className={`min-h-screen flex items-center justify-center ${bgColor}`}>
         <div className="text-center">
           <h2 className={`text-xl font-bold mb-2 ${textColor}`}>Provider Not Found</h2>
-          <button onClick={() => navigate(-1)} className="px-4 py-2 bg-emerald-500 text-white rounded-sm">Go Back</button>
+          <button onClick={() => navigate(-1)} className="px-5 py-2.5 bg-[#E5252A] hover:bg-[#c91d22] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-colors shadow-xs">Go Back</button>
         </div>
       </div>
     );
@@ -334,10 +334,10 @@ export default function ProviderDetail() {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className={`mb-5 inline-flex items-center gap-2 rounded-md border px-4 py-2.5 text-sm font-semibold transition-colors ${
+          className={`mb-5 inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors ${
             darkMode
-              ? 'border-gray-700 bg-gray-900 text-gray-200 hover:bg-gray-800'
-              : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-100'
+              ? 'border-gray-800 bg-gray-900 text-gray-200 hover:bg-gray-800'
+              : 'border-[#E5E5E5] bg-white text-[#151515] hover:bg-[#F5F5F5]'
           }`}
         >
           <ArrowLeft className="h-4 w-4" />
@@ -348,27 +348,26 @@ export default function ProviderDetail() {
         <div className="flex items-center justify-between mb-4 lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
-            className={`flex items-center gap-2 px-3 py-1.5 text-sm ${cardBg} shadow-sm`}
-            style={{ borderRadius: '2px' }}
+            className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold uppercase tracking-wider rounded-xl border border-[#E5E5E5] dark:border-gray-800 ${cardBg} shadow-xs`}
           >
-            <MapPin className="w-4 h-4" />
+            <MapPin className="w-4 h-4 text-[#E5252A]" />
             Contact Info
           </button>
-          <div className={`text-sm ${mutedText}`}>
+          <div className={`text-xs font-bold uppercase tracking-wider ${mutedText}`}>
             {filteredImages.length} items
           </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar - Contact Info */}
-          <div className={`lg:w-64 flex-shrink-0 ${sidebarOpen ? 'fixed inset-0 z-50 lg:relative lg:z-auto' : 'hidden lg:block'}`}>
+          <div className={`lg:w-72 flex-shrink-0 ${sidebarOpen ? 'fixed inset-0 z-50 lg:relative lg:z-auto' : 'hidden lg:block'}`}>
             {sidebarOpen && (
-              <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+              <div className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-xs" onClick={() => setSidebarOpen(false)} />
             )}
-            <div className={`relative z-50 w-72 lg:w-full h-full lg:h-auto overflow-y-auto ${cardBg} border-0 shadow-sm p-4 ${sidebarOpen ? 'fixed left-0 top-0' : ''}`} style={{ borderRadius: '2px' }}>
+            <div className={`relative z-50 w-72 lg:w-full h-full lg:h-auto overflow-y-auto ${cardBg} border border-[#E5E5E5] dark:border-gray-800 rounded-2xl shadow-xs p-5 ${sidebarOpen ? 'fixed left-0 top-0' : ''}`}>
               <div className="flex justify-between items-center mb-4 lg:hidden">
-                <h3 className={`font-semibold ${textColor}`}>Contact Info</h3>
-                <button onClick={() => setSidebarOpen(false)} className="p-1">
+                <h3 className={`font-bold text-sm uppercase tracking-wider ${textColor}`}>Contact Info</h3>
+                <button onClick={() => setSidebarOpen(false)} className="p-1 rounded-lg text-gray-500 hover:text-[#151515]">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -378,27 +377,25 @@ export default function ProviderDetail() {
                 <img
                   src={profileImageUrl || '/default-profile.png'}
                   alt={provider.name || provider.email}
-                  className="w-20 h-20 object-cover"
-                  style={{ borderRadius: '2px' }}
+                  className="w-20 h-20 object-cover rounded-2xl border border-[#E5E5E5] dark:border-gray-800 shadow-xs"
                 />
               </div>
 
-              <h2 className={`text-center text-lg font-bold mb-4 ${textColor}`}>
+              <h2 className={`text-center text-base font-bold mb-4 ${textColor}`}>
                 {provider.name || provider.email.split('@')[0]}
               </h2>
 
               {/* Contact Information */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {provider.phone_number && (
                   <a
                     href={`tel:${provider.phone_number}`}
-                    className={`flex items-center gap-3 p-2 transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
-                    style={{ borderRadius: '2px' }}
+                    className={`flex items-center gap-3 p-2.5 rounded-xl transition-colors ${darkMode ? 'hover:bg-gray-800 text-gray-200' : 'hover:bg-[#F5F5F5] text-gray-700'}`}
                   >
-                    <PhoneIcon className="w-4 h-4 text-emerald-500" />
-                    <div>
-                      <div className={`text-xs ${mutedText}`}>Phone</div>
-                      <div className={`text-sm ${textColor}`}>{provider.phone_number}</div>
+                    <PhoneIcon className="w-4 h-4 text-[#E5252A] flex-shrink-0" />
+                    <div className="min-w-0">
+                      <div className={`text-[10px] font-bold uppercase tracking-wider ${mutedText}`}>Phone</div>
+                      <div className="text-xs font-semibold truncate">{provider.phone_number}</div>
                     </div>
                   </a>
                 )}
@@ -406,13 +403,12 @@ export default function ProviderDetail() {
                 {provider.email && (
                   <a
                     href={`mailto:${provider.email}`}
-                    className={`flex items-center gap-3 p-2 transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
-                    style={{ borderRadius: '2px' }}
+                    className={`flex items-center gap-3 p-2.5 rounded-xl transition-colors ${darkMode ? 'hover:bg-gray-800 text-gray-200' : 'hover:bg-[#F5F5F5] text-gray-700'}`}
                   >
-                    <Mail className="w-4 h-4 text-emerald-500" />
-                    <div>
-                      <div className={`text-xs ${mutedText}`}>Email</div>
-                      <div className={`text-sm ${textColor} truncate max-w-[180px]`}>{provider.email}</div>
+                    <Mail className="w-4 h-4 text-[#E5252A] flex-shrink-0" />
+                    <div className="min-w-0">
+                      <div className={`text-[10px] font-bold uppercase tracking-wider ${mutedText}`}>Email</div>
+                      <div className="text-xs font-semibold truncate max-w-[170px]">{provider.email}</div>
                     </div>
                   </a>
                 )}
@@ -422,13 +418,12 @@ export default function ProviderDetail() {
                     href={`https://wa.me/${provider.whatsapp_number.replace(/\D/g, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`flex items-center gap-3 p-2 transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
-                    style={{ borderRadius: '2px' }}
+                    className={`flex items-center gap-3 p-2.5 rounded-xl transition-colors ${darkMode ? 'hover:bg-gray-800 text-gray-200' : 'hover:bg-[#F5F5F5] text-gray-700'}`}
                   >
-                    <FaWhatsapp className="w-4 h-4 text-green-500" />
-                    <div>
-                      <div className={`text-xs ${mutedText}`}>WhatsApp</div>
-                      <div className={`text-sm ${textColor}`}>{provider.whatsapp_number}</div>
+                    <FaWhatsapp className="w-4 h-4 text-green-500 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <div className={`text-[10px] font-bold uppercase tracking-wider ${mutedText}`}>WhatsApp</div>
+                      <div className="text-xs font-semibold truncate">{provider.whatsapp_number}</div>
                     </div>
                   </a>
                 )}
@@ -444,12 +439,12 @@ export default function ProviderDetail() {
                   return (
                     <div className={`mt-4 pt-4 border-t ${borderColor}`}>
                       <div className="flex items-center gap-2 mb-2">
-                        <MapPin className="w-4 h-4 text-emerald-500" />
-                        <span className={`text-xs font-medium uppercase ${mutedText}`}>Location</span>
+                        <MapPin className="w-4 h-4 text-[#E5252A]" />
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${mutedText}`}>Location</span>
                       </div>
                       <div className="flex flex-wrap gap-1.5">
                         {addressParts.map((part, idx) => (
-                          <span key={idx} className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`} style={{ borderRadius: '2px' }}>
+                          <span key={idx} className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-[#F5F5F5] text-[#151515]'}`}>
                             {part}
                           </span>
                         ))}
@@ -464,17 +459,17 @@ export default function ProviderDetail() {
               {provider.bio && (
                 <div className={`mt-4 pt-4 border-t ${borderColor} text-xs leading-relaxed`}>
                   <div className="flex items-center gap-2 mb-2">
-                    <FileText className="w-4 h-4 text-emerald-500" />
-                    <span className={`text-xs font-medium uppercase ${mutedText}`}>About Provider</span>
+                    <FileText className="w-4 h-4 text-[#E5252A]" />
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ${mutedText}`}>About Provider</span>
                   </div>
                   <p className={`${
                     isBioExpanded ? '' : 'line-clamp-4'
-                  } ${textColor}`}>
+                  } ${textColor} text-xs leading-relaxed`}>
                     {provider.bio}
                   </p>
                   <button
                     onClick={() => setIsBioExpanded(!isBioExpanded)}
-                    className="text-emerald-500 hover:text-emerald-600 font-bold mt-1 text-[10px] uppercase tracking-wider block"
+                    className="text-[#E5252A] hover:text-[#c91d22] font-bold mt-1.5 text-[10px] uppercase tracking-wider block"
                   >
                     {isBioExpanded ? 'View Less' : 'View More'}
                   </button>
@@ -482,41 +477,24 @@ export default function ProviderDetail() {
               )}
 
               {/* Action Buttons */}
-              <div className="mt-6 pt-4 border-t ${borderColor} space-y-2">
+              <div className={`mt-6 pt-4 border-t ${borderColor} space-y-2.5`}>
                 {whatsappLink && (
                   <a
                     href={whatsappLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-colors ${darkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white`}
-                    style={{ borderRadius: '2px' }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-xs"
                   >
                     <FaWhatsapp className="w-4 h-4" />
                     WhatsApp
                   </a>
                 )}
                 <div className="w-full">
-                  <style>{`
-                    @keyframes chat-shake {
-                      0%, 100% { transform: scale(1); }
-                      10%, 30%, 50%, 70%, 90% { transform: scale(1.02) rotate(-0.5deg); }
-                      20%, 40%, 60%, 80% { transform: scale(1.02) rotate(0.5deg); }
-                    }
-                    @keyframes chat-pulse {
-                      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
-                      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-                      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-                    }
-                    .chat-wave-shake {
-                      animation: chat-shake 4s infinite ease-in-out, chat-pulse 2s infinite;
-                    }
-                  `}</style>
                   <button
                     onClick={handleChatClick}
-                    className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[11px] font-black uppercase tracking-widest shadow-md chat-wave-shake hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2"
-                    style={{ borderRadius: '2px' }}
+                    className="w-full py-3 bg-[#E5252A] hover:bg-[#c91d22] text-white text-xs font-bold uppercase tracking-wider shadow-xs hover:brightness-105 active:scale-98 transition-all flex items-center justify-center gap-2 rounded-xl"
                   >
-                    <MessageCircle className="w-4 h-4 animate-bounce" />
+                    <MessageCircle className="w-4 h-4" />
                     <span>Instant Chat Dialog</span>
                   </button>
                 </div>
@@ -530,32 +508,29 @@ export default function ProviderDetail() {
             <div className="flex flex-wrap gap-2 mb-6">
               <button
                 onClick={() => setSelectedType("all")}
-                className={`px-3 py-1.5 text-sm font-medium transition-colors ${selectedType === "all"
-                    ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                    : darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50'
-                  } shadow-sm`}
-                style={{ borderRadius: '2px' }}
+                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all rounded-xl ${selectedType === "all"
+                    ? 'bg-[#E5252A] text-white shadow-xs'
+                    : darkMode ? 'bg-gray-900 border border-gray-800 text-gray-300 hover:bg-gray-800' : 'bg-white border border-[#E5E5E5] text-gray-700 hover:bg-[#F5F5F5]'
+                  }`}
               >
                 All ({images.length})
               </button>
               <button
                 onClick={() => setSelectedType("product")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${selectedType === "product"
-                    ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                    : darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50'
-                  } shadow-sm`}
-                style={{ borderRadius: '2px' }}
+                className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all rounded-xl ${selectedType === "product"
+                    ? 'bg-[#E5252A] text-white shadow-xs'
+                    : darkMode ? 'bg-gray-900 border border-gray-800 text-gray-300 hover:bg-gray-800' : 'bg-white border border-[#E5E5E5] text-gray-700 hover:bg-[#F5F5F5]'
+                  }`}
               >
                 <Package className="w-3.5 h-3.5" />
                 Products ({images.filter(i => i.type === "product").length})
               </button>
               <button
                 onClick={() => setSelectedType("service")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors ${selectedType === "service"
-                    ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                    : darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50'
-                  } shadow-sm`}
-                style={{ borderRadius: '2px' }}
+                className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all rounded-xl ${selectedType === "service"
+                    ? 'bg-[#E5252A] text-white shadow-xs'
+                    : darkMode ? 'bg-gray-900 border border-gray-800 text-gray-300 hover:bg-gray-800' : 'bg-white border border-[#E5E5E5] text-gray-700 hover:bg-[#F5F5F5]'
+                  }`}
               >
                 <Briefcase className="w-3.5 h-3.5" />
                 Services ({images.filter(i => i.type === "service").length})
@@ -564,20 +539,19 @@ export default function ProviderDetail() {
 
             {/* Items Grid */}
             {filteredImages.length === 0 ? (
-              <div className={`text-center py-16 ${mutedText}`}>
+              <div className={`text-center py-16 text-xs font-bold uppercase tracking-wider ${mutedText}`}>
                 No items found in this category.
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filteredImages.map((img, idx) => (
                   <div
                     key={idx}
-                    className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-md flex flex-col h-full ${cardBg} border-0 shadow-sm`}
-                    style={{ borderRadius: '2px' }}
+                    className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-md flex flex-col h-full ${cardBg} border border-[#E5E5E5] dark:border-gray-800 rounded-2xl hover:border-[#E5252A]/40`}
                   >
                     {/* Image */}
                     <div
-                      className="relative h-40 overflow-hidden bg-gray-100 dark:bg-gray-700"
+                      className="relative h-44 overflow-hidden bg-[#F5F5F5] dark:bg-gray-950"
                       onClick={() => navigate(`/product-or-service-detail/${providerId}/${img.productId}`)}
                     >
                       {(() => {
@@ -595,63 +569,61 @@ export default function ProviderDetail() {
                         );
                       })()}
                       {img.type === 'product' && img.inStock === false && (
-                        <div className="absolute top-2 left-2 px-1.5 py-0.5 text-[10px] font-bold bg-red-600 text-white z-10 shadow-sm" style={{ borderRadius: '2px' }}>
+                        <div className="absolute top-2.5 left-2.5 px-2.5 py-0.5 text-[10px] font-bold bg-[#E5252A] text-white z-10 rounded-full shadow-xs uppercase tracking-wider">
                           OUT OF STOCK
                         </div>
                       )}
                       {img.type === "product" ? (
-                        <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-medium bg-emerald-500 text-white" style={{ borderRadius: '2px' }}>
+                        <div className="absolute top-2.5 right-2.5 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#0A0A0A] text-white rounded-full shadow-xs">
                           Product
                         </div>
                       ) : (
-                        <div className="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-medium bg-blue-500 text-white" style={{ borderRadius: '2px' }}>
+                        <div className="absolute top-2.5 right-2.5 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#E5252A] text-white rounded-full shadow-xs">
                           Service
                         </div>
                       )}
                     </div>
 
                     {/* Content */}
-                    <div className="p-3 flex-1 flex flex-col">
-                      <h3 className={`text-sm font-semibold line-clamp-1 mb-1 ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors`}>
-                        {img.title || 'Untitled'}
-                      </h3>
-                      
-                      {img.desc && (
-                        <p className={`text-xs line-clamp-2 mb-2 ${mutedText}`}>
-                          {img.desc}
-                        </p>
-                      )}
+                    <div className="p-4 flex-1 flex flex-col justify-between">
+                      <div>
+                        <h3 className={`text-sm font-bold line-clamp-1 mb-1 ${darkMode ? 'text-white group-hover:text-[#E5252A]' : 'text-[#151515] group-hover:text-[#E5252A]'} transition-colors`}>
+                          {img.title || 'Untitled'}
+                        </h3>
+                        
+                        {img.desc && (
+                          <p className={`text-xs line-clamp-2 mb-3 leading-relaxed ${mutedText}`}>
+                            {img.desc}
+                          </p>
+                        )}
+                      </div>
 
-                      <div className="mt-auto">
-                        <div className={`text-base font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                      <div className="mt-2 pt-2 border-t border-[#E5E5E5] dark:border-gray-800">
+                        <div className={`text-sm font-extrabold mb-2.5 ${darkMode ? 'text-white' : 'text-[#151515]'}`}>
                           {img.price ? `RWF ${img.price.toLocaleString()}` : "Contact for price"}
                         </div>
                         
-                        <div className="mt-2">
+                        <div>
                           {img.type === 'product' && img.inStock === false ? (
                             <button
                               disabled
-                              className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium bg-gray-400 dark:bg-gray-700 text-gray-200 dark:text-gray-400 cursor-not-allowed"
-                              style={{ borderRadius: '2px' }}
+                              className="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-bold uppercase tracking-wider bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 rounded-xl cursor-not-allowed"
                             >
                               Out of Stock
                             </button>
                           ) : (
                             <button
                               onClick={(e) => { e.stopPropagation(); img.type === "product" ? handleBuyProduct(img) : handleBookService(img); }}
-                              className={`w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium transition-colors 
-                                ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
-                                  : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
-                              style={{ borderRadius: '2px' }}
+                              className="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-bold uppercase tracking-wider transition-all rounded-xl bg-[#E5252A] text-white hover:bg-[#c91d22] shadow-xs"
                             >
                               {img.type === "product" ? (
                                 <>
-                                  <ShoppingBag className="w-3 h-3" />
+                                  <ShoppingBag className="w-3.5 h-3.5" />
                                   Buy
                                 </>
                               ) : (
                                 <>
-                                  <Calendar className="w-3 h-3" />
+                                  <Calendar className="w-3.5 h-3.5" />
                                   Book
                                 </>
                               )}
@@ -670,7 +642,7 @@ export default function ProviderDetail() {
 
       {/* Chat Modal */}
       {showChat && providerId && customerId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="w-full max-w-2xl max-h-[90vh]">
             <ChatBox
               providerId={providerId}
@@ -688,8 +660,7 @@ export default function ProviderDetail() {
           <div className="relative max-w-5xl max-h-[95vh]" onClick={e => e.stopPropagation()}>
             <button
               onClick={closeModal}
-              className="absolute -top-12 right-0 p-2 bg-white/10 hover:bg-white/20 text-white transition-colors"
-              style={{ borderRadius: '2px' }}
+              className="absolute -top-12 right-0 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -698,22 +669,20 @@ export default function ProviderDetail() {
               <>
                 <button
                   onClick={prevModalView}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white transition-colors"
-                  style={{ borderRadius: '2px' }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
                 >
                   <ChevronRight className="w-5 h-5 rotate-180" />
                 </button>
                 <button
                   onClick={nextModalView}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white transition-colors"
-                  style={{ borderRadius: '2px' }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </>
             )}
 
-            <div className="bg-black overflow-hidden">
+            <div className="bg-black overflow-hidden rounded-2xl">
               {(() => {
                 const currentUrl = modalViews[modalViewIndex] || modalImage;
                 const isVideo = selectedModalItem.fileType === 'video' ||
@@ -725,23 +694,23 @@ export default function ProviderDetail() {
                     src={toAbsoluteMediaUrl(currentUrl)}
                     controls
                     autoPlay={false}
-                    className="max-w-[90vw] max-h-[80vh]"
+                    className="max-w-[90vw] max-h-[80vh] rounded-2xl"
                     style={{ maxWidth: '90vw', maxHeight: '80vh', objectFit: 'contain' }}
                   />
                 ) : (
                   <img
                     src={toAbsoluteMediaUrl(currentUrl)}
                     alt={selectedModalItem.title || 'Full size'}
-                    className="max-w-[90vw] max-h-[80vh]"
+                    className="max-w-[90vw] max-h-[80vh] rounded-2xl"
                     style={{ maxWidth: '90vw', maxHeight: '80vh', objectFit: 'contain' }}
                   />
                 );
               })()}
             </div>
 
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-3 py-1.5" style={{ borderRadius: '2px' }}>
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-full border border-white/10 shadow-lg">
               <div className="flex items-center gap-3 text-xs">
-                <span className="font-medium">{selectedModalItem.title}</span>
+                <span className="font-semibold">{selectedModalItem.title}</span>
                 {modalViews.length > 1 && (
                   <span className="text-gray-300">{modalViewIndex + 1} / {modalViews.length}</span>
                 )}

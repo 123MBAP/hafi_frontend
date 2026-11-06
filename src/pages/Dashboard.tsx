@@ -8,7 +8,9 @@ import SubscriptionBanner from '../components/DashboardParts/PlansScrollingBanne
 import ProductUploadCard from '../components/DashboardParts/ProductUploadCard';
 import ServiceUploadCard from '../components/DashboardParts/ServiceUploadCard';
 import ServicePromptBanner from '../components/DashboardParts/ServicePromptBanner';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { API_BASE } from '../api/apiClient';
+import { uploadMultipleFilesToR2 } from '../services/r2UploadService';
 type MediaType = "product" | "service";
 type FileType = "image" | "video" | "mixed";
 
@@ -103,6 +105,12 @@ export default function Dashboard() {
   const [deletingImageIds, setDeletingImageIds] = useState<Set<string>>(new Set());
   const [pendingDeleteQueue, setPendingDeleteQueue] = useState<Map<string, UploadedMedia>>(new Map());
 
+  // Edit product in upload fields mode
+  const [editingProduct, setEditingProduct] = useState<UploadedMedia | null>(null);
+  const [existingProductImageUrl, setExistingProductImageUrl] = useState<string>('');
+  const [existingProductViews, setExistingProductViews] = useState<string[]>([]);
+  const [existingProductVideoUrl, setExistingProductVideoUrl] = useState<string>('');
+
   // For upload
   const [productTitle, setProductTitle] = useState('');
   const [productDesc, setProductDesc] = useState('');
@@ -124,6 +132,7 @@ export default function Dashboard() {
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
 
   const [service, setService] = useState<{ id?: string; title?: string; custom_type?: string; specific_features?: boolean; features?: ServiceFeature[] } | null>(null);
+  const [serviceLoading, setServiceLoading] = useState(true);
   const [featureValues, setFeatureValues] = useState<Record<string, any>>({});
 
   const serviceOnlyMode = String(service?.custom_type ?? 'general').trim().toLowerCase() !== 'general';
@@ -159,9 +168,7 @@ export default function Dashboard() {
         return res.json();
       })
       .then(data => {
-        console.log('📦 RAW DATA FROM BACKEND:', data);
-
-        if (Array.isArray(data.product)) {
+          if (Array.isArray(data.product)) {
           const processedProducts = data.product.map((media: any, i: number) => ({
             url: media.url,
             id: media.id,
@@ -185,8 +192,7 @@ export default function Dashboard() {
             mediaFiles: media.mediaFiles, // Include mediaFiles
           }));
 
-          console.log('🔧 PROCESSED PRODUCTS:', processedProducts);
-          setUploadedProductImages(processedProducts);
+               setUploadedProductImages(processedProducts);
         }
 
         if (Array.isArray(data.service)) {
@@ -204,8 +210,6 @@ export default function Dashboard() {
             mediaFiles: media.mediaFiles, // Include mediaFiles
             feature_values: media.feature_values || {},
           }));
-
-          console.log('🔧 PROCESSED SERVICES:', processedServices);
           setUploadedServiceImages(processedServices);
         }
       })
@@ -246,8 +250,7 @@ export default function Dashboard() {
             }
 
             if (Array.isArray(data.service)) {
-              console.log('🔍 [DEBUG] Raw service data from backend:', data.service);
-              setUploadedServiceImages(data.service.map((img: any, i: number) => {
+                           setUploadedServiceImages(data.service.map((img: any, i: number) => {
                 // Detect file type from URL
                 const isVideo = img.url && (
                   img.url.includes('.mp4') ||
@@ -385,12 +388,123 @@ export default function Dashboard() {
     });
   };
 
-  // Upload handlers
+  // Upload / Update handlers
   const handleProductUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!providerId) return;
 
     if (isUploadingProduct) return;
+
+    // Handle Edit Mode submission
+    if (editingProduct) {
+      if (!productTitle.trim() || !productDesc.trim() || !productPrice.trim()) {
+        alert('Please fill all required fields');
+        return;
+      }
+
+      setIsUploadingProduct(true);
+      try {
+        let finalMainImageUrl = existingProductImageUrl;
+        const finalViews: string[] = [...existingProductViews];
+        let finalVideoUrl = existingProductVideoUrl;
+
+        // 1. Upload new main image if selected
+        if (productImages.length > 0) {
+          setProductUploadProgress(10);
+          const uploadedMain = await uploadMultipleFilesToR2(
+            [{ file: productImages[0], isMain: true, isView: false }],
+            { category: 'products', onProgress: (p) => setProductUploadProgress(Math.round(p * 0.4)) }
+          );
+          if (uploadedMain[0]?.url) {
+            finalMainImageUrl = uploadedMain[0].url;
+          }
+        }
+
+        // 2. Upload new view images if selected
+        const newViewFiles = productViews.flat();
+        if (newViewFiles.length > 0) {
+          const uploadedViews = await uploadMultipleFilesToR2(
+            newViewFiles.map(f => ({ file: f, isMain: false, isView: true })),
+            { category: 'products', onProgress: (p) => setProductUploadProgress(40 + Math.round(p * 0.3)) }
+          );
+          uploadedViews.forEach(v => {
+            if (v.url) finalViews.push(v.url);
+          });
+        }
+
+        // 3. Upload new video if selected
+        if (productVideos.length > 0) {
+          const uploadedVideos = await uploadMultipleFilesToR2(
+            [{ file: productVideos[0], isMain: false, isView: false }],
+            { category: 'products', onProgress: (p) => setProductUploadProgress(70 + Math.round(p * 0.3)) }
+          );
+          if (uploadedVideos[0]?.url) {
+            finalVideoUrl = uploadedVideos[0].url;
+          }
+        }
+
+        setProductUploadProgress(100);
+
+        const res = await fetch(`${API_BASE}/api/media/${editingProduct.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: productTitle,
+            desc: productDesc,
+            price: parseFloat(productPrice),
+            madeInRwanda: productMadeInRwanda,
+            used: productUsed,
+            pricingUnit: productPricingUnit,
+            featureValues: (service?.specific_features && service?.features) || service?.custom_type?.toLowerCase() === 'real_estate' ? featureValues : undefined,
+            mainImageUrl: finalMainImageUrl,
+            views: finalViews,
+            videoUrl: finalVideoUrl,
+          })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || 'Failed to update product');
+        }
+
+        const data = await res.json();
+        console.log('✅ Product updated successfully:', data);
+
+        // Update local state
+        setUploadedProductImages(prev =>
+          prev.map(img =>
+            img.id === editingProduct.id
+              ? {
+                  ...img,
+                  title: productTitle,
+                  desc: productDesc,
+                  price: parseFloat(productPrice),
+                  madeInRwanda: productMadeInRwanda,
+                  used: productUsed,
+                  pricingUnit: productPricingUnit,
+                  url: finalMainImageUrl || img.url,
+                  views: finalViews,
+                  mediaFiles: [
+                    ...(finalMainImageUrl ? [{ id: `${img.id}-main`, url: finalMainImageUrl, type: 'image' as const, fileType: 'image' as const, size: 0, filename: 'main.jpg', title: productTitle, desc: productDesc, visible: true }] : []),
+                    ...finalViews.map((v, i) => ({ id: `${img.id}-view-${i}`, url: v, type: 'image' as const, fileType: 'image' as const, size: 0, filename: `view-${i}.jpg`, title: productTitle, desc: productDesc, visible: true })),
+                    ...(finalVideoUrl ? [{ id: `${img.id}-video`, url: finalVideoUrl, type: 'video' as const, fileType: 'video' as const, size: 0, filename: 'video.mp4', title: productTitle, desc: productDesc, visible: true }] : [])
+                  ]
+                }
+              : img
+          )
+        );
+
+        alert('Product updated successfully!');
+        handleCancelEditProduct();
+      } catch (err: any) {
+        console.error('Update error:', err);
+        alert(err.message || 'Failed to update product');
+      } finally {
+        setIsUploadingProduct(false);
+        setProductUploadProgress(null);
+      }
+      return;
+    }
 
     const hasImages = productImages.length > 0;
     const hasVideos = productVideos.length > 0;
@@ -407,39 +521,76 @@ export default function Dashboard() {
 
     setIsUploadingProduct(true);
     try {
-      const formData = new FormData();
-      formData.append('providerId', providerId);
-      formData.append('title', productTitle);
-      formData.append('desc', productDesc);
-      formData.append('price', productPrice);
-      formData.append('madeInRwanda', String(productMadeInRwanda));
-      formData.append('used', String(productUsed));
-      formData.append('pricingUnit', productPricingUnit);
+      let data: any = null;
 
-      // Add feature values if service has specific_features
-      if (service?.specific_features && service?.features) {
-        formData.append('featureValues', JSON.stringify(featureValues));
-      }
+      // Try Direct Cloudflare R2 Upload First
+      try {
+        const itemsToUpload: Array<{ file: File; isMain?: boolean; isView?: boolean }> = [];
+        productImages.forEach((img, idx) => itemsToUpload.push({ file: img, isMain: idx === 0, isView: idx > 0 }));
+        productVideos.forEach(vid => itemsToUpload.push({ file: vid, isMain: false, isView: false }));
+        productViews.flat().forEach(viewImg => itemsToUpload.push({ file: viewImg, isMain: false, isView: true }));
 
-      // Add images
-      productImages.forEach(image => formData.append('images', image));
+        setProductUploadProgress(0);
+        const r2Files = await uploadMultipleFilesToR2(itemsToUpload, {
+          category: 'products',
+          onProgress: (percent) => setProductUploadProgress(percent),
+        });
 
-      // Add videos
-      productVideos.forEach(video => formData.append('videos', video));
+        const uploadUrl = `${API_BASE}/api/upload/products/unified`;
+        const res = await fetch(uploadUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            providerId,
+            title: productTitle,
+            desc: productDesc,
+            price: productPrice,
+            madeInRwanda: productMadeInRwanda,
+            used: productUsed,
+            pricingUnit: productPricingUnit,
+            featureValues: (service?.specific_features && service?.features) || service?.custom_type?.toLowerCase() === 'real_estate' ? featureValues : undefined,
+            r2Files
+          })
+        });
 
-      // Add view images
-      productViews.flat().forEach(viewImage => formData.append('viewImages', viewImage));
-
-      const uploadUrl = `${API_BASE}/api/upload/products/unified`;
-      setProductUploadProgress(0);
-      const data = await uploadWithProgress(
-        "POST",
-        uploadUrl,
-        formData,
-        (percent) => {
-          setProductUploadProgress(percent);
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || 'Failed to save product media to database');
         }
-      );
+
+        data = await res.json();
+      } catch (r2Error: any) {
+        console.warn('Direct R2 upload not available or failed, falling back to server upload:', r2Error.message);
+        
+        // Fallback: Legacy uploadWithProgress
+        const formData = new FormData();
+        formData.append('providerId', providerId);
+        formData.append('title', productTitle);
+        formData.append('desc', productDesc);
+        formData.append('price', productPrice);
+        formData.append('madeInRwanda', String(productMadeInRwanda));
+        formData.append('used', String(productUsed));
+        formData.append('pricingUnit', productPricingUnit);
+
+        if (service?.specific_features && service?.features || service?.custom_type?.toLowerCase() === 'real_estate') {
+          formData.append('featureValues', JSON.stringify(featureValues));
+        }
+
+        productImages.forEach(image => formData.append('images', image));
+        productVideos.forEach(video => formData.append('videos', video));
+        productViews.flat().forEach(viewImage => formData.append('viewImages', viewImage));
+
+        const uploadUrl = `${API_BASE}/api/upload/products/unified`;
+        setProductUploadProgress(0);
+        data = await uploadWithProgress(
+          "POST",
+          uploadUrl,
+          formData,
+          (percent) => {
+            setProductUploadProgress(percent);
+          }
+        );
+      }
 
       // Create unified product entry for display (typed to satisfy TS)
       const unifiedProduct: UploadedMedia = {
@@ -474,15 +625,17 @@ export default function Dashboard() {
       setProductUsed(false);
       setProductPricingUnit('Per Item / Piece');
       // Reset feature values
-      if (service?.specific_features && service?.features) {
+      if ((service?.specific_features && service?.features) || service?.custom_type?.toLowerCase() === 'real_estate') {
         const resetValues: Record<string, any> = {};
-        service.features.forEach((feature) => {
-          if (feature.type === 'simple') {
-            resetValues[feature.name] = '';
-          } else if (feature.type === 'object') {
-            resetValues[feature.name] = {};
-          }
-        });
+        if (service?.features && Array.isArray(service.features)) {
+          service.features.forEach((feature) => {
+            if (feature.type === 'simple') {
+              resetValues[feature.name] = '';
+            } else if (feature.type === 'object') {
+              resetValues[feature.name] = {};
+            }
+          });
+        }
         setFeatureValues(resetValues);
       }
 
@@ -503,8 +656,71 @@ export default function Dashboard() {
     setIsUploadingService(true);
     try {
 
-      // Upload images
+      let uploadedGroupId: string | null = null; // Track group_id for real estate
+      let uploadedSuccessfullyToR2 = false;
+
+      // Try Direct Cloudflare R2 Upload First
+      const itemsToUpload: Array<{ file: File; isMain?: boolean; isView?: boolean }> = [];
       for (let i = 0; i < serviceImages.length; i++) {
+        itemsToUpload.push({ file: serviceImages[i], isMain: i === 0, isView: false });
+        const views = serviceViews[i] || [];
+        views.forEach(v => itemsToUpload.push({ file: v, isMain: false, isView: true }));
+      }
+      serviceVideos.forEach(v => itemsToUpload.push({ file: v, isMain: false, isView: false }));
+
+      if (itemsToUpload.length > 0) {
+        try {
+          const r2Files = await uploadMultipleFilesToR2(itemsToUpload, {
+            category: service?.custom_type?.toLowerCase() === 'real_estate' ? 'real_estate' : 'services',
+          });
+
+          const res = await fetch(`${API_BASE}/api/upload/services/unified`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              providerId,
+              title: serviceTitle,
+              desc: serviceDesc,
+              price: servicePrice,
+              featureValues: (service?.specific_features && service?.features) || service?.custom_type?.toLowerCase() === 'real_estate' ? featureValues : undefined,
+              r2Files
+            })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            uploadedGroupId = data.groupId || null;
+            uploadedSuccessfullyToR2 = true;
+
+            const mainFiles = data.files.filter((f: any) => f.isMain || !f.isView);
+            const viewUrls = data.files.filter((f: any) => f.isView).map((f: any) => f.url);
+
+            for (const mf of mainFiles) {
+              setUploadedServiceImages(prev => [
+                ...prev,
+                {
+                  id: mf.id,
+                  url: mf.url,
+                  title: serviceTitle || `Service ${mf.type} ${prev.length + 1}`,
+                  desc: serviceDesc,
+                  price: parseFloat(servicePrice),
+                  type: "service",
+                  fileType: mf.type === 'video' ? 'video' : 'image',
+                  visible: true,
+                  views: viewUrls,
+                  ...extraFieldsData,
+                }
+              ]);
+            }
+          }
+        } catch (r2Err: any) {
+          console.warn('Direct R2 service upload failed or not configured, using fallback:', r2Err.message);
+        }
+      }
+
+      if (!uploadedSuccessfullyToR2) {
+        // Fallback: Upload images
+        for (let i = 0; i < serviceImages.length; i++) {
         const mainImg = serviceImages[i];
         const views = serviceViews[i] || [];
         const formData = new FormData();
@@ -515,7 +731,7 @@ export default function Dashboard() {
         formData.append('desc', serviceDesc);
         formData.append('price', servicePrice);
         // Add feature values if service has specific_features
-        if (service?.specific_features && service?.features) {
+        if ((service?.specific_features && service?.features) || service?.custom_type?.toLowerCase() === 'real_estate') {
           const featureValuesJson = JSON.stringify(featureValues);
           formData.append('featureValues', featureValuesJson);
           console.log(`📤 [FRONTEND] Image ${i + 1} - Sending featureValues:`, featureValuesJson);
@@ -533,6 +749,7 @@ export default function Dashboard() {
             continue;
           }
           if (data.url) {
+            uploadedGroupId = data.groupId || data.group_id || uploadedGroupId || null;
             setUploadedServiceImages(prev => [
               ...prev,
               {
@@ -564,7 +781,7 @@ export default function Dashboard() {
         formData.append('desc', serviceDesc);
         formData.append('price', servicePrice);
         // Add feature values if service has specific_features
-        if (service?.specific_features && service?.features) {
+        if ((service?.specific_features && service?.features) || service?.custom_type?.toLowerCase() === 'real_estate') {
           const featureValuesJson = JSON.stringify(featureValues);
           formData.append('featureValues', featureValuesJson);
           console.log(`📤 [FRONTEND] Video ${i + 1} - Sending featureValues:`, featureValuesJson);
@@ -602,6 +819,30 @@ export default function Dashboard() {
           // ignore
         }
       }
+      }
+
+      // If real estate, save structured property fields to dedicated table
+      if (service?.custom_type?.toLowerCase() === 'real_estate' && uploadedGroupId && providerId) {
+        try {
+          await fetch(`${API_BASE}/api/real-estate/properties/save-fields`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+            },
+            body: JSON.stringify({
+              group_id: uploadedGroupId,
+              provider_id: parseInt(providerId),
+              title: serviceTitle,
+              description: serviceDesc,
+              price: featureValues.price || servicePrice,
+              ...featureValues,
+            }),
+          });
+        } catch (err) {
+          console.error('⚠️ Could not save real estate fields:', err);
+        }
+      }
 
       setServiceImages([]);
       setServiceVideos([]);
@@ -610,15 +851,17 @@ export default function Dashboard() {
       setServicePrice('');
       setServiceViews([]);
       // Reset feature values
-      if (service?.specific_features && service?.features) {
+      if ((service?.specific_features && service?.features) || service?.custom_type?.toLowerCase() === 'real_estate') {
         const resetValues: Record<string, any> = {};
-        service.features.forEach((feature) => {
-          if (feature.type === 'simple') {
-            resetValues[feature.name] = '';
-          } else if (feature.type === 'object') {
-            resetValues[feature.name] = {};
-          }
-        });
+        if (service?.features && Array.isArray(service.features)) {
+          service.features.forEach((feature) => {
+            if (feature.type === 'simple') {
+              resetValues[feature.name] = '';
+            } else if (feature.type === 'object') {
+              resetValues[feature.name] = {};
+            }
+          });
+        }
         setFeatureValues(resetValues);
       }
     } finally {
@@ -626,10 +869,72 @@ export default function Dashboard() {
     }
   };
 
+  const handleCancelEditProduct = () => {
+    setEditingProduct(null);
+    setProductTitle('');
+    setProductDesc('');
+    setProductPrice('');
+    setProductMadeInRwanda(false);
+    setProductUsed(false);
+    setProductPricingUnit('Per Item / Piece');
+    setExistingProductImageUrl('');
+    setExistingProductViews([]);
+    setExistingProductVideoUrl('');
+    setProductImages([]);
+    setProductViews([]);
+    setProductVideos([]);
+    if ((service?.specific_features && service?.features) || service?.custom_type?.toLowerCase() === 'real_estate') {
+      const resetValues: Record<string, any> = {};
+      if (service?.features && Array.isArray(service.features)) {
+        service.features.forEach((feature) => {
+          if (feature.type === 'simple') {
+            resetValues[feature.name] = '';
+          } else if (feature.type === 'object') {
+            resetValues[feature.name] = {};
+          }
+        });
+      }
+      setFeatureValues(resetValues);
+    }
+  };
+
   // Editing handlers
   const startEditing = (img: UploadedMedia) => {
     console.log('🔧 [EDIT] Starting edit for:', img);
-    console.log('🔧 [EDIT] Image has feature_values:', (img as any).feature_values);
+
+    // If product, open in ProductUploadCard edit mode
+    if (img.type === 'product') {
+      setEditingProduct(img);
+      setProductTitle(img.title || '');
+      setProductDesc(img.desc || '');
+      setProductPrice(img.price !== undefined && img.price !== null ? String(img.price) : '');
+      setProductMadeInRwanda(img.madeInRwanda || false);
+      setProductUsed(img.used || false);
+      setProductPricingUnit(img.pricingUnit || 'Per Item / Piece');
+
+      const featureVals = (img as any).feature_values || {};
+      setFeatureValues(featureVals);
+
+      setExistingProductImageUrl(img.url || '');
+      setExistingProductViews(Array.isArray(img.views) ? [...img.views] : []);
+      const vid = img.mediaFiles?.find(m => m.type === 'video')?.url || (img.fileType === 'video' ? img.url : '');
+      setExistingProductVideoUrl(vid || '');
+
+      setProductImages([]);
+      setProductViews([]);
+      setProductVideos([]);
+
+      setSelectedCard('product');
+      setTimeout(() => {
+        const el = document.getElementById('product-upload-card');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 60);
+
+      setEditingImage(null);
+      return;
+    }
 
     setEditingImage(img);
     setEditingTitle(img.title);
@@ -768,9 +1073,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!providerId) {
+      setServiceLoading(false);
       return;
     }
 
+    setServiceLoading(true);
     const cacheBuster = Date.now();
     const fetchUrl = `${API_BASE}/api/providers/${providerId}/service?t=${cacheBuster}`;
 
@@ -793,6 +1100,11 @@ export default function Dashboard() {
         }
 
         setService(data);
+        const isServiceOnly = String(data?.custom_type ?? 'general').trim().toLowerCase() !== 'general';
+        if (isServiceOnly) {
+          setSelectedCard('service');
+        }
+
         if (data.specific_features && data.features) {
           const initialValues: Record<string, any> = {};
           data.features.forEach((feature: any) => {
@@ -805,8 +1117,11 @@ export default function Dashboard() {
           setFeatureValues(initialValues);
         }
       })
-      .catch(() => {
-        // Handled silently
+      .catch((err) => {
+        console.error("Error loading service configuration:", err);
+      })
+      .finally(() => {
+        setServiceLoading(false);
       });
   }, [providerId]);
 
@@ -953,47 +1268,57 @@ export default function Dashboard() {
     }
   };
 
+  if (serviceLoading || subscriptionLoading) {
+    return (
+      <div className={`min-h-screen -mx-4 sm:mx-0 flex flex-col items-center justify-center ${darkMode ? "bg-black text-white" : "bg-white text-black"}`}>
+        <LoadingSpinner
+          variant="dots"
+          size="lg"
+          message="Loading dashboard & fields..."
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className={`w-full mt-0 -mx-4 sm:mx-0 px-0 sm:px-2 overflow-x-hidden ${darkMode ? "bg-gray-950 text-gray-200" : "bg-white text-gray-800"}`}>
+    <div className={`w-full mt-0 -mx-4 sm:mx-0 px-0 sm:px-2 overflow-x-hidden ${darkMode ? "bg-black text-white/90" : "bg-white text-black"}`}>
       <div
-        className="sticky z-40 w-full overflow-x-hidden overflow-y-visible bg-yellow-100 border-b border-yellow-400 mb-2"
+        className="sticky z-40 w-full overflow-x-hidden overflow-y-visible bg-red-50 border-b border-red-300 mb-2"
         style={{ top: 'var(--navbar-height)' }}
       >
         <SubscriptionBanner />
       </div>
 
-      <h2 className={`text-2xl font-bold tracking-tighter uppercase text-center mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>Service Provider's Dashboard</h2>
+      <h2 className={`text-2xl font-bold uppercase text-center mb-2 ${darkMode ? "text-white" : "text-black"}`}>{service?.custom_type?.toLowerCase() === 'real_estate' ? "Real Estate Dashboard" : "Service Provider's Dashboard"}</h2>
       {service?.title && (
-        <p className={`text-center mb-6 text-xs font-bold uppercase tracking-wider ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
-          Service: <span className="text-emerald-500">{service.title}</span>
+        <p className={`text-center mb-6 text-xs font-bold uppercase tracking-wider ${darkMode ? "text-white/70" : "text-black/60"}`}>
+          {service?.custom_type?.toLowerCase() === 'real_estate' ? "Category: " : "Service: "}<span className="text-red-600">{service.title}</span>
         </p>
       )}
     
       {!serviceOnlyMode && (
-        <div className="flex justify-center space-x-4 mb-6">
+        <div className="flex justify-center space-x-3 mb-6">
           <button
             onClick={() => setSelectedCard('product')}
-            className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border
+            className={`px-5 py-2.5 font-bold text-xs transition-all uppercase tracking-wider rounded-lg border shadow-sm
               ${selectedCard === 'product'
-                ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm'
+                ? 'bg-[#E5252A] border-[#E5252A] text-white'
                 : darkMode
-                  ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
-                  : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:border-[#E5252A]'
+                  : 'bg-white border-gray-200 text-gray-700 hover:border-[#E5252A]'
               }`}
-            style={{ borderRadius: '2px' }}
           >
-            Product Upload
+            {editingProduct ? 'Edit Product (Active)' : 'Product Upload'}
           </button>
           <button
             onClick={() => setSelectedCard('service')}
-            className={`px-4 py-2 font-semibold text-xs transition-colors uppercase tracking-wider border
+            className={`px-5 py-2.5 font-bold text-xs transition-all uppercase tracking-wider rounded-lg border shadow-sm
               ${selectedCard === 'service'
-                ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm'
+                ? 'bg-[#E5252A] border-[#E5252A] text-white'
                 : darkMode
-                  ? 'bg-gray-800 border-gray-750 text-gray-300 hover:bg-gray-700'
-                  : 'bg-white border-gray-250 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:border-[#E5252A]'
+                  : 'bg-white border-gray-200 text-gray-700 hover:border-[#E5252A]'
               }`}
-            style={{ borderRadius: '2px' }}
           >
             Service Upload
           </button>
@@ -1009,6 +1334,7 @@ export default function Dashboard() {
           service={service}
           productImages={productImages}
           productVideos={productVideos}
+          productViews={productViews}
           productTitle={productTitle}
           productDesc={productDesc}
           productPrice={productPrice}
@@ -1029,6 +1355,15 @@ export default function Dashboard() {
           featureValues={featureValues}
           setFeatureValues={setFeatureValues}
           uploadProgress={productUploadProgress}
+          isEditing={!!editingProduct}
+          editingItemName={editingProduct?.title}
+          onCancelEdit={handleCancelEditProduct}
+          existingImageUrl={existingProductImageUrl}
+          onRemoveExistingImage={() => setExistingProductImageUrl('')}
+          existingViews={existingProductViews}
+          onRemoveExistingView={(idx) => setExistingProductViews(prev => prev.filter((_, i) => i !== idx))}
+          existingVideoUrl={existingProductVideoUrl}
+          onRemoveExistingVideo={() => setExistingProductVideoUrl('')}
         />
       )}
 

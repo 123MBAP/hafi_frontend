@@ -8,7 +8,7 @@ import {
   EyeOff,
   Lock,
   Mail,
-  UserPlus
+  X
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -22,6 +22,7 @@ const Login = () => {
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
@@ -32,6 +33,14 @@ const Login = () => {
   const { darkMode } = useDarkMode();
 
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('hafi_remember_email');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   useEffect(() => {
     const message = searchParams.get('message');
@@ -47,91 +56,34 @@ const Login = () => {
     }
   }, [searchParams, location.state]);
 
-  const cleanupAndRedirect = (message = 'session_expired') => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userData');
-    navigate(`/login?message=${message}`, {
-      replace: true,
-      state: { forceReset: true }
-    });
-  };
-
-  const getStoredToken = (): string => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      cleanupAndRedirect();
-      throw new Error("No token available. Please login again.");
+  const handleClose = () => {
+    const fromPath = (location.state as any)?.from;
+    const bgLocation = (location.state as any)?.backgroundLocation;
+    if (bgLocation?.pathname) {
+      navigate(bgLocation.pathname + (bgLocation.search || ''), { replace: true });
+    } else if (fromPath && typeof fromPath === 'string') {
+      navigate(fromPath, { replace: true });
+    } else if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/', { replace: true });
     }
-    return token;
   };
 
-  const getStoredRefreshToken = (): string => {
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (!refreshToken) {
-      cleanupAndRedirect();
-      throw new Error("No refresh token available. Please login again.");
-    }
-    return refreshToken;
-  };
-
-  const fetchWithRefresh = async (url: string, options: RequestInit = {}) => {
-    let token = getStoredToken();
-
-    let res = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options.headers || {}),
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (res.status === 401) {
-      const refreshToken = getStoredRefreshToken();
-
-      try {
-        const refreshRes = await fetch(`${API_BASE}/api/refresh`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refreshToken }),
-        });
-
-        const refreshData = await refreshRes.json();
-
-        if (refreshRes.status === 403) {
-          if (refreshData.code === 'REFRESH_TOKEN_EXPIRED') {
-            cleanupAndRedirect('session_expired');
-          } else {
-            cleanupAndRedirect('invalid_session');
-          }
-          throw new Error("Session expired. Please login again.");
-        }
-
-        if (!refreshRes.ok || !refreshData.token) {
-          cleanupAndRedirect();
-          throw new Error("Session expired. Please login again.");
-        }
-
-        token = refreshData.token;
-        localStorage.setItem("token", token);
-
-        res = await fetch(url, {
-          ...options,
-          headers: {
-            'Content-Type': 'application/json',
-            ...(options.headers || {}),
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-      } catch (error) {
-        cleanupAndRedirect();
-        throw new Error("Session expired. Please login again.");
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClose();
       }
-    }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
-    return res;
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
   };
 
   const handleLogin = async () => {
@@ -148,7 +100,7 @@ const Login = () => {
       const loginRes = await fetch(`${API_BASE}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
 
       const loginData = await loginRes.json();
@@ -159,16 +111,20 @@ const Login = () => {
         return;
       }
 
-      // Login sets the user data in context
+      if (rememberMe) {
+        localStorage.setItem('hafi_remember_email', email.trim());
+      } else {
+        localStorage.removeItem('hafi_remember_email');
+      }
+
       login(loginData.user, loginData.token, loginData.refreshToken);
 
-      // Get roles from the login response
       const roles = loginData.user?.roles;
 
       if (roles) {
-        // Check if there's a return path from navigation state
         const returnPath = (location.state as any)?.from;
-        const path = returnPath || getNavigationPath(roles);
+        const bgPath = (location.state as any)?.backgroundLocation?.pathname;
+        const path = returnPath || bgPath || getNavigationPath(roles);
 
         setTimeout(() => {
           navigate(path, {
@@ -243,8 +199,6 @@ const Login = () => {
 
       if (res.ok) {
         if (!data.token) {
-          // Google account exists but backend didn't return a token yet
-          // (e.g. awaiting role selection) — don't call login with undefined
           setError(data.error || 'Sign-in incomplete. Please try again.');
           setLoading(false);
           return;
@@ -254,7 +208,8 @@ const Login = () => {
 
         const roles = data.user?.roles || [];
         const returnPath = (location.state as any)?.from;
-        const path = returnPath || getNavigationPath(roles);
+        const bgPath = (location.state as any)?.backgroundLocation?.pathname;
+        const path = returnPath || bgPath || getNavigationPath(roles);
         navigate(path);
       } else {
         setError(data.error || 'Google sign-in failed');
@@ -269,253 +224,276 @@ const Login = () => {
   const handleGoogleError = () => {
     setError('Google sign-in was cancelled or failed');
   };
+
   return (
     <div
-      ref={containerRef}
-      className={`min-h-screen pt-2 pb-8 p-0 transition-colors duration-300 ${
-        darkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'
-      }`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
+      onClick={handleBackdropClick}
     >
-      <div className="w-full max-w-md mx-auto px-0">
-        {/* Back Button for Recovery */}
-        {showRecovery && (
+      <div
+        ref={containerRef}
+        className={`w-full max-w-[380px] sm:max-w-[400px] p-6 sm:p-7 border shadow-2xl relative transition-all duration-200 ${
+          darkMode
+            ? 'bg-black border-white/20 text-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)]'
+            : 'bg-white border-black text-black shadow-[0_25px_60px_-15px_rgba(0,0,0,0.2)]'
+        }`}
+        style={{ borderRadius: '12px' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-5">
+          <h1 className="text-xl font-black uppercase tracking-wider text-black dark:text-white">
+            {showRecovery ? (
+              <>
+                Reset Password<span className="text-red-600">.</span>
+              </>
+            ) : (
+              <>
+                LOGIN<span className="text-red-600">.</span>
+              </>
+            )}
+          </h1>
           <button
-            onClick={() => setShowRecovery(false)}
-            className={`mb-4 flex items-center text-sm font-medium transition-colors ${
-              darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-650 hover:text-gray-900'
-            }`}
+            type="button"
+            onClick={handleClose}
+            className="p-1 rounded-full text-black/50 dark:text-white/50 hover:text-red-600 dark:hover:text-red-600 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+            aria-label="Close"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Login
+            <X className="w-5 h-5" />
           </button>
+        </div>
+
+        {/* Error/Success Messages */}
+        {error && (
+          <div
+            className="flex items-start gap-2.5 p-3 border border-red-600/30 bg-red-600/10 text-red-600 dark:text-red-400 mb-4"
+            style={{ borderRadius: '6px' }}
+          >
+            <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+            <span className="text-xs font-semibold">{error}</span>
+          </div>
         )}
 
-        {/* Main Card */}
-        <div
-          className={`p-0 sm:p-6 border-0 sm:border transition-all duration-300 ${
-            darkMode ? 'bg-gray-950 sm:bg-gray-900 sm:border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
-          }`}
-          style={{ borderRadius: '2px' }}
-        >
-          {/* Header */}
-          <div className="mb-6">
-            <h1 className={`text-2xl font-bold uppercase tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              {showRecovery ? 'Reset Password' : 'Welcome back'}
-            </h1>
-            <p className={`text-xs font-bold uppercase tracking-wider mt-1 ${darkMode ? 'text-gray-455' : 'text-gray-500'}`}>
-              {showRecovery
-                ? 'Enter your email to reset your password'
-                : 'Sign in to continue to HafiConnect'
-              }
-            </p>
+        {recoveryMessage && (
+          <div
+            className={`flex items-start gap-2.5 p-3 border mb-4 ${
+              darkMode ? 'border-white/30 bg-zinc-950 text-white' : 'border-black bg-zinc-50 text-black'
+            }`}
+            style={{ borderRadius: '6px' }}
+          >
+            <CheckCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+            <span className="text-xs font-semibold">{recoveryMessage}</span>
           </div>
+        )}
 
-          {/* Error/Success Messages */}
-          {error && (
-            <div
-              className={`flex items-start gap-3 p-3 border mb-6 ${
-                darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-655'
-              }`}
-              style={{ borderRadius: '2px' }}
-            >
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-              <span className="text-sm font-semibold">{error}</span>
-            </div>
-          )}
-
-          {recoveryMessage && (
-            <div
-              className={`flex items-start gap-3 p-3 border mb-6 ${
-                darkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-emerald-50 border-emerald-505 text-emerald-600'
-              }`}
-              style={{ borderRadius: '2px' }}
-            >
-              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-              <span className="text-sm font-semibold">{recoveryMessage}</span>
-            </div>
-          )}
-
-          {/* Recovery Form */}
-          {showRecovery ? (
-            <div className="space-y-4">
-              <div>
-                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
-                  Email address
-                </label>
-                <div className="relative">
-                  <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
-                      darkMode
-                        ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
-                        : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                    } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                    style={{ borderRadius: '2px' }}
-                    value={recoveryEmail}
-                    onChange={(e) => setRecoveryEmail(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                  />
-                </div>
-              </div>
-
-              <button
-                onClick={handleRecover}
-                className={`w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border ${
-                  darkMode
-                    ? 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500'
-                    : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm'
-                }`}
-                style={{ borderRadius: '2px' }}
-              >
-                Send recovery email
-              </button>
-            </div>
-          ) : (
-            /* Login Form */
-            <div className="space-y-4">
-              {/* Google Sign-In Button */}
-              <div>
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={handleGoogleError}
-                  useOneTap={false}
-                  theme={darkMode ? 'filled_black' : 'outline'}
-                  size="large"
-                  text="signin_with"
-                  shape="rectangular"
-                  logo_alignment="center"
+        {/* Recovery Form */}
+        {showRecovery ? (
+          <div className="space-y-4">
+            <div>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-white/80' : 'text-black/80'}`}>
+                Email
+              </label>
+              <div className="relative">
+                <Mail className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-white/50' : 'text-black/50'}`} />
+                <input
+                  type="email"
+                  placeholder="Enter your email..."
+                  className={`w-full pl-9 pr-3.5 py-2.5 border text-sm transition-colors ${
+                    darkMode
+                      ? 'bg-black border-white/30 text-white placeholder-white/40'
+                      : 'bg-white border-black text-black placeholder-black/40'
+                  } focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600`}
+                  style={{ borderRadius: '6px' }}
+                  value={recoveryEmail}
+                  onChange={(e) => setRecoveryEmail(e.target.value)}
+                  onKeyPress={handleKeyPress}
                 />
               </div>
+            </div>
 
-              {/* Divider */}
-              <div className="relative flex items-center py-2">
-                <div className={`flex-grow border-t ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}></div>
-                <span className={`flex-shrink mx-4 text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>or</span>
-                <div className={`flex-grow border-t ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}></div>
-              </div>
+            <button
+              type="button"
+              onClick={handleRecover}
+              className="w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-all border bg-red-600 hover:bg-red-700 border-red-600 shadow-md active:scale-[0.99]"
+              style={{ borderRadius: '6px' }}
+            >
+              Send Recovery Email
+            </button>
 
-              {/* Email Field */}
-              <div>
-                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
-                  Email address
-                </label>
-                <div className="relative">
-                  <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
-                      darkMode
-                        ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-550'
-                        : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                    } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                    style={{ borderRadius: '2px' }}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                  />
-                </div>
-              </div>
-
-              {/* Password Field */}
-              <div>
-                <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    className={`w-full pl-10 pr-12 py-2.5 border text-sm transition-colors ${
-                      darkMode
-                        ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-555'
-                        : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                    } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
-                    style={{ borderRadius: '2px' }}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className={`absolute right-3 top-2.5 transition-colors ${
-                      darkMode ? 'text-gray-500 hover:text-gray-350' : 'text-gray-400 hover:text-gray-600'
-                    }`}
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Forgot Password Link */}
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setShowRecovery(true)}
-                  className={`text-sm font-medium transition-colors ${
-                    darkMode ? 'text-emerald-450 hover:text-emerald-350' : 'text-emerald-600 hover:text-emerald-700'
-                  }`}
-                >
-                  Forgot password?
-                </button>
-              </div>
-
-              {/* Login Button */}
+            <div className="text-center pt-2">
               <button
-                onClick={handleLogin}
-                disabled={loading}
-                className={`w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border ${
-                  loading
-                    ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
-                    : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm'
-                }`}
-                style={{ borderRadius: '2px' }}
+                type="button"
+                onClick={() => setShowRecovery(false)}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-black/60 dark:text-white/60 hover:text-red-600 dark:hover:text-red-600 transition-colors"
               >
-                {loading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    <span>Signing in...</span>
-                  </div>
-                ) : (
-                  'Sign in'
-                )}
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back to Login
               </button>
-
-              {/* Divider */}
-              <div className="relative flex items-center py-2">
-                <div className={`flex-grow border-t ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}></div>
-              </div>
-
-              {/* Register Link */}
-              <div className="text-center space-y-3">
-                <div>
-                  <Link
-                    to="/register"
-                    className={`inline-flex items-center gap-2 text-sm font-medium transition-colors ${
-                      darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-655 hover:text-gray-900'
-                    }`}
-                  >
-                    <UserPlus className="w-4 h-4" />
-                    Don't have an account? Sign up
-                  </Link>
-                </div>
-                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                  <Link
-                    to="/agent/login"
-                    className={`text-xs font-bold uppercase tracking-wider transition-colors ${
-                      darkMode ? 'text-emerald-450 hover:text-emerald-350' : 'text-emerald-600 hover:text-emerald-700'
-                    }`}
-                  >
-                    Login as HafiConnect Agent
-                  </Link>
-                </div>
+            </div>
+          </div>
+        ) : (
+          /* Login Form */
+          <div className="space-y-3.5">
+            {/* Email Field */}
+            <div>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-white/80' : 'text-black/80'}`}>
+                Email
+              </label>
+              <div className="relative">
+                <Mail className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-white/50' : 'text-black/50'}`} />
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className={`w-full pl-9 pr-3.5 py-2.5 border text-sm transition-colors ${
+                    darkMode
+                      ? 'bg-black border-white/30 text-white placeholder-white/40'
+                      : 'bg-white border-black text-black placeholder-black/40'
+                  } focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600`}
+                  style={{ borderRadius: '6px' }}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  autoComplete="email"
+                />
               </div>
             </div>
-          )}
-        </div>
+
+            {/* Password Field */}
+            <div>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-white/80' : 'text-black/80'}`}>
+                Password
+              </label>
+              <div className="relative">
+                <Lock className={`absolute left-3 top-3 w-4 h-4 ${darkMode ? 'text-white/50' : 'text-black/50'}`} />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  className={`w-full pl-9 pr-10 py-2.5 border text-sm transition-colors ${
+                    darkMode
+                      ? 'bg-black border-white/30 text-white placeholder-white/40'
+                      : 'bg-white border-black text-black placeholder-black/40'
+                  } focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600`}
+                  style={{ borderRadius: '6px' }}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={`absolute right-3 top-3 transition-colors ${
+                    darkMode ? 'text-white/60 hover:text-red-600' : 'text-black/60 hover:text-red-600'
+                  }`}
+                  tabIndex={-1}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Remember me Checkbox */}
+            <div className="flex items-center gap-2 pt-0.5">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded-xs border-black/30 dark:border-white/30 text-red-600 focus:ring-red-600 accent-red-600 cursor-pointer"
+              />
+              <label
+                htmlFor="rememberMe"
+                className={`text-xs font-semibold cursor-pointer select-none ${
+                  darkMode ? 'text-white/80' : 'text-black/80'
+                }`}
+              >
+                Remember me?
+              </label>
+            </div>
+
+            {/* Login Button */}
+            <button
+              type="button"
+              onClick={handleLogin}
+              disabled={loading}
+              className={`w-full py-2.5 px-4 text-white text-xs font-black uppercase tracking-wider transition-all border ${
+                loading
+                  ? 'bg-black/50 border-zinc-700 text-white/50 cursor-not-allowed'
+                  : 'bg-red-600 hover:bg-red-700 border-red-600 shadow-md active:scale-[0.99]'
+              }`}
+              style={{ borderRadius: '6px' }}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  <span>Signing in...</span>
+                </div>
+              ) : (
+                'LOGIN'
+              )}
+            </button>
+
+            {/* Forgot Password Link */}
+            <div className="flex justify-end -mt-1">
+              <button
+                type="button"
+                onClick={() => setShowRecovery(true)}
+                className="text-xs font-semibold text-black/60 dark:text-white/60 hover:text-red-600 dark:hover:text-red-600 transition-colors"
+              >
+                Forgot Password?
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div className="relative flex items-center py-1">
+              <div className={`flex-grow border-t ${darkMode ? 'border-white/20' : 'border-black/20'}`}></div>
+              <span className={`flex-shrink mx-3 text-[10px] font-bold uppercase tracking-widest ${
+                darkMode ? 'text-white/50' : 'text-black/50'
+              }`}>
+                OR
+              </span>
+              <div className={`flex-grow border-t ${darkMode ? 'border-white/20' : 'border-black/20'}`}></div>
+            </div>
+
+            {/* Only Continue with Google */}
+            <div className="flex justify-center w-full">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                useOneTap={false}
+                theme={darkMode ? 'filled_black' : 'outline'}
+                size="large"
+                text="continue_with"
+                shape="rectangular"
+                width="100%"
+                logo_alignment="center"
+              />
+            </div>
+
+            {/* Need an account? SIGN UP */}
+            <div className="text-center text-xs text-black/70 dark:text-white/70 pt-1">
+              Need an account?{' '}
+              <Link
+                to="/register"
+                state={{ backgroundLocation: (location.state as any)?.backgroundLocation }}
+                className="font-bold uppercase tracking-wider text-red-600 hover:text-red-700 hover:underline"
+              >
+                SIGN UP
+              </Link>
+            </div>
+
+            {/* Login as HafiConnect Agent */}
+            <div className={`pt-2.5 border-t text-center ${darkMode ? 'border-white/10' : 'border-black/10'}`}>
+              <Link
+                to="/agent/login"
+                className="text-xs font-black uppercase tracking-wider transition-colors text-red-600 hover:text-red-700 hover:underline"
+              >
+                Login as HafiConnect Agent →
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

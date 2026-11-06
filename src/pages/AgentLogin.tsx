@@ -5,7 +5,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE } from '../api/apiClient';
 
-
 export default function AgentLogin() {
   const { darkMode } = useDarkMode();
   const navigate = useNavigate();
@@ -50,13 +49,13 @@ export default function AgentLogin() {
   };
 
   return (
-    <div className={`min-h-screen pt-12 pb-16 transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-      <div className="w-full max-w-md mx-auto px-0">
+    <div className={`min-h-screen pt-6 pb-16 px-4 transition-colors duration-200 ${darkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
+      <div className="w-full max-w-md mx-auto">
         {/* Back Link */}
         <Link
           to="/login"
-          className={`mb-4 inline-flex items-center text-sm font-medium transition-colors ${
-            darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-650 hover:text-gray-900'
+          className={`mb-4 inline-flex items-center text-xs font-bold uppercase tracking-wider transition-colors ${
+            darkMode ? 'text-white/70 hover:text-red-600' : 'text-black/70 hover:text-red-600'
           }`}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -65,31 +64,32 @@ export default function AgentLogin() {
 
         {/* Card */}
         <div
-          className={`p-0 sm:p-8 border-0 sm:border transition-all duration-300 ${
-            darkMode ? 'bg-gray-950 sm:bg-gray-800 sm:border-gray-700 shadow-sm' : 'bg-white border-gray-250 shadow-sm'
+          className={`p-6 sm:p-8 border transition-all duration-200 ${
+            darkMode ? 'bg-black border-white/20 shadow-2xl' : 'bg-white border-black shadow-lg'
           }`}
           style={{ borderRadius: '2px' }}
         >
           {/* Header */}
           <div className="mb-6">
-            <h1 className={`text-2xl font-bold uppercase tracking-tighter ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            <div className="inline-block px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-red-600 text-white rounded-sm mb-2.5">
               Agent Portal
+            </div>
+            <h1 className={`text-2xl sm:text-3xl font-extrabold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-black'}`}>
+              Agent Portal<span className="text-red-600">.</span>
             </h1>
-            <p className={`text-xs font-bold uppercase tracking-wider mt-1 ${darkMode ? 'text-emerald-450' : 'text-emerald-600'}`}>
-              Log in to access your Agent Dashboard
+            <p className={`text-xs font-bold uppercase tracking-wider mt-1.5 ${darkMode ? 'text-white/70' : 'text-black/60'}`}>
+              Log in to access your regional agent dashboard
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
             <div
-              className={`flex items-start gap-3 p-3 border mb-6 ${
-                darkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-655'
-              }`}
+              className="flex items-start gap-3 p-3 border border-red-600/30 bg-red-600/10 text-red-600 dark:text-red-400 mb-6"
               style={{ borderRadius: '2px' }}
             >
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-              <span className="text-sm font-semibold">{error}</span>
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <span className="text-xs font-semibold">{error}</span>
             </div>
           )}
 
@@ -97,19 +97,19 @@ export default function AgentLogin() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email / Username Field */}
             <div>
-              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-650'}`}>
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-white/80' : 'text-black/70'}`}>
                 Email Address or Username
               </label>
               <div className="relative">
-                <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                <Mail className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-white/50' : 'text-black/50'}`} />
                 <input
                   type="text"
-                  placeholder="Enter email or username"
+                  placeholder="ENTER EMAIL OR USERNAME..."
                   className={`w-full pl-10 pr-4 py-2.5 border text-sm transition-colors ${
                     darkMode
-                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-550'
-                      : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                  } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                      ? 'bg-black border-white/30 text-white placeholder-white/40'
+                      : 'bg-white border-black text-black placeholder-black/40'
+                  } focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600`}
                   style={{ borderRadius: '2px' }}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -120,19 +120,19 @@ export default function AgentLogin() {
 
             {/* Password Field */}
             <div>
-              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-655'}`}>
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-white/80' : 'text-black/70'}`}>
                 Password
               </label>
               <div className="relative">
-                <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                <Lock className={`absolute left-3 top-2.5 w-5 h-5 ${darkMode ? 'text-white/50' : 'text-black/50'}`} />
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter password"
+                  placeholder="ENTER PASSWORD..."
                   className={`w-full pl-10 pr-12 py-2.5 border text-sm transition-colors ${
                     darkMode
-                      ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-555'
-                      : 'bg-white border-gray-250 text-gray-900 placeholder-gray-400'
-                  } focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500`}
+                      ? 'bg-black border-white/30 text-white placeholder-white/40'
+                      : 'bg-white border-black text-black placeholder-black/40'
+                  } focus:outline-none focus:ring-1 focus:ring-red-600 focus:border-red-600`}
                   style={{ borderRadius: '2px' }}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -142,7 +142,7 @@ export default function AgentLogin() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className={`absolute right-3 top-2.5 transition-colors ${
-                    darkMode ? 'text-gray-500 hover:text-gray-350' : 'text-gray-400 hover:text-gray-600'
+                    darkMode ? 'text-white/60 hover:text-red-600' : 'text-black/60 hover:text-red-600'
                   }`}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -154,26 +154,31 @@ export default function AgentLogin() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-colors border ${
+              className={`w-full py-2.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-all border ${
                 loading
-                  ? 'bg-gray-400 border-gray-500 text-gray-200 cursor-not-allowed'
-                  : 'bg-emerald-500 hover:bg-emerald-600 border-emerald-500 shadow-sm'
+                  ? 'bg-black/50 border-zinc-700 text-white/50 cursor-not-allowed'
+                  : 'bg-red-600 hover:bg-red-700 border-red-600 shadow-md active:scale-[0.99]'
               }`}
               style={{ borderRadius: '2px' }}
             >
-              {loading ? 'Logging in...' : 'Sign in as Agent'}
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  <span>Signing in...</span>
+                </div>
+              ) : (
+                'Sign in as Agent'
+              )}
             </button>
           </form>
 
           {/* Register Link */}
-          <div className="mt-6 text-center border-t pt-4 border-gray-200 dark:border-gray-700">
+          <div className="mt-6 text-center border-t pt-4 border-black/20 dark:border-white/20">
             <Link
               to="/agent/register"
-              className={`text-sm font-semibold transition-colors ${
-                darkMode ? 'text-emerald-450 hover:text-emerald-350' : 'text-emerald-600 hover:text-emerald-700'
-              }`}
+              className="text-xs font-black uppercase tracking-wider transition-colors text-red-600 hover:text-red-700 hover:underline"
             >
-              Apply to become HafiConnect Agent
+              Apply to become HafiConnect Agent →
             </Link>
           </div>
         </div>

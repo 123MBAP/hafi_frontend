@@ -5,7 +5,6 @@ import { FaEllipsisV, FaMicrophone, FaPaperclip, FaPaperPlane, FaSearch, FaSmile
 import { useLocation, useNavigate } from "react-router-dom";
 import { API_BASE } from '../api/apiClient';
 
-
 interface ChatMessage {
   sender: string; // 'provider' or 'customer'
   text: string;
@@ -37,7 +36,6 @@ export default function ChatBox({
 
   const partnerInitial = partnerName ? partnerName.charAt(0).toUpperCase() : currentUserRole === 'provider' ? 'C' : 'P';
 
-
   // Fetch initial messages
   useEffect(() => {
     if (!providerId || !customerId) return;
@@ -62,7 +60,8 @@ export default function ChatBox({
             }))
           : [];
         setChatMessages(normalized);
-      });
+      })
+      .catch(console.error);
   }, [providerId, customerId, currentUserRole, token]);
 
   // Poll for new messages
@@ -195,66 +194,65 @@ export default function ChatBox({
 
   const containerWrapper = inline
     ? 'w-full'
-    : 'fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50';
+    : 'fixed inset-0 flex items-center justify-center z-50 bg-black/60 backdrop-blur-xs p-4';
 
   const containerInner = inline
-    ? `w-full rounded-xl flex flex-col overflow-hidden ${darkMode ? 'border border-gray-700 bg-[#111b21] text-gray-100' : 'border border-gray-200 bg-white text-gray-800'}`
-    : `w-full max-w-md rounded-xl flex flex-col ${darkMode ? 'bg-[#111b21] text-gray-100' : 'bg-white text-gray-800'}`;
+    ? `w-full rounded-2xl flex flex-col overflow-hidden border ${darkMode ? 'border-gray-800 bg-[#0A0A0A] text-gray-100' : 'border-[#E5E5E5] bg-white text-[#151515]'}`
+    : `w-full max-w-md rounded-2xl flex flex-col overflow-hidden shadow-2xl border ${darkMode ? 'border-gray-800 bg-[#0A0A0A] text-gray-100' : 'border-[#E5E5E5] bg-white text-[#151515]'}`;
 
   const containerStyle = inline
     ? { maxHeight: '70vh', minHeight: '28rem', width: '100%' }
-    : { maxHeight: '90vh', width: '400px', height: '80vh' };
+    : { maxHeight: '90vh', width: '420px', height: '80vh' };
 
   return (
     <div className={containerWrapper}>
       <div className={containerInner} style={containerStyle}>
-        {/* Header - WhatsApp Style */}
-        <div className={`flex items-center justify-between px-4 py-3 ${darkMode ? 'bg-[#202c33]' : 'bg-[#f0f2f5]'
-          }`}>
+        {/* Header - HafiConnect Premium Dark */}
+        <div className="flex items-center justify-between px-4 py-3.5 bg-[#0A0A0A] text-white border-b border-gray-800">
           <div className="flex items-center space-x-3">
             <button
-              className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
+              className="p-1.5 text-gray-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
               onClick={onClose}
               title="Close chat"
             >
               ←
             </button>
-            <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
-              <span className="text-white font-semibold">
+            <div className="w-10 h-10 rounded-full bg-[#E5252A] flex items-center justify-center shadow-xs">
+              <span className="text-white font-bold text-sm">
                 {partnerInitial}
               </span>
             </div>
             <div>
-              <div className={`font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>
+              <div className="font-bold text-sm text-white tracking-tight">
                 {partnerName || (currentUserRole === 'provider' ? 'Customer' : 'Provider')}
               </div>
-              <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              <div className="flex items-center gap-1.5 text-[11px] text-gray-400 font-medium">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 Online
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <FaSearch className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} cursor-pointer`} size={16} />
-            <FaEllipsisV className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} cursor-pointer`} size={16} />
+          <div className="flex items-center space-x-3 text-gray-400">
+            <button type="button" className="p-1.5 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+              <FaSearch size={14} />
+            </button>
+            <button type="button" className="p-1.5 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+              <FaEllipsisV size={14} />
+            </button>
           </div>
         </div>
 
         {/* Messages Area */}
         <div
-          className="flex-1 overflow-y-auto px-4 py-2"
-          style={{
-            backgroundImage: darkMode
-              ? 'linear-gradient(rgba(17, 27, 33, 0.9), rgba(17, 27, 33, 0.9)), url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z\' fill=\'%23343a40\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")'
-              : 'linear-gradient(rgba(240, 242, 245, 0.9), rgba(240, 242, 245, 0.9)), url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z\' fill=\'%239ba4ab\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")',
-            backgroundSize: '400px 400px'
-          }}
+          className={`flex-1 overflow-y-auto px-4 py-4 ${
+            darkMode ? 'bg-gray-950' : 'bg-[#F5F5F5]'
+          }`}
         >
           {Object.entries(messageGroups).map(([date, messages]) => (
             <div key={date}>
               {/* Date Separator */}
-              <div className="flex justify-center my-4">
-                <div className={`px-3 py-1 rounded-full text-xs ${darkMode ? 'bg-[#182229] text-gray-300' : 'bg-[#e6f2ff] text-gray-600'
-                  }`}>
+              <div className="flex justify-center my-3">
+                <div className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white dark:bg-gray-900 text-[#666666] dark:text-gray-400 border border-[#E5E5E5] dark:border-gray-800 shadow-2xs">
                   {date}
                 </div>
               </div>
@@ -263,25 +261,30 @@ export default function ChatBox({
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
-                  className={`mb-2 ${msg.sender === currentUserRole ? "text-right" : "text-left"
-                    }`}
+                  className={`mb-3 ${msg.sender === currentUserRole ? "text-right" : "text-left"}`}
                 >
-                  <div className={`inline-block max-w-xs px-3 py-2 rounded-lg ${msg.sender === currentUserRole
-                    ? darkMode
-                      ? 'bg-[#005c4b] text-white'
-                      : 'bg-[#d9fdd3] text-gray-800'
-                    : darkMode
-                      ? 'bg-[#202c33] text-white'
-                      : 'bg-white text-gray-800 shadow-sm'
-                    }`}>
-                    <div>{msg.text}</div>
-                    <div className={`text-xs mt-1 text-right ${darkMode
-                      ? msg.sender === currentUserRole ? 'text-[#99b8b1]' : 'text-gray-400'
-                      : msg.sender === currentUserRole ? 'text-[#0a7e6e]' : 'text-gray-500'
-                      }`}>
+                  <div
+                    className={`inline-block max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
+                      msg.sender === currentUserRole
+                        ? 'bg-[#E5252A] text-white rounded-tr-xs shadow-xs text-left'
+                        : darkMode
+                        ? 'bg-gray-900 text-white rounded-tl-xs border border-gray-800 shadow-xs'
+                        : 'bg-white text-[#151515] rounded-tl-xs border border-[#E5E5E5] shadow-xs'
+                    }`}
+                  >
+                    <div className="leading-relaxed break-words">{msg.text}</div>
+                    <div
+                      className={`text-[10px] mt-1 text-right font-medium ${
+                        msg.sender === currentUserRole
+                          ? 'text-red-100'
+                          : darkMode
+                          ? 'text-gray-400'
+                          : 'text-[#666666]'
+                      }`}
+                    >
                       {new Date(msg.timestamp).toLocaleTimeString([], {
                         hour: '2-digit',
-                        minute: '2-digit'
+                        minute: '2-digit',
                       })}
                     </div>
                   </div>
@@ -292,47 +295,56 @@ export default function ChatBox({
           <div ref={chatEndRef} />
         </div>
 
-        {/* Input Area - WhatsApp Style */}
-        <div className={`px-4 py-3 ${darkMode ? 'bg-[#202c33]' : 'bg-[#f0f2f5]'}`}>
+        {/* Input Area */}
+        <div className={`px-4 py-3 border-t ${
+          darkMode ? 'bg-[#0A0A0A] border-gray-800' : 'bg-white border-[#E5E5E5]'
+        }`}>
           <div className="flex items-center space-x-2">
             {/* Left Icons */}
-            <div className="flex items-center space-x-3">
-              <FaSmile className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} cursor-pointer`} size={20} />
-              <FaPaperclip className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} cursor-pointer`} size={18} />
+            <div className="flex items-center space-x-2 text-gray-400">
+              <button type="button" className="p-1.5 hover:text-[#E5252A] transition-colors">
+                <FaSmile size={18} />
+              </button>
+              <button type="button" className="p-1.5 hover:text-[#E5252A] transition-colors">
+                <FaPaperclip size={16} />
+              </button>
             </div>
 
             {/* Input Field */}
-            <div className={`flex-1 rounded-lg px-4 py-2 ${darkMode ? 'bg-[#2a3942]' : 'bg-white'
-              }`}>
+            <div className={`flex-1 rounded-xl px-3.5 py-2 border transition-all ${
+              darkMode
+                ? 'bg-gray-900 border-gray-800 focus-within:border-[#E5252A]'
+                : 'bg-[#F5F5F5] border-[#E5E5E5] focus-within:border-[#E5252A] focus-within:bg-white'
+            }`}>
               <input
                 type="text"
-                className={`w-full border-0 outline-none ${darkMode ? 'bg-[#2a3942] text-white placeholder-gray-400' : 'bg-white text-black placeholder-gray-500'
-                  }`}
+                className={`w-full text-sm border-0 outline-none bg-transparent ${
+                  darkMode ? 'text-white placeholder-gray-500' : 'text-[#151515] placeholder-gray-400'
+                }`}
                 value={chatInput}
-                placeholder="Type a message"
+                placeholder="Type a message..."
                 onChange={e => setChatInput(e.target.value)}
                 onKeyDown={handleKeyDown}
               />
             </div>
 
-            {/* Right Icon */}
+            {/* Right Action Button */}
             <button
-              className={`p-3 rounded-full ${chatInput.trim()
-                ? darkMode
-                  ? 'bg-[#005c4b] text-white hover:bg-[#0a7e6e]'
-                  : 'bg-[#008069] text-white hover:bg-[#00a884]'
-                : darkMode
-                  ? 'text-gray-400'
-                  : 'text-gray-600'
-                }`}
+              className={`p-3 rounded-full transition-all cursor-pointer ${
+                chatInput.trim()
+                  ? 'bg-[#E5252A] text-white hover:bg-[#c91d22] shadow-xs'
+                  : darkMode
+                  ? 'text-gray-500 hover:text-white'
+                  : 'text-gray-400 hover:text-gray-700'
+              }`}
               onClick={handleSendMessage}
               disabled={!chatInput.trim()}
-              title="Send"
+              title={chatInput.trim() ? "Send message" : "Record audio"}
             >
               {chatInput.trim() ? (
-                <FaPaperPlane size={16} />
+                <FaPaperPlane size={14} />
               ) : (
-                <FaMicrophone size={16} />
+                <FaMicrophone size={14} />
               )}
             </button>
           </div>

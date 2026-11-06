@@ -322,8 +322,8 @@ export default function ServiceDetailPage() {
         if (showNearby && userCoords && typeof userCoords.lat === 'number' && typeof userCoords.lng === 'number') {
           L.circle([userCoords.lat, userCoords.lng], { 
             radius: 50000, 
-            color: '#10b981',
-            fillColor: '#10b981',
+            color: '#dc2626',
+            fillColor: '#dc2626',
             fillOpacity: 0.1
           })
             .addTo(mapRef.current!)
@@ -387,9 +387,9 @@ export default function ServiceDetailPage() {
       ? 'Search providers by district, sector, or cell...'
       : 'Search products or services...';
 
-  const mainContainerClasses = darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900';
-  const cardBgClasses = darkMode ? 'bg-gray-800' : 'bg-white';
-  const mutedText = darkMode ? 'text-gray-400' : 'text-gray-500';
+  const mainContainerClasses = darkMode ? 'bg-black text-white' : 'bg-white text-black';
+  const cardBgClasses = darkMode ? 'bg-black border border-white/30' : 'bg-white border border-black';
+  const mutedText = darkMode ? 'text-white' : 'text-black';
 
   const visibleCount = viewMode === 'providers' ? filteredProviders.length : filteredListings.length;
   // render page header + inline spinner while loading so header/navigation remains visible
@@ -401,11 +401,11 @@ export default function ServiceDetailPage() {
           <div className="mb-6">
             <button
               onClick={() => navigate('/services')}
-              className={`text-sm ${mutedText} hover:text-emerald-500 transition-colors mb-3 inline-flex items-center gap-1`}
+              className={`text-sm ${mutedText} hover:text-red-600 transition-colors mb-3 inline-flex items-center gap-1`}
             >
               ← Back to Services
             </button>
-            <h1 className={`text-2xl font-bold tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            <h1 className={`text-2xl font-bold tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-black'}`}>
               {service?.title || 'Service'}
             </h1>
             <p className={`text-sm ${mutedText} mt-2 max-w-2xl`}>
@@ -422,12 +422,12 @@ export default function ServiceDetailPage() {
   }
 
   if (!service) return (
-    <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
       <div className="text-center">
         <h2 className="text-xl font-bold mb-2">Service Not Found</h2>
         <button 
           onClick={() => navigate('/services')}
-          className="px-4 py-2 bg-emerald-500 text-white rounded-sm"
+          className="px-4 py-2 bg-red-600 text-white rounded-sm hover:bg-red-700"
         >
           Back to Services
         </button>
@@ -442,11 +442,11 @@ export default function ServiceDetailPage() {
         <div className="mb-6">
           <button
             onClick={() => navigate('/services')}
-            className={`text-sm ${mutedText} hover:text-emerald-500 transition-colors mb-3 inline-flex items-center gap-1`}
+            className={`text-sm ${mutedText} hover:text-red-600 transition-colors mb-3 inline-flex items-center gap-1`}
           >
             ← Back to Services
           </button>
-          <h1 className={`text-2xl font-bold tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          <h1 className={`text-2xl font-bold tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-black'}`}>
             {service.title}
           </h1>
           <p className={`text-sm ${mutedText} mt-2 max-w-2xl`}>
@@ -457,21 +457,21 @@ export default function ServiceDetailPage() {
         {/* Search and Controls - Compact row */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
           <div className="relative flex-1 max-w-md">
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-red-600" />
             <input
               type="text"
               value={activeSearchTerm}
               onChange={(e) => handleSearchTermChange(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={activeSearchPlaceholder}
-              className={`w-full pl-9 pr-4 py-2 text-sm border-0 ${darkMode ? 'bg-gray-800 text-white placeholder-gray-400' : 'bg-white text-gray-900 placeholder-gray-500'} shadow-sm focus:ring-1 focus:ring-emerald-500`}
+              className={`w-full pl-9 pr-4 py-2 text-sm border ${darkMode ? 'bg-black border-white text-white placeholder-white' : 'bg-white border-black text-black placeholder-black'} shadow-sm focus:ring-1 focus:ring-red-600`}
               style={{ borderRadius: '2px' }}
             />
           </div>
           
           <button
             onClick={handleSearch}
-            className={`px-4 py-2 text-sm font-medium transition-colors ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-emerald-500 text-white hover:bg-emerald-600'} shadow-sm`}
+            className="px-4 py-2 text-sm font-bold transition-colors bg-red-600 text-white hover:bg-red-700 shadow-sm"
             style={{ borderRadius: '2px' }}
           >
             Search
@@ -481,8 +481,8 @@ export default function ServiceDetailPage() {
             <button
               onClick={() => setShowMap(prev => !prev)}
               className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors shadow-sm ${showMap
-                  ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                  : darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50'
+                  ? 'bg-red-600 text-white'
+                  : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
                 }`}
               style={{ borderRadius: '2px' }}
             >
@@ -492,8 +492,8 @@ export default function ServiceDetailPage() {
             <button
               onClick={() => setViewMode('listings')}
               className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors shadow-sm ${viewMode === 'listings'
-                  ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                  : darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50'
+                  ? 'bg-red-600 text-white'
+                  : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
                 }`}
               style={{ borderRadius: '2px' }}
             >
@@ -503,8 +503,8 @@ export default function ServiceDetailPage() {
             <button
               onClick={() => setViewMode('providers')}
               className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors shadow-sm ${viewMode === 'providers'
-                  ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
-                  : darkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-50'
+                  ? 'bg-red-600 text-white'
+                  : darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'
                 }`}
               style={{ borderRadius: '2px' }}
             >
@@ -518,7 +518,7 @@ export default function ServiceDetailPage() {
             <span className={`text-sm ${mutedText}`}>All</span>
             <button
               onClick={() => setShowNearby(!showNearby)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-1 focus:ring-emerald-500 ${showNearby ? 'bg-emerald-500' : darkMode ? 'bg-gray-600' : 'bg-gray-300'}`}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-1 focus:ring-red-600 ${showNearby ? 'bg-red-600' : darkMode ? 'bg-white' : 'bg-black'}`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform ${showNearby ? 'translate-x-6' : 'translate-x-1'}`}
@@ -538,7 +538,7 @@ export default function ServiceDetailPage() {
             />
           </div>
         ) : showMap ? (
-          <div className={`mb-8 text-center py-8 text-sm ${mutedText} border border-dashed ${darkMode ? 'border-gray-700' : 'border-gray-200'}`} style={{ borderRadius: '2px' }}>
+          <div className={`mb-8 text-center py-8 text-sm ${mutedText} border border-dashed ${darkMode ? 'border-white/30' : 'border-black'}`} style={{ borderRadius: '2px' }}>
             <MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" />
             No provider locations to display on map
           </div>
@@ -546,10 +546,10 @@ export default function ServiceDetailPage() {
 
         {/* Providers Count */}
         <div className="mb-4 flex items-center justify-between">
-          <h2 className={`text-base font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          <h2 className={`text-base font-bold uppercase ${darkMode ? 'text-white' : 'text-black'}`}>
             {viewMode === 'providers' ? 'Service Providers' : 'Products & Services'}
           </h2>
-          <span className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-500'}`} style={{ borderRadius: '2px' }}>
+          <span className={`text-xs px-2 py-0.5 ${darkMode ? 'bg-white text-black' : 'bg-black text-white'}`} style={{ borderRadius: '2px' }}>
             {visibleCount} {viewMode === 'providers' ? (visibleCount === 1 ? 'provider' : 'providers') : (visibleCount === 1 ? 'item' : 'items')}
           </span>
         </div>
@@ -582,11 +582,11 @@ export default function ServiceDetailPage() {
                   <div
                     key={provider.id}
                     onClick={() => navigate(`/provider/${provider.id}/uploads`)}
-                    className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-md flex flex-col h-full ${cardBgClasses} border-0 shadow-sm`}
+                    className={`group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-md hover:border-red-600 flex flex-col h-full ${cardBgClasses} shadow-sm`}
                     style={{ borderRadius: '2px' }}
                   >
                   {/* Image */}
-                  <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-700">
+                  <div className="relative h-44 overflow-hidden bg-white dark:bg-black">
                     <img
                       src={imagePath}
                       alt={provider.email.split('@')[0]}
@@ -596,7 +596,7 @@ export default function ServiceDetailPage() {
                       }}
                     />
                     {isNearby && (
-                      <div className="absolute top-1 right-1 px-1.5 py-0.5 text-[9px] font-medium bg-emerald-500 text-white" style={{ borderRadius: '2px' }}>
+                      <div className="absolute top-1 right-1 px-1.5 py-0.5 text-[9px] font-bold bg-red-600 text-white" style={{ borderRadius: '2px' }}>
                         Nearby
                       </div>
                     )}
@@ -604,13 +604,13 @@ export default function ServiceDetailPage() {
 
                   {/* Content */}
                   <div className="p-2.5 flex-1 flex flex-col">
-                    <h3 className={`text-base font-semibold truncate ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors`}>
+                    <h3 className={`text-base font-bold truncate ${darkMode ? 'text-white group-hover:text-red-400' : 'text-black group-hover:text-red-600'} transition-colors`}>
                       {provider.email.split('@')[0]}
                     </h3>
 
                     {locationText && (
                       <div className="flex items-start gap-1 mt-1">
-                        <MapPin className="w-3 h-3 text-gray-400 flex-shrink-0 mt-0.5" />
+                        <MapPin className="w-3 h-3 text-red-600 flex-shrink-0 mt-0.5" />
                         <p className={`text-xs sm:text-sm leading-6 ${mutedText} line-clamp-1`}>
                           {locationText}
                         </p>
@@ -619,11 +619,11 @@ export default function ServiceDetailPage() {
 
                     <div className="mt-auto pt-2">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 text-red-600">
                   
       
                         </div>
-                        <ChevronRight className="w-3.5 h-3.5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <ChevronRight className="w-3.5 h-3.5 text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     </div>
                   </div>
@@ -649,7 +649,7 @@ export default function ServiceDetailPage() {
                   style={{ borderRadius: '2px' }}
                   onClick={() => navigate(`/product-or-service-detail/${item.providerId}/${item.productId}`)}
                 >
-                  <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-700">
+                  <div className="relative h-44 overflow-hidden bg-white dark:bg-black">
                     <img
                       src={imagePath}
                       alt={item.title || 'Item'}
@@ -658,13 +658,13 @@ export default function ServiceDetailPage() {
                         (e.currentTarget as HTMLImageElement).src = blankProfileImage;
                       }}
                     />
-                    <div className={`absolute top-1 right-1 px-1.5 py-0.5 text-[9px] font-medium text-white ${item.type === 'product' ? 'bg-emerald-500' : 'bg-blue-500'}`} style={{ borderRadius: '2px' }}>
+                    <div className="absolute top-1 right-1 px-1.5 py-0.5 text-[9px] font-bold text-white bg-red-600" style={{ borderRadius: '2px' }}>
                       {item.type === 'product' ? 'Product' : 'Service'}
                     </div>
                   </div>
 
                   <div className="p-2.5 flex-1 flex flex-col">
-                    <h3 className={`text-base font-semibold truncate ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'} transition-colors`}>
+                    <h3 className={`text-base font-bold truncate ${darkMode ? 'text-white group-hover:text-red-400' : 'text-black group-hover:text-red-600'} transition-colors`}>
                       {item.title || 'Untitled'}
                     </h3>
 
@@ -674,7 +674,7 @@ export default function ServiceDetailPage() {
 
                     <div className="mt-auto pt-2">
                       <div className="flex items-center justify-between gap-2">
-                        <div className={`text-xs font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        <div className={`text-xs font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
                           {item.price ? `RWF ${item.price.toLocaleString()}` : 'Contact for price'}
                         </div>
                         <button
@@ -683,7 +683,7 @@ export default function ServiceDetailPage() {
                             e.stopPropagation();
                             navigate(`/provider/${item.providerId}/uploads`);
                           }}
-                          className={`text-xs font-medium px-2 py-1 transition-colors ${darkMode ? 'bg-gray-700 text-white hover:bg-emerald-600' : 'bg-gray-100 text-gray-700 hover:bg-emerald-500 hover:text-white'}`}
+                          className={`text-xs font-bold px-2 py-1 transition-colors ${darkMode ? 'bg-black border border-white text-white hover:bg-red-600' : 'bg-white border border-black text-black hover:bg-red-600 hover:text-white'}`}
                           style={{ borderRadius: '2px' }}
                         >
                           Provider

@@ -215,20 +215,19 @@ export default function ProductOrServiceDetail({
       </button>
 
       {(providerId || providerName || providerEmail || providerPhone || providerWhatsapp) && (
-        <div className={`mb-6 p-4 border ${darkMode ? "border-gray-700 bg-gray-900/40" : "border-gray-200 bg-gray-50"}`} style={{ borderRadius: '2px' }}>
+        <div className={`mb-6 p-5 rounded-2xl border shadow-xs ${darkMode ? "border-gray-800 bg-gray-900" : "border-[#E5E5E5] bg-white"}`}>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <img
                 src={providerProfileImage || '/default-profile.png'}
                 alt={providerName || providerEmail || 'Provider profile'}
-                className="w-14 h-14 object-cover flex-shrink-0"
-                style={{ borderRadius: '2px' }}
+                className="w-14 h-14 object-cover flex-shrink-0 rounded-xl border border-[#E5E5E5] dark:border-gray-800"
               />
               <div className="min-w-0 flex-1">
-                <div className={`text-xs uppercase tracking-wide ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                <div className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                   Service provider
                 </div>
-                <h3 className={`text-base font-semibold truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                <h3 className={`text-base font-bold truncate ${darkMode ? 'text-white' : 'text-[#151515]'}`}>
                   {providerName || providerEmail?.split('@')[0] || 'Provider'}
                 </h3>
                 <button
@@ -243,12 +242,9 @@ export default function ProductOrServiceDetail({
                       navigate(`/provider/${providerId}/uploads`);
                     }
                   }}
-                  className={`mt-2 inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold transition-colors md:w-auto w-full
-                      ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
-                        : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
-                  style={{ borderRadius: '2px' }}
+                  className="mt-2 inline-flex items-center justify-center px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors md:w-auto w-full rounded-xl bg-[#E5252A] text-white hover:bg-[#c91d22] shadow-xs"
                 >
-                  View more products and services by {providerName || 'this provider'}
+                  View more by {providerName || 'this provider'}
                 </button>
               </div>
             </div>
@@ -257,18 +253,18 @@ export default function ProductOrServiceDetail({
               {providerPhone && (
                 <a
                   href={`tel:${providerPhone}`}
-                  className={`flex items-center gap-2 text-sm transition-colors ${darkMode ? 'text-gray-200 hover:text-emerald-400' : 'text-gray-700 hover:text-emerald-600'}`}
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${darkMode ? 'text-gray-200 hover:text-[#E5252A]' : 'text-gray-700 hover:text-[#E5252A]'}`}
                 >
-                  <FaPhone className="w-3.5 h-3.5 text-emerald-500" />
+                  <FaPhone className="w-3.5 h-3.5 text-[#E5252A]" />
                   <span>{providerPhone}</span>
                 </a>
               )}
               {providerEmail && (
                 <a
                   href={`mailto:${providerEmail}`}
-                  className={`flex items-center gap-2 text-sm transition-colors ${darkMode ? 'text-gray-200 hover:text-emerald-400' : 'text-gray-700 hover:text-emerald-600'}`}
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${darkMode ? 'text-gray-200 hover:text-[#E5252A]' : 'text-gray-700 hover:text-[#E5252A]'}`}
                 >
-                  <FaEnvelope className="w-3.5 h-3.5 text-emerald-500" />
+                  <FaEnvelope className="w-3.5 h-3.5 text-[#E5252A]" />
                   <span className="truncate">{providerEmail}</span>
                 </a>
               )}
@@ -277,7 +273,7 @@ export default function ProductOrServiceDetail({
                   href={`https://wa.me/${providerWhatsapp.replace(/\D/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex items-center gap-2 text-sm transition-colors ${darkMode ? 'text-gray-200 hover:text-emerald-400' : 'text-gray-700 hover:text-emerald-600'}`}
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${darkMode ? 'text-gray-200 hover:text-green-400' : 'text-gray-700 hover:text-green-600'}`}
                 >
                   <FaWhatsapp className="w-3.5 h-3.5 text-green-500" />
                   <span>{providerWhatsapp}</span>
@@ -302,7 +298,7 @@ export default function ProductOrServiceDetail({
               }}
             >
               {index === 0 && type === "product" && isOutOfStock && (
-                <div className="absolute top-4 left-4 bg-red-600 text-white font-extrabold text-xs px-3 py-1.5 z-10 uppercase tracking-wider shadow-lg" style={{ borderRadius: '2px' }}>
+                <div className="absolute top-4 left-4 bg-[#E5252A] text-white font-extrabold text-xs px-3.5 py-1.5 z-10 uppercase tracking-wider rounded-full shadow-md">
                   OUT OF STOCK
                 </div>
               )}
@@ -384,13 +380,13 @@ export default function ProductOrServiceDetail({
       </div>
 
       {/* Details */}
-      <div className={`w-full md:w-1/3 flex flex-col font-sans p-4 shadow-lg  ${darkMode ? "bg-gray-900 border border-gray-800 text-gray-100" : "bg-white border border-gray-200 text-gray-900"}`}>
-        <h2 className={`text-2xl font-semibold mb-4 ${darkMode ? "text-white" : "text-gray-900"}`}>{title}</h2>
+      <div className={`w-full md:w-1/3 flex flex-col font-sans p-6 rounded-2xl border shadow-xs ${darkMode ? "bg-gray-900 border-gray-800 text-gray-100" : "bg-white border-[#E5E5E5] text-[#151515]"}`}>
+        <h2 className={`text-2xl font-bold tracking-tight mb-4 ${darkMode ? "text-white" : "text-[#151515]"}`}>{title}</h2>
 
         {description && (
-          <div className="mb-4">
+          <div className="mb-5">
             <div 
-              className={`text-base whitespace-pre-line leading-relaxed ${darkMode ? "text-gray-300" : "text-gray-600"}`}
+              className={`text-sm whitespace-pre-line leading-relaxed ${darkMode ? "text-gray-300" : "text-gray-600"}`}
               style={!isDescExpanded ? {
                 display: '-webkit-box',
                 WebkitLineClamp: 15,
@@ -404,7 +400,7 @@ export default function ProductOrServiceDetail({
               <button
                 type="button"
                 onClick={() => setIsDescExpanded(!isDescExpanded)}
-                className="mt-1 text-xs font-bold uppercase tracking-wider text-emerald-500 hover:text-emerald-600 focus:outline-none transition-colors"
+                className="mt-2 text-xs font-bold uppercase tracking-wider text-[#E5252A] hover:text-[#c91d22] focus:outline-none transition-colors"
               >
                 {isDescExpanded ? "View Less" : "View More"}
               </button>
@@ -412,45 +408,43 @@ export default function ProductOrServiceDetail({
           </div>
         )}
 
-        <div className="flex items-center gap-2 flex-wrap mb-1">
-          <p className={`text-lg font-medium ${darkMode ? "text-gray-100" : "text-gray-900"}`}>
-            Price: {formatFrw(price)}
-            <span className={`text-xs font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} ml-1`}>
+        <div className="flex items-center gap-2 flex-wrap mb-2">
+          <p className={`text-xl font-extrabold ${darkMode ? "text-white" : "text-[#151515]"}`}>
+            {formatFrw(price)}
+            <span className={`text-xs font-normal ${darkMode ? 'text-gray-400' : 'text-gray-500'} ml-1.5`}>
               / {pricingUnit || pricing_unit || 'Per Item / Piece'}
             </span>
           </p>
           {used && (
-            <span className="text-[10px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2 py-0.5 font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+            <span className="text-[10px] bg-amber-500/10 text-amber-600 border border-amber-500/20 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
               USED
             </span>
           )}
           {type === "product" && isOutOfStock && (
-            <span className="text-[20px] bg-red-500/10 text-red-500 border border-red-500/20 px-4 py-0.5 font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+            <span className="text-xs bg-red-500/10 text-[#E5252A] border border-red-500/20 px-3 py-1 rounded-full font-bold uppercase tracking-wider">
               OUT OF STOCK
             </span>
           )}
         </div>
 
-        <p className={`text-base font-medium mb-4 ${darkMode ? "text-gray-200" : "text-gray-700"}`}>
-          Total: {formatFrw(price * quantity)}
+        <p className={`text-sm font-semibold mb-5 ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
+          Total: <span className="text-[#E5252A]">{formatFrw(price * quantity)}</span>
         </p>
-
-    
 
         {/* Quantity selector */}
         {!(type === "product" && isOutOfStock) && (
-          <div className={`flex items-center overflow-hidden max-w-[200px] mb-5 ${darkMode ? "border border-gray-700" : "border border-gray-200"}`}>
+          <div className={`flex items-center overflow-hidden max-w-[180px] mb-6 rounded-xl border ${darkMode ? "border-gray-700 bg-gray-800" : "border-[#E5E5E5] bg-[#F5F5F5]"}`}>
             <button
               onClick={handleDecrease}
-              className={`flex-1 py-2 text-xl font-bold ${darkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-500 hover:bg-gray-100"} transition`}
+              className={`flex-1 py-2 text-lg font-bold ${darkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-600 hover:bg-gray-200"} transition`}
               type="button"
             >
               &minus;
             </button>
-            <div className={`flex-1 text-center text-base font-medium py-2 ${darkMode ? "text-gray-100" : "text-gray-900"}`}>{quantity}</div>
+            <div className={`flex-1 text-center text-sm font-bold py-2 ${darkMode ? "text-white" : "text-[#151515]"}`}>{quantity}</div>
             <button
               onClick={handleIncrease}
-              className={`flex-1 py-2 text-xl font-bold ${darkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-500 hover:bg-gray-100"} transition`}
+              className={`flex-1 py-2 text-lg font-bold ${darkMode ? "text-gray-200 hover:bg-gray-700" : "text-gray-600 hover:bg-gray-200"} transition`}
               type="button"
             >
               +
@@ -459,23 +453,23 @@ export default function ProductOrServiceDetail({
         )}
 
         {message && (
-          <div className={`${darkMode ? "mb-4 p-2 bg-green-900 text-green-200 rounded text-sm" : "mb-4 p-2 bg-green-100 text-green-700 rounded text-sm"}`}>
+          <div className={`mb-4 p-3 rounded-xl text-sm font-medium ${darkMode ? "bg-green-950/40 border border-green-900 text-green-300" : "bg-green-50 border border-green-200 text-green-700"}`}>
             {message}
           </div>
         )}
 
         {/* Service Customization Form */}
         {type === "service" && (
-          <div className={`mb-4 p-4 rounded-lg border ${darkMode ? "border-blue-600 bg-blue-900/20" : "border-blue-300 bg-blue-50"}`}>
+          <div className={`mb-5 p-4 rounded-xl border ${darkMode ? "border-gray-800 bg-gray-800/40" : "border-[#E5E5E5] bg-[#F5F5F5]/60"}`}>
             {/* Info Tag */}
-            <div className={`mb-4 p-3 rounded text-sm font-medium ${darkMode ? "bg-blue-800 text-blue-100" : "bg-blue-100 text-blue-800"}`}>
-              The service provider will review and adjust the price based on your customization needs
+            <div className={`mb-3 p-3 rounded-lg text-xs leading-relaxed font-medium ${darkMode ? "bg-gray-800 text-gray-300 border border-gray-700" : "bg-white text-gray-700 border border-[#E5E5E5]"}`}>
+              The service provider will review and adjust the price based on your customization needs.
             </div>
 
             {/* Customization Text Area */}
             <div className="mb-4">
-              <label className={`block text-sm font-semibold mb-2 ${darkMode ? "text-gray-100" : "text-gray-700"}`}>
-                Please specify your needs and customize them <span className="text-red-500">*</span>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+                Specify Requirements <span className="text-[#E5252A]">*</span>
               </label>
               <textarea
                 value={customizationRequest}
@@ -484,17 +478,17 @@ export default function ProductOrServiceDetail({
                   setCustomizationError("");
                 }}
                 placeholder="Describe your specific requirements, preferences, or customizations..."
-                className={`w-full px-3 py-2 rounded border text-sm resize-none focus:outline-none focus:ring-2 ${
+                className={`w-full px-3.5 py-2.5 rounded-xl border text-sm resize-none focus:outline-none focus:ring-2 ${
                   darkMode
-                    ? "border-gray-600 bg-gray-700 text-white focus:ring-hafi-teal"
-                    : "border-gray-300 bg-white text-gray-900 focus:ring-hafi-teal"
+                    ? "border-gray-700 bg-gray-900 text-white focus:ring-[#E5252A]/20 focus:border-[#E5252A]"
+                    : "border-[#E5E5E5] bg-white text-[#151515] focus:ring-[#E5252A]/20 focus:border-[#E5252A]"
                 }`}
                 rows={4}
               />
             </div>
 
             {/* No Customization Option */}
-            <div className="mb-3 flex items-center gap-3">
+            <div className="mb-2 flex items-center gap-2.5">
               <input
                 type="checkbox"
                 id="noCustomization"
@@ -506,16 +500,16 @@ export default function ProductOrServiceDetail({
                   }
                   setCustomizationError("");
                 }}
-                className={`h-4 w-4 rounded ${darkMode ? "accent-hafi-teal-light" : "accent-hafi-teal"}`}
+                className="h-4 w-4 rounded accent-[#E5252A]"
               />
-              <label htmlFor="noCustomization" className={`text-sm font-medium ${darkMode ? "text-gray-200" : "text-gray-700"}`}>
+              <label htmlFor="noCustomization" className={`text-xs font-medium cursor-pointer ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                 No customization needed
               </label>
             </div>
 
             {/* Error Message */}
             {customizationError && (
-              <div className={`p-2 rounded text-sm font-medium ${darkMode ? "bg-red-900 text-red-200" : "bg-red-100 text-red-700"}`}>
+              <div className="p-2.5 rounded-lg text-xs font-semibold bg-red-500/10 text-[#E5252A] border border-red-500/20">
                 {customizationError}
               </div>
             )}
@@ -524,26 +518,26 @@ export default function ProductOrServiceDetail({
 
         {/* Add to cart / Contact seller info if out of stock */}
         {type === "product" && isOutOfStock ? (
-          <div className={`mt-2 p-5 border-2 border-dashed rounded-lg transition-all ${
+          <div className={`mt-2 p-5 border-2 border-dashed rounded-xl transition-all ${
             darkMode 
               ? "bg-red-950/20 border-red-900/60 text-gray-200" 
               : "bg-red-50/50 border-red-200 text-gray-800"
           }`}>
-            <h3 className="text-lg font-bold text-red-600 dark:text-red-400 mb-2 flex items-center gap-2">
-              <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse"></span>
+            <h3 className="text-sm font-bold text-[#E5252A] mb-2 flex items-center gap-2">
+              <span className="inline-block w-2 h-2 rounded-full bg-[#E5252A] animate-pulse"></span>
               Temporarily Out of Stock
             </h3>
-            <p className={`text-sm mb-4 leading-relaxed ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
+            <p className={`text-xs mb-4 leading-relaxed ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
               This product is currently out of stock. Contact the service provider or seller to get details on when it will be available.
             </p>
             
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               {providerPhone && (
                 <a
                   href={`tel:${providerPhone}`}
-                  className="flex items-center justify-center gap-3 py-3 px-4 rounded-md font-semibold text-sm transition-all shadow-sm bg-emerald-600 text-white hover:bg-emerald-500"
+                  className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow-xs bg-[#E5252A] text-white hover:bg-[#c91d22]"
                 >
-                  <FaPhone className="w-4 h-4" />
+                  <FaPhone className="w-3.5 h-3.5" />
                   Call Seller: {providerPhone}
                 </a>
               )}
@@ -554,18 +548,18 @@ export default function ProductOrServiceDetail({
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-3 py-3 px-4 rounded-md font-semibold text-sm text-white transition-all shadow-sm bg-green-600 hover:bg-green-500"
+                  className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider text-white transition-all shadow-xs bg-green-600 hover:bg-green-500"
                 >
-                  <FaWhatsapp className="w-4.5 h-4.5" />
+                  <FaWhatsapp className="w-4 h-4" />
                   WhatsApp: {providerWhatsapp}
                 </a>
               )}
               {!providerPhone && !providerWhatsapp && providerEmail && (
                 <a
                   href={`mailto:${providerEmail}?subject=${encodeURIComponent(`Inquiry about ${title}`)}&body=${encodeURIComponent(`Hello, I would like to know when the product "${title}" will be back in stock.`)}`}
-                  className="flex items-center justify-center gap-3 py-3 px-4 rounded-md font-semibold text-sm text-white transition-all shadow-sm bg-blue-600 hover:bg-blue-500"
+                  className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider text-white transition-all shadow-xs bg-[#0A0A0A] hover:bg-black border border-gray-700"
                 >
-                  <FaEnvelope className="w-4 h-4" />
+                  <FaEnvelope className="w-3.5 h-3.5" />
                   Email Seller: {providerEmail}
                 </a>
               )}
@@ -577,9 +571,7 @@ export default function ProductOrServiceDetail({
         ) : (
           <button
             onClick={handleAddToCart}
-            className={`w-full py-3 text-base font-semibold shadow transition 
-               ${darkMode ? 'bg-emerald-600 text-white hover:bg-emerald-500' 
-                          : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
+            className="w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider shadow-xs transition-all bg-[#E5252A] text-white hover:bg-[#c91d22]"
           >
             {type === "service" ? "Add service to cart" : "Add to cart"}
           </button>
@@ -590,8 +582,8 @@ export default function ProductOrServiceDetail({
 
       {/* Related Products & Services */}
       {relatedItems && relatedItems.length > 0 && (
-        <div className="mt-16 border-t pt-10 border-gray-200 dark:border-gray-800">
-          <h3 className={`text-xl font-bold uppercase tracking-wider mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+        <div className="mt-16 border-t pt-10 border-[#E5E5E5] dark:border-gray-800">
+          <h3 className={`text-lg font-bold uppercase tracking-wider mb-6 ${darkMode ? 'text-white' : 'text-[#151515]'}`}>
             Other products and services from this provider
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -608,13 +600,12 @@ export default function ProductOrServiceDetail({
                   navigate(targetPath);
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className={`group cursor-pointer border p-4 flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
-                  darkMode ? 'bg-gray-900 border-gray-800 hover:border-emerald-700' : 'bg-white border-gray-200 hover:border-emerald-300'
+                className={`group cursor-pointer rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${
+                  darkMode ? 'bg-gray-900 border-gray-800 hover:border-[#E5252A]/40' : 'bg-white border-[#E5E5E5] hover:border-[#E5252A]/40'
                 }`}
-                style={{ borderRadius: '2px' }}
               >
                 <div>
-                  <div className="aspect-square w-full mb-3 overflow-hidden bg-gray-55 dark:bg-gray-950 flex items-center justify-center">
+                  <div className="aspect-square w-full mb-3 overflow-hidden rounded-xl bg-[#F5F5F5] dark:bg-gray-950 flex items-center justify-center">
                     <img
                       src={toAbsoluteMediaUrl(item.url)}
                       alt={item.title || 'Related item'}
@@ -624,15 +615,11 @@ export default function ProductOrServiceDetail({
                       }}
                     />
                   </div>
-                  <div className={`text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5 ${
-                    item.type === 'service' 
-                      ? (darkMode ? 'text-teal-400' : 'text-teal-600') 
-                      : (darkMode ? 'text-emerald-400' : 'text-emerald-600')
-                  }`}>
+                  <div className="text-[10px] font-bold uppercase tracking-wider mb-1.5 text-[#E5252A]">
                     {item.type}
                   </div>
-                  <h5 className={`font-semibold text-base mb-1 group-hover:text-emerald-500 transition-colors line-clamp-1 ${
-                    darkMode ? 'text-white' : 'text-gray-900'
+                  <h5 className={`font-bold text-sm mb-1 group-hover:text-[#E5252A] transition-colors line-clamp-1 ${
+                    darkMode ? 'text-white' : 'text-[#151515]'
                   }`}>
                     {item.title || 'Untitled'}
                   </h5>
@@ -645,12 +632,10 @@ export default function ProductOrServiceDetail({
                   )}
                 </div>
                 <div>
-                  <div className={`text-sm font-semibold mt-2 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                  <div className={`text-sm font-extrabold mt-2 ${darkMode ? 'text-gray-200' : 'text-[#151515]'}`}>
                     {item.price ? formatFrw(item.price) : 'Contact for price'}
                   </div>
-                  <span className={`mt-3 inline-flex text-xs font-semibold items-center gap-1 transition-colors ${
-                    darkMode ? 'text-emerald-400 group-hover:text-emerald-300' : 'text-emerald-600 group-hover:text-emerald-700'
-                  }`}>
+                  <span className="mt-3 inline-flex text-xs font-bold items-center gap-1 transition-colors text-[#E5252A] group-hover:text-[#c91d22]">
                     View Details &rarr;
                   </span>
                 </div>

@@ -64,6 +64,7 @@ import Contact from './pages/Contact';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
 import Hafibot from './components/Hafibot';
 import Seo from './components/Seo';
+import voltaleLogo from './assets/images/voltale.png';
 
 
 
@@ -76,6 +77,10 @@ function VerifyPageWrapper() {
 
 const App: React.FC = () => {
 
+  const location = useLocation();
+  const state = location.state as { backgroundLocation?: Location; from?: string } | undefined;
+  const backgroundLocation = state?.backgroundLocation;
+  const isAuthPage = location.pathname === '/login' && !backgroundLocation;
   const [chatCustomerId, setChatCustomerId] = useState<string | null>(null);
   const [chatWidth, setChatWidth] = useState(50);
   const { darkMode } = useDarkMode();
@@ -129,9 +134,9 @@ const App: React.FC = () => {
         >
           <div className="flex flex-col min-h-screen bg-gray-50/50 text-black font-sans dark:bg-gray-950 dark:text-gray-100 overflow-x-hidden">
 
-            <main className="flex-grow px-4 py-6 overflow-x-hidden">
+            <main className={`flex-grow overflow-x-hidden ${isAuthPage ? "p-0" : "px-4 py-6"}`}>
 
-          <Routes>
+          <Routes location={backgroundLocation || location}>
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
               <Route path="/reset-password" element={<ResetPassword />} />
@@ -259,6 +264,12 @@ const App: React.FC = () => {
 
           </Routes>
 
+          {backgroundLocation && (
+            <Routes>
+              <Route path="/login" element={<Login />} />
+            </Routes>
+          )}
+
 
 
 
@@ -274,7 +285,7 @@ const App: React.FC = () => {
         </main>
 
 
-        {!isBotOpen && (
+        {!isBotOpen && !isAuthPage && (
         <footer className="py-12 mt-auto border-t-2 border-red-600 bg-black text-white transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-10">
@@ -355,7 +366,7 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8 border-t border-zinc-800">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pt-8 border-t border-zinc-800">
               <div>
                 <a href="/" className="text-2xl font-black text-white mb-3 block hover:text-red-500 transition-colors tracking-tight">
                   HafiConnect<span className="text-red-600">.</span>
@@ -379,7 +390,7 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
                 <div>
                   <h4 className="font-black mb-3 text-sm uppercase tracking-wider text-white border-b-2 border-red-600 inline-block pb-1">
                     Quick Links
@@ -402,7 +413,35 @@ const App: React.FC = () => {
                     Phone: <a href="tel:+250791689396" className="text-white hover:text-red-600 font-semibold transition-colors">+250 791 689 396</a>
                   </p>
                 </div>
-              </div>
+
+                <div className="flex justify-start md:justify-end items-start">
+                  <a
+                    href="https://www.voltaleltd.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    title="Visit VOLTALE LTD (opens in new tab)"
+                    className="group inline-flex items-center gap-3 rounded-xl bg-red-600 px-4 py-3 text-white shadow-lg border-2 border-red-500 hover:bg-red-700 hover:border-red-400 hover:shadow-red-950/20 hover:-translate-y-0.5 transition-all duration-300"
+                  >
+                    <img src={voltaleLogo} alt="VOLTALE LTD logo" className="h-10 w-10 object-contain flex-shrink-0" />
+                    <div className="flex flex-col text-left">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-white/80 leading-tight">
+                        Powered by
+                      </span>
+                      <span className="text-sm font-black tracking-tight text-white leading-snug">
+                        VOLTALE LTD
+                      </span>
+                      <span className="text-[11px] font-bold text-white inline-flex items-center gap-1 group-hover:underline mt-0.5">
+                        Visit Website
+                        <span className="inline-block transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
+                      </span>
+                    </div>
+                    <div className="ml-1.5 flex items-center justify-center w-7 h-7 rounded-full bg-white/20 text-white group-hover:bg-white/30 transition-colors duration-300">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </div>
+                  </a>
+                </div>
             </div>
           </div>
 

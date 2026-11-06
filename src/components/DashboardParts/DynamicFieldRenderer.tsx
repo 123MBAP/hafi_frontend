@@ -59,7 +59,7 @@ export const DynamicFieldRenderer: React.FC<DynamicFieldRendererProps> = ({
                         className={`w-full px-4 py-2.5 border text-sm focus:border-emerald-500 focus:outline-none transition-all ${
                             error ? 'border-red-500' : 'border-gray-250 text-gray-900 placeholder-gray-400'
                         }`}
-                        style={{ borderRadius: '2px' }}
+                       
                     />
                 );
 
@@ -78,7 +78,7 @@ export const DynamicFieldRenderer: React.FC<DynamicFieldRendererProps> = ({
                         className={`w-full px-4 py-2.5 border text-sm focus:border-emerald-500 focus:outline-none transition-all ${
                             error ? 'border-red-500' : 'border-gray-250 text-gray-900 placeholder-gray-400'
                         }`}
-                        style={{ borderRadius: '2px' }}
+                       
                     />
                 );
 
@@ -92,7 +92,7 @@ export const DynamicFieldRenderer: React.FC<DynamicFieldRendererProps> = ({
                         className={`w-full px-4 py-2.5 border text-sm focus:border-emerald-500 focus:outline-none transition-all ${
                             error ? 'border-red-500' : 'border-gray-250 text-gray-900'
                         }`}
-                        style={{ borderRadius: '2px' }}
+                       
                     >
                         <option value="">Select {field.field_label}</option>
                         {field.options?.map((option, index) => {
@@ -131,7 +131,7 @@ export const DynamicFieldRenderer: React.FC<DynamicFieldRendererProps> = ({
                                             }
                                         }}
                                         className="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500"
-                                        style={{ borderRadius: '2px' }}
+                                       
                                     />
                                     <span className="text-gray-750 text-sm">{optionLabel}</span>
                                 </label>
@@ -181,7 +181,7 @@ export const DynamicFieldRenderer: React.FC<DynamicFieldRendererProps> = ({
                                 }
                                 placeholder="Min"
                                 className="w-full px-4 py-2 border border-gray-250 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none transition-all"
-                                style={{ borderRadius: '2px' }}
+                               
                             />
                         </div>
                         <div>
@@ -194,7 +194,7 @@ export const DynamicFieldRenderer: React.FC<DynamicFieldRendererProps> = ({
                                 }
                                 placeholder="Max"
                                 className="w-full px-4 py-2 border border-gray-250 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none transition-all"
-                                style={{ borderRadius: '2px' }}
+                               
                             />
                         </div>
                     </div>
@@ -216,7 +216,7 @@ export const DynamicFieldRenderer: React.FC<DynamicFieldRendererProps> = ({
                                 placeholder="-1.9403"
                                 step="any"
                                 className="w-full px-4 py-2 border border-gray-250 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none transition-all"
-                                style={{ borderRadius: '2px' }}
+                               
                             />
                         </div>
                         <div>
@@ -230,7 +230,7 @@ export const DynamicFieldRenderer: React.FC<DynamicFieldRendererProps> = ({
                                 placeholder="29.8739"
                                 step="any"
                                 className="w-full px-4 py-2 border border-gray-250 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none transition-all"
-                                style={{ borderRadius: '2px' }}
+                               
                             />
                         </div>
                     </div>
@@ -247,7 +247,7 @@ export const DynamicFieldRenderer: React.FC<DynamicFieldRendererProps> = ({
                         className={`w-full px-4 py-2 border text-sm focus:border-emerald-500 focus:outline-none transition-all ${
                             error ? 'border-red-500' : 'border-gray-250 text-gray-900'
                         }`}
-                        style={{ borderRadius: '2px' }}
+                       
                     />
                 );
 

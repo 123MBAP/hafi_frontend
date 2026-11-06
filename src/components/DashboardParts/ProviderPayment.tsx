@@ -248,7 +248,7 @@ export default function ProviderUpgradePaymentPage() {
           className={`w-full py-2.5 px-4 rounded font-bold text-xs uppercase tracking-wider transition-colors ${
             darkMode ? 'bg-gray-850 hover:bg-gray-750 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
           }`}
-          style={{ borderRadius: '2px' }}
+         
         >
           Back to Plans
         </button>
@@ -279,7 +279,7 @@ export default function ProviderUpgradePaymentPage() {
           className={`w-full py-2.5 px-4 rounded font-bold text-xs uppercase tracking-wider transition-colors ${
             darkMode ? 'bg-gray-850 hover:bg-gray-750 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
           }`}
-          style={{ borderRadius: '2px' }}
+         
         >
           Back to Plans
         </button>
@@ -297,7 +297,7 @@ export default function ProviderUpgradePaymentPage() {
               ? 'border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700' 
               : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
           }`}
-          style={{ borderRadius: '2px' }}
+         
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Plans</span>
@@ -323,7 +323,7 @@ export default function ProviderUpgradePaymentPage() {
                   ? 'border-emerald-500 bg-emerald-500 text-white shadow-sm font-bold' 
                   : `${borderColor} ${cardBg} ${textColor} hover:border-emerald-400`
               }`}
-              style={{ borderRadius: '2px' }}
+             
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -345,7 +345,7 @@ export default function ProviderUpgradePaymentPage() {
 
       {/* Selected plan details */}
       {selectedPlan && (
-        <div className={`mb-6 p-6 border ${borderColor} ${cardBg}`} style={{ borderRadius: '2px' }}>
+        <div className={`mb-6 p-6 border ${borderColor} ${cardBg}`}>
           <h2 className={`font-bold text-base uppercase tracking-tight mb-4 ${textColor}`}>
             {getTitle(selectedPlan)} - {getPrice(selectedPlan).toLocaleString()} RWF
           </h2>
@@ -373,7 +373,7 @@ export default function ProviderUpgradePaymentPage() {
                     ? 'bg-yellow-500 text-white border-yellow-500 font-bold shadow-sm' 
                     : `${borderColor} ${cardBg} ${textColor} hover:border-yellow-450`
                 }`}
-                style={{ borderRadius: '2px' }}
+               
               >
                 <img src={MtnIcon} alt="MTN" className="w-6 h-6 mr-2" /> 
                 <span className="text-xs uppercase tracking-wider">MTN</span>
@@ -385,7 +385,7 @@ export default function ProviderUpgradePaymentPage() {
                     ? 'bg-red-600 text-white border-red-600 font-bold shadow-sm' 
                     : `${borderColor} ${cardBg} ${textColor} hover:border-red-450`
                 }`}
-                style={{ borderRadius: '2px' }}
+               
               >
                 <img src={AirtelIcon} alt="Airtel" className="w-6 h-6 mr-2" /> 
                 <span className="text-xs uppercase tracking-wider">Airtel</span>
@@ -413,7 +413,7 @@ export default function ProviderUpgradePaymentPage() {
                         ? 'bg-gray-900 text-white border-gray-750'
                         : 'bg-white text-gray-900 border-gray-250'
                     } ${status === 'processing' ? 'opacity-50 cursor-not-allowed' : ''} focus:outline-none focus:ring-1 focus:ring-emerald-500`}
-                    style={{ borderRadius: '2px' }}
+                   
                   />
                 </div>
                 <p className={`text-[9px] font-bold uppercase tracking-wider mt-1 ${secondaryTextColor}`}>
@@ -423,7 +423,7 @@ export default function ProviderUpgradePaymentPage() {
             )}
 
             {selectedMethod === 'wallet' && (
-              <div className={`mb-4 p-3 border ${darkMode ? 'bg-emerald-500/10 text-emerald-450 border-emerald-500/20' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`} style={{ borderRadius: '2px' }}>
+              <div className={`mb-4 p-3 border ${darkMode ? 'bg-emerald-500/10 text-emerald-450 border-emerald-500/20' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
                 <div className="text-xs font-bold uppercase tracking-wider">
                   Payment will be taken from your wallet balance.
                 </div>
@@ -441,7 +441,7 @@ export default function ProviderUpgradePaymentPage() {
                   ? 'bg-gray-400 cursor-not-allowed text-white'
                   : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm'
               }`}
-              style={{ borderRadius: '2px' }}
+             
             >
               {submitting ? 'Processing…' : `Pay ${getPrice(selectedPlan).toLocaleString()} RWF`}
             </button>
@@ -455,7 +455,7 @@ export default function ProviderUpgradePaymentPage() {
                 : resultMsg.includes('successful') || resultMsg.includes('Success')
                 ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
                 : 'bg-blue-500/10 text-blue-500 border-blue-500/20'
-            }`} style={{ borderRadius: '2px' }}>
+            }`}>
               {resultMsg}
             </div>
           )}

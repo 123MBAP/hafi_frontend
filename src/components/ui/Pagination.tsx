@@ -1,4 +1,4 @@
-// Updated Pagination component (if needed)
+// Shared Pagination component
 interface PaginationProps {
   currentPage: number;
   totalItems: number;
@@ -47,12 +47,15 @@ export default function Pagination({
   };
 
   return (
-    <div className={`flex justify-center items-center gap-1 ${className}`}>
+    <div className={`flex justify-center items-center gap-1.5 ${className}`}>
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`px-3 py-1.5 text-sm transition-colors disabled:opacity-40 ${darkMode ? 'text-gray-400 hover:text-white hover:bg-gray-800' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
-        style={{ borderRadius: '2px' }}
+        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed border ${
+          darkMode
+            ? 'border-gray-800 text-gray-300 hover:text-white hover:bg-gray-800'
+            : 'border-[#E5E5E5] text-[#151515] hover:bg-gray-100'
+        }`}
       >
         Previous
       </button>
@@ -61,13 +64,17 @@ export default function Pagination({
         <button
           key={idx}
           onClick={() => typeof page === 'number' && onPageChange(page)}
-          className={`px-3 py-1.5 text-sm transition-colors ${page === currentPage
-              ? darkMode ? 'bg-emerald-600 text-white' : 'bg-emerald-500 text-white'
+          className={`min-w-8 h-8 px-2 text-xs font-semibold rounded-lg transition-all flex items-center justify-center ${
+            page === currentPage
+              ? 'bg-[#E5252A] text-white shadow-xs'
               : typeof page === 'number'
-                ? darkMode ? 'text-gray-400 hover:text-white hover:bg-gray-800' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
-                : darkMode ? 'text-gray-500' : 'text-gray-400'
-            }`}
-          style={{ borderRadius: '2px' }}
+                ? darkMode
+                  ? 'text-gray-300 hover:text-white hover:bg-gray-800 border border-transparent'
+                  : 'text-[#151515] hover:bg-gray-100 border border-transparent'
+                : darkMode
+                  ? 'text-gray-500'
+                  : 'text-gray-400'
+          }`}
           disabled={typeof page !== 'number'}
         >
           {page}
@@ -77,8 +84,11 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className={`px-3 py-1.5 text-sm transition-colors disabled:opacity-40 ${darkMode ? 'text-gray-400 hover:text-white hover:bg-gray-800' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}
-        style={{ borderRadius: '2px' }}
+        className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed border ${
+          darkMode
+            ? 'border-gray-800 text-gray-300 hover:text-white hover:bg-gray-800'
+            : 'border-[#E5E5E5] text-[#151515] hover:bg-gray-100'
+        }`}
       >
         Next
       </button>

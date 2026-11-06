@@ -229,7 +229,7 @@ export default function MadeInRwandaProductDetail() {
             {/* Made in Rwanda Badge in sidebar */}
             {product.madeInRwanda && (
                 <div className="fixed top-20 right-4 z-50">
-                    <div className="bg-emerald-500 text-white text-sm font-semibold px-4 py-2 rounded-full shadow-lg">
+                    <div className="bg-[#E5252A] text-white text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full shadow-lg border border-white/20">
                         🇷🇼 Made in Rwanda
                     </div>
                 </div>

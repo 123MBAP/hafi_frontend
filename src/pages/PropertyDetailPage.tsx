@@ -206,19 +206,13 @@ export default function PropertyDetailPage() {
             }
         }
 
-        if (!items.length && property?.location) {
-            push('District', property.location.district);
-            push('Sector', property.location.sector);
-            push('Cell', property.location.cell);
-        }
-
-        if (items.length === 0 && values && typeof values === 'object') {
-            const v = values as any;
-            push('District', v.district);
-            push('Sector', v.sector);
-            push('Cell', v.cell);
-            push('Village', v.village);
-            push('Province', v.province);
+        if (items.length === 0) {
+            const v = (values && typeof values === 'object') ? (values as any) : {};
+            if (v.province) push('Province', v.province);
+            if (v.district || property?.location?.district) push('District', v.district || property?.location?.district);
+            if (v.sector || property?.location?.sector) push('Sector', v.sector || property?.location?.sector);
+            if (v.cell || property?.location?.cell) push('Cell', v.cell || property?.location?.cell);
+            if (v.village) push('Village', v.village);
         }
 
         return items;
@@ -252,6 +246,41 @@ export default function PropertyDetailPage() {
             }
             return String(raw).trim();
         };
+
+        // First check for hardcoded real estate structured fields
+        const v = values as any;
+        const detailsFields: DisplayField[] = [];
+        if (v.property_category) detailsFields.push({ label: 'Property Category', value: String(v.property_category) });
+        if (v.listing_type) detailsFields.push({ label: 'Listing Type', value: String(v.listing_type) });
+        if (v.land_size_sqm != null) detailsFields.push({ label: 'Land Size', value: `${v.land_size_sqm} m²` });
+        if (v.land_use) detailsFields.push({ label: 'Land Use', value: String(v.land_use) });
+        if (v.road_access != null) detailsFields.push({ label: 'Road Access', value: v.road_access ? 'Yes' : 'No' });
+        if (Array.isArray(v.utilities_available) && v.utilities_available.length > 0) {
+            detailsFields.push({ label: 'Utilities Available', value: v.utilities_available.join(', ') });
+        }
+        if (v.building_area_sqm != null) detailsFields.push({ label: 'Building Area', value: `${v.building_area_sqm} m²` });
+        if (v.number_of_floors != null) detailsFields.push({ label: 'Number of Floors', value: String(v.number_of_floors) });
+        if (v.rooms_or_offices != null) detailsFields.push({ label: 'Rooms or Offices', value: String(v.rooms_or_offices) });
+        if (v.bedrooms != null) detailsFields.push({ label: 'Bedrooms', value: String(v.bedrooms) });
+        if (v.bathrooms != null) detailsFields.push({ label: 'Bathrooms', value: String(v.bathrooms) });
+        if (v.kitchen != null) detailsFields.push({ label: 'Kitchen', value: v.kitchen ? 'Yes' : 'No' });
+        if (v.parking != null) detailsFields.push({ label: 'Parking', value: v.parking ? 'Yes' : 'No' });
+        if (v.garden_swimming_pool != null) detailsFields.push({ label: 'Garden / Swimming Pool', value: v.garden_swimming_pool ? 'Yes' : 'No' });
+        if (v.floor_area_sqm != null) detailsFields.push({ label: 'Floor Area', value: `${v.floor_area_sqm} m²` });
+        if (v.floor_number != null) detailsFields.push({ label: 'Floor Number', value: String(v.floor_number) });
+        if (v.furnished != null) detailsFields.push({ label: 'Furnished', value: v.furnished ? 'Yes' : 'No' });
+
+        if (detailsFields.length > 0) {
+            groups.push({ title: 'Property Details', fields: detailsFields });
+        }
+
+        // Amenities
+        if (Array.isArray(v.amenities) && v.amenities.length > 0) {
+            groups.push({
+                title: 'Amenities',
+                fields: v.amenities.map((item) => ({ label: item })),
+            });
+        }
 
         for (const feature of serviceFeatures) {
             if (!feature) continue;

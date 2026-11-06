@@ -318,7 +318,7 @@ export const AdminServiceManager: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Services List */}
                 <div className="lg:col-span-1">
-                    <div className="bg-white border border-gray-250 p-6 shadow-sm" style={{ borderRadius: '2px' }}>
+                    <div className="bg-white border border-gray-250 p-6 shadow-sm">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-sm font-bold uppercase tracking-wider text-gray-800">Services</h2>
                             <button
@@ -327,7 +327,7 @@ export const AdminServiceManager: React.FC = () => {
                                     setShowServiceForm(true);
                                 }}
                                 className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold uppercase text-xs tracking-wider transition-colors duration-200"
-                                style={{ borderRadius: '2px' }}
+                               
                             >
                                 + New Service
                             </button>
@@ -356,7 +356,7 @@ export const AdminServiceManager: React.FC = () => {
                                             ? 'bg-emerald-50 border-emerald-500 text-emerald-900'
                                             : 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-700'
                                             }`}
-                                        style={{ borderRadius: '2px' }}
+                                       
                                         onClick={() => setSelectedService(service)}
                                     >
                                         <div className="flex justify-between items-start">
@@ -364,7 +364,7 @@ export const AdminServiceManager: React.FC = () => {
                                                 <h3 className="font-bold text-sm text-gray-800">{service.name}</h3>
                                                 <p className="text-xs text-gray-500">{service.slug}</p>
                                                 {service.has_specific_features && (
-                                                    <span className="inline-block mt-1 px-2 py-0.5 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+                                                    <span className="inline-block mt-1 px-2 py-0.5 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
                                                         Custom Fields
                                                     </span>
                                                 )}
@@ -410,7 +410,7 @@ export const AdminServiceManager: React.FC = () => {
                 {/* Field Definitions */}
                 <div className="lg:col-span-2">
                     {selectedService ? (
-                        <div className="bg-white border border-gray-250 p-6 shadow-sm" style={{ borderRadius: '2px' }}>
+                        <div className="bg-white border border-gray-250 p-6 shadow-sm">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-sm font-bold uppercase tracking-wider text-gray-800">
                                     {selectedService.name} - Field Definitions
@@ -423,7 +423,7 @@ export const AdminServiceManager: React.FC = () => {
                                             setShowFieldForm(true);
                                         }}
                                         className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold uppercase text-xs tracking-wider transition-colors duration-200"
-                                        style={{ borderRadius: '2px' }}
+                                       
                                     >
                                         + Add Field
                                     </button>
@@ -431,7 +431,7 @@ export const AdminServiceManager: React.FC = () => {
                             </div>
 
                             {!selectedService.has_specific_features ? (
-                                <div className="text-center py-12 text-gray-650 bg-gray-50 border border-gray-200" style={{ borderRadius: '2px' }}>
+                                <div className="text-center py-12 text-gray-650 bg-gray-50 border border-gray-200">
                                     <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                     </svg>
@@ -439,7 +439,7 @@ export const AdminServiceManager: React.FC = () => {
                                     <p className="text-xs mt-2 text-gray-500">Edit the service and enable "Dynamic Fields" to add custom fields.</p>
                                 </div>
                             ) : fields.length === 0 ? (
-                                <div className="text-center py-12 bg-emerald-50 border border-emerald-150" style={{ borderRadius: '2px' }}>
+                                <div className="text-center py-12 bg-emerald-50 border border-emerald-150">
                                     <svg className="w-16 h-16 mx-auto mb-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                     </svg>
@@ -452,7 +452,7 @@ export const AdminServiceManager: React.FC = () => {
                                             setShowFieldForm(true);
                                         }}
                                         className="inline-flex items-center px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold uppercase text-xs tracking-wider transition-colors duration-200"
-                                        style={{ borderRadius: '2px' }}
+                                       
                                     >
                                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -466,21 +466,21 @@ export const AdminServiceManager: React.FC = () => {
                                         <div
                                             key={field.id}
                                             className="p-4 bg-gray-50 border border-gray-200"
-                                            style={{ borderRadius: '2px' }}
+                                           
                                         >
                                             <div className="flex justify-between items-start">
                                                 <div className="flex-1">
                                                     <div className="flex items-center space-x-2 mb-1">
                                                         <h3 className="font-bold text-sm text-gray-800">{field.field_label}</h3>
                                                         {field.is_required && (
-                                                            <span className="px-2 py-0.5 bg-red-50 border border-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+                                                            <span className="px-2 py-0.5 bg-red-50 border border-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider">
                                                                 Required
                                                             </span>
                                                         )}
-                                                        <span className="px-2 py-0.5 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+                                                        <span className="px-2 py-0.5 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">
                                                             {field.input_type}
                                                         </span>
-                                                        <span className="px-2 py-0.5 bg-gray-100 border border-gray-200 text-gray-750 text-[10px] font-bold uppercase tracking-wider" style={{ borderRadius: '2px' }}>
+                                                        <span className="px-2 py-0.5 bg-gray-100 border border-gray-200 text-gray-750 text-[10px] font-bold uppercase tracking-wider">
                                                             {field.usage_context}
                                                         </span>
                                                     </div>
@@ -528,7 +528,7 @@ export const AdminServiceManager: React.FC = () => {
                             )}
                         </div>
                     ) : (
-                        <div className="bg-white border border-gray-250 p-6 shadow-sm" style={{ borderRadius: '2px' }}>
+                        <div className="bg-white border border-gray-250 p-6 shadow-sm">
                             <div className="text-center py-12 text-gray-600">
                                 <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -543,7 +543,7 @@ export const AdminServiceManager: React.FC = () => {
             {/* Service Form Modal */}
             {showServiceForm && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white border border-gray-250 p-8 max-w-2xl w-full max-h-screen overflow-y-auto shadow-xl" style={{ borderRadius: '2px' }}>
+                    <div className="bg-white border border-gray-250 p-8 max-w-2xl w-full max-h-screen overflow-y-auto shadow-xl">
                         <h2 className="text-xl font-bold uppercase tracking-tight text-gray-900 mb-6">
                             {selectedService ? 'Edit Service' : 'Create New Service'}
                         </h2>
@@ -559,7 +559,7 @@ export const AdminServiceManager: React.FC = () => {
                                     onChange={(e) => setServiceForm(prev => ({ ...prev, name: e.target.value }))}
                                     required
                                     className="w-full px-4 py-2.5 border border-gray-250 text-sm text-gray-900 bg-white focus:border-emerald-500 focus:outline-none transition-all"
-                                    style={{ borderRadius: '2px' }}
+                                   
                                 />
                             </div>
 
@@ -574,7 +574,7 @@ export const AdminServiceManager: React.FC = () => {
                                     required
                                     placeholder="lowercase-with-dashes"
                                     className="w-full px-4 py-2.5 border border-gray-250 text-sm text-gray-900 bg-white placeholder-gray-405 focus:border-emerald-500 focus:outline-none transition-all"
-                                    style={{ borderRadius: '2px' }}
+                                   
                                 />
                             </div>
 
@@ -585,7 +585,7 @@ export const AdminServiceManager: React.FC = () => {
                                     onChange={(e) => setServiceForm(prev => ({ ...prev, description: e.target.value }))}
                                     rows={3}
                                     className="w-full px-4 py-2.5 border border-gray-250 text-sm text-gray-900 bg-white focus:border-emerald-500 focus:outline-none transition-all"
-                                    style={{ borderRadius: '2px' }}
+                                   
                                 />
                             </div>
 
@@ -601,7 +601,7 @@ export const AdminServiceManager: React.FC = () => {
                                             }
                                         }}
                                         className="w-4 h-4 mt-1 text-emerald-600 border-gray-300 focus:ring-emerald-500"
-                                        style={{ borderRadius: '2px' }}
+                                       
                                     />
                                     <div>
                                         <span className="text-gray-800 font-semibold">Specific Features</span>
@@ -611,7 +611,7 @@ export const AdminServiceManager: React.FC = () => {
 
                                 {/* Show inline field builder when specific features is enabled */}
                                 {serviceForm.has_specific_features && !selectedService && (
-                                    <div className="mt-3 p-5 bg-gray-50 border border-gray-250" style={{ borderRadius: '2px' }}>
+                                    <div className="mt-3 p-5 bg-gray-50 border border-gray-250">
                                         <div className="flex justify-between items-center mb-4">
                                             <div>
                                                 <h4 className="text-sm font-bold uppercase tracking-wider text-gray-800 flex items-center">
@@ -635,7 +635,7 @@ export const AdminServiceManager: React.FC = () => {
                                                     }]);
                                                 }}
                                                 className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold uppercase text-xs tracking-wider transition flex items-center shadow-sm"
-                                                style={{ borderRadius: '2px' }}
+                                               
                                             >
                                                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -646,16 +646,16 @@ export const AdminServiceManager: React.FC = () => {
 
                                         <div className="space-y-3 max-h-96 overflow-y-auto">
                                             {newServiceFields.map((field, index) => (
-                                                <div key={field.tempId} className="p-4 bg-white border border-gray-250 shadow-sm transition-all" style={{ borderRadius: '2px' }}>
+                                                <div key={field.tempId} className="p-4 bg-white border border-gray-250 shadow-sm transition-all">
                                                     <div className="flex justify-between items-start mb-3">
-                                                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5" style={{ borderRadius: '2px' }}>Field {index + 1}</span>
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5">Field {index + 1}</span>
                                                         <button
                                                             type="button"
                                                             onClick={() => {
                                                                 setNewServiceFields(prev => prev.filter(f => f.tempId !== field.tempId));
                                                             }}
                                                             className="text-red-500 hover:text-red-750 transition-colors p-1 hover:bg-red-50"
-                                                            style={{ borderRadius: '2px' }}
+                                                           
                                                             title="Remove field"
                                                         >
                                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -677,7 +677,7 @@ export const AdminServiceManager: React.FC = () => {
                                                                 }}
                                                                 placeholder="e.g., Listing Type, Number of Bedrooms, Property Type"
                                                                 className="w-full px-3 py-2 text-sm border border-gray-250 text-gray-900 bg-white placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
-                                                                style={{ borderRadius: '2px' }}
+                                                               
                                                             />
                                                         </div>
 
@@ -692,7 +692,7 @@ export const AdminServiceManager: React.FC = () => {
                                                                         ));
                                                                     }}
                                                                     className="w-full px-3 py-2 text-sm border border-gray-250 text-gray-900 bg-white focus:border-emerald-500 focus:outline-none transition-all"
-                                                                    style={{ borderRadius: '2px' }}
+                                                                   
                                                                 >
                                                                     <option value="text">Text</option>
                                                                     <option value="number">Number</option>
@@ -713,7 +713,7 @@ export const AdminServiceManager: React.FC = () => {
                                                                         ));
                                                                     }}
                                                                     className="w-full px-3 py-2 text-sm border border-gray-250 text-gray-900 bg-white focus:border-emerald-500 focus:outline-none transition-all"
-                                                                    style={{ borderRadius: '2px' }}
+                                                                   
                                                                 >
                                                                     <option value="both">Upload & Filter</option>
                                                                     <option value="upload_only">Upload Only</option>
@@ -738,7 +738,7 @@ export const AdminServiceManager: React.FC = () => {
                                                                     }}
                                                                     placeholder="e.g., Rent, Sell, Lease"
                                                                     className="w-full px-3 py-2 text-sm border border-gray-250 text-gray-900 bg-white placeholder-gray-400 focus:border-emerald-500 focus:outline-none transition-all"
-                                                                    style={{ borderRadius: '2px' }}
+                                                                   
                                                                 />
                                                             </div>
                                                         )}
@@ -753,7 +753,7 @@ export const AdminServiceManager: React.FC = () => {
                                                                     ));
                                                                 }}
                                                                 className="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500"
-                                                                style={{ borderRadius: '2px' }}
+                                                               
                                                             />
                                                             <span className="text-sm text-gray-700 font-medium">Required field</span>
                                                         </label>
@@ -762,7 +762,7 @@ export const AdminServiceManager: React.FC = () => {
                                             ))}
 
                                             {newServiceFields.length === 0 && (
-                                                <div className="text-center py-8 text-gray-500 bg-white border border-dashed border-gray-250 animate-pulse" style={{ borderRadius: '2px' }}>
+                                                <div className="text-center py-8 text-gray-500 bg-white border border-dashed border-gray-250 animate-pulse">
                                                     <svg className="w-12 h-12 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                     </svg>
@@ -773,7 +773,7 @@ export const AdminServiceManager: React.FC = () => {
                                         </div>
 
                                         {newServiceFields.length > 0 && (
-                                            <div className="mt-4 p-3 bg-emerald-50 border border-emerald-100" style={{ borderRadius: '2px' }}>
+                                            <div className="mt-4 p-3 bg-emerald-50 border border-emerald-100">
                                                 <div className="flex items-center text-xs font-bold uppercase tracking-wider text-emerald-700">
                                                     <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -791,7 +791,7 @@ export const AdminServiceManager: React.FC = () => {
                                         checked={serviceForm.supports_products}
                                         onChange={(e) => setServiceForm(prev => ({ ...prev, supports_products: e.target.checked }))}
                                         className="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500"
-                                        style={{ borderRadius: '2px' }}
+                                       
                                     />
                                     <span className="text-sm text-gray-700 font-semibold">Supports products</span>
                                 </label>
@@ -802,7 +802,7 @@ export const AdminServiceManager: React.FC = () => {
                                         checked={serviceForm.supports_services}
                                         onChange={(e) => setServiceForm(prev => ({ ...prev, supports_services: e.target.checked }))}
                                         className="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500"
-                                        style={{ borderRadius: '2px' }}
+                                       
                                     />
                                     <span className="text-sm text-gray-700 font-semibold">Supports services</span>
                                 </label>
@@ -816,14 +816,14 @@ export const AdminServiceManager: React.FC = () => {
                                         resetServiceForm();
                                     }}
                                     className="px-6 py-2.5 border border-gray-250 text-gray-750 font-bold uppercase text-xs tracking-wider hover:bg-gray-50 transition-colors"
-                                    style={{ borderRadius: '2px' }}
+                                   
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold uppercase text-xs tracking-wider transition-colors duration-200"
-                                    style={{ borderRadius: '2px' }}
+                                   
                                 >
                                     {selectedService ? 'Update Service' : 'Create Service'}
                                 </button>
@@ -836,7 +836,7 @@ export const AdminServiceManager: React.FC = () => {
             {/* Field Form Modal */}
             {showFieldForm && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white shadow-xl p-8 max-w-2xl w-full max-h-screen overflow-y-auto" style={{ borderRadius: '2px' }}>
+                    <div className="bg-white shadow-xl p-8 max-w-2xl w-full max-h-screen overflow-y-auto">
                         <h2 className="text-xl font-bold uppercase tracking-wider text-gray-800 mb-6">
                             {editingField ? 'Edit Field' : 'Add New Field'}
                         </h2>
@@ -853,7 +853,7 @@ export const AdminServiceManager: React.FC = () => {
                                     required
                                     placeholder="e.g., Hair Type, Number of Bedrooms"
                                     className="w-full px-4 py-2.5 border border-gray-250 text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                                    style={{ borderRadius: '2px' }}
+                                   
                                 />
                             </div>
 
@@ -867,7 +867,7 @@ export const AdminServiceManager: React.FC = () => {
                                     onChange={(e) => setFieldForm(prev => ({ ...prev, field_key: e.target.value }))}
                                     placeholder="hair_type, bedrooms"
                                     className="w-full px-4 py-2.5 border border-gray-250 text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                                    style={{ borderRadius: '2px' }}
+                                   
                                 />
                             </div>
 
@@ -878,7 +878,7 @@ export const AdminServiceManager: React.FC = () => {
                                     onChange={(e) => setFieldForm(prev => ({ ...prev, field_description: e.target.value }))}
                                     rows={2}
                                     className="w-full px-4 py-2.5 border border-gray-250 text-gray-900 bg-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                                    style={{ borderRadius: '2px' }}
+                                   
                                 />
                             </div>
 
@@ -892,7 +892,7 @@ export const AdminServiceManager: React.FC = () => {
                                         onChange={(e) => setFieldForm(prev => ({ ...prev, input_type: e.target.value }))}
                                         required
                                         className="w-full px-4 py-2.5 border border-gray-250 text-gray-900 bg-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                                        style={{ borderRadius: '2px' }}
+                                       
                                     >
                                         <option value="text">Text</option>
                                         <option value="number">Number</option>
@@ -916,7 +916,7 @@ export const AdminServiceManager: React.FC = () => {
                                         onChange={(e) => setFieldForm(prev => ({ ...prev, usage_context: e.target.value }))}
                                         required
                                         className="w-full px-4 py-2.5 border border-gray-250 text-gray-900 bg-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                                        style={{ borderRadius: '2px' }}
+                                       
                                     >
                                         <option value="both">Both (Upload & Filter)</option>
                                         <option value="upload_only">Upload Only</option>
@@ -932,7 +932,7 @@ export const AdminServiceManager: React.FC = () => {
                                         checked={fieldForm.is_required}
                                         onChange={(e) => setFieldForm(prev => ({ ...prev, is_required: e.target.checked }))}
                                         className="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500"
-                                        style={{ borderRadius: '2px' }}
+                                       
                                     />
                                     <span className="text-sm font-semibold text-gray-755">This field is required</span>
                                 </label>
@@ -952,13 +952,13 @@ export const AdminServiceManager: React.FC = () => {
                                                     onChange={(e) => updateOption(index, e.target.value)}
                                                     placeholder={`Option ${index + 1}`}
                                                     className="flex-1 px-4 py-2.5 border border-gray-250 text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                                                    style={{ borderRadius: '2px' }}
+                                                   
                                                 />
                                                 <button
                                                     type="button"
                                                     onClick={() => removeOption(index)}
                                                     className="px-4 py-2.5 bg-red-500 text-white font-bold uppercase text-xs tracking-wider hover:bg-red-600 transition-colors"
-                                                    style={{ borderRadius: '2px' }}
+                                                   
                                                 >
                                                     Remove
                                                 </button>
@@ -968,7 +968,7 @@ export const AdminServiceManager: React.FC = () => {
                                             type="button"
                                             onClick={addOption}
                                             className="w-full px-4 py-2.5 border border-dashed border-gray-300 text-gray-650 hover:border-emerald-500 hover:text-emerald-600 transition-colors font-bold uppercase text-xs tracking-wider"
-                                            style={{ borderRadius: '2px' }}
+                                           
                                         >
                                             + Add Option
                                         </button>
@@ -985,14 +985,14 @@ export const AdminServiceManager: React.FC = () => {
                                         resetFieldForm();
                                     }}
                                     className="px-6 py-2.5 border border-gray-250 text-gray-750 font-bold uppercase text-xs tracking-wider hover:bg-gray-50 transition-colors"
-                                    style={{ borderRadius: '2px' }}
+                                   
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold uppercase text-xs tracking-wider transition-colors duration-200"
-                                    style={{ borderRadius: '2px' }}
+                                   
                                 >
                                     {editingField ? 'Update Field' : 'Add Field'}
                                 </button>

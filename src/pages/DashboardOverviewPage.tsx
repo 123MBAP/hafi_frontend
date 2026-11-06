@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { usePhases } from '@/context/PhaseContext';
 import SubscriptionBanner from '@/components/DashboardParts/PlansScrollingBanner';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { API_BASE } from '../api/apiClient';
 import {
   User,
@@ -197,7 +198,7 @@ export default function DashboardOverviewPage() {
 
   if (loading && refreshKey === 0) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-800'}`}>
+      <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
         <div className="text-center py-16">
           <LoadingSpinner size="lg" message="Loading dashboard..." variant="dots" />
         </div>
@@ -206,10 +207,10 @@ export default function DashboardOverviewPage() {
   }
 
   return (
-    <div className={`min-h-screen -mx-4 sm:mx-0 overflow-x-hidden transition-colors duration-200 ${darkMode ? 'bg-gray-950 text-gray-100' : 'bg-gray-50 text-gray-800'}`}>
+    <div className={`min-h-screen -mx-4 sm:mx-0 overflow-x-hidden transition-colors duration-200 ${darkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
       {/* Plans scrolling banner at navbar top */}
       <div
-        className="sticky z-30 w-full overflow-x-hidden overflow-y-visible bg-yellow-100 border-b border-yellow-400 mb-2"
+        className="sticky z-30 w-full overflow-x-hidden overflow-y-visible bg-red-50 border-b border-red-300 mb-2"
         style={{ top: 'var(--navbar-height)' }}
       >
         <SubscriptionBanner />
@@ -217,47 +218,37 @@ export default function DashboardOverviewPage() {
 
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6">
 
-        {/* Title Bar - Matching Services page uppercase bold style */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className={`text-2xl font-bold tracking-tighter uppercase ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Overview
-            </h1>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
-              Real-time summary of your HafiConnect accounts and data
-            </p>
-          </div>
-          <button
-            onClick={triggerRefresh}
-            className={`px-3 py-2 border transition-all flex items-center gap-1.5 text-sm font-medium shadow-sm
-              ${darkMode
-                ? 'bg-gray-900 hover:bg-gray-800 border-gray-800 text-emerald-400 hover:text-emerald-350'
-                : 'bg-white hover:bg-gray-50 border-gray-200 text-emerald-600 hover:text-emerald-700'}`}
-            style={{ borderRadius: '2px' }}
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </button>
-        </div>
-
-        {/* 1. Hero Welcoming Card - Matching Homepage clean card borders with flat accent border */}
-        <div
-          className={`relative overflow-hidden border p-6 md:p-8 mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6
-            ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} border-l-4 border-l-emerald-500`}
-          style={{ borderRadius: '2px' }}
-        >
-          <div className="relative z-10">
-            <span
-              className={`text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 shadow-sm
-                ${darkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-500/10 text-emerald-600'}`}
-              style={{ borderRadius: '2px' }}
+        {/* Page Header */}
+        <PageHeader
+          badge="Control Panel"
+          title="Overview"
+          subtitle="Real-time summary of your HafiConnect accounts, listings, appointments, and data."
+          breadcrumbs={[
+            { label: 'Home', href: '/' },
+            { label: 'Dashboard', href: '/dashboard' },
+            { label: 'Overview' }
+          ]}
+          actions={
+            <button
+              onClick={triggerRefresh}
+              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-gray-800 dark:text-gray-200 hover:border-brand-red hover:text-brand-red transition-all shadow-sm"
             >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          }
+        />
+
+        {/* 1. Hero Welcoming Card */}
+        <div className={`relative overflow-hidden rounded-xl border border-gray-200 dark:border-zinc-800 p-6 md:p-8 mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6 shadow-sm border-l-4 border-l-brand-red ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+          <div className="relative z-10">
+            <span className="text-[11px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-red-50 text-brand-red border border-red-100 dark:bg-red-950/40 dark:border-red-900/40">
               Control Panel
             </span>
-            <h2 className="text-xl font-bold mt-3 tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold mt-3 tracking-tight text-gray-900 dark:text-white">
               {getGreeting()}, {user?.name || 'User'}!
             </h2>
-            <p className={`mt-1.5 text-sm leading-relaxed max-w-xl ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            <p className="mt-1.5 text-sm text-gray-600 dark:text-gray-400 max-w-xl">
               Here is a unified look at your listings, appointments, statistics, and billing profiles.
             </p>
           </div>
@@ -265,25 +256,14 @@ export default function DashboardOverviewPage() {
           {/* Roles container */}
           <div className="flex flex-wrap gap-2 md:self-end z-10">
             {roles.map(role => {
-              let colorClass = '';
               let label = role;
-              if (role === 'customer') {
-                colorClass = darkMode ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' : 'bg-cyan-50 text-cyan-700 border-cyan-200';
-                label = 'Client';
-              } else if (role === 'seller') {
-                colorClass = darkMode ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' : 'bg-blue-50 text-blue-700 border-blue-200';
-                label = 'Merchant';
-              } else if (role === 'service_provider') {
-                colorClass = darkMode ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : 'bg-purple-50 text-purple-700 border-purple-200';
-                label = 'Service Provider';
-              } else {
-                colorClass = darkMode ? 'bg-gray-800 text-gray-400 border-gray-700' : 'bg-gray-100 text-gray-600 border-gray-200';
-              }
+              if (role === 'customer') label = 'Client';
+              else if (role === 'seller') label = 'Merchant';
+              else if (role === 'service_provider') label = 'Service Provider';
               return (
                 <span
                   key={role}
-                  className={`text-[10px] font-bold px-2.5 py-1 rounded border uppercase tracking-wider ${colorClass}`}
-                  style={{ borderRadius: '2px' }}
+                  className="text-xs font-semibold px-3 py-1 rounded-full border border-gray-200 dark:border-zinc-700 bg-[#F5F5F5] dark:bg-zinc-800 text-gray-800 dark:text-gray-200 uppercase tracking-wide"
                 >
                   {label}
                 </span>
@@ -292,84 +272,56 @@ export default function DashboardOverviewPage() {
           </div>
         </div>
 
-        {/* 2. Core Stats Grid - Flat boxes with borderRadius: '2px' */}
+        {/* 2. Core Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {/* Merchant Products listing count */}
           {isSeller && (
-            <div
-              className={`p-5 border shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5
-                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-              style={{ borderRadius: '2px' }}
-            >
-              <div
-                className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                style={{ borderRadius: '2px' }}
-              >
-                <Store className="w-5 h-5" />
+            <div className={`p-5 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm flex items-center gap-4 transition-all duration-200 hover:border-gray-300 dark:hover:border-zinc-700 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+              <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red shrink-0">
+                <Store className="w-5 h-5 text-brand-red" />
               </div>
-              <div>
-                <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Products Listed</p>
-                <h3 className="text-2xl font-bold mt-0.5">{productCount !== null ? productCount : '...'}</h3>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Products Listed</p>
+                <h3 className="text-2xl font-bold mt-0.5 text-gray-900 dark:text-white">{productCount !== null ? productCount : '...'}</h3>
               </div>
             </div>
           )}
 
           {/* Service Provider portfolio count */}
           {isServiceProvider && (
-            <div
-              className={`p-5 border shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5
-                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-              style={{ borderRadius: '2px' }}
-            >
-              <div
-                className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                style={{ borderRadius: '2px' }}
-              >
-                <Briefcase className="w-5 h-5" />
+            <div className={`p-5 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm flex items-center gap-4 transition-all duration-200 hover:border-gray-300 dark:hover:border-zinc-700 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+              <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red shrink-0">
+                <Briefcase className="w-5 h-5 text-brand-red" />
               </div>
-              <div>
-                <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Services & Media</p>
-                <h3 className="text-2xl font-bold mt-0.5">{serviceCount !== null ? serviceCount : '...'}</h3>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Services & Media</p>
+                <h3 className="text-2xl font-bold mt-0.5 text-gray-900 dark:text-white">{serviceCount !== null ? serviceCount : '...'}</h3>
               </div>
             </div>
           )}
 
           {/* Active Orders count */}
           {(isSeller || isServiceProvider) && (
-            <div
-              className={`p-5 border shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5
-                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-              style={{ borderRadius: '2px' }}
-            >
-              <div
-                className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                style={{ borderRadius: '2px' }}
-              >
-                <ShoppingBag className="w-5 h-5" />
+            <div className={`p-5 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm flex items-center gap-4 transition-all duration-200 hover:border-gray-300 dark:hover:border-zinc-700 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+              <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red shrink-0">
+                <ShoppingBag className="w-5 h-5 text-brand-red" />
               </div>
-              <div>
-                <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Active Orders</p>
-                <h3 className="text-2xl font-bold mt-0.5">{activeOrderCount !== null ? activeOrderCount : '...'}</h3>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Active Orders</p>
+                <h3 className="text-2xl font-bold mt-0.5 text-gray-900 dark:text-white">{activeOrderCount !== null ? activeOrderCount : '...'}</h3>
               </div>
             </div>
           )}
 
           {/* Unread customer chats count */}
           {(isSeller || isServiceProvider) && (
-            <div
-              className={`p-5 border shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5
-                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-              style={{ borderRadius: '2px' }}
-            >
-              <div
-                className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                style={{ borderRadius: '2px' }}
-              >
-                <MessageCircle className="w-5 h-5" />
+            <div className={`p-5 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm flex items-center gap-4 transition-all duration-200 hover:border-gray-300 dark:hover:border-zinc-700 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+              <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red shrink-0">
+                <MessageCircle className="w-5 h-5 text-brand-red" />
               </div>
-              <div>
-                <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Unread Messages</p>
-                <h3 className={`text-2xl font-bold mt-0.5 ${unreadChatCount && unreadChatCount > 0 ? 'text-red-500 dark:text-red-400' : ''}`}>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Unread Messages</p>
+                <h3 className={`text-2xl font-bold mt-0.5 ${unreadChatCount && unreadChatCount > 0 ? 'text-brand-red' : 'text-gray-900 dark:text-white'}`}>
                   {unreadChatCount !== null ? unreadChatCount : '...'}
                 </h3>
               </div>
@@ -378,40 +330,26 @@ export default function DashboardOverviewPage() {
 
           {/* Pending Bookings count (Phase 2 feature) */}
           {isServiceProvider && showPhase2Features && (
-            <div
-              className={`p-5 border shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5
-                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-              style={{ borderRadius: '2px' }}
-            >
-              <div
-                className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                style={{ borderRadius: '2px' }}
-              >
-                <Calendar className="w-5 h-5" />
+            <div className={`p-5 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm flex items-center gap-4 transition-all duration-200 hover:border-gray-300 dark:hover:border-zinc-700 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+              <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red shrink-0">
+                <Calendar className="w-5 h-5 text-brand-red" />
               </div>
-              <div>
-                <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Pending Bookings</p>
-                <h3 className="text-2xl font-bold mt-0.5">{bookingCount !== null ? bookingCount : '...'}</h3>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Pending Bookings</p>
+                <h3 className="text-2xl font-bold mt-0.5 text-gray-900 dark:text-white">{bookingCount !== null ? bookingCount : '...'}</h3>
               </div>
             </div>
           )}
 
           {/* Pending Customization requests count (Phase 2 feature) */}
           {isServiceProvider && showPhase2Features && (
-            <div
-              className={`p-5 border shadow-sm flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5
-                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-              style={{ borderRadius: '2px' }}
-            >
-              <div
-                className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                style={{ borderRadius: '2px' }}
-              >
-                <Sparkles className="w-5 h-5" />
+            <div className={`p-5 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm flex items-center gap-4 transition-all duration-200 hover:border-gray-300 dark:hover:border-zinc-700 ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
+              <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red shrink-0">
+                <Sparkles className="w-5 h-5 text-brand-red" />
               </div>
-              <div>
-                <p className={`text-[10px] font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Custom Inquiries</p>
-                <h3 className="text-2xl font-bold mt-0.5">{customRequestCount !== null ? customRequestCount : '...'}</h3>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Custom Inquiries</p>
+                <h3 className="text-2xl font-bold mt-0.5 text-gray-900 dark:text-white">{customRequestCount !== null ? customRequestCount : '...'}</h3>
               </div>
             </div>
           )}
@@ -421,64 +359,46 @@ export default function DashboardOverviewPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
           {/* Subscription Plan details */}
-          <div
-            className={`p-6 border shadow-sm flex flex-col justify-between
-              ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-            style={{ borderRadius: '2px' }}
-          >
+          <div className={`p-6 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm flex flex-col justify-between ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div
-                    className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                    style={{ borderRadius: '2px' }}
-                  >
-                    <Crown className="w-5 h-5" />
+                  <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red">
+                    <Crown className="w-5 h-5 text-brand-red" />
                   </div>
                   <div>
-                    <h3 className={`text-lg font-bold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <h3 className="text-base font-bold tracking-tight text-gray-900 dark:text-white">
                       Subscription Plan
                     </h3>
-                    <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Plan restrictions and billing metrics</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Plan restrictions and billing metrics</p>
                   </div>
                 </div>
 
-                <span
-                  className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 border
-                    ${plan.status === 'active'
-                      ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
-                      : 'bg-red-500/10 text-red-600 border-red-500/20'}`}
-                  style={{ borderRadius: '2px' }}
-                >
+                <span className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${plan.status === 'active'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800'
+                    : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800'}`}>
                   {plan.status || 'Active'}
                 </span>
               </div>
 
               {/* Pricing Display */}
-              <div
-                className={`mb-5 p-4 border ${darkMode ? 'bg-gray-950/40 border-gray-800' : 'bg-gray-50 border-gray-200'}`}
-                style={{ borderRadius: '2px' }}
-              >
-                <span className={`text-[10px] font-bold uppercase tracking-widest block ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Current Pricing Tier</span>
-                <div className="flex items-baseline gap-1 mt-1">
-                  <span className={`text-3xl font-extrabold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              <div className={`mb-4 p-4 rounded-lg border ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 block">Current Pricing Tier</span>
+                <div className="flex items-baseline gap-1.5 mt-1">
+                  <span className="text-3xl font-extrabold text-gray-900 dark:text-white">
                     {plan.monthly_fee?.toLocaleString() || '0'}
                   </span>
-                  <span className={`text-sm font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>RWF/month</span>
+                  <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">RWF/month</span>
                 </div>
               </div>
 
               {/* Expiry / Days Remaining */}
-              <div
-                className={`p-4 border flex items-center justify-between mb-4
-                  ${darkMode ? 'bg-gray-950/30 border-gray-800' : 'bg-gray-50/50 border-gray-150'}`}
-                style={{ borderRadius: '2px' }}
-              >
+              <div className={`p-4 rounded-lg border flex items-center justify-between mb-5 ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
                 <div className="flex items-center gap-3">
-                  <Clock className={`w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                  <Clock className="w-5 h-5 text-brand-red shrink-0" />
                   <div>
-                    <p className={`text-[10px] uppercase font-bold tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Expiration Countdown</p>
-                    <p className="text-sm font-bold mt-0.5">
+                    <p className="text-[11px] uppercase font-bold tracking-wider text-gray-500 dark:text-gray-400">Expiration Countdown</p>
+                    <p className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">
                       {plan.days_remaining > 0
                         ? `${plan.days_remaining} days remaining`
                         : plan.hours_remaining > 0
@@ -488,10 +408,7 @@ export default function DashboardOverviewPage() {
                   </div>
                 </div>
                 {plan.days_remaining <= 5 && (
-                  <span
-                    className="text-[9px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 border border-amber-500/20 animate-pulse"
-                    style={{ borderRadius: '2px' }}
-                  >
+                  <span className="text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400 px-2.5 py-0.5 rounded-full border border-red-200 dark:border-red-900 animate-pulse">
                     Expiring soon
                   </span>
                 )}
@@ -500,11 +417,7 @@ export default function DashboardOverviewPage() {
 
             <Link
               to="/dashboard/upgrade"
-              className={`w-full py-2.5 px-4 font-semibold text-center text-sm shadow-sm transition-all duration-200 flex items-center justify-center gap-1.5
-                ${darkMode
-                  ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                  : 'bg-emerald-500 hover:bg-emerald-600 text-white'}`}
-              style={{ borderRadius: '2px' }}
+              className="w-full py-2.5 px-4 font-semibold text-center text-sm rounded-lg bg-brand-red hover:bg-red-700 text-white shadow-sm transition-all duration-200 flex items-center justify-center gap-2"
             >
               <TrendingUp className="w-4 h-4" />
               Manage Subscription Plan
@@ -512,29 +425,22 @@ export default function DashboardOverviewPage() {
           </div>
 
           {/* Storage Usage progress bar */}
-          <div
-            className={`p-6 border shadow-sm flex flex-col justify-between
-              ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-            style={{ borderRadius: '2px' }}
-          >
+          <div className={`p-6 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm flex flex-col justify-between ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div
-                    className={`p-3 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                    style={{ borderRadius: '2px' }}
-                  >
-                    <HardDrive className="w-5 h-5" />
+                  <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red">
+                    <HardDrive className="w-5 h-5 text-brand-red" />
                   </div>
                   <div>
-                    <h3 className={`text-lg font-bold uppercase tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <h3 className="text-base font-bold tracking-tight text-gray-900 dark:text-white">
                       Storage Usage
                     </h3>
-                    <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Allocated and used server storage</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Allocated and used server storage</p>
                   </div>
                 </div>
 
-                <span className={`text-[10px] font-bold ${darkMode ? 'text-gray-450 text-gray-450' : 'text-gray-500'}`}>
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-zinc-700">
                   {storage.usagePercentage}% Used
                 </span>
               </div>
@@ -542,64 +448,53 @@ export default function DashboardOverviewPage() {
               {/* Storage Stats details */}
               <div className="mb-5">
                 <div className="flex justify-between items-baseline mb-2">
-                  <span className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Data Capacity</span>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Data Capacity</span>
                   <div className="text-right">
-                    <span className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <span className="text-lg font-bold text-gray-900 dark:text-white">
                       {storage.totalSizeGB} GB
                     </span>
-                    <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
                       {' '}/ {storage.storageLimitGB} GB
                     </span>
                   </div>
                 </div>
 
-                {/* Progress bar container - flat sharp corners */}
-                <div className={`w-full h-3 overflow-hidden ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`} style={{ borderRadius: '2px' }}>
+                {/* Progress bar container */}
+                <div className="w-full h-2.5 rounded-full overflow-hidden bg-gray-100 dark:bg-zinc-800">
                   <div
-                    className="h-full bg-emerald-500 transition-all duration-500"
+                    className="h-full bg-brand-red rounded-full transition-all duration-500"
                     style={{ width: `${Math.min(storage.usagePercentage || 0, 100)}%` }}
                   ></div>
                 </div>
               </div>
 
               {/* Media Counts Breakdown */}
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                <div
-                  className={`p-3 border text-center ${darkMode ? 'bg-gray-950/40 border-gray-800' : 'bg-gray-50 border-gray-200'}`}
-                  style={{ borderRadius: '2px' }}
-                >
-                  <FileImage className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
-                  <p className={`text-[9px] uppercase font-bold tracking-wide ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Images</p>
-                  <p className="text-sm font-bold mt-0.5">{storage.fileCount?.images || 0}</p>
+              <div className="grid grid-cols-3 gap-3 mb-5">
+                <div className={`p-3 rounded-lg border text-center ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
+                  <FileImage className="w-4 h-4 text-brand-red mx-auto mb-1" />
+                  <p className="text-[10px] uppercase font-bold tracking-wide text-gray-500 dark:text-gray-400">Images</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">{storage.fileCount?.images || 0}</p>
                 </div>
 
-                <div
-                  className={`p-3 border text-center ${darkMode ? 'bg-gray-950/40 border-gray-800' : 'bg-gray-50 border-gray-200'}`}
-                  style={{ borderRadius: '2px' }}
-                >
-                  <FileVideo className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
-                  <p className={`text-[9px] uppercase font-bold tracking-wide ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Videos</p>
-                  <p className="text-sm font-bold mt-0.5">{storage.fileCount?.videos || 0}</p>
+                <div className={`p-3 rounded-lg border text-center ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
+                  <FileVideo className="w-4 h-4 text-brand-red mx-auto mb-1" />
+                  <p className="text-[10px] uppercase font-bold tracking-wide text-gray-500 dark:text-gray-400">Videos</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">{storage.fileCount?.videos || 0}</p>
                 </div>
 
-                <div
-                  className={`p-3 border text-center ${darkMode ? 'bg-gray-950/40 border-gray-800' : 'bg-gray-50 border-gray-200'}`}
-                  style={{ borderRadius: '2px' }}
-                >
-                  <Database className="w-4 h-4 text-emerald-500 mx-auto mb-1" />
-                  <p className={`text-[9px] uppercase font-bold tracking-wide ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Total files</p>
-                  <p className="text-sm font-bold mt-0.5">{storage.fileCount?.total || 0}</p>
+                <div className={`p-3 rounded-lg border text-center ${darkMode ? 'bg-zinc-800/40 border-zinc-800' : 'bg-[#F5F5F5] border-gray-200/70'}`}>
+                  <Database className="w-4 h-4 text-brand-red mx-auto mb-1" />
+                  <p className="text-[10px] uppercase font-bold tracking-wide text-gray-500 dark:text-gray-400">Total files</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">{storage.fileCount?.total || 0}</p>
                 </div>
               </div>
             </div>
 
             <Link
               to="/dashboard/account"
-              className={`w-full py-2.5 px-4 border font-semibold text-center text-sm transition-all duration-200 flex items-center justify-center gap-1.5
-                ${darkMode
-                  ? 'bg-gray-900 hover:bg-gray-800 border-gray-800 text-white'
-                  : 'bg-white hover:bg-gray-550 hover:bg-gray-50 border-gray-200 text-gray-700'}`}
-              style={{ borderRadius: '2px' }}
+              className={`w-full py-2.5 px-4 rounded-lg border font-semibold text-center text-sm transition-all duration-200 flex items-center justify-center gap-2 ${darkMode
+                  ? 'border-zinc-800 bg-zinc-800/50 hover:bg-zinc-800 text-white'
+                  : 'border-gray-200 bg-white hover:bg-[#F5F5F5] text-gray-900'}`}
             >
               <User className="w-4 h-4" />
               View Account Storage Details
@@ -608,36 +503,28 @@ export default function DashboardOverviewPage() {
         </div>
 
         {/* 4. Active Area Navigation Shortcuts */}
-        <h3 className={`text-lg font-bold tracking-tighter uppercase mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+        <h3 className="text-base font-bold tracking-tight uppercase mb-4 text-gray-900 dark:text-white">
           Dashboards & Navigation
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
           {/* Seller catalog manager */}
           {isSeller && (
-            <div
-              className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-              style={{ borderRadius: '2px' }}
-            >
+            <div className={`p-6 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm transition-all duration-200 hover:shadow-md flex flex-col justify-between ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div
-                    className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                    style={{ borderRadius: '2px' }}
-                  >
-                    <Store className="w-4 h-4" />
+                  <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red">
+                    <Store className="w-4 h-4 text-brand-red" />
                   </div>
-                  <h4 className="font-bold text-sm uppercase tracking-tight">Merchant Catalog Area</h4>
+                  <h4 className="font-bold text-sm tracking-tight text-gray-900 dark:text-white">Merchant Catalog Area</h4>
                 </div>
-                <p className={`text-xs leading-relaxed ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">
                   Manage product categories, configure catalog uploads, set product pricing, and upload product views.
                 </p>
               </div>
               <button
                 onClick={() => navigate('/dashboard/seller')}
-                className={`mt-5 w-full py-2 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all duration-205 border border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white dark:hover:text-white`}
-                style={{ borderRadius: '2px' }}
+                className="mt-5 w-full py-2.5 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 border border-gray-200 dark:border-zinc-800 bg-[#F5F5F5] dark:bg-zinc-800/60 text-gray-800 dark:text-gray-200 hover:border-brand-red hover:text-brand-red"
               >
                 Open Merchant Center
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -647,29 +534,21 @@ export default function DashboardOverviewPage() {
 
           {/* Service provider manager */}
           {isServiceProvider && (
-            <div
-              className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-              style={{ borderRadius: '2px' }}
-            >
+            <div className={`p-6 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm transition-all duration-200 hover:shadow-md flex flex-col justify-between ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div
-                    className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                    style={{ borderRadius: '2px' }}
-                  >
-                    <Briefcase className="w-4 h-4" />
+                  <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red">
+                    <Briefcase className="w-4 h-4 text-brand-red" />
                   </div>
-                  <h4 className="font-bold text-sm uppercase tracking-tight">Service Provider Area</h4>
+                  <h4 className="font-bold text-sm tracking-tight text-gray-900 dark:text-white">Service Provider Area</h4>
                 </div>
-                <p className={`text-xs leading-relaxed ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">
                   Describe your main service category, upload portfolio images/videos, and configure custom services variables.
                 </p>
               </div>
               <button
                 onClick={() => navigate('/dashboard/provider')}
-                className={`mt-5 w-full py-2 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all duration-205 border border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white dark:hover:text-white`}
-                style={{ borderRadius: '2px' }}
+                className="mt-5 w-full py-2.5 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 border border-gray-200 dark:border-zinc-800 bg-[#F5F5F5] dark:bg-zinc-800/60 text-gray-800 dark:text-gray-200 hover:border-brand-red hover:text-brand-red"
               >
                 Open Service Provider Center
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -677,31 +556,23 @@ export default function DashboardOverviewPage() {
             </div>
           )}
 
-          {/* Client orders & fullfillment */}
+          {/* Client orders & fulfillment */}
           {(isSeller || isServiceProvider) && (
-            <div
-              className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-              style={{ borderRadius: '2px' }}
-            >
+            <div className={`p-6 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm transition-all duration-200 hover:shadow-md flex flex-col justify-between ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div
-                    className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                    style={{ borderRadius: '2px' }}
-                  >
-                    <ShoppingBag className="w-4 h-4" />
+                  <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red">
+                    <ShoppingBag className="w-4 h-4 text-brand-red" />
                   </div>
-                  <h4 className="font-bold text-sm uppercase tracking-tight">Clients Orders Ledger</h4>
+                  <h4 className="font-bold text-sm tracking-tight text-gray-900 dark:text-white">Clients Orders Ledger</h4>
                 </div>
-                <p className={`text-xs leading-relaxed ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">
                   Fulfill customer orders, review pricing quotes, acknowledge client payments, and track delivery status.
                 </p>
               </div>
               <button
                 onClick={() => navigate('/dashboard/orders')}
-                className={`mt-5 w-full py-2 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all duration-205 border border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white dark:hover:text-white`}
-                style={{ borderRadius: '2px' }}
+                className="mt-5 w-full py-2.5 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 border border-gray-200 dark:border-zinc-800 bg-[#F5F5F5] dark:bg-zinc-800/60 text-gray-800 dark:text-gray-200 hover:border-brand-red hover:text-brand-red"
               >
                 Open Orders Center
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -711,29 +582,21 @@ export default function DashboardOverviewPage() {
 
           {/* Service appointments / ledger (Phase 2 feature) */}
           {isServiceProvider && showPhase2Features && (
-            <div
-              className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-              style={{ borderRadius: '2px' }}
-            >
+            <div className={`p-6 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm transition-all duration-200 hover:shadow-md flex flex-col justify-between ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div
-                    className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                    style={{ borderRadius: '2px' }}
-                  >
-                    <Calendar className="w-4 h-4" />
+                  <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red">
+                    <Calendar className="w-4 h-4 text-brand-red" />
                   </div>
-                  <h4 className="font-bold text-sm uppercase tracking-tight">Service Bookings</h4>
+                  <h4 className="font-bold text-sm tracking-tight text-gray-900 dark:text-white">Service Bookings</h4>
                 </div>
-                <p className={`text-xs leading-relaxed ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">
                   Review direct bookings from clients, verify arrival logs, and inspect escrow balance records.
                 </p>
               </div>
               <button
                 onClick={() => navigate('/dashboard/payments')}
-                className={`mt-5 w-full py-2 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all duration-205 border border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white dark:hover:text-white`}
-                style={{ borderRadius: '2px' }}
+                className="mt-5 w-full py-2.5 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 border border-gray-200 dark:border-zinc-800 bg-[#F5F5F5] dark:bg-zinc-800/60 text-gray-800 dark:text-gray-200 hover:border-brand-red hover:text-brand-red"
               >
                 Open Booking Center
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -743,29 +606,21 @@ export default function DashboardOverviewPage() {
 
           {/* Custom service request quotes (Phase 2 feature) */}
           {isServiceProvider && showPhase2Features && (
-            <div
-              className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-              style={{ borderRadius: '2px' }}
-            >
+            <div className={`p-6 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm transition-all duration-200 hover:shadow-md flex flex-col justify-between ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div
-                    className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                    style={{ borderRadius: '2px' }}
-                  >
-                    <Sparkles className="w-4 h-4" />
+                  <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red">
+                    <Sparkles className="w-4 h-4 text-brand-red" />
                   </div>
-                  <h4 className="font-bold text-sm uppercase tracking-tight">Customization Requests</h4>
+                  <h4 className="font-bold text-sm tracking-tight text-gray-900 dark:text-white">Customization Requests</h4>
                 </div>
-                <p className={`text-xs leading-relaxed ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">
                   Address customer customization parameters, propose quoted prices, and accept custom contracts.
                 </p>
               </div>
               <button
                 onClick={() => navigate('/dashboard/requests')}
-                className={`mt-5 w-full py-2 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all duration-205 border border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white dark:hover:text-white`}
-                style={{ borderRadius: '2px' }}
+                className="mt-5 w-full py-2.5 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 border border-gray-200 dark:border-zinc-800 bg-[#F5F5F5] dark:bg-zinc-800/60 text-gray-800 dark:text-gray-200 hover:border-brand-red hover:text-brand-red"
               >
                 Open Customization Center
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -775,29 +630,21 @@ export default function DashboardOverviewPage() {
 
           {/* Message Center */}
           {(isSeller || isServiceProvider) && (
-            <div
-              className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-                ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-              style={{ borderRadius: '2px' }}
-            >
+            <div className={`p-6 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm transition-all duration-200 hover:shadow-md flex flex-col justify-between ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div
-                    className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                    style={{ borderRadius: '2px' }}
-                  >
-                    <MessageCircle className="w-4 h-4" />
+                  <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red">
+                    <MessageCircle className="w-4 h-4 text-brand-red" />
                   </div>
-                  <h4 className="font-bold text-sm uppercase tracking-tight">Customer Communications</h4>
+                  <h4 className="font-bold text-sm tracking-tight text-gray-900 dark:text-white">Customer Communications</h4>
                 </div>
-                <p className={`text-xs leading-relaxed ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">
                   Converse with buyers and clients directly, address support inquiries, and arrange shipping routes.
                 </p>
               </div>
               <button
                 onClick={() => navigate('/dashboard/messages')}
-                className={`mt-5 w-full py-2 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all duration-205 border border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white dark:hover:text-white`}
-                style={{ borderRadius: '2px' }}
+                className="mt-5 w-full py-2.5 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 border border-gray-200 dark:border-zinc-800 bg-[#F5F5F5] dark:bg-zinc-800/60 text-gray-800 dark:text-gray-200 hover:border-brand-red hover:text-brand-red"
               >
                 Open Message Center
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -806,29 +653,21 @@ export default function DashboardOverviewPage() {
           )}
 
           {/* General accounts setting */}
-          <div
-            className={`p-6 border shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between
-              ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}
-            style={{ borderRadius: '2px' }}
-          >
+          <div className={`p-6 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm transition-all duration-200 hover:shadow-md flex flex-col justify-between ${darkMode ? 'bg-zinc-900' : 'bg-white'}`}>
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <div
-                  className={`p-2.5 border ${darkMode ? 'bg-gray-950 border-gray-800 text-emerald-400' : 'bg-gray-50 border-gray-200 text-emerald-600'}`}
-                  style={{ borderRadius: '2px' }}
-                >
-                  <User className="w-4 h-4" />
+                <div className="p-2.5 rounded-lg border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 text-brand-red">
+                  <User className="w-4 h-4 text-brand-red" />
                 </div>
-                <h4 className="font-bold text-sm uppercase tracking-tight">Profile and Security</h4>
+                <h4 className="font-bold text-sm tracking-tight text-gray-900 dark:text-white">Profile and Security</h4>
               </div>
-              <p className={`text-xs leading-relaxed ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">
                 Set payout credentials, request provider role updates, inspect recent uploads, and review privacy limits.
               </p>
             </div>
             <button
               onClick={() => navigate('/dashboard/account')}
-              className={`mt-5 w-full py-2 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all duration-205 border border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-white dark:hover:text-white`}
-              style={{ borderRadius: '2px' }}
+              className="mt-5 w-full py-2.5 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 border border-gray-200 dark:border-zinc-800 bg-[#F5F5F5] dark:bg-zinc-800/60 text-gray-800 dark:text-gray-200 hover:border-brand-red hover:text-brand-red"
             >
               Open Account Profile
               <ArrowRight className="w-3.5 h-3.5" />
