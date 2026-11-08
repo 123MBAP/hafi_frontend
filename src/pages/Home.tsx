@@ -13,6 +13,7 @@ import realEstateImage from "./images/bg_images/real_estate.jpg"
 import photoStudioImage from "./images/bg_images/photo_studio.jpg"
 import kidsOutdoorImage from "./images/bg_images/kids_outdoor.png"
 import { API_BASE } from '../api/apiClient';
+import { fetchEdgeProducts } from '../api/workerClient';
 
 
 
@@ -272,16 +273,16 @@ const HomePage = () => {
   useEffect(() => {
     async function loadUpdates() {
       try {
-        const [servicesRes, latestUploadsRes, productsRes, propertiesRes] = await Promise.all([
+        const [servicesRes, latestUploadsRes, edgeProductsRes, propertiesRes] = await Promise.all([
           cachedFetch<any>(`${API_BASE}/api/services`),
           cachedFetch<any>(`${API_BASE}/api/latest-uploads`),
-          cachedFetch<any>(`${API_BASE}/api/marketPage/products`),
+          fetchEdgeProducts({ limit: 50 }).catch(() => cachedFetch<any>(`${API_BASE}/api/marketPage/products`)),
           cachedFetch<any>(`${API_BASE}/api/real-estate/properties`),
         ]);
 
         const servicesData = servicesRes || { services: [] };
         const latestUploadsData = latestUploadsRes || [];
-        const productsData = productsRes || { products: [] };
+        const productsData = edgeProductsRes || { products: [] };
         const propertiesData = propertiesRes || { properties: [] };
 
         const servicesList: Service[] = Array.isArray(servicesData.services)

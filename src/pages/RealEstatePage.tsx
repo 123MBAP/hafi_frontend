@@ -29,6 +29,7 @@ import {
 } from "../api/realEstateTypes";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { API_BASE } from '../api/apiClient';
+import { fetchEdgeProperties, fetchEdgeRealEstateService } from '../api/workerClient';
 
 const norm = (v: any) => String(v ?? '').trim().toLowerCase();
 
@@ -175,10 +176,16 @@ export default function RealEstatePage() {
         async function load() {
             setLoading(true);
             try {
-                const res = await fetch(`${API_BASE}/api/real-estate/properties`, { signal: controller.signal });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                const list = Array.isArray(data?.properties) ? data.properties : [];
+                let list: Property[] = [];
+                try {
+                    const edgeData = await fetchEdgeProperties(200);
+                    list = (edgeData?.properties as any) || [];
+                } catch {
+                    const res = await fetch(`${API_BASE}/api/real-estate/properties`, { signal: controller.signal });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    list = Array.isArray(data?.properties) ? data.properties : [];
+                }
                 setProperties(list);
             } catch (e: any) {
                 if (didCancel || e?.name === 'AbortError') return;

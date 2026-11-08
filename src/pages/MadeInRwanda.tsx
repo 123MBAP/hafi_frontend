@@ -7,6 +7,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import Badge from "@/components/ui/Badge";
 import { Search, Filter, MapPin, X } from "lucide-react";
 import { API_BASE } from '../api/apiClient';
+import { fetchEdgeMadeInRwanda } from '../api/workerClient';
 
 
 const toAbsoluteMediaUrl = (rawUrl?: string | null) => {
@@ -211,9 +212,14 @@ export default function MadeInRwanda() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE}/api/market/made-in-rwanda`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        let data: any;
+        try {
+          data = await fetchEdgeMadeInRwanda();
+        } catch {
+          const res = await fetch(`${API_BASE}/api/market/made-in-rwanda`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          data = await res.json();
+        }
         const items: any[] = Array.isArray(data.products) ? data.products : Array.isArray(data) ? data : [];
 
         const normalized: MadeInRwandaProduct[] = items

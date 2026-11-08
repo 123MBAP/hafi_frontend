@@ -1,5 +1,6 @@
 import { useDarkMode } from "@/context/DarkMode";
 import { API_BASE } from "@/api/apiClient";
+import { fetchEdgeProviderById, fetchEdgeProperties } from "@/api/workerClient";
 import {
     ArrowLeft,
     BadgeCheck,
@@ -43,14 +44,26 @@ export default function CommissionerDetailPage() {
         async function loadData() {
             setLoading(true);
             try {
-                const providerRes = await fetch(`${API_BASE}/api/providers/${commissionerId}`, { signal: controller.signal });
-                if (!providerRes.ok) throw new Error(`Provider API HTTP ${providerRes.status}`);
-                const p = await providerRes.json();
+                let p: any;
+                let allProperties: Property[] = [];
 
-                const propsRes = await fetch(`${API_BASE}/api/real-estate/properties`, { signal: controller.signal });
-                if (!propsRes.ok) throw new Error(`Properties API HTTP ${propsRes.status}`);
-                const propsData = await propsRes.json();
-                const allProperties: Property[] = Array.isArray(propsData?.properties) ? propsData.properties : [];
+                try {
+                    const [edgeProvider, edgeProps] = await Promise.all([
+                        fetchEdgeProviderById(commissionerId!),
+                        fetchEdgeProperties(200)
+                    ]);
+                    p = edgeProvider;
+                    allProperties = (edgeProps?.properties as any) || [];
+                } catch {
+                    const providerRes = await fetch(`${API_BASE}/api/providers/${commissionerId}`, { signal: controller.signal });
+                    if (!providerRes.ok) throw new Error(`Provider API HTTP ${providerRes.status}`);
+                    p = await providerRes.json();
+
+                    const propsRes = await fetch(`${API_BASE}/api/real-estate/properties`, { signal: controller.signal });
+                    if (!propsRes.ok) throw new Error(`Properties API HTTP ${propsRes.status}`);
+                    const propsData = await propsRes.json();
+                    allProperties = Array.isArray(propsData?.properties) ? propsData.properties : [];
+                }
 
                 const providerProps = allProperties.filter(prop => String(prop.commissionerId) === String(commissionerId));
 

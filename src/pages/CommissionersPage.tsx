@@ -1,5 +1,6 @@
 import { useDarkMode } from "@/context/DarkMode";
 import { API_BASE } from "@/api/apiClient";
+import { fetchEdgeRealEstateService, fetchEdgeProvidersByService, fetchEdgeProperties } from "@/api/workerClient";
 import PageHeader from "@/components/ui/PageHeader";
 import {
     BadgeCheck,
@@ -115,23 +116,40 @@ export default function CommissionersPage() {
             setLoading(true);
             setLoadError(null);
             try {
-                const serviceRes = await fetch(`${API_BASE}/api/real-estate/service`, { signal: controller.signal });
-                if (!serviceRes.ok) throw new Error(`Service API HTTP ${serviceRes.status}`);
-                const serviceData = await serviceRes.json();
-                const serviceId = serviceData?.service?.id;
+                let serviceId: any;
+                let providersData: any[] = [];
+                let fetchedProperties: Property[] = [];
 
-                if (!serviceId) {
-                    throw new Error('Real estate service ID not found');
+                try {
+                    const sData = await fetchEdgeRealEstateService();
+                    serviceId = sData?.service?.id;
+                    if (serviceId) {
+                        const [pData, propsData] = await Promise.all([
+                            fetchEdgeProvidersByService(serviceId),
+                            fetchEdgeProperties(200)
+                        ]);
+                        providersData = pData || [];
+                        fetchedProperties = (propsData?.properties as any) || [];
+                    }
+                } catch {
+                    const serviceRes = await fetch(`${API_BASE}/api/real-estate/service`, { signal: controller.signal });
+                    if (!serviceRes.ok) throw new Error(`Service API HTTP ${serviceRes.status}`);
+                    const serviceData = await serviceRes.json();
+                    serviceId = serviceData?.service?.id;
+
+                    if (!serviceId) {
+                        throw new Error('Real estate service ID not found');
+                    }
+
+                    const providersRes = await fetch(`${API_BASE}/api/providers/${serviceId}/providers`, { signal: controller.signal });
+                    if (!providersRes.ok) throw new Error(`Providers API HTTP ${providersRes.status}`);
+                    providersData = await providersRes.json();
+
+                    const propsRes = await fetch(`${API_BASE}/api/real-estate/properties`, { signal: controller.signal });
+                    if (!propsRes.ok) throw new Error(`Properties API HTTP ${propsRes.status}`);
+                    const propsData = await propsRes.json();
+                    fetchedProperties = Array.isArray(propsData?.properties) ? propsData.properties : [];
                 }
-
-                const providersRes = await fetch(`${API_BASE}/api/providers/${serviceId}/providers`, { signal: controller.signal });
-                if (!providersRes.ok) throw new Error(`Providers API HTTP ${providersRes.status}`);
-                const providersData: any[] = await providersRes.json();
-
-                const propsRes = await fetch(`${API_BASE}/api/real-estate/properties`, { signal: controller.signal });
-                if (!propsRes.ok) throw new Error(`Properties API HTTP ${propsRes.status}`);
-                const propsData = await propsRes.json();
-                const fetchedProperties: Property[] = Array.isArray(propsData?.properties) ? propsData.properties : [];
 
                 const activeProviders = providersData.map(p => {
                     const providerId = String(p.id);

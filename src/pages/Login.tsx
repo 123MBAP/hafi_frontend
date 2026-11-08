@@ -60,11 +60,12 @@ const Login = () => {
     const fromPath = (location.state as any)?.from;
     const bgLocation = (location.state as any)?.backgroundLocation;
     if (bgLocation?.pathname) {
-      navigate(bgLocation.pathname + (bgLocation.search || ''), { replace: true });
+      navigate(
+        bgLocation.pathname + (bgLocation.search || '') + (bgLocation.hash || ''),
+        { replace: true }
+      );
     } else if (fromPath && typeof fromPath === 'string') {
       navigate(fromPath, { replace: true });
-    } else if (window.history.length > 1) {
-      navigate(-1);
     } else {
       navigate('/', { replace: true });
     }

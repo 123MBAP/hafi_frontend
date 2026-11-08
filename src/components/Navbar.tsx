@@ -113,6 +113,9 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
 
   const isNavActive = (path: string) => {
     if (path === '/') return location.pathname === '/';
+    if (path === '/real-estate' && location.pathname.startsWith('/real-estate/commissioners')) {
+      return false;
+    }
     return location.pathname.startsWith(path);
   };
 

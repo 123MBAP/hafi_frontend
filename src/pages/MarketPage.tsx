@@ -16,6 +16,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { API_BASE } from '../api/apiClient';
+import { fetchEdgeProducts } from '../api/workerClient';
 
 
 export interface MarketProductCat {
@@ -250,18 +251,19 @@ export default function MarketWithCategoryProducts() {
     setLoadingCats(true);
     setLoadingProducts(true);
     try {
-      const [categoriesRes, productsRes] = await Promise.all([
+      const [categoriesRes, edgeProductsData] = await Promise.all([
         fetch(`${API_BASE}/api/upload/categories?type=product`),
-        fetch(`${API_BASE}/api/marketPage/products`),
+        fetchEdgeProducts({ limit: 100 }).catch(async () => {
+          const fallback = await fetch(`${API_BASE}/api/marketPage/products`);
+          return fallback.ok ? await fallback.json() : { products: [] };
+        }),
       ]);
 
       const categoriesData = categoriesRes.ok
         ? await categoriesRes.json()
         : { uploadCategories: [] };
 
-      const productsData = productsRes.ok
-        ? await productsRes.json()
-        : { products: [] };
+      const productsData = edgeProductsData || { products: [] };
 
       const normalizedCategories = Array.isArray(categoriesData.uploadCategories)
         ? categoriesData.uploadCategories.map((cat: any) => ({

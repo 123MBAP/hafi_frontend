@@ -166,34 +166,81 @@ export default function SellerDashboardPage() {
 
     setEditIsSaving(true);
     setEditUploadProgress(0);
-    const form = new FormData();
-    form.append("title", editForm.title);
-    form.append("description", editForm.description);
-    form.append("price", editForm.price);
-    form.append("madeInRwanda", String(editMadeInRwanda));
-    form.append("used", String(editUsed));
-    form.append("pricingUnit", editPricingUnit);
-    form.append("categoryId", editForm.category_id || "uncategorized");
-
-    if (editMainFile) {
-      form.append("image", editMainFile);
-    }
-    if (editViewFiles.length > 0) {
-      editViewFiles.forEach(f => form.append("views", f));
-    }
-    if (editVideoFile) {
-      form.append("video", editVideoFile);
-    }
 
     try {
-      const data = await uploadWithProgress(
-        "PATCH",
-        `${API_BASE}/api/seller/product/${editingProduct.id}`,
-        form,
-        (percent) => {
-          setEditUploadProgress(percent);
+      let r2MainImage = undefined;
+      let r2ViewImages = undefined;
+      let r2Video = undefined;
+
+      // 1. Upload main image to R2 if selected
+      if (editMainFile) {
+        setEditUploadProgress(15);
+        const uploadedMain = await uploadMultipleFilesToR2(
+          [{ file: editMainFile, isMain: true, isView: false }],
+          {
+            category: 'products',
+            onProgress: (p) => setEditUploadProgress(Math.round(p * 0.4)),
+          }
+        );
+        if (uploadedMain[0]?.url) {
+          r2MainImage = uploadedMain[0];
         }
-      );
+      }
+
+      // 2. Upload additional views to R2 if selected
+      if (editViewFiles.length > 0) {
+        const uploadedViews = await uploadMultipleFilesToR2(
+          editViewFiles.map((file) => ({ file, isMain: false, isView: true })),
+          {
+            category: 'products',
+            onProgress: (p) => setEditUploadProgress(40 + Math.round(p * 0.3)),
+          }
+        );
+        r2ViewImages = uploadedViews;
+      }
+
+      // 3. Upload video to R2 if selected
+      if (editVideoFile) {
+        const uploadedVideos = await uploadMultipleFilesToR2(
+          [{ file: editVideoFile, isMain: false, isView: false }],
+          {
+            category: 'products',
+            onProgress: (p) => setEditUploadProgress(70 + Math.round(p * 0.3)),
+          }
+        );
+        if (uploadedVideos[0]?.url) {
+          r2Video = uploadedVideos[0];
+        }
+      }
+
+      setEditUploadProgress(100);
+
+      const payload = {
+        title: editForm.title,
+        description: editForm.description,
+        price: editForm.price,
+        madeInRwanda: editMadeInRwanda,
+        used: editUsed,
+        pricingUnit: editPricingUnit,
+        categoryId: editForm.category_id || "uncategorized",
+        ...(r2MainImage ? { r2MainImage } : { mainImageUrl: editPreviewMain || editingProduct.image_url }),
+        ...(r2ViewImages ? { r2ViewImages } : { views: editPreviewViews }),
+        ...(r2Video ? { r2Video } : { videoUrl: editPreviewVideo || editingProduct.video_url || null })
+      };
+
+      const res = await fetch(`${API_BASE}/api/seller/product/${editingProduct.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || "Failed to save product changes.");
+      }
 
       // Re-fetch products to ensure correct grouping
       await loadProducts();

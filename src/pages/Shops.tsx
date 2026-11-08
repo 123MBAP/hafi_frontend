@@ -16,6 +16,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { API_BASE } from '../api/apiClient';
+import { fetchEdgeShopProducts } from '../api/workerClient';
 
 
 export interface ShopCategory {
@@ -210,14 +211,17 @@ export default function ShopsPage() {
     setLoadingCats(true);
     setLoadingProducts(true);
     try {
-      const [catsRes, productsRes, prodCatsRes] = await Promise.all([
+      const [catsRes, edgeProductsData, prodCatsRes] = await Promise.all([
         fetch(`${API_BASE}/api/shopping-types`),
-        fetch(`${API_BASE}/api/shops/products`),
+        fetchEdgeShopProducts().catch(async () => {
+          const fb = await fetch(`${API_BASE}/api/shops/products`);
+          return fb.ok ? await fb.json() : { products: [] };
+        }),
         fetch(`${API_BASE}/api/upload/categories?type=product`),
       ]);
 
       const catsData = catsRes.ok ? await catsRes.json() : { shopping_types: [] };
-      const productsData = productsRes.ok ? await productsRes.json() : { products: [] };
+      const productsData = edgeProductsData || { products: [] };
       const prodCatsData = prodCatsRes.ok ? await prodCatsRes.json() : { uploadCategories: [] };
 
       // Exclude 'other' products shop category from filters
