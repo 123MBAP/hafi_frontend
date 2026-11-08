@@ -1,5 +1,6 @@
 import { useDarkMode } from "@/context/DarkMode";
 import { API_BASE } from "@/api/apiClient";
+import { fetchEdgeNotifications } from "@/api/workerClient";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import PageHeader from "@/components/ui/PageHeader";
 import { useEffect, useState } from "react";
@@ -95,8 +96,13 @@ export default function NotificationsPage() {
     useEffect(() => {
         async function fetchNotifications() {
             try {
-                const res = await fetch(`${API_BASE}/api/notifications`);
-                const data = await res.json();
+                let data: Notification[] = [];
+                try {
+                    data = await fetchEdgeNotifications();
+                } catch {
+                    const res = await fetch(`${API_BASE}/api/notifications`);
+                    data = await res.json();
+                }
                 setAllNotifications(data);
                 const unreadCount = data.filter((n: Notification) => !n.read).length;
                 setNotificationCount(unreadCount);

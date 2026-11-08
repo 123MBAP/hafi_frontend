@@ -137,6 +137,14 @@ export const fetchEdgeProductById = async (id: number | string): Promise<WorkerP
 };
 
 /**
+ * Fetch recent 7-day notifications/updates with caching
+ */
+export const fetchEdgeNotifications = async (): Promise<any[]> => {
+  const url = `${WORKER_BASE}/api/notifications`;
+  return await cachedFetch<any[]>(url, {}, { ttlMs: 30_000 });
+};
+
+/**
  * Invalidate client-side cache
  */
 export const invalidateEdgeCache = () => {
@@ -153,5 +161,6 @@ export default {
   fetchEdgeRealEstateService,
   fetchEdgeProvidersByService,
   fetchEdgeProviderById,
+  fetchEdgeNotifications,
   invalidateEdgeCache,
 };
