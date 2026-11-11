@@ -82,10 +82,6 @@ export default function RegisterPage() {
         const list = Array.isArray(data) ? data : (data.shopping_types || []);
         setShoppingTypes(list);
         setShopPlan(data.shop_plan || null);
-        const defaultST = list.find((st: any) => st.name.toLowerCase().includes('other')) || list[0];
-        if (defaultST) {
-          setForm(prev => ({ ...prev, shopping_type_id: String(defaultST.id) }));
-        }
       } catch (err) {
         console.error('Failed to fetch shopping types:', err);
       } finally {
@@ -110,6 +106,24 @@ export default function RegisterPage() {
 
     if (!agreeToTerms) {
       setError('Please agree to the Terms & Conditions and Privacy Policy to continue.');
+      setLoading(false);
+      return;
+    }
+
+    if (!form.role) {
+      setError('Please select how you want to use HafiConnect.');
+      setLoading(false);
+      return;
+    }
+
+    if (form.role === 'seller' && !form.shopping_type_id) {
+      setError('Please select a shop type to continue.');
+      setLoading(false);
+      return;
+    }
+
+    if (form.role === 'service_provider' && !form.service) {
+      setError('Please select a service to continue.');
       setLoading(false);
       return;
     }
@@ -239,6 +253,24 @@ export default function RegisterPage() {
       return;
     }
 
+    if (!form.role) {
+      setError('Please select how you want to use HafiConnect.');
+      setLoading(false);
+      return;
+    }
+
+    if (form.role === 'seller' && !form.shopping_type_id) {
+      setError('Please select a shop type to continue.');
+      setLoading(false);
+      return;
+    }
+
+    if (form.role === 'service_provider' && !form.service) {
+      setError('Please select a service to continue.');
+      setLoading(false);
+      return;
+    }
+
     let location = null;
     const isPremiumSeller = form.role === 'seller' && selectedShopType && selectedShopType.key !== 'other';
     const requiresLocation = form.role === 'service_provider' || isPremiumSeller;
@@ -308,6 +340,10 @@ export default function RegisterPage() {
   const selectedShopType = shoppingTypes.find(st => String(st.id) === String(form.shopping_type_id));
   const isPremiumSeller = form.role === 'seller' && selectedShopType && selectedShopType.key !== 'other';
   const showLocationFields = form.role === 'service_provider' || isPremiumSeller;
+  const isRoleDetailsComplete =
+    Boolean(form.role) &&
+    (form.role !== 'seller' || Boolean(form.shopping_type_id)) &&
+    (form.role !== 'service_provider' || Boolean(form.service));
 
   return (
     <div className={`min-h-screen pt-8 pb-16 px-4 transition-colors duration-200 ${darkMode ? 'bg-gray-950 text-white' : 'bg-[#F5F5F5] text-[#151515]'}`}>
@@ -485,7 +521,7 @@ export default function RegisterPage() {
                             </div>
                           )}
 
-                          {/* Nested dropdown for Seller */}
+                          {/* Shop type selection for Seller */}
                           {role.value === 'seller' && isSelected && (
                             <div className="px-4 pb-4 pt-1" onClick={(e) => e.stopPropagation()}>
                               <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -494,17 +530,7 @@ export default function RegisterPage() {
                               {loadingShoppingTypes ? (
                                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#E5252A] border-t-transparent"></div>
                               ) : (
-                                <select
-                                  name="shopping_type_id"
-                                  value={form.shopping_type_id}
-                                  onChange={handleChange}
-                                  required
-                                  className={`w-full p-2.5 rounded-xl border text-xs transition-colors ${
-                                    darkMode
-                                      ? 'bg-gray-800 border-gray-700 text-white focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]'
-                                      : 'bg-white border-[#E5E5E5] text-[#151515] focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]'
-                                  }`}
-                                >
+                                <div className="space-y-2" role="radiogroup" aria-label="Shop type">
                                   {[...shoppingTypes]
                                     .sort((a, b) => {
                                       const aIsOther = a.name.toLowerCase().includes('other');
@@ -513,12 +539,38 @@ export default function RegisterPage() {
                                       if (!aIsOther && bIsOther) return 1;
                                       return 0;
                                     })
-                                    .map(st => (
-                                      <option key={st.id} value={st.id}>
-                                        {st.name}
-                                      </option>
-                                    ))}
-                                </select>
+                                    .map(st => {
+                                      const isShopTypeSelected = String(st.id) === String(form.shopping_type_id);
+                                      return (
+                                        <label
+                                          key={st.id}
+                                          className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                                            isShopTypeSelected
+                                              ? 'border-[#E5252A] bg-red-500/5 dark:bg-red-950/20'
+                                              : darkMode
+                                              ? 'border-gray-800 bg-gray-800/40 hover:border-[#E5252A]/50'
+                                              : 'border-[#E5E5E5] bg-white hover:border-[#E5252A]/50'
+                                          }`}
+                                        >
+                                          <input
+                                            type="radio"
+                                            name="shopping_type_id"
+                                            value={st.id}
+                                            checked={isShopTypeSelected}
+                                            onChange={handleChange}
+                                            className="accent-[#E5252A]"
+                                          />
+                                          <span className={`text-xs font-bold uppercase tracking-wider ${
+                                            isShopTypeSelected
+                                              ? 'text-[#E5252A]'
+                                              : darkMode ? 'text-white' : 'text-[#151515]'
+                                          }`}>
+                                            {st.name}
+                                          </span>
+                                        </label>
+                                      );
+                                    })}
+                                </div>
                               )}
                               
                               {/* Selected Premium Shop Type Details */}
@@ -805,9 +857,9 @@ export default function RegisterPage() {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !isRoleDetailsComplete}
                   className={`w-full py-3 px-4 text-white text-xs font-bold uppercase tracking-wider transition-all rounded-xl shadow-xs active:scale-[0.99] ${
-                    loading
+                    loading || !isRoleDetailsComplete
                       ? 'bg-gray-400 dark:bg-gray-800 text-gray-200 dark:text-gray-500 cursor-not-allowed'
                       : 'bg-[#E5252A] hover:bg-[#c91d22]'
                   }`}
@@ -952,7 +1004,7 @@ export default function RegisterPage() {
                             </div>
                           )}
 
-                          {/* Nested dropdown for Seller */}
+                          {/* Shop type selection for Seller */}
                           {role.value === 'seller' && isSelected && (
                             <div className="px-4 pb-4 pt-1" onClick={(e) => e.stopPropagation()}>
                               <label className={`block text-[9px] font-bold uppercase tracking-wider mb-1.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -961,17 +1013,7 @@ export default function RegisterPage() {
                               {loadingShoppingTypes ? (
                                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#E5252A] border-t-transparent"></div>
                               ) : (
-                                <select
-                                  name="shopping_type_id"
-                                  value={form.shopping_type_id}
-                                  onChange={handleChange}
-                                  required
-                                  className={`w-full p-2.5 rounded-xl border text-xs transition-colors ${
-                                    darkMode
-                                      ? 'bg-gray-800 border-gray-700 text-white focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]'
-                                      : 'bg-white border-[#E5E5E5] text-[#151515] focus:ring-2 focus:ring-[#E5252A]/20 focus:border-[#E5252A]'
-                                  }`}
-                                >
+                                <div className="space-y-2" role="radiogroup" aria-label="Shop type">
                                   {[...shoppingTypes]
                                     .sort((a, b) => {
                                       const aIsOther = a.name.toLowerCase().includes('other');
@@ -980,12 +1022,38 @@ export default function RegisterPage() {
                                       if (!aIsOther && bIsOther) return 1;
                                       return 0;
                                     })
-                                    .map(st => (
-                                      <option key={st.id} value={st.id}>
-                                        {st.name}
-                                      </option>
-                                    ))}
-                                </select>
+                                    .map(st => {
+                                      const isShopTypeSelected = String(st.id) === String(form.shopping_type_id);
+                                      return (
+                                        <label
+                                          key={st.id}
+                                          className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                                            isShopTypeSelected
+                                              ? 'border-[#E5252A] bg-red-500/5 dark:bg-red-950/20'
+                                              : darkMode
+                                              ? 'border-gray-800 bg-gray-800/40 hover:border-[#E5252A]/50'
+                                              : 'border-[#E5E5E5] bg-white hover:border-[#E5252A]/50'
+                                          }`}
+                                        >
+                                          <input
+                                            type="radio"
+                                            name="shopping_type_id"
+                                            value={st.id}
+                                            checked={isShopTypeSelected}
+                                            onChange={handleChange}
+                                            className="accent-[#E5252A]"
+                                          />
+                                          <span className={`text-xs font-bold uppercase tracking-wider ${
+                                            isShopTypeSelected
+                                              ? 'text-[#E5252A]'
+                                              : darkMode ? 'text-white' : 'text-[#151515]'
+                                          }`}>
+                                            {st.name}
+                                          </span>
+                                        </label>
+                                      );
+                                    })}
+                                </div>
                               )}
                               
                               {/* Selected Premium Shop Type Details */}
@@ -1190,9 +1258,9 @@ export default function RegisterPage() {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={loading || !form.role}
+                  disabled={loading || !isRoleDetailsComplete}
                   className={`w-full py-3.5 px-4 text-white text-xs font-bold uppercase tracking-wider transition-all rounded-xl shadow-xs active:scale-[0.99] ${
-                    loading || !form.role
+                    loading || !isRoleDetailsComplete
                       ? 'bg-gray-400 dark:bg-gray-800 text-gray-200 dark:text-gray-500 cursor-not-allowed'
                       : 'bg-[#E5252A] hover:bg-[#c91d22]'
                   }`}

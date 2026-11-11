@@ -479,6 +479,7 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
                         </Link>
                         <Link
                           to="/register"
+                          onClick={closeMenu}
                           className="block w-full py-2 text-center text-xs font-bold uppercase tracking-wider border border-gray-300 dark:border-zinc-700 hover:border-gray-400 text-gray-900 dark:text-white rounded-lg transition-colors"
                         >
                           Register
