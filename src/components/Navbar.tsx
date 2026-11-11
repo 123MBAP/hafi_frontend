@@ -213,7 +213,7 @@ const Navbar: React.FC<NavbarProps> = ({ notificationCount }) => {
             <img src={logo} alt="HafiConnect Logo" className="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
             <div className="flex flex-col">
               <span className={`text-xl font-extrabold tracking-tight uppercase ${darkMode ? 'text-white' : 'text-[#0A0A0A]'}`}>
-                Hafi<span className="text-[#E5252A]">Connect</span>
+               <span className="text-[#E5252A]">Hafi</span>Connect
               </span>
               <span className="text-[10px] uppercase font-bold tracking-widest text-[#666666] dark:text-zinc-400 -mt-1">
                 Rwanda Marketplace

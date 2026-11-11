@@ -35,6 +35,16 @@ const norm = (v: any) => String(v ?? '').trim().toLowerCase();
 
 type RentSellKind = 'rent' | 'sale' | '';
 
+function deduplicateProperties(list: Property[]): Property[] {
+    const seen = new Set<string>();
+    return list.filter((property) => {
+        const id = String(property?.id ?? '').trim();
+        if (!id || seen.has(id)) return false;
+        seen.add(id);
+        return true;
+    });
+}
+
 function descriptionValuesOnlyFromUnknown(value: unknown): string {
     if (value == null) return '';
     if (typeof value === 'string') {
@@ -179,12 +189,12 @@ export default function RealEstatePage() {
                 let list: Property[] = [];
                 try {
                     const edgeData = await fetchEdgeProperties(200);
-                    list = (edgeData?.properties as any) || [];
+                    list = deduplicateProperties((edgeData?.properties as Property[]) || []);
                 } catch {
                     const res = await fetch(`${API_BASE}/api/real-estate/properties`, { signal: controller.signal });
                     if (!res.ok) throw new Error(`HTTP ${res.status}`);
                     const data = await res.json();
-                    list = Array.isArray(data?.properties) ? data.properties : [];
+                    list = deduplicateProperties(Array.isArray(data?.properties) ? data.properties : []);
                 }
                 setProperties(list);
             } catch (e: any) {

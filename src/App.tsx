@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useHafibot } from './context/HafibotContext';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import UpgradePlansPage from './components/DashboardParts/AdminParts/AdminPlans';
@@ -89,6 +89,22 @@ const App: React.FC = () => {
   const scrollPosRef = useRef<number>(0);
 
   const providerId = getProviderIdFromToken();
+
+  useLayoutEffect(() => {
+    window.history.scrollRestoration = 'manual';
+
+    if (!location.hash) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+      if (leftPageRef.current) {
+        leftPageRef.current.scrollTop = 0;
+      }
+    }
+
+    return () => {
+      window.history.scrollRestoration = 'auto';
+    };
+  }, [location.pathname, location.search, location.hash]);
 
   const closeChat = () => {
     setChatCustomerId(null);

@@ -111,6 +111,13 @@ export default function Dashboard() {
   const [existingProductViews, setExistingProductViews] = useState<string[]>([]);
   const [existingProductVideoUrl, setExistingProductVideoUrl] = useState<string>('');
 
+  // Edit service / real estate in upload fields mode
+  const [editingService, setEditingService] = useState<UploadedMedia | null>(null);
+  const [existingServiceImageUrl, setExistingServiceImageUrl] = useState<string>('');
+  const [existingServiceViews, setExistingServiceViews] = useState<string[]>([]);
+  const [existingServiceVideoUrl, setExistingServiceVideoUrl] = useState<string>('');
+  const [serviceUploadProgress, setServiceUploadProgress] = useState<number | null>(null);
+
   // For upload
   const [productTitle, setProductTitle] = useState('');
   const [productDesc, setProductDesc] = useState('');
@@ -653,6 +660,141 @@ export default function Dashboard() {
     if (!providerId) return;
 
     if (isUploadingService) return;
+
+    // Handle Edit Mode submission for services/real-estate
+    if (editingService) {
+      if (!serviceTitle.trim() || !serviceDesc.trim()) {
+        alert('Please fill in title and description');
+        return;
+      }
+
+      setIsUploadingService(true);
+      try {
+        let finalMainImageUrl = existingServiceImageUrl;
+        const finalViews: string[] = [...existingServiceViews];
+        let finalVideoUrl = existingServiceVideoUrl;
+
+        const isRealEstate = service?.custom_type?.toLowerCase() === 'real_estate';
+        const uploadCategory = isRealEstate ? 'real_estate' : 'services';
+
+        // 1. Upload new main image if selected
+        if (serviceImages.length > 0) {
+          setServiceUploadProgress(10);
+          const uploadedMain = await uploadMultipleFilesToR2(
+            [{ file: serviceImages[0], isMain: true, isView: false }],
+            { category: uploadCategory, onProgress: (p) => setServiceUploadProgress(Math.round(p * 0.4)) }
+          );
+          if (uploadedMain[0]?.url) {
+            finalMainImageUrl = uploadedMain[0].url;
+          }
+        }
+
+        // 2. Upload new view images if selected
+        const newViewFiles = serviceViews.flat();
+        if (newViewFiles.length > 0) {
+          const uploadedViews = await uploadMultipleFilesToR2(
+            newViewFiles.map(f => ({ file: f, isMain: false, isView: true })),
+            { category: uploadCategory, onProgress: (p) => setServiceUploadProgress(40 + Math.round(p * 0.3)) }
+          );
+          uploadedViews.forEach(v => {
+            if (v.url) finalViews.push(v.url);
+          });
+        }
+
+        // 3. Upload new video if selected
+        if (serviceVideos.length > 0) {
+          const uploadedVideos = await uploadMultipleFilesToR2(
+            [{ file: serviceVideos[0], isMain: false, isView: false }],
+            { category: uploadCategory, onProgress: (p) => setServiceUploadProgress(70 + Math.round(p * 0.3)) }
+          );
+          if (uploadedVideos[0]?.url) {
+            finalVideoUrl = uploadedVideos[0].url;
+          }
+        }
+
+        setServiceUploadProgress(100);
+
+        const priceNum = parseFloat(servicePrice) || (featureValues.price ? parseFloat(featureValues.price) : 0);
+
+        const res = await fetch(`${API_BASE}/api/media/${editingService.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: serviceTitle,
+            desc: serviceDesc,
+            price: priceNum,
+            featureValues: featureValues,
+            mainImageUrl: finalMainImageUrl,
+            views: finalViews,
+            videoUrl: finalVideoUrl,
+          })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || 'Failed to update service/property');
+        }
+
+        const data = await res.json();
+        console.log('✅ Service updated successfully:', data);
+
+        // If real estate, also sync dedicated table
+        if (isRealEstate && providerId) {
+          try {
+            await fetch(`${API_BASE}/api/real-estate/properties/save-fields`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+              },
+              body: JSON.stringify({
+                group_id: editingService.id,
+                provider_id: parseInt(providerId),
+                title: serviceTitle,
+                description: serviceDesc,
+                price: priceNum,
+                ...featureValues,
+              }),
+            });
+          } catch (saveErr) {
+            console.error('⚠️ Could not sync real estate fields to dedicated table:', saveErr);
+          }
+        }
+
+        // Update local state
+        setUploadedServiceImages(prev =>
+          prev.map(img =>
+            img.id === editingService.id
+              ? {
+                  ...img,
+                  title: serviceTitle,
+                  desc: serviceDesc,
+                  price: priceNum,
+                  url: finalMainImageUrl || img.url,
+                  views: finalViews,
+                  feature_values: featureValues,
+                  mediaFiles: [
+                    ...(finalMainImageUrl ? [{ id: `${img.id}-main`, url: finalMainImageUrl, type: 'image' as const, fileType: 'image' as const, size: 0, filename: 'main.jpg', title: serviceTitle, desc: serviceDesc, visible: true }] : []),
+                    ...finalViews.map((v, i) => ({ id: `${img.id}-view-${i}`, url: v, type: 'image' as const, fileType: 'image' as const, size: 0, filename: `view-${i}.jpg`, title: serviceTitle, desc: serviceDesc, visible: true })),
+                    ...(finalVideoUrl ? [{ id: `${img.id}-video`, url: finalVideoUrl, type: 'video' as const, fileType: 'video' as const, size: 0, filename: 'video.mp4', title: serviceTitle, desc: serviceDesc, visible: true }] : [])
+                  ]
+                }
+              : img
+          )
+        );
+
+        alert(isRealEstate ? 'Property updated successfully!' : 'Service updated successfully!');
+        handleCancelEditService();
+      } catch (err: any) {
+        console.error('Update error:', err);
+        alert(err.message || 'Failed to update');
+      } finally {
+        setIsUploadingService(false);
+        setServiceUploadProgress(null);
+      }
+      return;
+    }
+
     setIsUploadingService(true);
     try {
 
@@ -898,12 +1040,40 @@ export default function Dashboard() {
     }
   };
 
+  const handleCancelEditService = () => {
+    setEditingService(null);
+    setServiceTitle('');
+    setServiceDesc('');
+    setServicePrice('');
+    setExistingServiceImageUrl('');
+    setExistingServiceViews([]);
+    setExistingServiceVideoUrl('');
+    setServiceImages([]);
+    setServiceViews([]);
+    setServiceVideos([]);
+    setServiceUploadProgress(null);
+    if ((service?.specific_features && service?.features) || service?.custom_type?.toLowerCase() === 'real_estate') {
+      const resetValues: Record<string, any> = {};
+      if (service?.features && Array.isArray(service.features)) {
+        service.features.forEach((feature) => {
+          if (feature.type === 'simple') {
+            resetValues[feature.name] = '';
+          } else if (feature.type === 'object') {
+            resetValues[feature.name] = {};
+          }
+        });
+      }
+      setFeatureValues(resetValues);
+    }
+  };
+
   // Editing handlers
   const startEditing = (img: UploadedMedia) => {
     console.log('🔧 [EDIT] Starting edit for:', img);
 
     // If product, open in ProductUploadCard edit mode
     if (img.type === 'product') {
+      handleCancelEditService();
       setEditingProduct(img);
       setProductTitle(img.title || '');
       setProductDesc(img.desc || '');
@@ -931,6 +1101,92 @@ export default function Dashboard() {
           el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }, 60);
+
+      setEditingImage(null);
+      return;
+    }
+
+    // If service / real estate, open in ServiceUploadCard edit mode
+    if (img.type === 'service') {
+      handleCancelEditProduct();
+      setEditingService(img);
+      setServiceTitle(img.title || '');
+      setServiceDesc(img.desc || '');
+      setServicePrice(img.price !== undefined && img.price !== null ? String(img.price) : '');
+
+      const featureVals = { ...((img as any).feature_values || {}) };
+      if (img.price !== undefined && img.price !== null && !featureVals.price) {
+        featureVals.price = img.price;
+      }
+      setFeatureValues(featureVals);
+
+      setExistingServiceImageUrl(img.url || '');
+      setExistingServiceViews(Array.isArray(img.views) ? [...img.views] : []);
+      const vid = img.mediaFiles?.find(m => m.type === 'video')?.url || (img.fileType === 'video' ? img.url : '');
+      setExistingServiceVideoUrl(vid || '');
+
+      setServiceImages([]);
+      setServiceViews([]);
+      setServiceVideos([]);
+
+      setSelectedCard('service');
+      setTimeout(() => {
+        const el = document.getElementById('service-upload-card');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 60);
+
+      // If real estate, enrich with property fields from real_estate_properties table
+      if (service?.custom_type?.toLowerCase() === 'real_estate' && img.id) {
+        fetch(`${API_BASE}/api/real-estate/properties/${img.id}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data?.property) {
+              const prop = data.property;
+              setFeatureValues(prev => ({
+                ...prev,
+                property_category: prop.category || prop.property_category || prev.property_category,
+                listing_type: prop.transactionType === 'ForSale' ? 'For sale' : prop.transactionType === 'ForLetting' ? 'For rent' : (prop.listing_type || prev.listing_type),
+                price: prop.price || prev.price,
+                province: prop.province || (typeof prop.location === 'object' ? prop.location?.province : '') || prev.province,
+                district: prop.district || (typeof prop.location === 'object' ? prop.location?.district : '') || prev.district,
+                sector: prop.sector || (typeof prop.location === 'object' ? prop.location?.sector : '') || prev.sector,
+                cell: prop.cell || (typeof prop.location === 'object' ? prop.location?.cell : '') || prev.cell,
+                village: prop.village || (typeof prop.location === 'object' ? prop.location?.village : '') || prev.village,
+                bedrooms: prop.bedrooms ?? prev.bedrooms,
+                bathrooms: prop.bathrooms ?? prev.bathrooms,
+                land_size_sqm: prop.land_size_sqm ?? prev.land_size_sqm,
+                building_area_sqm: prop.building_area_sqm ?? prev.building_area_sqm,
+                floor_area_sqm: prop.floor_area_sqm ?? prev.floor_area_sqm,
+                floor_number: prop.floor_number ?? prev.floor_number,
+                number_of_floors: prop.number_of_floors ?? prev.number_of_floors,
+                rooms_or_offices: prop.rooms_or_offices ?? prev.rooms_or_offices,
+                parking: prop.parking ?? prev.parking,
+                furnished: prop.furnished ?? prev.furnished,
+                kitchen: prop.kitchen ?? prev.kitchen,
+                road_access: prop.road_access ?? prev.road_access,
+                land_use: prop.land_use ?? prev.land_use,
+                garden_swimming_pool: prop.garden_swimming_pool ?? prev.garden_swimming_pool,
+                utilities_available: prop.utilities_available || prev.utilities_available,
+                amenities: prop.amenities || prev.amenities,
+                ...(prop.feature_values || {}),
+              }));
+              if (prop.video_url && !vid) {
+                setExistingServiceVideoUrl(prop.video_url);
+              }
+              if (Array.isArray(prop.images) && prop.images.length > 0) {
+                if (!img.url && prop.images[0]) {
+                  setExistingServiceImageUrl(prop.images[0]);
+                }
+                if ((!img.views || img.views.length === 0) && prop.images.length > 1) {
+                  setExistingServiceViews(prop.images.slice(1));
+                }
+              }
+            }
+          })
+          .catch(err => console.warn('Could not fetch additional property details:', err));
+      }
 
       setEditingImage(null);
       return;
@@ -1320,7 +1576,9 @@ export default function Dashboard() {
                   : 'bg-white border-gray-200 text-gray-700 hover:border-[#E5252A]'
               }`}
           >
-            Service Upload
+            {editingService
+              ? (service?.custom_type?.toLowerCase() === 'real_estate' ? 'Edit Property (Active)' : 'Edit Service (Active)')
+              : (service?.custom_type?.toLowerCase() === 'real_estate' ? 'Property Upload' : 'Service Upload')}
           </button>
         </div>
       )}
@@ -1392,6 +1650,10 @@ export default function Dashboard() {
           featureValues={featureValues}
           setFeatureValues={setFeatureValues}
           onReset={() => {
+            if (editingService) {
+              handleCancelEditService();
+              return;
+            }
             setServiceImages([]);
             setServiceViews([]);
             setServiceVideos([]);
@@ -1405,18 +1667,30 @@ export default function Dashboard() {
               withDriverCost: 0,
             });
             // Reset feature values
-            if (service?.specific_features && service?.features) {
+            if ((service?.specific_features && service?.features) || service?.custom_type?.toLowerCase() === 'real_estate') {
               const resetValues: Record<string, any> = {};
-              service.features.forEach((feature) => {
-                if (feature.type === 'simple') {
-                  resetValues[feature.name] = '';
-                } else if (feature.type === 'object') {
-                  resetValues[feature.name] = {};
-                }
-              });
+              if (service?.features && Array.isArray(service.features)) {
+                service.features.forEach((feature) => {
+                  if (feature.type === 'simple') {
+                    resetValues[feature.name] = '';
+                  } else if (feature.type === 'object') {
+                    resetValues[feature.name] = {};
+                  }
+                });
+              }
               setFeatureValues(resetValues);
             }
           }}
+          uploadProgress={serviceUploadProgress}
+          isEditing={!!editingService}
+          editingItemName={editingService?.title}
+          onCancelEdit={handleCancelEditService}
+          existingImageUrl={existingServiceImageUrl}
+          onRemoveExistingImage={() => setExistingServiceImageUrl('')}
+          existingViews={existingServiceViews}
+          onRemoveExistingView={(idx) => setExistingServiceViews(prev => prev.filter((_, i) => i !== idx))}
+          existingVideoUrl={existingServiceVideoUrl}
+          onRemoveExistingVideo={() => setExistingServiceVideoUrl('')}
         />
       )}
 

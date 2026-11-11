@@ -15,7 +15,7 @@ type Notification = {
     created_at: string;
     category_id: string;
     seller_id: string;
-    provider_id: string;
+    provider_id?: string;
     read: boolean;
     image_url: string[];
 };
@@ -178,6 +178,8 @@ export default function NotificationsPage() {
 
             if (n.type === "adminService") {
                 navigate(`/services/${n.id}`);
+            } else if (n.type === "uploadedProduct" && n.provider_id) {
+                navigate(`/product-or-service-detail/${n.provider_id}/${n.id}`);
             } else if (n.type === "sellerProducts") {
                 navigate(`/product/${n.id}`);
             } else if (n.type === "marketCat") {

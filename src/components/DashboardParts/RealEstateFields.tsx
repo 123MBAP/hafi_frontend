@@ -31,17 +31,18 @@ const AMENITIES = [
 ];
 
 export default function RealEstateFields({ darkMode, values, onChange }: Props) {
-  const inputCls = `w-full p-2.5 border text-sm ${
+  const inputCls = `w-full p-2.5 border rounded-lg text-sm ${
     darkMode
-      ? 'bg-gray-950 border-gray-800 text-white placeholder-gray-500'
-      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
-  } focus:ring-1 focus:ring-emerald-500 focus:outline-none`;
-  const labelCls = `block text-[10px] font-bold uppercase tracking-wider mb-1.5 ${
+      ? 'bg-zinc-950 border-zinc-800 text-white placeholder-gray-500'
+      : 'bg-white border-gray-200 text-gray-900 placeholder-gray-400'
+  } focus:ring-1 focus:ring-brand-red focus:border-brand-red focus:outline-none transition-all`;
+  const labelCls = `block text-[11px] font-bold uppercase tracking-wider mb-1.5 ${
     darkMode ? 'text-gray-300' : 'text-gray-600'
   }`;
-  const sectionCls = `p-4 border rounded-sm ${
-    darkMode ? 'border-gray-700 bg-gray-900/30' : 'border-gray-200 bg-gray-50/50'
+  const sectionCls = `p-5 border rounded-xl transition-all ${
+    darkMode ? 'border-zinc-800 bg-zinc-950/40' : 'border-gray-200 bg-gray-50/70'
   }`;
+  const titleCls = `text-xs font-bold uppercase tracking-wider text-brand-red mb-3 flex items-center gap-2`;
 
   const category = values.property_category || '';
   const set = (keyOrObj: string | Record<string, any>, val?: any) => {
@@ -73,10 +74,10 @@ export default function RealEstateFields({ darkMode, values, onChange }: Props) 
   };
 
   return (
-    <div className="md:col-span-2 space-y-5 border-t border-gray-200 dark:border-gray-700 pt-6">
+    <div className="md:col-span-2 space-y-5 border-t border-gray-200 dark:border-zinc-800 pt-6">
       {/* ── Section 1: Common fields ── */}
       <div className={sectionCls}>
-        <h4 className={`${labelCls} text-emerald-600 mb-3`}>Property Details</h4>
+        <h4 className={titleCls}>Property Details</h4>
         <div className="grid md:grid-cols-3 gap-4">
           <div>
             <label className={labelCls}>Property Category *</label>
@@ -119,7 +120,7 @@ export default function RealEstateFields({ darkMode, values, onChange }: Props) 
 
       {/* ── Section 2: Location (Rwanda) ── */}
       <div className={sectionCls}>
-        <h4 className={`${labelCls} text-emerald-600 mb-3`}>Property Location (Rwanda)</h4>
+        <h4 className={titleCls}>Property Location (Rwanda)</h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
           <div>
             <label className={labelCls}>Province</label>
@@ -204,7 +205,7 @@ export default function RealEstateFields({ darkMode, values, onChange }: Props) 
       {/* ── Section 3: Category-specific fields ── */}
       {category === 'Land (Ikibanza)' && (
         <div className={sectionCls}>
-          <h4 className={`${labelCls} text-emerald-600 mb-3`}>Land Details</h4>
+          <h4 className={titleCls}>Land Details</h4>
           <div className="grid md:grid-cols-3 gap-4">
             <div>
               <label className={labelCls}>Land size (m²)</label>
@@ -248,15 +249,16 @@ export default function RealEstateFields({ darkMode, values, onChange }: Props) 
             <div className="flex flex-wrap gap-3 mt-1">
               {['Water', 'Electricity'].map((util) => {
                 const selected: string[] = Array.isArray(values.utilities_available) ? values.utilities_available : [];
+                const isSelected = selected.includes(util);
                 return (
-                  <label key={util} className="inline-flex items-center gap-2 text-sm cursor-pointer">
+                  <label key={util} className="inline-flex items-center gap-2 text-sm cursor-pointer select-none">
                     <input
                       type="checkbox"
-                      checked={selected.includes(util)}
+                      checked={isSelected}
                       onChange={() => toggleUtility(util)}
-                      className="accent-emerald-500"
+                      className="accent-brand-red rounded text-brand-red focus:ring-brand-red"
                     />
-                    <span className={darkMode ? 'text-gray-200' : 'text-gray-700'}>{util}</span>
+                    <span className={`text-xs font-medium ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>{util}</span>
                   </label>
                 );
               })}
@@ -267,7 +269,7 @@ export default function RealEstateFields({ darkMode, values, onChange }: Props) 
 
       {category === 'Commercial building' && (
         <div className={sectionCls}>
-          <h4 className={`${labelCls} text-emerald-600 mb-3`}>Commercial Building Details</h4>
+          <h4 className={titleCls}>Commercial Building Details</h4>
           <div className="grid md:grid-cols-4 gap-4">
             <div>
               <label className={labelCls}>Building area (m²)</label>
@@ -320,7 +322,7 @@ export default function RealEstateFields({ darkMode, values, onChange }: Props) 
 
       {category === 'Residential house' && (
         <div className={sectionCls}>
-          <h4 className={`${labelCls} text-emerald-600 mb-3`}>Residential House Details</h4>
+          <h4 className={titleCls}>Residential House Details</h4>
           <div className="grid md:grid-cols-3 gap-4">
             <div>
               <label className={labelCls}>Number of bedrooms</label>
@@ -386,7 +388,7 @@ export default function RealEstateFields({ darkMode, values, onChange }: Props) 
 
       {category === 'Apartment' && (
         <div className={sectionCls}>
-          <h4 className={`${labelCls} text-emerald-600 mb-3`}>Apartment Details</h4>
+          <h4 className={titleCls}>Apartment Details</h4>
           <div className="grid md:grid-cols-3 gap-4">
             <div>
               <label className={labelCls}>Number of bedrooms</label>
@@ -462,8 +464,8 @@ export default function RealEstateFields({ darkMode, values, onChange }: Props) 
 
       {/* ── Section 4: Amenities ── */}
       <div className={sectionCls}>
-        <h4 className={`${labelCls} text-emerald-600 mb-3`}>Amenities — select all that apply</h4>
-        <div className="flex flex-wrap gap-3">
+        <h4 className={titleCls}>Amenities — select all that apply</h4>
+        <div className="flex flex-wrap gap-2.5">
           {AMENITIES.map((amenity) => {
             const selected: string[] = Array.isArray(values.amenities) ? values.amenities : [];
             const isChecked = selected.includes(amenity);
@@ -472,14 +474,13 @@ export default function RealEstateFields({ darkMode, values, onChange }: Props) 
                 key={amenity}
                 type="button"
                 onClick={() => toggleAmenity(amenity)}
-                className={`px-3 py-1.5 text-xs font-semibold border transition-all ${
+                className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
                   isChecked
-                    ? 'bg-emerald-500 text-white border-emerald-500'
+                    ? 'bg-brand-red text-white border-brand-red shadow-sm'
                     : darkMode
-                    ? 'bg-gray-900 text-gray-300 border-gray-700 hover:border-emerald-500'
-                    : 'bg-white text-gray-700 border-gray-300 hover:border-emerald-500'
+                    ? 'bg-zinc-900 text-gray-300 border-zinc-800 hover:border-brand-red/60'
+                    : 'bg-white text-gray-700 border-gray-200 hover:border-brand-red/60'
                 }`}
-                style={{ borderRadius: '4px' }}
               >
                 {isChecked ? '✓ ' : ''}{amenity}
               </button>
@@ -487,7 +488,7 @@ export default function RealEstateFields({ darkMode, values, onChange }: Props) 
           })}
         </div>
         {Array.isArray(values.amenities) && values.amenities.length > 0 && (
-          <p className={`mt-2 text-xs ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+          <p className="mt-2.5 text-xs font-medium text-brand-red">
             {values.amenities.length} selected: {values.amenities.join(', ')}
           </p>
         )}

@@ -41,6 +41,8 @@ export interface Property {
     price: number; // in RWF
     location: LocationHierarchy;
     images: string[];
+    video_url?: string;
+    videoUrl?: string;
     uploadedBy: UploadedBy;
     contactPhone: string;
     whatsappNumber?: string;

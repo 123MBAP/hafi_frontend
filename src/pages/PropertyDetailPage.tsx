@@ -14,7 +14,13 @@ import {
     Share2,
     User,
     CheckCircle,
-    Clock
+    Clock,
+    ShieldCheck,
+    MessageCircle,
+    Copy,
+    Check,
+    Play,
+    Video
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
@@ -25,10 +31,10 @@ import {
     TransactionType
 } from "../api/realEstateTypes";
 import { mockCommissioners } from "../api/mockRealEstateData";
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { ServiceFeature } from "@/types/features";
 import { API_BASE } from '../api/apiClient';
-
+import { fetchEdgeProperties } from '../api/workerClient';
 
 export default function PropertyDetailPage() {
     const { propertyId } = useParams<{ propertyId: string }>();
@@ -41,6 +47,10 @@ export default function PropertyDetailPage() {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [similarProperties, setSimilarProperties] = useState<Property[]>([]);
     const [serviceFeatures, setServiceFeatures] = useState<ServiceFeature[]>([]);
+    const [copied, setCopied] = useState(false);
+    const [showVideo, setShowVideo] = useState(false);
+
+    const videoUrl = property?.videoUrl || property?.video_url || null;
 
     const toWhatsAppLink = (value: string): string | null => {
         const raw = (value || '').trim();
@@ -61,6 +71,7 @@ export default function PropertyDetailPage() {
                 setProperty(null);
                 setCommissioner(null);
                 setSimilarProperties([]);
+                setLoading(false);
                 return;
             }
 
@@ -70,15 +81,20 @@ export default function PropertyDetailPage() {
                     setProperty(null);
                     setCommissioner(null);
                     setSimilarProperties([]);
+                    setLoading(false);
                     return;
                 }
                 const data = await res.json();
-                const prop = data.property;
+                const prop: Property = data.property;
                 if (prop) {
                     setCurrentImageIndex(0);
-                    const recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewedProperties') || '[]');
-                    const updated = [prop, ...recentlyViewed.filter((p: Property) => p.id !== prop.id)].slice(0, 10);
-                    localStorage.setItem('recentlyViewedProperties', JSON.stringify(updated));
+                    try {
+                        const recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewedProperties') || '[]');
+                        const updated = [prop, ...recentlyViewed.filter((p: Property) => p.id !== prop.id)].slice(0, 10);
+                        localStorage.setItem('recentlyViewedProperties', JSON.stringify(updated));
+                    } catch {
+                        // ignore storage errors
+                    }
                 }
                 setProperty(prop);
 
@@ -110,8 +126,6 @@ export default function PropertyDetailPage() {
                     }
                 }
 
-                setCurrentImageIndex(0);
-
                 try {
                     const serviceRes = await fetch(`${API_BASE}/api/real-estate/service`, { signal: controller.signal });
                     if (serviceRes.ok) {
@@ -128,21 +142,24 @@ export default function PropertyDetailPage() {
 
                 if (prop) {
                     try {
-                        const listRes = await fetch(`${API_BASE}/api/real-estate/properties?limit=200`, { signal: controller.signal });
-                        if (listRes.ok) {
-                            const listData = await listRes.json();
-                            const list: Property[] = Array.isArray(listData?.properties) ? listData.properties : [];
-                            const similar = list
-                                .filter(p =>
-                                    p.id !== prop.id &&
-                                    p.category === prop.category &&
-                                    p.transactionType === prop.transactionType
-                                )
-                                .slice(0, 4);
-                            setSimilarProperties(similar);
-                        } else {
-                            setSimilarProperties([]);
+                        let list: Property[] = [];
+                        try {
+                            const edgeData = await fetchEdgeProperties(100);
+                            list = (edgeData?.properties as any) || [];
+                        } catch {
+                            const listRes = await fetch(`${API_BASE}/api/real-estate/properties?limit=100`, { signal: controller.signal });
+                            if (listRes.ok) {
+                                const listData = await listRes.json();
+                                list = Array.isArray(listData?.properties) ? listData.properties : [];
+                            }
                         }
+                        const similar = list
+                            .filter(p =>
+                                p.id !== prop.id &&
+                                (p.category === prop.category || p.property_type === (prop as any).property_type)
+                            )
+                            .slice(0, 4);
+                        setSimilarProperties(similar);
                     } catch (e: any) {
                         if (e?.name === 'AbortError') return;
                         setSimilarProperties([]);
@@ -247,7 +264,6 @@ export default function PropertyDetailPage() {
             return String(raw).trim();
         };
 
-        // First check for hardcoded real estate structured fields
         const v = values as any;
         const detailsFields: DisplayField[] = [];
         if (v.property_category) detailsFields.push({ label: 'Property Category', value: String(v.property_category) });
@@ -274,7 +290,6 @@ export default function PropertyDetailPage() {
             groups.push({ title: 'Property Details', fields: detailsFields });
         }
 
-        // Amenities
         if (Array.isArray(v.amenities) && v.amenities.length > 0) {
             groups.push({
                 title: 'Amenities',
@@ -288,11 +303,11 @@ export default function PropertyDetailPage() {
 
             if (feature.type === 'simple') {
                 const raw = (values as any)[feature.name];
-                const v = formatValue(raw);
-                if (!v) continue;
+                const val = formatValue(raw);
+                if (!val) continue;
                 groups.push({
                     title: feature.name,
-                    fields: [{ label: feature.name, value: v }],
+                    fields: [{ label: feature.name, value: val }],
                 });
                 continue;
             }
@@ -312,9 +327,9 @@ export default function PropertyDetailPage() {
                         continue;
                     }
 
-                    const v = formatValue(raw);
-                    if (!v) continue;
-                    fields.push({ label, value: v });
+                    const val = formatValue(raw);
+                    if (!val) continue;
+                    fields.push({ label, value: val });
                 }
 
                 if (fields.length) groups.push({ title: feature.name, fields });
@@ -338,42 +353,82 @@ export default function PropertyDetailPage() {
         }).format(price);
     };
 
-    const getStatusColor = (status: PropertyStatus): string => {
+    const getStatusBadge = (status: PropertyStatus) => {
         switch (status) {
-            case PropertyStatus.Available: return 'bg-emerald-500';
-            case PropertyStatus.Rented: return 'bg-amber-500';
-            case PropertyStatus.Sold: return 'bg-red-500';
-            default: return 'bg-gray-500';
+            case PropertyStatus.Available:
+                return (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-400 dark:border-emerald-800">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Available
+                    </span>
+                );
+            case PropertyStatus.Rented:
+                return (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-400 dark:border-amber-800">
+                        Rented
+                    </span>
+                );
+            case PropertyStatus.Sold:
+                return (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/60 dark:text-red-400 dark:border-red-800">
+                        Sold
+                    </span>
+                );
+            default:
+                return (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gray-100 text-gray-700 border border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700">
+                        {status}
+                    </span>
+                );
         }
     };
 
     const getCategoryIcon = (category: string) => {
         const c = String(category || '').toLowerCase();
-        if (c.includes('land') || c.includes('plot')) return <LandPlot className="w-5 h-5" />;
-        if (c.includes('commercial') || c.includes('business')) return <Building2 className="w-5 h-5" />;
-        return <Home className="w-5 h-5" />;
+        if (c.includes('land') || c.includes('plot')) return <LandPlot className="w-4 h-4 text-[#E5252A]" />;
+        if (c.includes('commercial') || c.includes('business')) return <Building2 className="w-4 h-4 text-[#E5252A]" />;
+        return <Home className="w-4 h-4 text-[#E5252A]" />;
+    };
+
+    const handleShare = () => {
+        if (navigator.share) {
+            navigator.share({
+                title: property?.title,
+                text: property?.description,
+                url: window.location.href
+            }).catch(() => {});
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
     };
 
     if (loading) {
         return (
-            <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-                <LoadingSpinner />
-                <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Loading property details...</p>
+            <div className={`min-h-screen flex items-center justify-center p-4 transition-colors ${darkMode ? 'bg-black text-white' : 'bg-[#FAFAFA] text-[#151515]'}`}>
+                <LoadingSpinner size="lg" message="Loading property details..." variant="dots" />
             </div>
         );
     }
 
     if (!property) {
         return (
-            <div className={`min-h-screen flex items-center justify-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-4">Property Not Found</h2>
+            <div className={`min-h-screen flex items-center justify-center p-6 ${darkMode ? 'bg-black text-white' : 'bg-[#FAFAFA] text-[#151515]'}`}>
+                <div className={`w-full max-w-md text-center p-8 rounded-2xl border ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'} shadow-sm`}>
+                    <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-red-500/10 text-[#E5252A] flex items-center justify-center">
+                        <Home className="w-7 h-7" />
+                    </div>
+                    <h2 className="text-xl font-bold mb-2">Property Not Found</h2>
+                    <p className={`text-sm mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        The property listing you are looking for may have been removed or is no longer available.
+                    </p>
                     <button
                         onClick={() => navigate('/real-estate')}
-                        className="px-6 py-2 bg-emerald-600 text-white transition-colors"
-                        style={{ borderRadius: '2px' }}
+                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#E5252A] hover:bg-[#c91d22] text-white shadow-xs transition-colors cursor-pointer"
                     >
-                        Back to Properties
+                        <ArrowLeft className="w-4 h-4" />
+                        <span>Browse Properties</span>
                     </button>
                 </div>
             </div>
@@ -381,140 +436,229 @@ export default function PropertyDetailPage() {
     }
 
     return (
-        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-            <div className="max-w-7xl mx-auto px-4 py-6">
-                {/* Back Button */}
-                <button
-                    onClick={() => navigate('/real-estate')}
-                    className={`flex items-center gap-2 mb-6 px-3 py-1.5 transition-colors ${darkMode ? 'text-gray-400 hover:text-white hover:bg-gray-800' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
-                    style={{ borderRadius: '2px' }}
-                >
-                    <ArrowLeft className="w-4 h-4" />
-                    <span className="text-sm">Back</span>
-                </button>
+        <div className={`min-h-screen py-8 transition-colors ${darkMode ? 'bg-black text-white' : 'bg-[#FAFAFA] text-[#151515]'}`}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Top Navigation & Breadcrumbs */}
+                <div className="flex items-center justify-between gap-4 mb-6">
+                    <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-colors cursor-pointer ${
+                            darkMode
+                                ? 'bg-gray-900 border-gray-800 text-gray-300 hover:text-white hover:bg-gray-800'
+                                : 'bg-white border-[#E5E5E5] text-[#151515] hover:bg-gray-50'
+                        }`}
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        <span>Back</span>
+                    </button>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Main Content - Left Column */}
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={handleShare}
+                            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border transition-colors cursor-pointer ${
+                                darkMode
+                                    ? 'bg-gray-900 border-gray-800 text-gray-300 hover:text-white hover:bg-gray-800'
+                                    : 'bg-white border-[#E5E5E5] text-[#151515] hover:bg-gray-50'
+                            }`}
+                        >
+                            {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Share2 className="w-4 h-4" />}
+                            <span>{copied ? 'Link Copied' : 'Share'}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Main Content - Left Column (2 Cols) */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Image Gallery */}
-                        <div className={`overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
-                            <div className="relative">
-                                <img
-                                    src={property.images[currentImageIndex]}
-                                    alt={property.title}
-                                    className="w-full h-96 object-cover"
-                                />
-                                {property.images.length > 1 && (
+                        {/* Gallery Section */}
+                        <div className={`overflow-hidden rounded-2xl border ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'} shadow-sm`}>
+                            <div className="relative aspect-16/10 bg-black/5 dark:bg-black/40 overflow-hidden">
+                                {showVideo && videoUrl ? (
+                                    <div className="w-full h-full bg-black flex items-center justify-center">
+                                        <video
+                                            src={videoUrl.startsWith('http') ? videoUrl : `${API_BASE}${videoUrl}`}
+                                            controls
+                                            autoPlay
+                                            playsInline
+                                            className="w-full h-full max-h-[500px] object-contain"
+                                        />
+                                    </div>
+                                ) : (
+                                    <img
+                                        src={property.images[currentImageIndex] || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80'}
+                                        alt={property.title}
+                                        className="w-full h-full object-cover transition-transform duration-500"
+                                    />
+                                )}
+
+                                {!showVideo && property.images.length > 1 && (
                                     <>
                                         <button
+                                            type="button"
                                             onClick={prevImage}
-                                            className="absolute left-3 top-1/2 transform -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 transition-colors"
-                                            style={{ borderRadius: '2px' }}
+                                            aria-label="Previous image"
+                                            className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md transition-all cursor-pointer shadow-md"
                                         >
-                                            <ChevronLeft className="w-5 h-5 text-white" />
+                                            <ChevronLeft className="w-5 h-5" />
                                         </button>
                                         <button
+                                            type="button"
                                             onClick={nextImage}
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 transition-colors"
-                                            style={{ borderRadius: '2px' }}
+                                            aria-label="Next image"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md transition-all cursor-pointer shadow-md"
                                         >
-                                            <ChevronRight className="w-5 h-5 text-white" />
+                                            <ChevronRight className="w-5 h-5" />
                                         </button>
                                     </>
                                 )}
-                                {/* Status Badge */}
-                                <div className={`absolute top-3 right-3 px-2 py-1 text-xs font-semibold text-white ${getStatusColor(property.status)}`} style={{ borderRadius: '2px' }}>
-                                    {property.status}
+
+                                {/* Top Badges */}
+                                <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2">
+                                    <div className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black/70 backdrop-blur-md text-white flex items-center gap-1.5 shadow-sm">
+                                        {getCategoryIcon(property.category)}
+                                        <span>{property.category}</span>
+                                    </div>
+                                    <div className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[#E5252A] text-white shadow-sm">
+                                        {property.transactionType === TransactionType.ForLetting ? 'For Rent' : 'For Sale'}
+                                    </div>
+                                    {videoUrl && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowVideo(!showVideo)}
+                                            className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-black/80 hover:bg-[#E5252A] text-white backdrop-blur-md flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                                        >
+                                            {showVideo ? <Home className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+                                            <span>{showVideo ? 'View Photos' : 'Watch Video'}</span>
+                                        </button>
+                                    )}
                                 </div>
-                                {/* Category Badge */}
-                                <div className="absolute bottom-3 left-3 px-2 py-1 text-xs font-semibold bg-black/60 backdrop-blur-sm text-white flex items-center gap-1.5" style={{ borderRadius: '2px' }}>
-                                    {getCategoryIcon(property.category)}
-                                    <span>{property.category}</span>
+
+                                <div className="absolute top-4 right-4">
+                                    {getStatusBadge(property.status)}
                                 </div>
+
+                                {/* Counter indicator */}
+                                {!showVideo && property.images.length > 1 && (
+                                    <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full text-xs font-mono font-bold bg-black/60 backdrop-blur-md text-white shadow-sm">
+                                        {currentImageIndex + 1} / {property.images.length}
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Thumbnail Navigation */}
-                            {property.images.length > 1 && (
-                                <div className="flex gap-2 p-3 overflow-x-auto border-t border-gray-100 dark:border-gray-700">
-                                    {property.images.map((image, index) => (
+                            {/* Thumbnail Strip (Images + Video button) */}
+                            <div className="flex gap-2.5 p-4 overflow-x-auto border-t border-[#E5E5E5] dark:border-gray-800 items-center">
+                                {property.images.map((image, index) => (
+                                    <button
+                                        type="button"
+                                        key={index}
+                                        onClick={() => {
+                                            setShowVideo(false);
+                                            setCurrentImageIndex(index);
+                                        }}
+                                        className={`relative w-20 h-16 shrink-0 rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
+                                            !showVideo && currentImageIndex === index
+                                                ? 'border-[#E5252A] ring-2 ring-[#E5252A]/20 scale-102'
+                                                : 'border-transparent opacity-60 hover:opacity-100'
+                                        }`}
+                                    >
                                         <img
-                                            key={index}
                                             src={image}
-                                            alt={`View ${index + 1}`}
-                                            onClick={() => setCurrentImageIndex(index)}
-                                            className={`w-16 h-16 object-cover cursor-pointer transition-all ${currentImageIndex === index
-                                                    ? 'ring-1 ring-emerald-500'
-                                                    : 'opacity-60 hover:opacity-100'
-                                                }`}
-                                            style={{ borderRadius: '2px' }}
+                                            alt={`Thumbnail ${index + 1}`}
+                                            className="w-full h-full object-cover"
                                         />
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                                    </button>
+                                ))}
 
-                        {/* Title & Basic Info */}
-                        <div className={`p-5 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
-                            <h1 className={`text-2xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                                {property.title}
-                            </h1>
-
-                            <div className="flex flex-wrap items-center gap-4 mb-4">
-                                <div className="flex items-center gap-1.5">
-                                    <MapPin className="w-4 h-4 text-gray-400" />
-                                    <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                                        {property.location.cell}, {property.location.sector}, {property.location.district}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <Eye className="w-4 h-4 text-gray-400" />
-                                    <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                                        {property.views} views
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <Clock className="w-4 h-4 text-gray-400" />
-                                    <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                                        Listed {new Date(property.createdAt).toLocaleDateString()}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Price */}
-                            <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
-                                <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-1`}>
-                                    {property.transactionType === TransactionType.ForLetting ? 'Monthly Rent' : 'Sale Price'}
-                                </div>
-                                <div className={`text-3xl font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                                    {formatPrice(property.price)}
-                                </div>
+                                {videoUrl && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowVideo(true)}
+                                        className={`relative w-20 h-16 shrink-0 rounded-xl overflow-hidden border-2 transition-all cursor-pointer bg-black/90 flex flex-col items-center justify-center text-white gap-1 ${
+                                            showVideo
+                                                ? 'border-[#E5252A] ring-2 ring-[#E5252A]/20 scale-102'
+                                                : 'border-transparent opacity-80 hover:opacity-100'
+                                        }`}
+                                    >
+                                        <Play className="w-5 h-5 fill-current text-[#E5252A]" />
+                                        <span className="text-[10px] font-bold uppercase tracking-wider">Video</span>
+                                    </button>
+                                )}
                             </div>
                         </div>
 
-                        {/* Description */}
-                        <div className={`p-5 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
-                            <h3 className={`font-semibold text-base mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {/* Title, Pricing & Essential Info */}
+                        <div className={`p-6 sm:p-8 rounded-2xl border ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'} shadow-sm`}>
+                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+                                <div>
+                                    <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#151515] dark:text-white">
+                                        {property.title}
+                                    </h1>
+                                    <div className="flex items-center gap-1.5 mt-2 text-xs font-medium text-[#666666] dark:text-gray-400">
+                                        <MapPin className="w-4 h-4 text-[#E5252A] shrink-0" />
+                                        <span>
+                                            {[property.location?.cell, property.location?.sector, property.location?.district]
+                                                .filter(Boolean)
+                                                .join(', ') || 'Rwanda'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="sm:text-right shrink-0">
+                                    <span className="block text-[11px] font-bold uppercase tracking-wider text-[#666666] dark:text-gray-400 mb-0.5">
+                                        {property.transactionType === TransactionType.ForLetting ? 'Monthly Rent' : 'Price'}
+                                    </span>
+                                    <div className="text-2xl sm:text-3xl font-black text-[#E5252A]">
+                                        {formatPrice(property.price)}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-6 pt-4 border-t border-[#E5E5E5] dark:border-gray-800 text-xs font-medium text-[#666666] dark:text-gray-400">
+                                <div className="flex items-center gap-1.5">
+                                    <Eye className="w-4 h-4 text-[#E5252A]" />
+                                    <span>{property.views || 0} views</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <Calendar className="w-4 h-4 text-[#E5252A]" />
+                                    <span>Listed {new Date(property.createdAt).toLocaleDateString()}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Verified Listing</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Description Section */}
+                        <div className={`p-6 sm:p-8 rounded-2xl border ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'} shadow-sm`}>
+                            <h2 className="text-xs font-bold uppercase tracking-wider text-[#E5252A] mb-3">
                                 Description
-                            </h3>
-                            <p className={`text-sm leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                                {property.description}
+                            </h2>
+                            <p className="text-sm leading-relaxed text-[#151515] dark:text-gray-300 whitespace-pre-line">
+                                {property.description || 'No detailed description provided for this listing.'}
                             </p>
                         </div>
 
-                        {/* Location Details */}
+                        {/* Location Details Breakdown */}
                         {(() => {
                             const locationItems = buildLocationItems();
                             if (locationItems.length === 0) return null;
                             return (
-                                <div className={`p-5 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
-                                    <h3 className={`font-semibold text-base mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                                <div className={`p-6 sm:p-8 rounded-2xl border ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'} shadow-sm`}>
+                                    <h2 className="text-xs font-bold uppercase tracking-wider text-[#E5252A] mb-4">
                                         Location Details
-                                    </h3>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    </h2>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                                         {locationItems.map((item, idx) => (
-                                            <div key={idx}>
-                                                <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-0.5`}>{item.label}</div>
-                                                <div className={`text-sm font-medium ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{item.value}</div>
+                                            <div key={idx} className="p-3.5 rounded-xl bg-gray-50 dark:bg-black/40 border border-[#E5E5E5] dark:border-gray-800/80">
+                                                <span className="block text-[10px] font-bold uppercase tracking-wider text-[#666666] dark:text-gray-400 mb-1">
+                                                    {item.label}
+                                                </span>
+                                                <span className="text-sm font-bold text-[#151515] dark:text-white">
+                                                    {item.value}
+                                                </span>
                                             </div>
                                         ))}
                                     </div>
@@ -522,35 +666,42 @@ export default function PropertyDetailPage() {
                             );
                         })()}
 
-                        {/* Property Features */}
-                        <div className={`p-5 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
-                            <h3 className={`font-semibold text-base mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                                Property Features
-                            </h3>
+                        {/* Structured Property Features */}
+                        <div className={`p-6 sm:p-8 rounded-2xl border ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'} shadow-sm`}>
+                            <h2 className="text-xs font-bold uppercase tracking-wider text-[#E5252A] mb-4">
+                                Property Details & Amenities
+                            </h2>
                             {(() => {
                                 const groups = buildFeatureGroups();
                                 if (!groups.length) {
-                                    return <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No features listed</p>;
+                                    return <p className="text-xs text-[#666666] dark:text-gray-400">No additional specifications listed.</p>;
                                 }
                                 return (
-                                    <div className="space-y-4">
+                                    <div className="space-y-6">
                                         {groups.map((group, gIdx) => (
-                                            <div key={gIdx}>
-                                                <div className={`text-xs font-semibold uppercase tracking-wider mb-2 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                                            <div key={gIdx} className="space-y-3">
+                                                <h3 className="text-xs font-bold uppercase tracking-wider text-[#151515] dark:text-white flex items-center gap-2">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-[#E5252A]" />
                                                     {group.title}
-                                                </div>
-                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                </h3>
+                                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                                     {group.fields.map((field, fIdx) => (
-                                                        <div key={fIdx}>
-                                                            <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{field.label}</div>
-                                                            {field.value && (
-                                                                <div className={`text-sm font-medium ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{field.value}</div>
-                                                            )}
-                                                            {!field.value && field.label && (
-                                                                <div className="text-sm text-emerald-500">
-                                                                    <CheckCircle className="w-4 h-4 inline mr-1" />
+                                                        <div
+                                                            key={fIdx}
+                                                            className="p-3.5 rounded-xl bg-gray-50 dark:bg-black/40 border border-[#E5E5E5] dark:border-gray-800/80"
+                                                        >
+                                                            <span className="block text-[10px] font-bold uppercase tracking-wider text-[#666666] dark:text-gray-400 mb-1">
+                                                                {field.label}
+                                                            </span>
+                                                            {field.value ? (
+                                                                <span className="text-xs sm:text-sm font-bold text-[#151515] dark:text-white">
+                                                                    {field.value}
+                                                                </span>
+                                                            ) : (
+                                                                <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                                                                    <CheckCircle className="w-3.5 h-3.5 shrink-0" />
                                                                     Included
-                                                                </div>
+                                                                </span>
                                                             )}
                                                         </div>
                                                     ))}
@@ -563,93 +714,129 @@ export default function PropertyDetailPage() {
                         </div>
                     </div>
 
-                    {/* Sidebar - Right Column */}
+                    {/* Sidebar - Right Column (1 Col) */}
                     <div className="lg:col-span-1 space-y-6">
-                        {/* Contact Card */}
-                        <div className={`p-5 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm sticky top-6`} style={{ borderRadius: '2px' }}>
-                            <h3 className={`font-semibold text-base mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                                Contact Information
+                        {/* Direct Contact & Action Card */}
+                        <div className={`p-6 sm:p-7 rounded-2xl border ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'} shadow-sm sticky top-6`}>
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-[#E5252A] mb-4 flex items-center gap-2">
+                                <Phone className="w-4 h-4" />
+                                Direct Inquiry
                             </h3>
 
-                            <button
-                                onClick={() => window.location.href = `tel:${property.contactPhone}`}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white transition-colors hover:bg-emerald-700 font-medium mb-2"
-                                style={{ borderRadius: '2px' }}
-                            >
-                                <Phone className="w-4 h-4" />
-                                <span className="text-sm">Call {property.contactPhone}</span>
-                            </button>
+                            <div className="space-y-3">
+                                {property.contactPhone && (
+                                    <button
+                                        type="button"
+                                        onClick={() => window.location.href = `tel:${property.contactPhone}`}
+                                        className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#E5252A] hover:bg-[#c91d22] text-white shadow-xs transition-colors cursor-pointer"
+                                    >
+                                        <Phone className="w-4 h-4" />
+                                        <span>Call {property.contactPhone}</span>
+                                    </button>
+                                )}
 
-                            {property.whatsappNumber && (
+                                {property.whatsappNumber && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const link = toWhatsAppLink(property.whatsappNumber || '');
+                                            if (link) window.open(link, '_blank');
+                                        }}
+                                        className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors cursor-pointer"
+                                    >
+                                        <MessageCircle className="w-4 h-4" />
+                                        <span>Chat on WhatsApp</span>
+                                    </button>
+                                )}
+
                                 <button
-                                    onClick={() => {
-                                        const link = toWhatsAppLink(property.whatsappNumber || '');
-                                        if (link) window.open(link, '_blank');
-                                    }}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500 text-white transition-colors hover:bg-emerald-600 font-medium mb-2"
-                                    style={{ borderRadius: '2px' }}
+                                    type="button"
+                                    onClick={handleShare}
+                                    className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider border transition-colors cursor-pointer ${
+                                        darkMode
+                                            ? 'bg-black/50 border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white'
+                                            : 'bg-gray-50 border-[#E5E5E5] text-[#151515] hover:bg-gray-100'
+                                    }`}
                                 >
-                                    <Phone className="w-4 h-4" />
-                                    <span className="text-sm">WhatsApp {property.whatsappNumber}</span>
+                                    <Copy className="w-4 h-4" />
+                                    <span>{copied ? 'Link Copied!' : 'Copy Property Link'}</span>
                                 </button>
-                            )}
+                            </div>
 
-                            <button
-                                onClick={() => {
-                                    if (navigator.share) {
-                                        navigator.share({
-                                            title: property.title,
-                                            text: property.description,
-                                            url: window.location.href
-                                        });
-                                    }
-                                }}
-                                className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 transition-colors font-medium ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                                style={{ borderRadius: '2px' }}
-                            >
-                                <Share2 className="w-4 h-4" />
-                                <span className="text-sm">Share Property</span>
-                            </button>
+                            {/* Trust & Safety Highlights */}
+                            <div className="pt-6 mt-6 border-t border-[#E5E5E5] dark:border-gray-800">
+                                <h4 className="text-xs font-bold uppercase tracking-wider text-[#151515] dark:text-white mb-3">
+                                    Safety & Verification
+                                </h4>
+                                <ul className="space-y-3">
+                                    <li className="flex items-start gap-2.5 text-xs text-[#151515] dark:text-gray-300">
+                                        <CheckCircle className="w-4 h-4 text-[#E5252A] shrink-0 mt-0.5" />
+                                        <span>Physical inspection & ownership vetted</span>
+                                    </li>
+                                    <li className="flex items-start gap-2.5 text-xs text-[#151515] dark:text-gray-300">
+                                        <ShieldCheck className="w-4 h-4 text-[#E5252A] shrink-0 mt-0.5" />
+                                        <span>HafiConnect secure commissioner network</span>
+                                    </li>
+                                    <li className="flex items-start gap-2.5 text-xs text-[#151515] dark:text-gray-300">
+                                        <Clock className="w-4 h-4 text-[#E5252A] shrink-0 mt-0.5" />
+                                        <span>Rapid on-site tour arrangement</span>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
 
-                        {/* Commissioner Info */}
+                        {/* Listed by Commissioner Card */}
                         {commissioner && (
-                            <div className={`p-5 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
-                                <h4 className={`font-semibold text-sm mb-3 ${darkMode ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider`}>
-                                    Listed by
-                                </h4>
+                            <div className={`p-6 rounded-2xl border ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'} shadow-sm`}>
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#666666] dark:text-gray-400">
+                                        Listed By
+                                    </span>
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                                        <BadgeCheck className="w-3.5 h-3.5" />
+                                        Verified Agent
+                                    </span>
+                                </div>
+
                                 <div
                                     onClick={() => navigate(`/real-estate/commissioner/${commissioner.id}`)}
-                                    className="cursor-pointer"
+                                    className="flex items-center gap-3.5 cursor-pointer group"
                                 >
-                                    <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-[#E5E5E5] dark:border-gray-800 shrink-0">
                                         <img
-                                            src={commissioner.photo || 'https://i.pravatar.cc/100?img=1'}
+                                            src={commissioner.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'}
                                             alt={commissioner.name}
-                                            className="w-12 h-12 object-cover"
-                                            style={{ borderRadius: '2px' }}
+                                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
                                         />
-                                        <div className="flex-1">
-                                            <div className={`font-semibold flex items-center gap-1.5 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                {commissioner.name}
-                                                {commissioner.verified && (
-                                                    <BadgeCheck className="w-4 h-4 text-emerald-500" />
-                                                )}
-                                            </div>
-                                            <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                {commissioner.propertiesManaged}+ properties
-                                            </div>
-                                        </div>
                                     </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="text-sm font-bold text-[#151515] dark:text-white group-hover:text-[#E5252A] transition-colors truncate">
+                                            {commissioner.name}
+                                        </h4>
+                                        <p className="text-xs text-[#666666] dark:text-gray-400 truncate mt-0.5">
+                                            {commissioner.operatingLocations?.districts?.[0] || 'Kigali'} Real Estate Specialist
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-5 pt-4 border-t border-[#E5E5E5] dark:border-gray-800 flex gap-2">
                                     <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            window.location.href = `tel:${commissioner.phone}`;
-                                        }}
-                                        className="w-full px-4 py-2 bg-emerald-600 text-white transition-colors hover:bg-emerald-700 text-sm font-medium"
-                                        style={{ borderRadius: '2px' }}
+                                        type="button"
+                                        onClick={() => navigate(`/real-estate/commissioner/${commissioner.id}`)}
+                                        className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider border transition-colors cursor-pointer text-center ${
+                                            darkMode
+                                                ? 'bg-black/40 border-gray-800 text-gray-300 hover:bg-gray-800 hover:text-white'
+                                                : 'bg-gray-50 border-[#E5E5E5] text-[#151515] hover:bg-gray-100'
+                                        }`}
                                     >
-                                        Contact Agent
+                                        View Profile
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => window.location.href = `tel:${commissioner.phone}`}
+                                        className="py-2.5 px-3.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#E5252A] hover:bg-[#c91d22] text-white transition-colors cursor-pointer"
+                                    >
+                                        <Phone className="w-3.5 h-3.5" />
                                     </button>
                                 </div>
                             </div>
@@ -657,42 +844,65 @@ export default function PropertyDetailPage() {
                     </div>
                 </div>
 
-                {/* Similar Properties - Equal sized cards */}
+                {/* Similar Properties Section */}
                 {similarProperties.length > 0 && (
-                    <div className={`mt-8 p-5 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm`} style={{ borderRadius: '2px' }}>
-                        <h3 className={`font-semibold text-lg mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                            Similar Properties
-                        </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {similarProperties.map(prop => (
-                                <div
-                                    key={prop.id}
-                                    onClick={() => navigate(`/real-estate/property/${prop.id}`)}
-                                    className="cursor-pointer group"
-                                >
-                                    <div className="overflow-hidden bg-gray-100 dark:bg-gray-700" style={{ borderRadius: '2px' }}>
-                                        <img
-                                            src={prop.images[0]}
-                                            alt={prop.title}
-                                            className="w-full h-36 object-cover transition-transform duration-300 group-hover:scale-105"
-                                        />
-                                    </div>
-                                    <div className="mt-2">
-                                        <h4 className={`text-sm font-medium line-clamp-1 ${darkMode ? 'text-white group-hover:text-emerald-400' : 'text-gray-900 group-hover:text-emerald-600'}`}>
-                                            {prop.title}
-                                        </h4>
-                                        <div className={`text-sm font-bold mt-1 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                                            {formatPrice(prop.price)}
+                    <div className="mt-14 pt-10 border-t border-[#E5E5E5] dark:border-gray-800">
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 className="text-xs font-bold uppercase tracking-wider text-[#E5252A]">
+                                    Explore More
+                                </h3>
+                                <h2 className="text-lg sm:text-xl font-black uppercase tracking-tight text-[#151515] dark:text-white mt-1">
+                                    Similar Properties
+                                </h2>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/real-estate')}
+                                className="text-xs font-bold uppercase tracking-wider text-[#E5252A] hover:underline cursor-pointer"
+                            >
+                                View All
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                            {similarProperties.map((prop, idx) => {
+                                const locationLabel = typeof prop.location === 'string'
+                                    ? prop.location
+                                    : (prop.location?.district || prop.district || prop.location?.sector || 'Rwanda');
+                                return (
+                                    <div
+                                        key={`${prop.id}-${idx}`}
+                                        onClick={() => navigate(`/real-estate/property/${prop.id}`)}
+                                        className={`group rounded-2xl border overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer ${
+                                            darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-[#E5E5E5]'
+                                        }`}
+                                    >
+                                        <div className="relative aspect-16/10 overflow-hidden bg-black/5 dark:bg-black/40">
+                                            <img
+                                                src={prop.images?.[0] || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=600&q=80'}
+                                                alt={prop.title}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            />
+                                            <div className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black/70 backdrop-blur-md text-white">
+                                                {prop.category || (prop as any).property_type || 'Property'}
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-1 mt-1">
-                                            <MapPin className="w-3 h-3 text-gray-400" />
-                                            <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                {prop.location.district}
-                                            </span>
+                                        <div className="p-4">
+                                            <h4 className="text-sm font-bold text-[#151515] dark:text-white group-hover:text-[#E5252A] transition-colors truncate">
+                                                {prop.title}
+                                            </h4>
+                                            <div className="flex items-center gap-1.5 mt-1 text-xs text-[#666666] dark:text-gray-400">
+                                                <MapPin className="w-3.5 h-3.5 text-[#E5252A]" />
+                                                <span className="truncate">{locationLabel}</span>
+                                            </div>
+                                            <div className="text-base font-black text-[#E5252A] mt-2.5">
+                                                {formatPrice(prop.price)}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 )}
