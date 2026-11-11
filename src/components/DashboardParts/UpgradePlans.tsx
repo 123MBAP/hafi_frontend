@@ -437,108 +437,116 @@ export default function UpgradePlans() {
           
           {/* Left Column: Base Plans or Active Plan Info (3/5) */}
           <div className="lg:col-span-3 space-y-4">
-            { (canPurchaseBase || userPlanInfo?.subscription_status !== "active") ? (
+            {userPlanInfo?.subscription_status === "active" && userPlanInfo?.current_plan && (
               <>
                 <div className="flex items-center gap-2">
-          
-                  <h2 className="text-base font-bold uppercase tracking-wider">Base Plans<span className="text-red-600">.</span></h2>
+                  <Shield className="w-5 h-5 text-red-600" />
+                  <h2 className="text-base font-bold uppercase tracking-wider">Active Plan Info<span className="text-red-600">.</span></h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {visiblePlans.map((plan, index) => (
-                    <div
-                      key={plan.id}
-                      className={`p-4 border shadow-sm relative ${cardBase}`}
-                     
-                    >
-                      {index === 1 && (
-                        <div className="absolute -top-2 left-3">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-red-600 text-white">
-                            Popular
-                          </span>
-                        </div>
-                      )}
-                      <div className="text-center">
-                        <h3 className="text-base font-bold">{plan.display_name}</h3>
-                        <div className="mt-2 text-2xl font-bold">
-                          {plan.monthly_fee.toLocaleString()} <span className="text-sm font-normal text-gray-400">RWF</span>
-                        </div>
-                        <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-zinc-100 dark:bg-zinc-900 border border-black/10 dark:border-white/10 text-black dark:text-white">
-                          {formatStorage(plan.base_storage_gb)} included
-                        </div>
-                      </div>
-                      <ul className="mt-4 space-y-1.5">
-                        {plan.feature_list.slice(0, 4).map((feature, idx) => (
-                          <li key={idx} className="flex items-center gap-2 text-xs">
-                            <Check className="w-3.5 h-3.5 text-red-600" />
-                            <span className={mutedText}>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      
-                      {userPlanInfo?.subscription_status !== "active" ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedPlanForRenewal(plan);
-                            setRenewalModalOpen(true);
-                            setRenewAddonAmount(0);
-                            setIsAddingMoreStorage(false);
-                            setRenewMessage(null);
-                          }}
-                          className={`mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-semibold transition-colors ${buttonPrimary}`}
-                         
-                        >
-                          {plan.monthly_fee === 0 ? "Get Started" : "Subscribe"}
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
-                      ) : (
-                        <Link
-                          to={`/checkout?plan=${plan.id}&type=base`}
-                          className={`mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-semibold transition-colors ${buttonPrimary}`}
-                         
-                        >
-                          {plan.monthly_fee === 0 ? "Get Started" : "Subscribe"}
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              userPlanInfo?.current_plan && (
-                <>
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-red-600" />
-                    <h2 className="text-base font-bold uppercase tracking-wider">Active Plan Info<span className="text-red-600">.</span></h2>
-                  </div>
-                  <div className={`p-5 border shadow-sm relative ${cardBase}`}>
-                    <div className="p-4 bg-red-600/10 border border-red-600/25 mb-4">
+                <div className={`p-5 border shadow-sm relative ${cardBase}`}>
+                  <div className="p-4 bg-red-600/10 border border-red-600/25 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
                       <h4 className="text-lg font-bold text-red-600">{userPlanInfo.current_plan.display_name}</h4>
                       <p className={`text-xs ${mutedText} mt-1`}>Active Subscription</p>
                     </div>
-                    <ul className="space-y-2 mt-4 text-xs">
-                      <li className="flex justify-between py-1 border-b border-gray-150 dark:border-gray-700/50">
-                        <span className={subText}>Monthly Fee:</span>
-                        <span className="font-semibold">{userPlanInfo.current_plan.monthly_fee.toLocaleString()} RWF</span>
-                      </li>
-                      <li className="flex justify-between py-1 border-b border-gray-150 dark:border-gray-700/50">
-                        <span className={subText}>Base Storage:</span>
-                        <span className="font-semibold">{formatStorage(userPlanInfo.current_plan.base_storage_gb)}</span>
-                      </li>
-                      <li className="flex justify-between py-1 border-b border-gray-150 dark:border-gray-700/50">
-                        <span className={subText}>Support Level:</span>
-                        <span className="font-semibold">{userPlanInfo.current_plan.features.support_level}</span>
-                      </li>
-                      <li className="flex justify-between py-1">
-                        <span className={subText}>Analytics:</span>
-                        <span className="font-semibold">{userPlanInfo.current_plan.features.analytics_enabled ? 'Enabled' : 'Disabled'}</span>
-                      </li>
-                    </ul>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const planToRenew = visiblePlans.find(p => p.id === userPlanInfo.current_plan?.id) || visiblePlans[0] || (userPlanInfo.current_plan as AdminPlan);
+                        if (planToRenew) {
+                          setSelectedPlanForRenewal(planToRenew as AdminPlan);
+                          setRenewalModalOpen(true);
+                          setRenewAddonAmount(0);
+                          setIsAddingMoreStorage(false);
+                          setRenewMessage(null);
+                        }
+                      }}
+                      className={`inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors ${buttonPrimary}`}
+                    >
+                      Renew / Extend Plan
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                </>
-              )
+                  <ul className="space-y-2 mt-4 text-xs">
+                    <li className="flex justify-between py-1 border-b border-gray-150 dark:border-gray-700/50">
+                      <span className={subText}>Monthly Fee:</span>
+                      <span className="font-semibold">{userPlanInfo.current_plan.monthly_fee.toLocaleString()} RWF</span>
+                    </li>
+                    <li className="flex justify-between py-1 border-b border-gray-150 dark:border-gray-700/50">
+                      <span className={subText}>Base Storage:</span>
+                      <span className="font-semibold">{formatStorage(userPlanInfo.current_plan.base_storage_gb)}</span>
+                    </li>
+                    <li className="flex justify-between py-1 border-b border-gray-150 dark:border-gray-700/50">
+                      <span className={subText}>Support Level:</span>
+                      <span className="font-semibold">{userPlanInfo.current_plan.features.support_level}</span>
+                    </li>
+                    <li className="flex justify-between py-1">
+                      <span className={subText}>Analytics:</span>
+                      <span className="font-semibold">{userPlanInfo.current_plan.features.analytics_enabled ? 'Enabled' : 'Disabled'}</span>
+                    </li>
+                  </ul>
+                </div>
+              </>
             )}
+
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-bold uppercase tracking-wider">
+                {userPlanInfo?.subscription_status === "active" ? "Available Plans" : "Base Plans"}
+                <span className="text-red-600">.</span>
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {visiblePlans.map((plan, index) => (
+                <div
+                  key={plan.id}
+                  className={`p-4 border shadow-sm relative ${cardBase}`}
+                >
+                  {index === 1 && (
+                    <div className="absolute -top-2 left-3">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-red-600 text-white">
+                        Popular
+                      </span>
+                    </div>
+                  )}
+                  <div className="text-center">
+                    <h3 className="text-base font-bold">{plan.display_name}</h3>
+                    <div className="mt-2 text-2xl font-bold">
+                      {plan.monthly_fee.toLocaleString()} <span className="text-sm font-normal text-gray-400">RWF</span>
+                    </div>
+                    <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-zinc-100 dark:bg-zinc-900 border border-black/10 dark:border-white/10 text-black dark:text-white">
+                      {formatStorage(plan.base_storage_gb)} included
+                    </div>
+                  </div>
+                  <ul className="mt-4 space-y-1.5">
+                    {plan.feature_list.slice(0, 4).map((feature, idx) => (
+                      <li key={idx} className="flex items-center gap-2 text-xs">
+                        <Check className="w-3.5 h-3.5 text-red-600" />
+                        <span className={mutedText}>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedPlanForRenewal(plan);
+                      setRenewalModalOpen(true);
+                      setRenewAddonAmount(0);
+                      setIsAddingMoreStorage(false);
+                      setRenewMessage(null);
+                    }}
+                    className={`mt-4 w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-semibold transition-colors ${buttonPrimary}`}
+                  >
+                    {plan.monthly_fee === 0
+                      ? "Get Started"
+                      : userPlanInfo?.subscription_status === "active"
+                        ? (plan.id === userPlanInfo?.current_plan?.id ? "Renew Plan" : "Switch Plan")
+                        : "Subscribe"}
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Right Column: Storage Add-ons (2/5) */}
