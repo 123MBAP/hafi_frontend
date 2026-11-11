@@ -28,6 +28,7 @@ export default function AgentRegister() {
   const [selectedProvince, setSelectedProvince] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedSector, setSelectedSector] = useState('');
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -38,6 +39,12 @@ export default function AgentRegister() {
     setLoading(true);
     setError('');
     setSuccess('');
+
+    if (!agreeToTerms) {
+      setError('Please agree to the Terms & Conditions and Privacy Policy to register as an Agent.');
+      setLoading(false);
+      return;
+    }
 
     if (form.password !== form.passwordConfirm) {
       setError('Passwords do not match.');
@@ -346,6 +353,43 @@ export default function AgentRegister() {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Terms Agreement */}
+            <div className="flex items-start gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="agentAgreeTerms"
+                checked={agreeToTerms}
+                onChange={(e) => setAgreeToTerms(e.target.checked)}
+                className="mt-0.5 w-4 h-4 rounded-xs border-black/30 dark:border-white/30 text-red-600 focus:ring-red-600 accent-red-600 cursor-pointer"
+              />
+              <label
+                htmlFor="agentAgreeTerms"
+                className={`text-[11px] leading-tight cursor-pointer select-none ${
+                  darkMode ? 'text-white/80' : 'text-black/80'
+                }`}
+              >
+                I agree to the{' '}
+                <Link
+                  to="/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-red-600 hover:underline"
+                >
+                  Terms &amp; Conditions
+                </Link>{' '}
+                and{' '}
+                <Link
+                  to="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-red-600 hover:underline"
+                >
+                  Privacy Policy
+                </Link>
+                .
+              </label>
             </div>
 
             {/* Submit */}

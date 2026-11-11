@@ -13,12 +13,19 @@ export default function AgentLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!agreeTerms) {
+      setError('Please agree to the Terms & Conditions and Privacy Policy to login.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -148,6 +155,43 @@ export default function AgentLogin() {
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
+            </div>
+
+            {/* Terms Agreement Checkbox */}
+            <div className="flex items-start gap-2 pt-0.5">
+              <input
+                type="checkbox"
+                id="agentLoginTerms"
+                checked={agreeTerms}
+                onChange={(e) => setAgreeTerms(e.target.checked)}
+                className="w-4 h-4 mt-0.5 rounded-xs border-black/30 dark:border-white/30 text-red-600 focus:ring-red-600 accent-red-600 cursor-pointer"
+              />
+              <label
+                htmlFor="agentLoginTerms"
+                className={`text-[11px] leading-tight cursor-pointer select-none ${
+                  darkMode ? 'text-white/70' : 'text-black/70'
+                }`}
+              >
+                I agree to the{' '}
+                <Link
+                  to="/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-red-600 hover:underline"
+                >
+                  Terms &amp; Conditions
+                </Link>{' '}
+                and{' '}
+                <Link
+                  to="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-red-600 hover:underline"
+                >
+                  Privacy Policy
+                </Link>
+                .
+              </label>
             </div>
 
             {/* Login Button */}

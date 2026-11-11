@@ -23,6 +23,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
@@ -90,6 +91,12 @@ const Login = () => {
   const handleLogin = async () => {
     setError('');
     setLoading(true);
+
+    if (!agreeTerms) {
+      setError('Please agree to the Terms & Conditions and Privacy Policy to login.');
+      setLoading(false);
+      return;
+    }
 
     if (!email || !password) {
       setError('Please fill in all fields.');
@@ -186,8 +193,14 @@ const Login = () => {
   };
 
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
-    setLoading(true);
     setError('');
+
+    if (!agreeTerms) {
+      setError('Please check and agree to the Terms & Conditions and Privacy Policy before continuing with Google.');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch(`${API_BASE}/api/auth/google`, {
@@ -394,23 +407,62 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Remember me Checkbox */}
-            <div className="flex items-center gap-2 pt-0.5">
-              <input
-                type="checkbox"
-                id="rememberMe"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded-xs border-black/30 dark:border-white/30 text-red-600 focus:ring-red-600 accent-red-600 cursor-pointer"
-              />
-              <label
-                htmlFor="rememberMe"
-                className={`text-xs font-semibold cursor-pointer select-none ${
-                  darkMode ? 'text-white/80' : 'text-black/80'
-                }`}
-              >
-                Remember me?
-              </label>
+            {/* Remember me & Terms Agreement Checkboxes */}
+            <div className="space-y-2 pt-0.5">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded-xs border-black/30 dark:border-white/30 text-red-600 focus:ring-red-600 accent-red-600 cursor-pointer"
+                />
+                <label
+                  htmlFor="rememberMe"
+                  className={`text-xs font-semibold cursor-pointer select-none ${
+                    darkMode ? 'text-white/80' : 'text-black/80'
+                  }`}
+                >
+                  Remember me?
+                </label>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <input
+                  type="checkbox"
+                  id="loginTerms"
+                  checked={agreeTerms}
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
+                  className="w-4 h-4 mt-0.5 rounded-xs border-black/30 dark:border-white/30 text-red-600 focus:ring-red-600 accent-red-600 cursor-pointer"
+                />
+                <label
+                  htmlFor="loginTerms"
+                  className={`text-[11px] leading-tight cursor-pointer select-none ${
+                    darkMode ? 'text-white/70' : 'text-black/70'
+                  }`}
+                >
+                  I agree to the{' '}
+                  <Link
+                    to="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-bold text-red-600 hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Terms &amp; Conditions
+                  </Link>{' '}
+                  and{' '}
+                  <Link
+                    to="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-bold text-red-600 hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Privacy Policy
+                  </Link>
+                </label>
+              </div>
             </div>
 
             {/* Login Button */}

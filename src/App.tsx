@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useHafibot } from './context/HafibotContext';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import UpgradePlansPage from './components/DashboardParts/AdminParts/AdminPlans';
 import ChatWrapper, { getProviderIdFromToken } from './components/DashboardParts/ChatBotWrapper';
 import MessagesCard from './components/DashboardParts/MessagesCard';
@@ -61,6 +61,8 @@ import VerifyEmailForm from './pages/VerifyEmailForm';
 import Wallet from './pages/Wallet';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import TermsPage from './pages/TermsPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
 import Hafibot from './components/Hafibot';
 import Seo from './components/Seo';
@@ -163,6 +165,8 @@ const App: React.FC = () => {
               <Route path="/services" element={<Services />} />
               <Route path="/about-haficonnect" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
               <Route path="/search" element={<Search />} />
               <Route path="/book/payment" element={<PaymentPage />} />
               <Route path="/market" element={<MarketPage />} />
@@ -464,8 +468,8 @@ const App: React.FC = () => {
           {/* Footer Bottom */}
           <div className="border-t border-zinc-900 mt-10 pt-5 text-center text-xs text-white/70 font-medium">
             &copy; {new Date().getFullYear()} HafiConnect. All rights reserved. &nbsp;|&nbsp;
-            <a href="/terms" className="text-white/80 hover:text-red-600 font-bold transition-colors">Terms of Service</a> &nbsp;|&nbsp;
-            <a href="/privacy" className="text-white/80 hover:text-red-600 font-bold transition-colors">Privacy Policy</a>
+            <Link to="/terms" className="text-white/80 hover:text-red-600 font-bold transition-colors">Terms of Service</Link> &nbsp;|&nbsp;
+            <Link to="/privacy" className="text-white/80 hover:text-red-600 font-bold transition-colors">Privacy Policy</Link>
           </div>
         </footer>
         )}

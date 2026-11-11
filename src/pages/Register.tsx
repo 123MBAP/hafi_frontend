@@ -49,6 +49,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
 
   const { darkMode } = useDarkMode();
   const navigate = useNavigate();
@@ -106,6 +107,12 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (!agreeToTerms) {
+      setError('Please agree to the Terms & Conditions and Privacy Policy to continue.');
+      setLoading(false);
+      return;
+    }
 
     if (form.password !== confirmPassword) {
       setError("Passwords do not match.");
@@ -225,6 +232,12 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (!agreeToTerms) {
+      setError('Please agree to the Terms & Conditions and Privacy Policy to complete registration.');
+      setLoading(false);
+      return;
+    }
 
     let location = null;
     const isPremiumSeller = form.role === 'seller' && selectedShopType && selectedShopType.key !== 'other';
@@ -752,6 +765,43 @@ export default function RegisterPage() {
                   </div>
                 )}
 
+                {/* Terms & Conditions and Privacy Policy Agreement */}
+                <div className="flex items-start gap-2.5 pt-1">
+                  <input
+                    type="checkbox"
+                    id="registerAgreeTerms"
+                    checked={agreeToTerms}
+                    onChange={(e) => setAgreeToTerms(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded-xs border-gray-300 dark:border-gray-700 text-[#E5252A] focus:ring-[#E5252A] accent-[#E5252A] cursor-pointer"
+                  />
+                  <label
+                    htmlFor="registerAgreeTerms"
+                    className={`text-xs cursor-pointer select-none leading-relaxed ${
+                      darkMode ? 'text-gray-300' : 'text-gray-700'
+                    }`}
+                  >
+                    I have read and agree to HafiConnect's{' '}
+                    <Link
+                      to="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold text-[#E5252A] hover:underline"
+                    >
+                      Terms &amp; Conditions
+                    </Link>{' '}
+                    and{' '}
+                    <Link
+                      to="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold text-[#E5252A] hover:underline"
+                    >
+                      Privacy Policy
+                    </Link>
+                    .
+                  </label>
+                </div>
+
                 {/* Submit Button */}
                 <button
                   type="submit"
@@ -1099,6 +1149,43 @@ export default function RegisterPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Terms & Conditions and Privacy Policy Agreement */}
+                <div className="flex items-start gap-2.5 pt-1">
+                  <input
+                    type="checkbox"
+                    id="registerAgreeTerms"
+                    checked={agreeToTerms}
+                    onChange={(e) => setAgreeToTerms(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded-xs border-gray-300 dark:border-gray-700 text-[#E5252A] focus:ring-[#E5252A] accent-[#E5252A] cursor-pointer"
+                  />
+                  <label
+                    htmlFor="registerAgreeTerms"
+                    className={`text-xs cursor-pointer select-none leading-relaxed ${
+                      darkMode ? 'text-gray-300' : 'text-gray-700'
+                    }`}
+                  >
+                    I have read and agree to HafiConnect's{' '}
+                    <Link
+                      to="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold text-[#E5252A] hover:underline"
+                    >
+                      Terms &amp; Conditions
+                    </Link>{' '}
+                    and{' '}
+                    <Link
+                      to="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-bold text-[#E5252A] hover:underline"
+                    >
+                      Privacy Policy
+                    </Link>
+                    .
+                  </label>
+                </div>
 
                 {/* Submit Button */}
                 <button
