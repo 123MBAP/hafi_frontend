@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useDarkMode } from '@/context/DarkMode';
 import { ServiceFeature } from '@/types/features';// adjust path if needed
+import AccountSummaryCard from '../components/DashboardParts/AccountSummaryCard';
 import MediaManagementSection from '../components/DashboardParts/MediaManagementSection';
 import SubscriptionBanner from '../components/DashboardParts/PlansScrollingBanner';
 import ProductUploadCard from '../components/DashboardParts/ProductUploadCard';
@@ -1544,6 +1545,8 @@ export default function Dashboard() {
       >
         <SubscriptionBanner />
       </div>
+
+      <AccountSummaryCard className="mb-4" />
 
       <h2 className={`text-2xl font-bold uppercase text-center mb-2 ${darkMode ? "text-white" : "text-black"}`}>{service?.custom_type?.toLowerCase() === 'real_estate' ? "Real Estate Dashboard" : "Service Provider's Dashboard"}</h2>
       {service?.title && (

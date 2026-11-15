@@ -3,6 +3,7 @@ import { useDarkMode } from "@/context/DarkMode";
 import { useEffect, useState } from "react";
 import { FiEdit2, FiSave, FiSearch, FiTrash2, FiUpload, FiVideo, FiX } from "react-icons/fi";
 
+import AccountSummaryCard from '../components/DashboardParts/AccountSummaryCard';
 import SubscriptionBanner from '../components/DashboardParts/PlansScrollingBanner';
 import RestrictionCard from '../components/PlansParts/RestrictionCards';
 import { cachedFetch } from '../utils/cachedFetch';
@@ -575,6 +576,7 @@ export default function SellerDashboardPage() {
 
       {/* Header */}
       <div className="max-w-7xl mx-auto px-4 pt-4 pb-2">
+        <AccountSummaryCard className="mb-4" />
         <PageHeader
           badge="Merchant Studio"
           title="Seller Dashboard"

@@ -55,7 +55,7 @@ interface ProviderImage {
   type: "product" | "service";
   visible?: boolean;
   views?: string[];
-  mediaFiles?: Array<{ url: string; type: 'image' | 'video' }>;
+  mediaFiles?: Array<{ id?: string | number; url: string; type: 'image' | 'video' }>;
   fileType?: 'image' | 'video' | 'mixed';
   madeInRwanda?: boolean;
   used?: boolean;
@@ -132,7 +132,13 @@ export default function ProductOrServicesDetailPage() {
 
         const numericIndex = parseInt(imageIndex);
         const matchedByIndex = !isNaN(numericIndex) ? allImages[numericIndex] : undefined;
-        const matchedById = allImages.find((img) => String(img.productId) === String(imageIndex));
+        // Match the item's group id, or the id of any media file inside it
+        // (links from the updates page may carry a media row id).
+        const matchedById = allImages.find(
+          (img) =>
+            String(img.productId) === String(imageIndex) ||
+            (img.mediaFiles || []).some((m) => m.id !== undefined && String(m.id) === String(imageIndex))
+        );
 
         if (matchedById) {
           setImageData(matchedById);

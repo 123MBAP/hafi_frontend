@@ -5,7 +5,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import PageHeader from "@/components/ui/PageHeader";
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { Bell, Clock, ArrowRight, Eye, Sparkles, Grid3x3 } from "lucide-react";
+import { Bell, Clock, ArrowRight } from "lucide-react";
 
 type Notification = {
     id: string;
@@ -16,6 +16,7 @@ type Notification = {
     category_id: string;
     seller_id: string;
     provider_id?: string;
+    group_id?: string | null;
     read: boolean;
     image_url: string[];
 };
@@ -179,10 +180,12 @@ export default function NotificationsPage() {
             if (n.type === "adminService") {
                 navigate(`/services/${n.id}`);
             } else if (n.type === "uploadedProduct" && n.provider_id) {
-                navigate(`/product-or-service-detail/${n.provider_id}/${n.id}`);
+                // The detail page looks items up by group id (falls back to the row id)
+                navigate(`/product-or-service-detail/${n.provider_id}/${n.group_id || n.id}`);
             } else if (n.type === "sellerProducts") {
                 navigate(`/product/${n.id}`);
-            } else if (n.type === "marketCat") {
+            } else if (n.type === "marketCat" || n.type === "product") {
+                // Both types are market categories: open the market filtered to that category
                 navigate(`/market?categoryId=${n.id}`);
             }
         } catch (err) {
@@ -205,7 +208,7 @@ export default function NotificationsPage() {
         return date.toLocaleDateString();
     };
 
-    // Refined card with consistent design tokens
+    // Refined card with consistent design tokens matching Home.tsx
     const TinyCard = ({ notification }: { notification: Notification }) => {
         const src = normalizeImageField(notification.image_url);
         
@@ -213,7 +216,7 @@ export default function NotificationsPage() {
             <button
                 type="button"
                 onClick={() => handleNotificationClick(notification)}
-                className="group w-full text-left transition-all duration-200 hover:shadow-lg rounded-xl overflow-hidden bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:border-[#E5252A] dark:hover:border-[#E5252A] flex flex-col h-full shadow-sm"
+                className="group w-full text-left transition-all duration-200 hover:shadow-lg rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-red-600 dark:hover:border-red-600 flex flex-col h-full shadow-sm"
             >
                 {/* Image */}
                 <div className="relative h-36 w-full overflow-hidden bg-gray-50 dark:bg-black">
@@ -225,14 +228,14 @@ export default function NotificationsPage() {
                             loading="lazy"
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <div className="w-full h-full flex items-center justify-center text-black/40 dark:text-gray-500">
                             <Bell className="w-7 h-7" />
                         </div>
                     )}
                     
                     {/* Unread indicator */}
                     {!notification.read && (
-                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-[#E5252A] text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm">
+                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-red-600 text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm">
                             <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
                             <span>New</span>
                         </div>
@@ -241,17 +244,17 @@ export default function NotificationsPage() {
                 
                 {/* Text content */}
                 <div className="p-3 flex-1 flex flex-col justify-between">
-                    <h3 className={`text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-[#E5252A] transition-colors ${
-                        !notification.read ? 'font-bold text-[#151515] dark:text-white' : 'font-medium text-[#666666] dark:text-zinc-400'
+                    <h3 className={`text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors ${
+                        !notification.read ? 'font-bold text-black dark:text-white' : 'font-medium text-black/70 dark:text-gray-400'
                     }`}>
                         {notification.title}
                     </h3>
-                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-zinc-800/80">
-                        <div className="flex items-center gap-1 text-[11px] text-gray-400">
-                            <Clock className="w-3 h-3 text-gray-400" />
+                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+                        <div className="flex items-center gap-1 text-[11px] text-black/70 dark:text-gray-400">
+                            <Clock className="w-3 h-3 text-black/60 dark:text-gray-400" />
                             <span>{formatDate(notification.created_at)}</span>
                         </div>
-                        <ArrowRight className="w-3 h-3 text-[#E5252A] opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <ArrowRight className="w-3 h-3 text-red-600 dark:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                 </div>
             </button>
@@ -266,7 +269,7 @@ export default function NotificationsPage() {
             <button
                 type="button"
                 onClick={() => handleNotificationClick(notification)}
-                className="group w-60 flex-shrink-0 text-left transition-all duration-200 hover:shadow-lg rounded-xl overflow-hidden bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:border-[#E5252A] dark:hover:border-[#E5252A] flex flex-col shadow-sm"
+                className="group w-60 flex-shrink-0 text-left transition-all duration-200 hover:shadow-lg rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-red-600 dark:hover:border-red-600 flex flex-col shadow-sm"
             >
                 <div className="relative h-32 w-full overflow-hidden bg-gray-50 dark:bg-black">
                     {src ? (
@@ -277,24 +280,24 @@ export default function NotificationsPage() {
                             loading="lazy"
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <div className="w-full h-full flex items-center justify-center text-black/40 dark:text-gray-500">
                             <Bell className="w-6 h-6" />
                         </div>
                     )}
                     {!notification.read && (
-                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-[#E5252A] text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm">
+                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-red-600 text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shadow-sm">
                             <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
                             <span>New</span>
                         </div>
                     )}
                 </div>
                 <div className="p-3">
-                    <h3 className={`text-xs font-semibold line-clamp-2 leading-snug group-hover:text-[#E5252A] transition-colors ${
-                        !notification.read ? 'text-[#151515] dark:text-white' : 'text-[#666666] dark:text-zinc-400'
+                    <h3 className={`text-xs font-semibold line-clamp-2 leading-snug group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors ${
+                        !notification.read ? 'text-black dark:text-white' : 'text-black/70 dark:text-gray-400'
                     }`}>
                         {notification.title}
                     </h3>
-                    <div className="flex items-center gap-1 mt-2 text-[11px] text-gray-400">
+                    <div className="flex items-center gap-1 mt-2 text-[11px] text-black/70 dark:text-gray-400">
                         <Clock className="w-3 h-3" />
                         <span>{formatDate(notification.created_at)}</span>
                     </div>
@@ -392,7 +395,7 @@ export default function NotificationsPage() {
 
     if (loading) {
         return (
-            <div className={`w-full min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
+            <div className={`w-full min-h-screen ${darkMode ? 'bg-gray-950 text-white' : 'bg-white text-black'}`}>
                 <div className="max-w-7xl mx-auto px-4 py-16">
                     <LoadingSpinner size="lg" message="Loading updates..." variant="dots" />
                 </div>
@@ -401,7 +404,7 @@ export default function NotificationsPage() {
     }
 
     return (
-        <div className={`w-full min-h-screen ${darkMode ? 'bg-black' : 'bg-white'}`}>
+        <div className={`w-full min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-950 text-white' : 'bg-white text-black'}`}>
             <div className="max-w-7xl mx-auto px-4 py-6">
                 {/* Editorial Header */}
                 <PageHeader
@@ -411,19 +414,25 @@ export default function NotificationsPage() {
                     ]}
                     title="Platform Updates"
                     subtitle="Latest notifications, product releases, service listings, and announcements across HafiConnect."
-                    badge={unreadCount > 0 ? `${unreadCount} unread updates` : undefined}
+                    badge={unreadCount > 0 ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-600 text-white shadow-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                            {unreadCount} unread
+                        </span>
+                    ) : undefined}
+                    darkMode={darkMode}
                 />
 
                 {/* Rows of cards */}
                 {rows.length === 0 ? (
-                    <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm">
+                    <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
                         <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-red-50 dark:bg-red-950/40 flex items-center justify-center">
-                            <Bell className="w-6 h-6 text-[#E5252A]" />
+                            <Bell className="w-6 h-6 text-red-600 dark:text-red-400" />
                         </div>
-                        <h3 className="text-base font-bold text-[#151515] dark:text-white mb-1">
+                        <h3 className="text-base font-bold text-black dark:text-white mb-1">
                             No updates yet
                         </h3>
-                        <p className="text-xs sm:text-sm text-[#666666] dark:text-zinc-400">
+                        <p className="text-xs sm:text-sm text-black/70 dark:text-gray-400">
                             Check back soon for new announcements and market arrivals.
                         </p>
                     </div>

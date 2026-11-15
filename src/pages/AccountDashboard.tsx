@@ -3,7 +3,7 @@ import { useDarkMode } from '@/context/DarkMode';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import PageHeader from '@/components/ui/PageHeader';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import RoleManagement from '../components/RoleManagement';
 import { useAuth } from '../context/AuthContext';
 
@@ -185,6 +185,15 @@ export default function AccountDashboard() {
 
     fetchAccountData();
   }, []);
+
+  // Scroll to the section named in the URL hash (e.g. #payment-methods, #roles)
+  // once the page content has loaded.
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (loading || !hash) return;
+    const el = document.getElementById(hash.slice(1));
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [loading, hash]);
 
   // Separate function to fetch storage data for real-time updates
   const fetchStorageData = async () => {
@@ -436,7 +445,7 @@ export default function AccountDashboard() {
 
         {/* Payment Settings Card */}
         {!isPureCustomer && (user_profile?.roles?.includes('service_provider') || user_profile?.roles?.includes('seller')) && (
-          <div className="rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 mb-6 shadow-sm">
+          <div id="payment-methods" className="scroll-mt-24 rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 mb-6 shadow-sm">
             <div className="flex items-center mb-6">
               <div className="p-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-[#F5F5F5] dark:bg-zinc-800 text-[#E5252A]">
                 <CreditCard className="w-5 h-5 text-[#E5252A]" />
@@ -453,7 +462,7 @@ export default function AccountDashboard() {
         )}
 
         {/* Role Management Section */}
-        <div className="mt-8">
+        <div id="roles" className="mt-8 scroll-mt-24">
           <RoleManagement
             currentRoles={user_profile.roles || []}
             onRoleUpdate={() => window.location.reload()}
