@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import PaymentSettingsCard from '@/components/DashboardParts/PaymentCredentials';
 import { useDarkMode } from '@/context/DarkMode';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -62,8 +63,8 @@ type PlanInfo = {
   features: {
     can_upload_images: boolean;
     can_upload_videos: boolean;
-    max_image_size_mb: number;
-    max_video_size_mb: number;
+    max_image_size_mb: number | string;
+    max_video_size_mb: number | string;
     max_products: number;
     support_level: string;
   };
@@ -308,9 +309,9 @@ export default function AccountDashboard() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save payment credentials");
-      alert("Payment credentials saved successfully!");
+      notify("Payment credentials saved successfully!");
     } catch (err) {
-      alert(`Failed to save credentials: ${err instanceof Error ? err.message : String(err)}`);
+      notify(`Failed to save credentials: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setLoading(false);
     }
@@ -427,7 +428,7 @@ export default function AccountDashboard() {
             
             <div className="bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900/40 rounded-xl py-3 px-4 text-center select-all cursor-pointer hover:border-[#E5252A] transition-colors" onClick={() => {
               navigator.clipboard.writeText(data.referral_code?.code || '');
-              alert('Referral code copied to clipboard!');
+              notify('Referral code copied to clipboard!');
             }}>
               <span className="text-xl font-mono font-black tracking-widest text-[#E5252A]">
                 {data.referral_code.code}

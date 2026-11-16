@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import LoadingSpinner from "../LoadingSpinner";
@@ -99,7 +100,7 @@ export default function PaymentSettingsCard({ className, darkMode = false, metho
       setMethods(data.methods || payload.methods);
       setTempMethods((t) => ({ ...(t || {}), ...(data.methods || {}) }));
       setEditingMethod(null);
-      alert("Payment method saved successfully!");
+      notify("Payment method saved successfully!");
     } catch (err: any) {
       setError(err?.message || String(err));
     }

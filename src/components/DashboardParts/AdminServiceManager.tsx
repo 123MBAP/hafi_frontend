@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 /**
  * ADMIN SERVICE MANAGER
  * Component for admins to create/edit services and manage field definitions
@@ -122,7 +123,7 @@ export const AdminServiceManager: React.FC = () => {
             if (selectedService) {
                 // Update existing service
                 response = await axios.put(`${API_BASE}/api/dynamic-services/${selectedService.id}`, serviceForm);
-                alert('Service updated successfully!');
+                notify('Service updated successfully!');
                 // Reload services and fields
                 await loadServices();
                 if (selectedService.id) {
@@ -161,9 +162,9 @@ export const AdminServiceManager: React.FC = () => {
 
                 // Show success message with guidance
                 if (serviceForm.has_specific_features) {
-                    alert(`Service "${newService.name}" created successfully with ${newServiceFields.length} fields! You can add more fields or edit existing ones.`);
+                    notify(`Service "${newService.name}" created successfully with ${newServiceFields.length} fields! You can add more fields or edit existing ones.`);
                 } else {
-                    alert(`Service "${newService.name}" created successfully!`);
+                    notify(`Service "${newService.name}" created successfully!`);
                 }
 
                 // Reload services list
@@ -180,7 +181,7 @@ export const AdminServiceManager: React.FC = () => {
             setNewServiceFields([]);
         } catch (error: any) {
             console.error('Service submit error:', error);
-            alert(error.response?.data?.error || 'Failed to save service');
+            notify(error.response?.data?.error || 'Failed to save service');
         }
     };
 
@@ -188,7 +189,7 @@ export const AdminServiceManager: React.FC = () => {
         e.preventDefault();
 
         if (!selectedService) {
-            alert('Please select a service first');
+            notify('Please select a service first');
             return;
         }
 
@@ -216,7 +217,7 @@ export const AdminServiceManager: React.FC = () => {
             loadFields(selectedService.id);
             resetFieldForm();
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to save field');
+            notify(error.response?.data?.error || 'Failed to save field');
         }
     };
 
@@ -230,7 +231,7 @@ export const AdminServiceManager: React.FC = () => {
             loadServices();
             setSelectedService(null);
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to delete service');
+            notify(error.response?.data?.error || 'Failed to delete service');
         }
     };
 
@@ -243,7 +244,7 @@ export const AdminServiceManager: React.FC = () => {
             await axios.delete(`${API_BASE}/api/dynamic-services/${selectedService.id}/fields/${fieldId}`);
             loadFields(selectedService.id);
         } catch (error: any) {
-            alert(error.response?.data?.error || 'Failed to delete field');
+            notify(error.response?.data?.error || 'Failed to delete field');
         }
     };
 

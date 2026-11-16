@@ -154,9 +154,14 @@ export default function NotificationsPage() {
 
     const markAsRead = async (type: string, id: string) => {
         try {
-            await fetch(`${API_BASE}/api/notifications/${type}/${id}/read`, {
-                method: "PATCH",
-            });
+            // Marking as read is saved on the server only for logged-in users.
+            const authToken = localStorage.getItem('token');
+            if (authToken) {
+                await fetch(`${API_BASE}/api/notifications/${type}/${id}/read`, {
+                    method: "PATCH",
+                    headers: { Authorization: `Bearer ${authToken}` },
+                });
+            }
 
             setAllNotifications((prev) => {
                 const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));

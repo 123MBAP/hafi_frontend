@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import { useDarkMode } from "@/context/DarkMode";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -400,7 +401,7 @@ export default function MadeInRwanda() {
 
   const handleUseMyLocation = () => {
     if (!navigator.geolocation) {
-      alert("Geolocation is not available.");
+      notify("Geolocation is not available.");
       return;
     }
     navigator.geolocation.getCurrentPosition(
@@ -409,7 +410,7 @@ export default function MadeInRwanda() {
         setNearbyOnly(true);
       },
       (err) => {
-        alert("Unable to get location: " + err.message);
+        notify("Unable to get location: " + err.message);
       }
     );
   };

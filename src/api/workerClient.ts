@@ -75,7 +75,7 @@ export const fetchEdgeProducts = async (options?: {
   const url = `${WORKER_BASE}/api/products${qs}`;
 
   // Client cache for 30s
-  return await cachedFetch<{ total: number; products: WorkerProduct[] }>(url, {}, { ttlMs: 30_000 });
+  return await cachedFetch<{ total: number; products: WorkerProduct[] }>(url, {}, { ttl: 30_000 });
 };
 
 /**
@@ -84,7 +84,7 @@ export const fetchEdgeProducts = async (options?: {
 export const fetchEdgeShopProducts = async (shopTypeId?: string | number): Promise<{ products: WorkerProduct[] }> => {
   const qs = shopTypeId ? `?shop_type_id=${shopTypeId}` : '';
   const url = `${WORKER_BASE}/api/shops/products${qs}`;
-  return await cachedFetch<{ products: WorkerProduct[] }>(url, {}, { ttlMs: 30_000 });
+  return await cachedFetch<{ products: WorkerProduct[] }>(url, {}, { ttl: 30_000 });
 };
 
 /**
@@ -92,7 +92,7 @@ export const fetchEdgeShopProducts = async (shopTypeId?: string | number): Promi
  */
 export const fetchEdgeMadeInRwanda = async (): Promise<{ products: WorkerProduct[] }> => {
   const url = `${WORKER_BASE}/api/market/made-in-rwanda`;
-  return await cachedFetch<{ products: WorkerProduct[] }>(url, {}, { ttlMs: 30_000 });
+  return await cachedFetch<{ products: WorkerProduct[] }>(url, {}, { ttl: 30_000 });
 };
 
 /**
@@ -100,7 +100,7 @@ export const fetchEdgeMadeInRwanda = async (): Promise<{ products: WorkerProduct
  */
 export const fetchEdgeProperties = async (limit = 200): Promise<{ properties: WorkerProperty[] }> => {
   const url = `${WORKER_BASE}/api/real-estate/properties?limit=${limit}`;
-  return await cachedFetch<{ properties: WorkerProperty[] }>(url, {}, { ttlMs: 45_000 });
+  return await cachedFetch<{ properties: WorkerProperty[] }>(url, {}, { ttl: 45_000 });
 };
 
 /**
@@ -108,7 +108,7 @@ export const fetchEdgeProperties = async (limit = 200): Promise<{ properties: Wo
  */
 export const fetchEdgeRealEstateService = async (): Promise<{ service: any }> => {
   const url = `${WORKER_BASE}/api/real-estate/service`;
-  return await cachedFetch<{ service: any }>(url, {}, { ttlMs: 300_000 }); // 5 minutes
+  return await cachedFetch<{ service: any }>(url, {}, { ttl: 300_000 }); // 5 minutes
 };
 
 /**
@@ -116,7 +116,7 @@ export const fetchEdgeRealEstateService = async (): Promise<{ service: any }> =>
  */
 export const fetchEdgeProvidersByService = async (serviceId: string | number): Promise<any[]> => {
   const url = `${WORKER_BASE}/api/providers/${serviceId}/providers`;
-  return await cachedFetch<any[]>(url, {}, { ttlMs: 60_000 });
+  return await cachedFetch<any[]>(url, {}, { ttl: 60_000 });
 };
 
 /**
@@ -124,7 +124,7 @@ export const fetchEdgeProvidersByService = async (serviceId: string | number): P
  */
 export const fetchEdgeProviderById = async (id: string | number): Promise<any> => {
   const url = `${WORKER_BASE}/api/providers/${id}`;
-  return await cachedFetch<any>(url, {}, { ttlMs: 60_000 });
+  return await cachedFetch<any>(url, {}, { ttl: 60_000 });
 };
 
 /**
@@ -132,7 +132,7 @@ export const fetchEdgeProviderById = async (id: string | number): Promise<any> =
  */
 export const fetchEdgeProductById = async (id: number | string): Promise<WorkerProduct> => {
   const url = `${WORKER_BASE}/api/products/${id}`;
-  const data = await cachedFetch<{ product: WorkerProduct }>(url, {}, { ttlMs: 60_000 });
+  const data = await cachedFetch<{ product: WorkerProduct }>(url, {}, { ttl: 60_000 });
   return data.product;
 };
 
@@ -141,7 +141,7 @@ export const fetchEdgeProductById = async (id: number | string): Promise<WorkerP
  */
 export const fetchEdgeNotifications = async (): Promise<any[]> => {
   const url = `${WORKER_BASE}/api/notifications`;
-  return await cachedFetch<any[]>(url, {}, { ttlMs: 30_000 });
+  return await cachedFetch<any[]>(url, {}, { ttl: 30_000 });
 };
 
 /**

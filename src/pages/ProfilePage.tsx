@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import { useAuth } from "@/context/AuthContext";
 import { useDarkMode } from "@/context/DarkMode";
 import { useEffect, useState } from "react";
@@ -157,7 +158,7 @@ export default function ProfilePage() {
         }
       } catch (error) {
         console.error("Error loading profile:", error);
-        alert("Error loading profile");
+        notify("Error loading profile");
       } finally {
         setLoading(false);
       }
@@ -180,7 +181,7 @@ export default function ProfilePage() {
 
   const handleServiceSelect = async (serviceId: string) => {
     if (!profile?.roles?.includes('service_provider')) {
-      alert('Only service providers can set their service');
+      notify('Only service providers can set their service');
       return;
     }
     setIsUpdatingService(true);
@@ -201,7 +202,7 @@ export default function ProfilePage() {
       }
 
       const selectedService = services.find(s => s.id === serviceId);
-      alert(
+      notify(
         `✅ Service Updated!\n\n` +
         `Old Service: ${profile.service_title || 'None'}\n` +
         `New Service: ${selectedService?.title || 'None'}\n\n` +
@@ -209,7 +210,7 @@ export default function ProfilePage() {
       );
       window.location.reload();
     } catch (error) {
-      alert(`Failed to update service: ${error instanceof Error ? error.message : ""}`);
+      notify(`Failed to update service: ${error instanceof Error ? error.message : ""}`);
     } finally {
       setIsUpdatingService(false);
     }
@@ -229,7 +230,7 @@ export default function ProfilePage() {
 
   const handleImageUpload = async () => {
     if (!selectedImage || !canEdit()) {
-      alert(!canEdit() ? "You don't have permission to upload images" : "No image selected");
+      notify(!canEdit() ? "You don't have permission to upload images" : "No image selected");
       return;
     }
     setIsUploadingImage(true);
@@ -284,7 +285,7 @@ export default function ProfilePage() {
       setProfile(prev => prev ? { ...prev, profile_image: uploadedUrl! } : prev);
       setSelectedImage(null);
     } catch {
-      alert("Image upload failed");
+      notify("Image upload failed");
     } finally {
       setIsUploadingImage(false);
     }
@@ -383,7 +384,7 @@ export default function ProfilePage() {
       setProfile(prev => prev ? { ...prev, specializations: tempSpecializations } : prev);
       setEditSpecializationMode(false);
     } catch (error) {
-      alert(`Failed to update specializations: ${error instanceof Error ? error.message : ""}`);
+      notify(`Failed to update specializations: ${error instanceof Error ? error.message : ""}`);
     } finally {
       setIsSavingSpecialization(false);
     }
@@ -391,7 +392,7 @@ export default function ProfilePage() {
 
   const handleSave = async (field: string) => {
     if (!canEdit()) {
-      alert("You don't have permission to edit");
+      notify("You don't have permission to edit");
       return;
     }
     setIsSavingProfile(true);
@@ -419,7 +420,7 @@ export default function ProfilePage() {
       setEditField(null);
       setEditAddressMode(false);
     } catch (error) {
-      alert(`Failed to update profile: ${error instanceof Error ? error.message : ""}`);
+      notify(`Failed to update profile: ${error instanceof Error ? error.message : ""}`);
     } finally {
       setIsSavingProfile(false);
     }
@@ -430,7 +431,7 @@ export default function ProfilePage() {
     const area = `${newAreaSector}, ${newAreaDistrict}, ${newAreaProvince}`;
     const currentAreas = profile.operating_areas || [];
     if (currentAreas.includes(area)) {
-      alert("Area is already added");
+      notify("Area is already added");
       return;
     }
     const updatedAreas = [...currentAreas, area];
@@ -457,7 +458,7 @@ export default function ProfilePage() {
       setNewAreaDistrict("");
       setNewAreaSector("");
     } catch (error) {
-      alert(`Failed to add operating area: ${error instanceof Error ? error.message : ""}`);
+      notify(`Failed to add operating area: ${error instanceof Error ? error.message : ""}`);
     } finally {
       setIsSavingArea(false);
     }
@@ -485,7 +486,7 @@ export default function ProfilePage() {
 
       setProfile(prev => prev ? { ...prev, operating_areas: updatedAreas } : prev);
     } catch (error) {
-      alert(`Failed to remove operating area: ${error instanceof Error ? error.message : ""}`);
+      notify(`Failed to remove operating area: ${error instanceof Error ? error.message : ""}`);
     }
   };
 
@@ -509,13 +510,13 @@ export default function ProfilePage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
 
-      alert("Password updated successfully");
+      notify("Password updated successfully");
       setShowPasswordForm(false);
       setOldPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
     } catch (err) {
-      alert(`Failed to update password: ${err instanceof Error ? err.message : ""}`);
+      notify(`Failed to update password: ${err instanceof Error ? err.message : ""}`);
     } finally {
       setIsUpdatingPassword(false);
     }
@@ -523,7 +524,7 @@ export default function ProfilePage() {
 
   const captureCurrentLocation = async () => {
     if (!canEdit()) {
-      alert("You don't have permission to edit location");
+      notify("You don't have permission to edit location");
       return;
     }
     setIsGettingLocation(true);
@@ -557,9 +558,9 @@ export default function ProfilePage() {
       }
 
       setProfile(prev => prev ? { ...prev, location: newLocation } : prev);
-      alert("📍 Location coordinates saved successfully!");
+      notify("📍 Location coordinates saved successfully!");
     } catch (error) {
-      alert(`Failed to get location: ${error instanceof Error ? error.message : ""}`);
+      notify(`Failed to get location: ${error instanceof Error ? error.message : ""}`);
     } finally {
       setIsGettingLocation(false);
     }

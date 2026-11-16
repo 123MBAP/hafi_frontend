@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import { useAuth } from '@/context/AuthContext';
 import { useDarkMode } from '@/context/DarkMode';
 import { jwtDecode } from 'jwt-decode';
@@ -296,7 +297,7 @@ export default function ProviderDetail() {
     }
 
     if (!customerId) {
-      alert('Only customers can initiate chats. Please ensure you are logged in with a customer account.');
+      notify('Only customers can initiate chats. Please ensure you are logged in with a customer account.');
       return;
     }
 

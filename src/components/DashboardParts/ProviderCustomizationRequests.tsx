@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import { useEffect, useState } from "react";
 import { useDarkMode } from "@/context/DarkMode";
 import { useAuth } from "@/context/AuthContext";
@@ -54,7 +55,7 @@ export default function ProviderCustomizationRequests() {
 
   const handleQuotePrice = async (requestId: string) => {
     if (!customPrice || isNaN(parseFloat(customPrice))) {
-      alert("Please enter a valid price");
+      notify("Please enter a valid price");
       return;
     }
 
@@ -79,13 +80,13 @@ export default function ProviderCustomizationRequests() {
         ));
         setEditingRequestId(null);
         setCustomPrice("");
-        alert("Price quoted successfully!");
+        notify("Price quoted successfully!");
       } else {
-        alert("Failed to quote price");
+        notify("Failed to quote price");
       }
     } catch (error) {
       console.error("Error quoting price:", error);
-      alert("Error quoting price");
+      notify("Error quoting price");
     }
   };
 
@@ -270,7 +271,7 @@ export default function ProviderCustomizationRequests() {
                           });
                           if (res.ok) {
                             setRequests(prev => prev.map(r => r.id === request.id ? { ...r, status: 'completed' } : r));
-                            alert("Request marked as completed!");
+                            notify("Request marked as completed!");
                           }
                         } catch (err) {
                           console.error(err);

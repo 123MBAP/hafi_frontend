@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import { useAuth } from "@/context/AuthContext";
 import { useDarkMode } from "@/context/DarkMode";
 import {
@@ -90,7 +91,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                 body: JSON.stringify({ shopping_type_id: null }),
             });
             if (!res.ok) throw new Error("Failed to remove category");
-            alert("Shop category removed successfully.");
+            notify("Shop category removed successfully.");
             setShopCategory(null);
             if (onRoleUpdate) {
                 onRoleUpdate();
@@ -98,7 +99,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                 window.location.reload();
             }
         } catch (err) {
-            alert("Error removing category");
+            notify("Error removing category");
         } finally {
             setIsUpdatingRole(false);
         }
@@ -106,7 +107,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
 
     const handleAddCategory = async () => {
         if (!selectedCategoryId) {
-            alert("Please select a category.");
+            notify("Please select a category.");
             return;
         }
         setIsUpdatingRole(true);
@@ -120,7 +121,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                 body: JSON.stringify({ shopping_type_id: selectedCategoryId }),
             });
             if (!res.ok) throw new Error("Failed to assign category");
-            alert("Shop category assigned successfully.");
+            notify("Shop category assigned successfully.");
             setShowAddCategoryModal(false);
             setSelectedCategoryId(null);
             await fetchSellerProfileAndCategories();
@@ -130,7 +131,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                 window.location.reload();
             }
         } catch (err) {
-            alert("Error assigning category");
+            notify("Error assigning category");
         } finally {
             setIsUpdatingRole(false);
         }
@@ -182,7 +183,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                 updateToken(data.token);
             }
 
-            alert(data.message || "Role updated");
+            notify(data.message || "Role updated");
 
             if (onRoleUpdate) {
                 onRoleUpdate();
@@ -191,7 +192,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
             }
 
         } catch {
-            alert("Error updating roles");
+            notify("Error updating roles");
         } finally {
             setIsUpdatingRole(false);
         }
@@ -199,7 +200,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
 
     const handleRemoveRoleClick = (role: string) => {
         if (role === 'customer') {
-            alert('The customer role cannot be removed.');
+            notify('The customer role cannot be removed.');
             return;
         }
 
@@ -214,7 +215,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
 
         const expectedPhrase = `remove the ${roleToRemove.replace('_', ' ')}`;
         if (confirmationInput.toLowerCase() !== expectedPhrase.toLowerCase()) {
-            alert(`Please type "${expectedPhrase}" to confirm.`);
+            notify(`Please type "${expectedPhrase}" to confirm.`);
             return;
         }
 
@@ -243,7 +244,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
                 updateToken(data.token);
             }
 
-            alert(data.message || "Role removed successfully");
+            notify(data.message || "Role removed successfully");
             setShowRemoveRoleModal(false);
             setRoleToRemove(null);
 
@@ -254,7 +255,7 @@ export default function RoleManagement({ currentRoles, onRoleUpdate }: RoleManag
             }
 
         } catch (error) {
-            alert(`Error removing role: ${error instanceof Error ? error.message : ""}`);
+            notify(`Error removing role: ${error instanceof Error ? error.message : ""}`);
             setShowRemoveRoleModal(false);
             setRoleToRemove(null);
         } finally {

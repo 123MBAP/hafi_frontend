@@ -45,7 +45,7 @@ export default function ChatBox({
       : `${API_BASE}/api/messages?providerId=${providerId}&customerId=${customerId}`;
 
     const headers: Record<string, string> = {};
-    if (currentUserRole === 'provider' && token) {
+    if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
 
@@ -74,7 +74,7 @@ export default function ChatBox({
 
     const getHeaders = () => {
       const headers: Record<string, string> = {};
-      if (currentUserRole === 'provider' && token) {
+      if (token) {
         headers.Authorization = `Bearer ${token}`;
       }
       return headers;
@@ -152,7 +152,7 @@ export default function ChatBox({
       } else {
         await fetch(`${API_BASE}/api/messages`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
           body: JSON.stringify(newMsg),
         });
       }

@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import { useAuth } from '@/context/AuthContext';
 import { useDarkMode } from "@/context/DarkMode";
 import { useEffect, useState } from "react";
@@ -25,6 +26,7 @@ interface Product {
   video_url?: string;
   madeInRwanda?: boolean;
   used?: boolean;
+  in_stock?: boolean;
   pricing_unit?: string;
 }
 
@@ -248,7 +250,7 @@ export default function SellerDashboardPage() {
 
       setEditingProduct(null);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to save product changes.");
+      notify(err instanceof Error ? err.message : "Failed to save product changes.");
     } finally {
       setEditIsSaving(false);
       setEditUploadProgress(null);
@@ -425,14 +427,14 @@ export default function SellerDashboardPage() {
     e.preventDefault();
 
     if (!canUploadProducts) {
-      alert("Your subscription is not active. Please upgrade your plan to upload products.");
+      notify("Your subscription is not active. Please upgrade your plan to upload products.");
       return;
     }
 
     const product = productForms[cid];
     const main = mainFiles[cid];
     if (!product?.title || !product.description || !product.price || !main) {
-      alert("Please fill all fields and select a main image.");
+      notify("Please fill all fields and select a main image.");
       return;
     }
 
@@ -521,7 +523,7 @@ export default function SellerDashboardPage() {
       await loadProducts();
       resetForm(cid);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Upload failed. Please try again.");
+      notify(err instanceof Error ? err.message : "Upload failed. Please try again.");
     } finally {
       setUploadingCids(prev => ({ ...prev, [cid]: false }));
       setUploadProgress(prev => { const { [cid]: _, ...rest } = prev; return rest; });
@@ -1352,7 +1354,7 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
       onUpdate(); // Refresh product list
     } catch (err) {
       console.error("Delete error:", err);
-      alert("Failed to delete product");
+      notify("Failed to delete product");
     } finally {
       setIsDeleting(false);
     }
@@ -1614,7 +1616,7 @@ function ProductCard({ product, darkMode, onUpdate, onEdit }: { product: Product
                       if (!res.ok) throw new Error("Failed to update stock status");
                       onUpdate();
                     } catch (e: any) {
-                      alert(e.message);
+                      notify(e.message);
                     } finally {
                       setIsUpdatingStock(false);
                       setShowConfirmStock(false);

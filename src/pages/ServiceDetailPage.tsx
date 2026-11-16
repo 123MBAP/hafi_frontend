@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import L from 'leaflet';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -207,12 +208,12 @@ export default function ServiceDetailPage() {
           });
         },
         () => {
-          alert('Could not get your location.');
+          notify('Could not get your location.');
           setShowNearby(false);
         }
       );
     } else {
-      alert('Geolocation not supported.');
+      notify('Geolocation not supported.');
       setShowNearby(false);
     }
   }, [showNearby]);

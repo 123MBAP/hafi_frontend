@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import { useEffect, useState } from "react";
 import { API_BASE } from "@/api/apiClient";
 import { useDarkMode } from "@/context/DarkMode";
@@ -135,7 +136,7 @@ export default function AdminPlansPage() {
   // ✅ Fetch plans from backend
   async function fetchPlans() {
     if (!token) {
-      alert("You are not logged in");
+      notify("You are not logged in");
       return;
     }
 

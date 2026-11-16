@@ -202,7 +202,10 @@ const OrdersPage = () => {
         if (!providerId) return;
 
         try {
-          const response = await fetch(`${API_BASE}/api/messages?providerId=${providerId}&customerId=${customerId}`);
+          const authToken = localStorage.getItem('token');
+          const response = await fetch(`${API_BASE}/api/messages?providerId=${providerId}&customerId=${customerId}`, {
+            headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+          });
           if (!response.ok) return;
           const data = await response.json();
 

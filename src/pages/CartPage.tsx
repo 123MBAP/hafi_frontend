@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import { useDarkMode } from "@/context/DarkMode";
 import { useAuth } from "@/context/AuthContext";
 import { usePhases } from "@/context/PhaseContext";
@@ -73,7 +74,7 @@ const CartPage = () => {
       navigate(`/orders?placed=${order.orderUuid}`);
     } catch (err) {
       console.error('Order placement error:', err);
-      alert('Could not place the order. Please try again.');
+      notify('Could not place the order. Please try again.');
     } finally {
       setPlacingOrder(false);
     }

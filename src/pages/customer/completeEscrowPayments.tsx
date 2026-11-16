@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDarkMode } from "@/context/DarkMode";
@@ -43,10 +44,10 @@ export default function CompleteEscrowPaymentPage() {
       });
       if (!res.ok) throw new Error("Failed to complete escrow payment");
 
-      alert("Payment completed! Funds released to provider.");
+      notify("Payment completed! Funds released to provider.");
       navigate("/payments");
     } catch (err) {
-      alert("Failed to complete escrow payment");
+      notify("Failed to complete escrow payment");
     } finally {
       setSubmitting(false);
     }

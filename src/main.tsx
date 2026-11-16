@@ -1,5 +1,5 @@
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import React from "react";
+import React, { Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
@@ -9,7 +9,13 @@ import { CartProvider } from "./context/CartContext";
 import { DarkModeProvider } from "./context/DarkMode";
 import { PhaseProvider } from "./context/PhaseContext";
 import { HafibotProvider } from "./context/HafibotContext";
+import ConnectionStatus from "./components/ConnectionStatus";
+import ErrorBoundary from "./components/ErrorBoundary";
+import Toaster from "./components/Toaster";
+import { initMonitoring } from "./monitoring";
 import "./tailwind.css";
+
+initMonitoring();
 
 
 // SECURITY: Prevent leaking internal routes, state, and tokens to browser console in production
@@ -32,7 +38,13 @@ createRoot(document.getElementById("root")!).render(
             <CartProvider>
               <AuthProvider>
                 <HafibotProvider>
-                  <App />
+                  <ErrorBoundary>
+                    <Suspense fallback={null}>
+                      <App />
+                    </Suspense>
+                  </ErrorBoundary>
+                  <Toaster />
+                  <ConnectionStatus />
                 </HafibotProvider>
               </AuthProvider>
             </CartProvider>

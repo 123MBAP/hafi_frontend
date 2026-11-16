@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import { useDarkMode } from "@/context/DarkMode";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -121,13 +122,13 @@ export default function CustomerStatements() {
             ? { ...req, status: 'accepted' }
             : req
         ));
-        alert("Quote accepted successfully! You can now proceed with payment.");
+        notify("Quote accepted successfully! You can now proceed with payment.");
       } else {
-        alert("Failed to accept quote");
+        notify("Failed to accept quote");
       }
     } catch (error) {
       console.error("Error accepting quote:", error);
-      alert("Error accepting quote");
+      notify("Error accepting quote");
     }
   };
 
@@ -152,19 +153,19 @@ export default function CustomerStatements() {
             ? { ...req, status: 'rejected' }
             : req
         ));
-        alert("Quote rejected successfully.");
+        notify("Quote rejected successfully.");
       } else {
-        alert("Failed to reject quote");
+        notify("Failed to reject quote");
       }
     } catch (error) {
       console.error("Error rejecting quote:", error);
-      alert("Error rejecting quote");
+      notify("Error rejecting quote");
     }
   };
 
   const handlePayment = (request: CustomServiceRequest) => {
     if (!request.custom_price) {
-      alert("No custom price available for this request.");
+      notify("No custom price available for this request.");
       return;
     }
 
@@ -499,7 +500,7 @@ export default function CustomerStatements() {
                           {(request.is_paid) && (
                             <div className="flex gap-3">
                               <button
-                                onClick={() => alert(`Service details would open here for ${request.service_name}`)}
+                                onClick={() => notify(`Service details would open here for ${request.service_name}`)}
                                 className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
                               >
                                 Generate report

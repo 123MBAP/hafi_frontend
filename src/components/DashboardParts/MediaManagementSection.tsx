@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import { useState } from 'react';
 import ImageCarouselCard from '@/pages/ImageCarouselCard';
 import { ServiceFeature } from '@/types/features';
@@ -411,7 +412,7 @@ export default function MediaManagementSection({
                                       if (!res.ok) throw new Error("Failed to update stock status");
                                       onRefreshMedia?.();
                                     } catch (e: any) {
-                                      alert(e.message);
+                                      notify(e.message);
                                     } finally {
                                       setIsUpdatingStock(false);
                                       setConfirmStockProductId(null);

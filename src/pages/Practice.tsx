@@ -1,9 +1,10 @@
+import { notify } from '@/utils/notify';
 import { useState, useEffect } from "react";
 
 export default function PracticePage(){
     //    const [p1, stP1]=useState
     const handleClick = ()=>{
-    alert('the card is clicked')
+    notify('the card is clicked')
 }
     
     return (

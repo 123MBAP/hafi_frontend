@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 // components/PaymentHistory.tsx
 import { PaymentFilter, usePaymentHistory } from "@/components/Statements/Hooks/usePaymentHistory";
 import { useState } from "react";
@@ -39,17 +40,17 @@ const PaymentHistory = ({ darkMode }: PaymentHistoryProps) => {
 
   const handleSubmitDispute = async () => {
     if (!selectedPaymentForDispute || !disputeReason.trim()) {
-      alert("Please provide a reason for the dispute");
+      notify("Please provide a reason for the dispute");
       return;
     }
 
     setDisputingPaymentId(selectedPaymentForDispute.id);
     try {
       await disputeEscrowPayment(selectedPaymentForDispute.id, disputeReason.trim());
-      alert("Dispute submitted successfully! Our team will review your case.");
+      notify("Dispute submitted successfully! Our team will review your case.");
       handleCloseDispute();
     } catch (err: any) {
-      alert("Failed to submit dispute: " + (err.message || "Unknown error"));
+      notify("Failed to submit dispute: " + (err.message || "Unknown error"));
     } finally {
       setDisputingPaymentId(null);
     }
@@ -62,9 +63,9 @@ const PaymentHistory = ({ darkMode }: PaymentHistoryProps) => {
     setReleasingPaymentId(paymentId);
     try {
       await releaseEscrowPayment(paymentId);
-      alert("Escrow funds released successfully!");
+      notify("Escrow funds released successfully!");
     } catch (err: any) {
-      alert("Failed to release escrow: " + (err.message || "Unknown error"));
+      notify("Failed to release escrow: " + (err.message || "Unknown error"));
     } finally {
       setReleasingPaymentId(null);
     }

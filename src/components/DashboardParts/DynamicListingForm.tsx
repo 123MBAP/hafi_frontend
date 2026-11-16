@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 /**
  * DYNAMIC LISTING FORM
  * Form component for creating/editing listings with dynamic fields
@@ -297,7 +298,7 @@ export const DynamicListingForm: React.FC<DynamicListingFormProps> = ({
                 });
                 setErrors(validationErrors);
             } else {
-                alert(error.response?.data?.error || 'Failed to submit listing');
+                notify(error.response?.data?.error || 'Failed to submit listing');
             }
         } finally {
             setSubmitting(false);

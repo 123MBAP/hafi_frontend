@@ -68,7 +68,7 @@ export default function AuthenticatedLayout() {
         </Link>
       ))}
       <button
-        onClick={logout}
+        onClick={() => logout()}
         className={`ml-2 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
           darkMode
             ? 'text-gray-400 hover:text-[#E5252A] hover:bg-gray-800'
@@ -96,7 +96,7 @@ export default function AuthenticatedLayout() {
           </Link>
         ))}
         <button
-          onClick={logout}
+          onClick={() => logout()}
           className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
             darkMode ? 'text-gray-400 hover:text-[#E5252A]' : 'text-[#666666] hover:text-[#E5252A]'
           }`}

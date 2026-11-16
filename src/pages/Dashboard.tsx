@@ -1,3 +1,4 @@
+import { notify } from '@/utils/notify';
 import React, { useEffect, useRef, useState } from 'react';
 // import { Images } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -413,7 +414,7 @@ export default function Dashboard() {
     // Handle Edit Mode submission
     if (editingProduct) {
       if (!productTitle.trim() || !productDesc.trim() || !productPrice.trim()) {
-        alert('Please fill all required fields');
+        notify('Please fill all required fields');
         return;
       }
 
@@ -509,11 +510,11 @@ export default function Dashboard() {
           )
         );
 
-        alert('Product updated successfully!');
+        notify('Product updated successfully!');
         handleCancelEditProduct();
       } catch (err: any) {
         console.error('Update error:', err);
-        alert(err.message || 'Failed to update product');
+        notify(err.message || 'Failed to update product');
       } finally {
         setIsUploadingProduct(false);
         setProductUploadProgress(null);
@@ -525,12 +526,12 @@ export default function Dashboard() {
     const hasVideos = productVideos.length > 0;
 
     if (!hasImages && !hasVideos) {
-      alert('Please select at least one image or video to upload');
+      notify('Please select at least one image or video to upload');
       return;
     }
 
     if (!productTitle.trim() || !productDesc.trim() || !productPrice.trim()) {
-      alert('Please fill all fields');
+      notify('Please fill all fields');
       return;
     }
 
@@ -627,7 +628,7 @@ export default function Dashboard() {
       };
 
       setUploadedProductImages(prev => [...prev, unifiedProduct]);
-      alert(`Product uploaded successfully with ${data.files.length} media files!`);
+      notify(`Product uploaded successfully with ${data.files.length} media files!`);
 
       // Clear form
       setProductImages([]);
@@ -656,7 +657,7 @@ export default function Dashboard() {
 
     } catch (err) {
       console.error('Upload error:', err);
-      alert(err instanceof Error ? err.message : 'Upload failed. Please try again.');
+      notify(err instanceof Error ? err.message : 'Upload failed. Please try again.');
     } finally {
       setIsUploadingProduct(false);
       setProductUploadProgress(null);
@@ -672,7 +673,7 @@ export default function Dashboard() {
     // Handle Edit Mode submission for services/real-estate
     if (editingService) {
       if (!serviceTitle.trim() || !serviceDesc.trim()) {
-        alert('Please fill in title and description');
+        notify('Please fill in title and description');
         return;
       }
 
@@ -791,11 +792,11 @@ export default function Dashboard() {
           )
         );
 
-        alert(isRealEstate ? 'Property updated successfully!' : 'Service updated successfully!');
+        notify(isRealEstate ? 'Property updated successfully!' : 'Service updated successfully!');
         handleCancelEditService();
       } catch (err: any) {
         console.error('Update error:', err);
-        alert(err.message || 'Failed to update');
+        notify(err.message || 'Failed to update');
       } finally {
         setIsUploadingService(false);
         setServiceUploadProgress(null);

@@ -1,7 +1,8 @@
+import { notify } from '@/utils/notify';
 
 import NestedFeatureBuilder from '@/components/NestedFeatureBuilder';
 import AdminSubscriptionReports from '@/components/DashboardParts/AdminParts/AdminSubscriptionReports';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import { useAuth } from '@/context/AuthContext';
 import { useDarkMode } from '@/context/DarkMode';
 import { ServiceFeature } from '@/types/features';
@@ -125,6 +126,7 @@ export default function AdminDashboard() {
   interface ShopType {
     id: number;
     name: string;
+    key?: string;
     is_premium?: boolean;
     price_monthly?: number;
     features?: string | string[];
@@ -261,15 +263,15 @@ export default function AdminDashboard() {
       });
       const data = await res.json();
       if (res.ok) {
-        alert('Withdrawal request approved successfully.');
+        notify('Withdrawal request approved successfully.');
         fetchWithdrawals();
         fetchAgents();
       } else {
-        alert(data.error || 'Failed to approve request.');
+        notify(data.error || 'Failed to approve request.');
       }
     } catch (err) {
       console.error(err);
-      alert('Error connecting to server');
+      notify('Error connecting to server');
     }
   };
 
@@ -285,15 +287,15 @@ export default function AdminDashboard() {
       });
       const data = await res.json();
       if (res.ok) {
-        alert('Withdrawal request rejected and balance refunded.');
+        notify('Withdrawal request rejected and balance refunded.');
         fetchWithdrawals();
         fetchAgents();
       } else {
-        alert(data.error || 'Failed to reject request.');
+        notify(data.error || 'Failed to reject request.');
       }
     } catch (err) {
       console.error(err);
-      alert('Error connecting to server');
+      notify('Error connecting to server');
     }
   };
 

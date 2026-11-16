@@ -1,74 +1,84 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
+import React, { lazy, Suspense, useState, useEffect, useLayoutEffect, useRef } from "react";
+import ErrorBoundary from "./components/ErrorBoundary";
+import LoadingSpinner from "./components/LoadingSpinner";
 import { useHafibot } from "./context/HafibotContext";
 import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
-import UpgradePlansPage from "./components/DashboardParts/AdminParts/AdminPlans";
 import ChatWrapper, {
   getProviderIdFromToken,
 } from "./components/DashboardParts/ChatBotWrapper";
-import MessagesCard from "./components/DashboardParts/MessagesCard";
-import PaymentCredentialsPage from "./components/DashboardParts/PaymentCredentials";
-import ProviderBookingsPage from "./components/DashboardParts/ProviderBookingsPage";
-import ProviderCustomizationRequests from "./components/DashboardParts/ProviderCustomizationRequests";
-import ProviderPayment from "./components/DashboardParts/ProviderPayment";
-import UpgradePlans from "./components/DashboardParts/UpgradePlans";
 import MapComponent from "./components/MapComponent";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Services from "./components/Services/Services";
 import Layout from "./components/ui/Layout";
 import { useDarkMode } from "./context/DarkMode";
-import AccountDashboard from "./pages/AccountDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminLogin from "./pages/AdminLogin";
-import Unauthorized from "./pages/anauthorised";
-import CartPage from "./pages/CartPage";
-import ChatBot from "./pages/ChatBox";
-import CommentBox from "./pages/CommentsPage";
-import CommissionerDetailPage from "./pages/CommissionerDetailPage";
-import CommissionersPage from "./pages/CommissionersPage";
-import CustomerStatements from "./pages/CustomerStatements";
-import Dashboard from "./pages/Dashboard";
-import DashboardOverviewPage from "./pages/DashboardOverviewPage";
 import HomePage from "./pages/Home";
 import Login from "./pages/Login";
-import MadeInRwanda from "./pages/MadeInRwanda";
-import MadeInRwandaProductDetail from "./pages/MadeInRwandaProductDetail";
-import MarketPage from "./pages/MarketPage";
-import ShopsPage from "./pages/Shops";
-import MarketProductDetil from "./pages/MarketProductDetail";
-import OrdersPage from "./pages/OrdersPage";
-import NotFound from "./pages/PageNotFound";
-import PaymentPage from "./pages/PaymentPage";
-import PendingTransactionsPage from "./pages/PendingTransactions";
-import PracticePage from "./pages/Practice";
-import ProductOrServicesDetailPage from "./pages/ProductOrServiceDetailPage";
-import Profile from "./pages/ProfilePage";
-import PropertyDetailPage from "./pages/PropertyDetailPage";
-import ProviderDetail from "./pages/ProviderDetail";
-import ProviderOrdersPage from "./pages/ProviderOrdersPage";
-import RealEstatePage from "./pages/RealEstatePage";
-import Register from "./pages/Register";
-import ResetPassword from "./pages/ResetPassword";
-import AgentLogin from "./pages/AgentLogin";
-import AgentRegister from "./pages/AgentRegister";
-import AgentDashboard from "./pages/AgentDashboard";
-import RwandaLocationSelector from "./pages/RwandaLocationSelector";
-import Search from "./pages/Search";
-import SellerDashboardPage from "./pages/SellerDashboardPage";
-import ServiceBookingPage from "./pages/ServiceBooking";
-import ServiceDetailPage from "./pages/ServiceDetailPage";
-import StorageCheckout from "./pages/StorageCheckout";
-import Updates from "./pages/UpdatesPage";
-import VerifyEmailAuto from "./pages/VerifyEmailAuto";
-import VerifyEmailForm from "./pages/VerifyEmailForm";
-import Wallet from "./pages/Wallet";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import TermsPage from "./pages/TermsPage";
-import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import AuthenticatedLayout from "./components/AuthenticatedLayout";
 import Hafibot from "./components/Hafibot";
 import Seo from "./components/Seo";
 import voltaleLogo from "./assets/images/voltale.png";
+
+// Every page other than the home and login pages is downloaded only when it is first opened.
+const UpgradePlansPage = lazy(() => import("./components/DashboardParts/AdminParts/AdminPlans"));
+const MessagesCard = lazy(() => import("./components/DashboardParts/MessagesCard"));
+const PaymentCredentialsPage = lazy(() => import("./components/DashboardParts/PaymentCredentials"));
+const ProviderBookingsPage = lazy(() => import("./components/DashboardParts/ProviderBookingsPage"));
+const ProviderCustomizationRequests = lazy(() => import("./components/DashboardParts/ProviderCustomizationRequests"));
+const ProviderPayment = lazy(() => import("./components/DashboardParts/ProviderPayment"));
+const UpgradePlans = lazy(() => import("./components/DashboardParts/UpgradePlans"));
+const AccountDashboard = lazy(() => import("./pages/AccountDashboard"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminLogin = lazy(() => import("./pages/AdminLogin"));
+const Unauthorized = lazy(() => import("./pages/anauthorised"));
+const CartPage = lazy(() => import("./pages/CartPage"));
+const ChatBot = lazy(() => import("./pages/ChatBox"));
+const CommentBox = lazy(() => import("./pages/CommentsPage"));
+const CommissionerDetailPage = lazy(() => import("./pages/CommissionerDetailPage"));
+const CommissionersPage = lazy(() => import("./pages/CommissionersPage"));
+const CustomerStatements = lazy(() => import("./pages/CustomerStatements"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const DashboardOverviewPage = lazy(() => import("./pages/DashboardOverviewPage"));
+const MadeInRwanda = lazy(() => import("./pages/MadeInRwanda"));
+const MadeInRwandaProductDetail = lazy(() => import("./pages/MadeInRwandaProductDetail"));
+const MarketPage = lazy(() => import("./pages/MarketPage"));
+const ShopsPage = lazy(() => import("./pages/Shops"));
+const MarketProductDetil = lazy(() => import("./pages/MarketProductDetail"));
+const OrdersPage = lazy(() => import("./pages/OrdersPage"));
+const NotFound = lazy(() => import("./pages/PageNotFound"));
+const PaymentPage = lazy(() => import("./pages/PaymentPage"));
+const PendingTransactionsPage = lazy(() => import("./pages/PendingTransactions"));
+const PracticePage = lazy(() => import("./pages/Practice"));
+const ProductOrServicesDetailPage = lazy(() => import("./pages/ProductOrServiceDetailPage"));
+const Profile = lazy(() => import("./pages/ProfilePage"));
+const PropertyDetailPage = lazy(() => import("./pages/PropertyDetailPage"));
+const ProviderDetail = lazy(() => import("./pages/ProviderDetail"));
+const ProviderOrdersPage = lazy(() => import("./pages/ProviderOrdersPage"));
+const RealEstatePage = lazy(() => import("./pages/RealEstatePage"));
+const Register = lazy(() => import("./pages/Register"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const AgentLogin = lazy(() => import("./pages/AgentLogin"));
+const AgentRegister = lazy(() => import("./pages/AgentRegister"));
+const AgentDashboard = lazy(() => import("./pages/AgentDashboard"));
+const RwandaLocationSelector = lazy(() => import("./pages/RwandaLocationSelector"));
+const Search = lazy(() => import("./pages/Search"));
+const SellerDashboardPage = lazy(() => import("./pages/SellerDashboardPage"));
+const ServiceBookingPage = lazy(() => import("./pages/ServiceBooking"));
+const ServiceDetailPage = lazy(() => import("./pages/ServiceDetailPage"));
+const StorageCheckout = lazy(() => import("./pages/StorageCheckout"));
+const Updates = lazy(() => import("./pages/UpdatesPage"));
+const VerifyEmailAuto = lazy(() => import("./pages/VerifyEmailAuto"));
+const VerifyEmailForm = lazy(() => import("./pages/VerifyEmailForm"));
+const Wallet = lazy(() => import("./pages/Wallet"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const TermsPage = lazy(() => import("./pages/TermsPage"));
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+
+const PageFallback = () => (
+  <div className="min-h-[50vh] flex items-center justify-center">
+    <LoadingSpinner size="lg" message="Loading..." variant="dots" />
+  </div>
+);
 
 function VerifyPageWrapper() {
   const search = new URLSearchParams(useLocation().search);
@@ -162,6 +172,8 @@ const App: React.FC = () => {
             <main
               className={`flex-grow overflow-x-hidden ${isAuthPage ? "p-0" : "px-4 py-6"}`}
             >
+              <ErrorBoundary resetKey={location.pathname}>
+              <Suspense fallback={<PageFallback />}>
               <Routes location={backgroundLocation || location}>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<HomePage />} />
@@ -385,6 +397,8 @@ const App: React.FC = () => {
                   />
                 </Route>
               </Routes>
+              </Suspense>
+              </ErrorBoundary>
 
               {backgroundLocation && (
                 <Routes>
