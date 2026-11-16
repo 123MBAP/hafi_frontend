@@ -12,6 +12,13 @@ import ServicePromptBanner from '../components/DashboardParts/ServicePromptBanne
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { API_BASE } from '../api/apiClient';
 import { uploadMultipleFilesToR2 } from '../services/r2UploadService';
+
+// Upload, edit and delete routes require the logged-in user's token.
+const authHeader = (): Record<string, string> => {
+  const token = localStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 type MediaType = "product" | "service";
 type FileType = "image" | "video" | "mixed";
 
@@ -455,7 +462,7 @@ export default function Dashboard() {
 
         const res = await fetch(`${API_BASE}/api/media/${editingProduct.id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...authHeader() },
           body: JSON.stringify({
             title: productTitle,
             desc: productDesc,
@@ -547,7 +554,7 @@ export default function Dashboard() {
         const uploadUrl = `${API_BASE}/api/upload/products/unified`;
         const res = await fetch(uploadUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...authHeader() },
           body: JSON.stringify({
             providerId,
             title: productTitle,
@@ -719,7 +726,7 @@ export default function Dashboard() {
 
         const res = await fetch(`${API_BASE}/api/media/${editingService.id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...authHeader() },
           body: JSON.stringify({
             title: serviceTitle,
             desc: serviceDesc,
@@ -819,7 +826,7 @@ export default function Dashboard() {
 
           const res = await fetch(`${API_BASE}/api/upload/services/unified`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...authHeader() },
             body: JSON.stringify({
               providerId,
               title: serviceTitle,
@@ -883,7 +890,7 @@ export default function Dashboard() {
         }
 
         try {
-          const res = await fetch(`${API_BASE}/api/upload/services`, { method: "POST", body: formData });
+          const res = await fetch(`${API_BASE}/api/upload/services`, { method: "POST", headers: authHeader(), body: formData });
           const text = await res.text();
           let data;
           try {
@@ -933,7 +940,7 @@ export default function Dashboard() {
         }
 
         try {
-          const res = await fetch(`${API_BASE}/api/upload/services/videos`, { method: "POST", body: formData });
+          const res = await fetch(`${API_BASE}/api/upload/services/videos`, { method: "POST", headers: authHeader(), body: formData });
           const text = await res.text();
           let data;
           try {
@@ -1211,7 +1218,7 @@ export default function Dashboard() {
       // Send update to backend
       const res = await fetch(`${API_BASE}/api/media/${editingImage.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
         body: JSON.stringify({
           title: editingTitle,
           desc: editingDesc,
@@ -1275,7 +1282,7 @@ export default function Dashboard() {
       try {
         const res = await fetch(`${API_BASE}/api/images/delete`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...authHeader() },
           // send ids as strings to support non-numeric ids (UUIDs/group ids)
           body: JSON.stringify({ ids: [id], type: img.type }),
         });
@@ -1416,7 +1423,7 @@ export default function Dashboard() {
     try {
       const res = await fetch(`${API_BASE}/api/images/delete`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
         body: JSON.stringify({ ids, type })
       });
 
@@ -1444,7 +1451,7 @@ export default function Dashboard() {
     try {
       const res = await fetch(`${API_BASE}/api/images/hide`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
         body: JSON.stringify({ ids, type })
       });
 
