@@ -63,7 +63,7 @@ const RestrictionCard: React.FC<RestrictionCardProps> = ({
   };
 
   // 1. No active subscription
-  if (!subscription || subscription.status !== "active") {
+  if (!subscription || (subscription.status !== "active" && subscription.status !== "expired")) {
     return renderRestrictionCard(
       <Lock className="w-6 h-6" />,
       "Active Subscription Required",

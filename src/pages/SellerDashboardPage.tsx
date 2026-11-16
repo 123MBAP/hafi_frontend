@@ -442,7 +442,7 @@ export default function SellerDashboardPage() {
     form.append("title", product.title);
     form.append("description", product.description);
     form.append("price", product.price);
-    form.append("used", String(product.used === 'true' || product.used === true));
+    form.append("used", String(String(product.used) === 'true'));
     form.append("pricingUnit", product.pricing_unit || "Per Item / Piece");
     
     const isPremium = sellerProfile?.shopping_type_id && sellerProfile.shopping_type_key !== 'other';
@@ -487,7 +487,7 @@ export default function SellerDashboardPage() {
             title: product.title,
             description: product.description,
             price: product.price,
-            used: product.used === 'true' || product.used === true,
+            used: String(product.used) === 'true',
             pricingUnit: product.pricing_unit || "Per Item / Piece",
             categoryId: targetCategoryId,
             madeInRwanda: Boolean(madeInRwanda[cid]),
@@ -777,7 +777,7 @@ export default function SellerDashboardPage() {
                                 <label className="flex items-center gap-2 cursor-pointer">
                                   <input
                                     type="checkbox"
-                                    checked={productForms[cid]?.used === 'true' || productForms[cid]?.used === true}
+                                    checked={String(productForms[cid]?.used) === 'true'}
                                     onChange={(e) => handleInput(cid, "used", e.target.checked ? "true" : "false")}
                                     className="w-4 h-4 rounded text-[#E5252A] focus:ring-[#E5252A] focus:outline-none border-gray-300"
                                   />

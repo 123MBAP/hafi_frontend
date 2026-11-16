@@ -36,6 +36,8 @@ export interface Property {
     id: string;
     title: string;
     category: string;
+    property_type?: string;
+    district?: string;
     transactionType: TransactionType;
     rentSell?: string;
     price: number; // in RWF
@@ -60,6 +62,7 @@ export interface Commissioner {
     id: string;
     name: string;
     phone: string;
+    email?: string;
     photo?: string;
     operatingLocations: {
         districts: string[];

@@ -241,6 +241,7 @@ export default function LoadingSpinner({
                 document.head.removeChild(style);
             };
         }
+        return undefined;
     }, [variant]);
 
     if (fullScreen) {

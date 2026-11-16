@@ -9,6 +9,7 @@
   },
   "include": [
     "src/**/*",
+    "src/**/*.json",
     "vite.config.ts",
     "index.html"
   ],

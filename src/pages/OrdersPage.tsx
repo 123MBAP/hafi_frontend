@@ -86,6 +86,9 @@ type ProviderContact = {
   name?: string;
   phone_number?: string | null;
   whatsapp_number?: string | null;
+  email?: string | null;
+  address?: string | null;
+  location?: string | null;
 };
 
 const OrdersPage = () => {

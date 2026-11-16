@@ -187,7 +187,7 @@ export default function RealEstatePage() {
                 let list: Property[] = [];
                 try {
                     const edgeData = await fetchEdgeProperties(200);
-                    list = deduplicateProperties((edgeData?.properties as Property[]) || []);
+                    list = deduplicateProperties((edgeData?.properties as unknown as Property[]) || []);
                 } catch {
                     const res = await fetch(`${API_BASE}/api/real-estate/properties`, { signal: controller.signal });
                     if (!res.ok) throw new Error(`HTTP ${res.status}`);

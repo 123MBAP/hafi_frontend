@@ -20,6 +20,18 @@ const PRICING_UNITS = [
   { value: 'Per Pack / Dozen', label: 'Per Pack / Dozen (e.g., box bundles, multipacks)' }
 ];
 
+// One image or video inside a grouped product/service.
+export interface MediaFile {
+  id?: string;
+  url: string;
+  type: 'image' | 'video';
+  fileType?: FileType;
+  title?: string;
+  desc?: string;
+  size?: number;
+  filename?: string;
+}
+
 export interface UploadedMedia {
   id: string;
   url: string;
@@ -34,7 +46,7 @@ export interface UploadedMedia {
   used?: boolean;
   pricingUnit?: string;
   inStock?: boolean;
-  mediaFiles?: UploadedMedia[];
+  mediaFiles?: MediaFile[];
 }
 
 type Props = {

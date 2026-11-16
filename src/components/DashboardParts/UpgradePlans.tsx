@@ -1253,13 +1253,13 @@ export default function UpgradePlans() {
                               ? (selectedMethod === 'mtn' ? formData.mtnPhone : formData.airtelPhone)
                               : '';
                             const cleanPhone = activePhone.replace(/\D/g, "");
-                            if (selectedMethod !== 'card' && !cleanPhone) throw new Error('Please enter a valid phone number');
+                            if (!cleanPhone) throw new Error('Please enter a valid phone number');
 
                             const body = {
                               plan_id: selectedPlanForRenewal.id,
                               phone: cleanPhone,
                               provider: selectedMethod,
-                              payment_method: selectedMethod === 'card' ? 'card' : 'momo',
+                              payment_method: 'momo',
                               addon_gb: changeGb,
                               addon_gb_total: totalAddonGb,
                               price_per_gb: storagePricing?.price_per_gb_rwf ?? 500,

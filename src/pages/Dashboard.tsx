@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useDarkMode } from '@/context/DarkMode';
 import { ServiceFeature } from '@/types/features';// adjust path if needed
 import AccountSummaryCard from '../components/DashboardParts/AccountSummaryCard';
-import MediaManagementSection from '../components/DashboardParts/MediaManagementSection';
+import MediaManagementSection, { type MediaFile } from '../components/DashboardParts/MediaManagementSection';
 import SubscriptionBanner from '../components/DashboardParts/PlansScrollingBanner';
 import ProductUploadCard from '../components/DashboardParts/ProductUploadCard';
 import ServiceUploadCard from '../components/DashboardParts/ServiceUploadCard';
@@ -36,7 +36,7 @@ interface UploadedMedia {
   madeInRwanda?: boolean;
   used?: boolean;
   pricingUnit?: string;
-  mediaFiles?: UploadedMedia[]; // For grouped products with multiple media
+  mediaFiles?: MediaFile[]; // For grouped products with multiple media
 }
 
 function uploadWithProgress(

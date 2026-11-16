@@ -293,7 +293,7 @@ export default function PropertyDetailPage() {
         if (Array.isArray(v.amenities) && v.amenities.length > 0) {
             groups.push({
                 title: 'Amenities',
-                fields: v.amenities.map((item) => ({ label: item })),
+                fields: v.amenities.map((item: string) => ({ label: item })),
             });
         }
 
